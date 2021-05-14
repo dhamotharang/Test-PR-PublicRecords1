@@ -1,4 +1,4 @@
-#workunit('name','Business IID-BD Process');
+﻿#workunit('name','Business IID-BD Process');
 #option('hthorMemoryLimit', 1000)
 
 IMPORT models, Risk_Indicators, Business_Risk; 
@@ -23,7 +23,7 @@ threads := 30;
 /* 
  * Roxie the ECL Query is located on 
  */
-roxieIP :='http://roxiebatch.br.seisint.com:9856';  // RoxieBatch
+roxieIP :='http://roxiethorvip.hpcc.risk.regn.net:9856';  // RoxieBatch
 
 /* *****************************************************
  *                      Main Script                    *

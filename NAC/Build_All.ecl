@@ -1,4 +1,4 @@
-import ut, VersionControl,lib_stringlib,lib_fileservices,_control,did_add,_validate, address, NID, header, PromoteSupers;
+﻿import ut, VersionControl,lib_stringlib,lib_fileservices,_control,did_add,_validate, address, NID, header, PromoteSupers;
 
 export Build_All(string version,string ip,string rootDir) := function
 
@@ -21,7 +21,7 @@ ProdVer:=did_add.get_EnvVariable('header_build_version')[1..8];
 flag:=dataset(Superfile_List().Flag,{string8 Prod_Ver},flat,opt);
 
 NewHeader := if(nothor(fileservices.fileExists(Superfile_List().Flag)),ProdVer <> flag[1].Prod_Ver,true);
-PromoteSupers.MAC_SF_BuildProcess(Build_base(version),Superfile_List().Base, BuildBase ,2,,true,pVersion:=version);
+PromoteSupers.MAC_SF_BuildProcess(Build_base(version),Superfile_List().Base, BuildBase ,3 ,,true,pVersion:=version);
 
 NewVer:=dataset([{ProdVer}],{string8 Prod_Ver});
 PromoteSupers.Mac_SF_BuildProcess(NewVer,Superfile_List().Flag, PostIt ,2,,true,pVersion:=version);
@@ -54,13 +54,8 @@ Build_NAC:=if(NewHeader
 											,BuildBase)
 								);
 
-col:=NAC.Mod_Collisions(version[1..6]).NewCollisions;
-
-out_all_col:=	sequential(
-							output(col,,'~nac::out::collisions_'+Version,compressed)
-							,FileServices.StartSuperFileTransaction()
-							,FileServices.AddSuperFile('~nac::out::collisions','~nac::out::collisions_'+Version)
-
+clear_consortium := sequential(
+							 FileServices.StartSuperFileTransaction()
 							,FileServices.AddSuperFile('~nac::in::consortium_history','~nac::in::consortium',,true)
 							,FileServices.ClearSuperFile('~nac::in::consortium')
 							,FileServices.FinishSuperFileTransaction()
@@ -70,9 +65,8 @@ buildIt := sequential(
 									Move_temp_in
 									,ByPassedRecords
 									,Build_NAC
-									,Out_all_col
-//									,Build_keys(version)
 									,NAC.Mod_despray(version,ip,rootDir).Odespray
+									,clear_consortium
 									);
 
 return buildIt;

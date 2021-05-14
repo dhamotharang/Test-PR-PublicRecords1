@@ -1,4 +1,4 @@
-﻿import ut,roxiekeybuild, doxie_files,dops,DOPSGrowthCheck, strata;
+﻿import ut,roxiekeybuild, doxie_files,dops,DOPSGrowthCheck, strata,scrubs_emerges,scrubs;
 
 export proc_build_key(string filedate) := function
 	SuperKeyName 					:= cluster.cluster_out+'key::hunting_fishing::';
@@ -84,8 +84,12 @@ DOPSGrowthCheck.PersistenceCheck('~thor_data400::base::emerges_hunt_vote_ccw',  
   build_CCW_autokeys						:= emerges.Proc_CCW_AutokeyBuild(filedate);
 	build_CCW_autokeys_fcra				:= emerges.Proc_CCW_AutokeyBuild_fcra(filedate);
 	
-	update_dops := dops.updateversion('EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com',,'N');
-  update_dops_fcra := dops.updateversion('FCRA_EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com;kent.wolf@lexisnexisrisk.com',,'F');
+	update_dops := if(scrubs.mac_ScrubsFailureTest('Scrubs_eMerges_Hunters,Scrubs_eMerges_Voters,Scrubs_eMerges_HVCCW',filedate),
+	sequential(
+		dops.updateversion('EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com',,'N'),
+		dops.updateversion('FCRA_EmergesKeys',filedate,'kgummadi@seisint.com;fhumayun@seisint.com;kent.wolf@lexisnexisrisk.com',,'F')
+	),OUTPUT('Scrubs has failed!',NAMED('Scrubs_Failure')));
+ 
 	
 	build_roxie_keys := 
 	  if (fileservices.getsuperfilesubname('~thor_data400::base::emerges_hunt_vote_ccw',1) = fileservices.getsuperfilesubname('~thor_data400::base::emerges_BUILT',1),
@@ -102,8 +106,8 @@ DOPSGrowthCheck.PersistenceCheck('~thor_data400::base::emerges_hunt_vote_ccw',  
 									 build_huntfish_autokeys_fcra,
 									 build_ccw_autokeys,
 									 build_ccw_autokeys_fcra,
-									 update_dops,
-                   update_dops_fcra                   
+									 scrubs_emerges.fn_RunScrubs(filedate),
+									 update_dops                   
 									 )) : success(send_succ_msg), failure(send_fail_msg);
 
 	// build_moxie_keys := emerges.proc_build_all_moxie_keys : success(output('moxie keys build completed')), failure(output('moxie key build failed'));

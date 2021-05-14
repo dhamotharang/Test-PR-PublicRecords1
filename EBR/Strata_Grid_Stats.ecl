@@ -1,4 +1,4 @@
-import strata;
+﻿import strata;
 
 f0010_Header := File_0010_Header_Base;
 Layout_f0010_Header_stat :=
@@ -77,7 +77,6 @@ record
 	unsigned8 geo_blk_CountNonBlank                                                       := sum(group, if(f0010_Header.geo_blk                                                        <> ''  ,1,0));
 	unsigned8 geo_match_CountNonBlank                                                     := sum(group, if(f0010_Header.geo_match                                                      <> ''  ,1,0));
 	unsigned8 err_stat_CountNonBlank                                                      := sum(group, if(f0010_Header.err_stat                                                       <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f0010_Header.lf                                                             <> ''  ,1,0));
 end;
 f0010_Header_stat := table(f0010_Header, Layout_f0010_Header_stat,   STATE_CODE, few);
 strata.createXMLStats(f0010_Header_stat, 'EBR', '0010_Header_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f0010_Header_stat, 'View', 'Population');
@@ -134,7 +133,6 @@ record
 	unsigned8 PAYMENT_TREND_CountNonBlank                                                 := sum(group, if(f1000_Executive_Summary.PAYMENT_TREND                                       <> ''  ,1,0));
 	unsigned8 INDUSTRY_DESCRIPTION_CountNonBlank                                          := sum(group, if(f1000_Executive_Summary.INDUSTRY_DESCRIPTION                                <> ''  ,1,0));
 	unsigned8 predicted_dbt_date_CountNonBlank                                            := sum(group, if(f1000_Executive_Summary.predicted_dbt_date                                  <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f1000_Executive_Summary.lf                                                  <> ''  ,1,0));
 end;
 f1000_Executive_Summary_stat := table(f1000_Executive_Summary, Layout_f1000_Executive_Summary_stat   , few);
 strata.createXMLStats(f1000_Executive_Summary_stat, 'EBR', '1000_Executive_Summary_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f1000_Executive_Summary_stat, 'View', 'Population');
@@ -198,7 +196,6 @@ record
 	unsigned8 DISPUTE_CODE_CountNonBlank                                                  := sum(group, if(f2000_Trade.DISPUTE_CODE                                                    <> ''  ,1,0));
 	unsigned8 date_reported_CountNonBlank                                                 := sum(group, if(f2000_Trade.date_reported                                                   <> ''  ,1,0));
 	unsigned8 date_last_sale_CountNonBlank                                                := sum(group, if(f2000_Trade.date_last_sale                                                  <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f2000_Trade.lf                                                              <> ''  ,1,0));
 end;
 f2000_Trade_stat := table(f2000_Trade, Layout_f2000_Trade_stat   , few);
 strata.createXMLStats(f2000_Trade_stat, 'EBR', '2000_Trade_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f2000_Trade_stat, 'View', 'Population');
@@ -279,7 +276,6 @@ record
 	unsigned8 account_balance_regular_tradelines_CountNonBlank                            := sum(group, if(f2015_Trade_Payment_Totals.account_balance_regular_tradelines               <> ''  ,1,0));
 	unsigned8 account_balance_new_CountNonBlank                                           := sum(group, if(f2015_Trade_Payment_Totals.account_balance_new                              <> ''  ,1,0));
 	unsigned8 account_balance_combined_CountNonBlank                                      := sum(group, if(f2015_Trade_Payment_Totals.account_balance_combined                         <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f2015_Trade_Payment_Totals.lf                                               <> ''  ,1,0));
 end;
 f2015_Trade_Payment_Totals_stat := table(f2015_Trade_Payment_Totals, Layout_f2015_Trade_Payment_Totals_stat   , few);
 strata.createXMLStats(f2015_Trade_Payment_Totals_stat, 'EBR', '2015_Trade_Payment_Totals_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f2015_Trade_Payment_Totals_stat, 'View', 'Population');
@@ -329,7 +325,6 @@ record
 	unsigned8 DBT_31_60_PCT_CountNonBlank                                                 := sum(group, if(f2020_Trade_Payment_Trends.DBT_31_60_PCT                                    <> ''  ,1,0));
 	unsigned8 DBT_61_90_PCT_CountNonBlank                                                 := sum(group, if(f2020_Trade_Payment_Trends.DBT_61_90_PCT                                    <> ''  ,1,0));
 	unsigned8 DBT_91_PLUS_PCT_CountNonBlank                                               := sum(group, if(f2020_Trade_Payment_Trends.DBT_91_PLUS_PCT                                  <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f2020_Trade_Payment_Trends.lf                                               <> ''  ,1,0));
 end;
 f2020_Trade_Payment_Trends_stat := table(f2020_Trade_Payment_Trends, Layout_f2020_Trade_Payment_Trends_stat   , few);
 strata.createXMLStats(f2020_Trade_Payment_Trends_stat, 'EBR', '2020_Trade_Payment_Trends_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f2020_Trade_Payment_Trends_stat, 'View', 'Population');
@@ -379,7 +374,6 @@ record
 	unsigned8 DEBT_31_60_PERCENT_CountNonBlank                                            := sum(group, if(f2025_Trade_Quarterly_Averages.DEBT_31_60_PERCENT                           <> ''  ,1,0));
 	unsigned8 DEBT_61_90_PERCENT_CountNonBlank                                            := sum(group, if(f2025_Trade_Quarterly_Averages.DEBT_61_90_PERCENT                           <> ''  ,1,0));
 	unsigned8 DEBT_91_PLUS_PERCENT_CountNonBlank                                          := sum(group, if(f2025_Trade_Quarterly_Averages.DEBT_91_PLUS_PERCENT                         <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f2025_Trade_Quarterly_Averages.lf                                           <> ''  ,1,0));
 end;
 f2025_Trade_Quarterly_Averages_stat := table(f2025_Trade_Quarterly_Averages, Layout_f2025_Trade_Quarterly_Averages_stat   , few);
 strata.createXMLStats(f2025_Trade_Quarterly_Averages_stat, 'EBR', '2025_Trade_Quarterly_Averages_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f2025_Trade_Quarterly_Averages_stat, 'View', 'Population');
@@ -430,7 +424,6 @@ record
 	unsigned8 DISPUTE_IND_CountNonBlank                                                   := sum(group, if(f4010_Bankruptcy.DISPUTE_IND                                                <> ''  ,1,0));
 	unsigned8 DISPUTE_CODE_CountNonBlank                                                  := sum(group, if(f4010_Bankruptcy.DISPUTE_CODE                                               <> ''  ,1,0));
 	unsigned8 date_filed_CountNonBlank                                                    := sum(group, if(f4010_Bankruptcy.date_filed                                                 <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f4010_Bankruptcy.lf                                                         <> ''  ,1,0));
 end;
 f4010_Bankruptcy_stat := table(f4010_Bankruptcy, Layout_f4010_Bankruptcy_stat   , few);
 strata.createXMLStats(f4010_Bankruptcy_stat, 'EBR', '4010_Bankruptcy_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f4010_Bankruptcy_stat, 'View', 'Population');
@@ -483,7 +476,6 @@ record
 	unsigned8 Dispute_Indicator_CountNonBlank                                             := sum(group, if(f4020_Tax_Liens.Dispute_Indicator                                           <> ''  ,1,0));
 	unsigned8 Dispute_Code_CountNonBlank                                                  := sum(group, if(f4020_Tax_Liens.Dispute_Code                                                <> ''  ,1,0));
 	unsigned8 date_filed_CountNonBlank                                                    := sum(group, if(f4020_Tax_Liens.date_filed                                                  <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f4020_Tax_Liens.lf                                                          <> ''  ,1,0));
 end;
 f4020_Tax_Liens_stat := table(f4020_Tax_Liens, Layout_f4020_Tax_Liens_stat   , few);
 strata.createXMLStats(f4020_Tax_Liens_stat, 'EBR', '4020_Tax_Liens_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f4020_Tax_Liens_stat, 'View', 'Population');
@@ -535,7 +527,6 @@ record
 	unsigned8 Dispute_Indicator_CountNonBlank                                             := sum(group, if(f4030_Judgement.Dispute_Indicator                                           <> ''  ,1,0));
 	unsigned8 Dispute_Code_CountNonBlank                                                  := sum(group, if(f4030_Judgement.Dispute_Code                                                <> ''  ,1,0));
 	unsigned8 date_filed_CountNonBlank                                                    := sum(group, if(f4030_Judgement.date_filed                                                  <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f4030_Judgement.lf                                                          <> ''  ,1,0));
 end;
 f4030_Judgement_stat := table(f4030_Judgement, Layout_f4030_Judgement_stat   , few);
 strata.createXMLStats(f4030_Judgement_stat, 'EBR', '4030_Judgement_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f4030_Judgement_stat, 'View', 'Population');
@@ -715,7 +706,6 @@ record
 	unsigned8 COLL_CODE12_CountNonBlank                                                   := sum(group, if(f4500_Collateral_Accounts.COLL_CODE12                                       <> ''  ,1,0));
 	unsigned8 COLL_DESC12_CountNonBlank                                                   := sum(group, if(f4500_Collateral_Accounts.COLL_DESC12                                       <> ''  ,1,0));
 	unsigned8 ADDTNL_COLL_CODES_CountNonBlank                                             := sum(group, if(f4500_Collateral_Accounts.ADDTNL_COLL_CODES                                 <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f4500_Collateral_Accounts.lf                                                <> ''  ,1,0));
 end;
 f4500_Collateral_Accounts_stat := table(f4500_Collateral_Accounts, Layout_f4500_Collateral_Accounts_stat   , few);
 strata.createXMLStats(f4500_Collateral_Accounts_stat, 'EBR', '4500_Collateral_Accounts_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f4500_Collateral_Accounts_stat, 'View', 'Population');
@@ -782,7 +772,6 @@ record
 	unsigned8 DISPUTE_IND_CountNonBlank                                                   := sum(group, if(f4510_UCC_Filings.DISPUTE_IND                                               <> ''  ,1,0));
 	unsigned8 DISPUTE_CODE_CountNonBlank                                                  := sum(group, if(f4510_UCC_Filings.DISPUTE_CODE                                              <> ''  ,1,0));
 	unsigned8 date_filed_CountNonBlank                                                    := sum(group, if(f4510_UCC_Filings.date_filed                                                <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f4510_UCC_Filings.lf                                                        <> ''  ,1,0));
 end;
 f4510_UCC_Filings_stat := table(f4510_UCC_Filings, Layout_f4510_UCC_Filings_stat ,ORIG_FILE_STATE_CODE  , few);
 strata.createXMLStats(f4510_UCC_Filings_stat, 'EBR', '4510_UCC_Filings_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f4510_UCC_Filings_stat, 'View', 'Population');
@@ -866,7 +855,6 @@ record
 	unsigned8 geo_blk_CountNonBlank                                                       := sum(group, if(f5000_Bank_Details.geo_blk                                                  <> ''  ,1,0));
 	unsigned8 geo_match_CountNonBlank                                                     := sum(group, if(f5000_Bank_Details.geo_match                                                <> ''  ,1,0));
 	unsigned8 err_stat_CountNonBlank                                                      := sum(group, if(f5000_Bank_Details.err_stat                                                 <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f5000_Bank_Details.lf                                                       <> ''  ,1,0));
 end;
 f5000_Bank_Details_stat := table(f5000_Bank_Details, Layout_f5000_Bank_Details_stat   , STATE_CODE, few);
 strata.createXMLStats(f5000_Bank_Details_stat, 'EBR', '5000_Bank_Details_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f5000_Bank_Details_stat, 'View', 'Population');
@@ -929,7 +917,6 @@ record
 	unsigned8 OWNER_TYPE_DESC_CountNonBlank                                               := sum(group, if(f5600_demographic_data.OWNER_TYPE_DESC                                      <> ''  ,1,0));
 	unsigned8 LOCATION_CODE_CountNonBlank                                                 := sum(group, if(f5600_demographic_data.LOCATION_CODE                                        <> ''  ,1,0));
 	unsigned8 LOCATION_DESC_CountNonBlank                                                 := sum(group, if(f5600_demographic_data.LOCATION_DESC                                        <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f5600_demographic_data.lf                                                   <> ''  ,1,0));
 end;
 f5600_demographic_data_stat := table(f5600_demographic_data, Layout_f5600_demographic_data_stat   , few);
 strata.createXMLStats(f5600_demographic_data_stat, 'EBR', '5600_demographic_data_base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f5600_demographic_data_stat, 'View', 'Population');
@@ -1043,7 +1030,6 @@ record
 	unsigned8 INQ_MM_CountNonBlank                                                        := sum(group, if(f6000_Inquiries.INQ_MM                                                      <> ''  ,1,0));
 	unsigned8 INQ_YY_CountNonBlank                                                        := sum(group, if(f6000_Inquiries.INQ_YY                                                      <> ''  ,1,0));
 	unsigned8 INQ_COUNT_CountNonBlank                                                     := sum(group, if(f6000_Inquiries.INQ_COUNT                                                   <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f6000_Inquiries.lf                                                          <> ''  ,1,0));
 end;
 f6000_Inquiries_stat := table(f6000_Inquiries, Layout_f6000_Inquiries_stat   , few);
 strata.createXMLStats(f6000_Inquiries_stat, 'EBR', '6000_Inquiries_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f6000_Inquiries_stat, 'View', 'Population');
@@ -1107,7 +1093,6 @@ record
 	unsigned8 DISPUTE_CODE_CountNonBlank                                                  := sum(group, if(f6500_Government_Trade.DISPUTE_CODE                                         <> ''  ,1,0));
 	unsigned8 date_reported_CountNonBlank                                                 := sum(group, if(f6500_Government_Trade.date_reported                                        <> ''  ,1,0));
 	unsigned8 date_last_sale_CountNonBlank                                                := sum(group, if(f6500_Government_Trade.date_last_sale                                       <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f6500_Government_Trade.lf                                                   <> ''  ,1,0));
 end;
 f6500_Government_Trade_stat := table(f6500_Government_Trade, Layout_f6500_Government_Trade_stat   , few);
 strata.createXMLStats(f6500_Government_Trade_stat, 'EBR', '6500_Government_Trade_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f6500_Government_Trade_stat, 'View', 'Population');
@@ -1305,7 +1290,6 @@ record
 	unsigned8 SEGMENT_CODE_CountNonBlank                                                  := sum(group, if(f7010_SNP_Data.SEGMENT_CODE                                                 <> ''  ,1,0));
 	unsigned8 SEQUENCE_NUMBER_CountNonBlank                                               := sum(group, if(f7010_SNP_Data.SEQUENCE_NUMBER                                              <> ''  ,1,0));
 	unsigned8 DATA_PRINT_LINE_CountNonBlank                                               := sum(group, if(f7010_SNP_Data.DATA_PRINT_LINE                                              <> ''  ,1,0));
-	unsigned8 lf_CountNonBlank                                                            := sum(group, if(f7010_SNP_Data.lf                                                           <> ''  ,1,0));
 end;
 f7010_SNP_Data_stat := table(f7010_SNP_Data, Layout_f7010_SNP_Data_stat   , few);
 strata.createXMLStats(f7010_SNP_Data_stat, 'EBR', '7010_SNP_Data_Base_StatsV1', version, 'sandy.butler@lexisnexis.com', output_f7010_SNP_Data_stat, 'View', 'Population');

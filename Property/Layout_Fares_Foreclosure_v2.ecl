@@ -351,6 +351,10 @@ export Layout_Fares_Foreclosure_v2 := record
 	string1		loan_type	:= '';
 	string60	loan_type_desc	:= '';
 	string2		source	:= '';	//FR = CL, 'B7' = BK_NOD, 'I5' = BK_REO
-	unsigned4 global_sid	:= 0;	//CCPA field
-	unsigned8 record_sid	:= 0;	//CCPA field
+	UNSIGNED8 record_sid; //CPPA field
+  UNSIGNED4 global_sid;	//CPPA field
+//New fields added for Delta Updates - DF-28049
+  UNSIGNED4 dt_effective_first;
+  UNSIGNED4 dt_effective_last;
+  UNSIGNED1 delta_ind := 0; // 0 - main record, 1 - incremental
 end;

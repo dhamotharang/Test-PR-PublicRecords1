@@ -1,14 +1,15 @@
 ﻿IMPORT PRTE2_DCA, PRTE2,ut,std;
 
 EXPORT Files := MODULE
+//Input Files
+ export infile_boca 	:= DATASET(Constants.in_dca + '::boca', Layouts.layout_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
+ export infile_alpha := DATASET(Constants.in_dca + '::alpha', Layouts.layout_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
 
- file_in_a := DATASET(Constants.in_dca, Layouts.layout_in, CSV(HEADING(1), SEPARATOR('\t'), TERMINATOR(['\n','\r\n']), QUOTE('"')) );
   
-	PRTE2.CleanFields(file_in_a,file_in_b);  
-	Export file_in:=file_in_b;
+	PRTE2.CleanFields(infile_boca,cln_boca);  
+	PRTE2.CleanFields(infile_alpha,cln_alpha);  
+	Export file_in:= cln_boca + cln_alpha;
 	
-	EXPORT file_base := DATASET(Constants.base_dca, Layouts.layout_base, FLAT );
-
 	Layouts.layout_base PhysicalAddress(Layouts.layout_in L, INTEGER C) :=	TRANSFORM
 						SELF.addr_1 := 	TRIM(L.street);
 						SELF.addr_2 :=  TRIM(L.city) + ', ' + TRIM(L.state) + ' ' + TRIM(L.zip);
@@ -49,6 +50,11 @@ EXPORT Files := MODULE
 						);
 								
 	EXPORT file_in_plus := file_in_physical_address + file_in_mailing_address;
+
+//Base File	
+	EXPORT file_base := DATASET(Constants.base_dca, Layouts.layout_base, FLAT );
+	 
+	EXPORT base_bdid := file_base(bdid <> 0);
 	
 	EXPORT file_linkids := 
 		PROJECT(file_base, 
@@ -60,7 +66,7 @@ EXPORT Files := MODULE
 
                      
 	EXPORT file_bdid := 
-		PROJECT(file_base, 
+		PROJECT(base_bdid, 
 						Transform(Layouts.layout_bdid,
 											SELF.prim_range  	:= LEFT.physical_address.prim_range;						
 											SELF.predir  			:= LEFT.physical_address.predir;				
@@ -126,30 +132,87 @@ EXPORT Files := MODULE
 											)
 						);	
 	
+	EXPORT file_entnum := PROJECT(file_base, Transform(Layouts.layout_entnum,	SELF:=Left;	SELF := [];));
 
-	//The rest are used to create empty keys
-	EXPORT file_base_empty := PROJECT(file_base(link_inc_date=''),Layouts.layout_base);
 	
-	EXPORT file_entnum := 
-		PROJECT(file_base_empty, Transform(Layouts.layout_entnum,	SELF:=Left;	SELF := [];));
+	EXPORT file_hierarchy_parent_to_child_entnum := PROJECT(file_base, 
+																													Transform(Layouts.layout_hierarchy_parent_to_child_entnum,	
+																																		self.Parent_Enterprise_number 	:= IF( left.Parent_Number != '', 
+																																																							left.Parent_Number, 
+																																																									left.Enterprise_num );
+																																		self.Enterprise_num := left.Enterprise_num;
+																																		self.child_level 		:= left.level;	
+																																		SELF :=Left;	
+																																		SELF := [];
+																																		));
+		
+	
+	EXPORT file_hierarchy_bdid := PROJECT(base_bdid, 
+																				Transform(Layouts.layout_hierarchy_bdid, 
+																									self.bdid   := left.bdid;
+																									self.level	:= left.level;
+																									self.root		:= left.root;
+																									self.sub		:= left.sub;
+																									self.parent_root := left.parent_number[1..9];
+																									self.parent_sub  := left.parent_number[11..];
+																									self:=left;	
+																									self := [];
+																									));
 
-	EXPORT file_hierarchy_parent_to_child_entnum := 
-		PROJECT(file_base_empty, Transform(Layouts.layout_hierarchy_parent_to_child_entnum,	SELF:=Left;	SELF := [];));
 
-	EXPORT file_hierarchy_bdid := 
-		PROJECT(file_base_empty, Transform(Layouts.layout_hierarchy_bdid, SELF:=Left;	SELF := [];));
+	
+	EXPORT file_hierarchy_parent_to_child_root_sub := PROJECT(file_base, 
+																														Transform(Layouts.layout_hierarchy_parent_to_child_root_sub,	
+																														self.parent_root := IF( left.parent_number != '', left.parent_number[1..9], left.root );
+																														self.parent_sub  := IF( left.parent_number != '', left.parent_number[11..], left.sub );
+																														self.child_root  := left.root;
+																														self.child_sub   := left.sub;
+																														self.child_level := left.level;	
+																														SELF := Left;	
+																														SELF := [];
+																														));
 
-	EXPORT file_hierarchy_parent_to_child_root_sub := 
-		PROJECT(file_base_empty, Transform(Layouts.layout_hierarchy_parent_to_child_root_sub,	SELF:=Left;	SELF := [];));
 
-	EXPORT file_hierarchy_root_sub := 
-		PROJECT(file_base_empty, Transform(Layouts.layout_hierarchy_root_sub,	SELF:=Left;	SELF := [];));
+	
+	EXPORT file_hierarchy_root_sub := PROJECT(base_bdid, 
+																						Transform(Layouts.layout_hierarchy_root_sub,	
+																						self.bdid		:= left.bdid;
+																						self.level	:= left.level;
+																						self.root		:= left.root;
+																						self.sub		:= left.sub;
+																						self.parent_root := left.parent_number[1..9];
+																						self.parent_sub  := left.parent_number[11..];
+																						SELF:=Left;	
+																						SELF := [];
+																						));
 
 	EXPORT file_root_sub := 
-		PROJECT(file_base_empty, Transform(Layouts.layout_root_sub,	SELF:=Left;	SELF := [];));
+		PROJECT(base_bdid, Transform(Layouts.layout_root_sub,	SELF:=Left;	SELF := [];));
+
 
 	EXPORT file_autokey := 
-		PROJECT(file_base_empty, Transform(Layouts.layout_autokey,	SELF:=Left;	SELF := [];));
+		PROJECT(file_base, Transform(Layouts.layout_autokey,	
+																SELF.BDID                     := left.BDID;
+																SELF.company_name             := left.Name;
+																SELF.company_phone            := left.Phone;
+																SELF.bus_addr.prim_range      := left.physical_address.prim_range;
+																SELF.bus_addr.predir          := left.physical_address.predir;
+																SELF.bus_addr.prim_name       := left.physical_address.prim_name;
+																SELF.bus_addr.addr_suffix     := left.physical_address.addr_suffix;
+																SELF.bus_addr.postdir         := left.physical_address.postdir;
+																SELF.bus_addr.unit_desig      := left.physical_address.unit_desig;
+																SELF.bus_addr.sec_range       := left.physical_address.sec_range;
+																SELF.bus_addr.p_city_name     := left.physical_address.p_city_name;
+																SELF.bus_addr.v_city_name     := left.physical_address.v_city_name;
+																SELF.bus_addr.st              := left.physical_address.st;
+																SELF.bus_addr.zip5            := left.physical_address.zip;
+																SELF.bus_addr.zip4            := left.physical_address.zip4;
+																SELF.bus_addr.fips_state      := '';
+																SELF.bus_addr.fips_county     := Left.physical_address.fips_county;
+																SELF.bus_addr.addr_rec_type   := '';
+																SELF:= Left;	
+																SELF := [];
+																));
 	//end empty key files
 	
  //needed for BIP header
@@ -157,9 +220,10 @@ EXPORT Files := MODULE
 		PROJECT(file_base, 
 						Transform(Layouts.layout_base_companies,
 											SELF.rawfields	:= LEFT.companies;
-           SELF := LEFT;
+											SELF := LEFT;
 											SELF	:= [];
 											));
                       
-
+//CCPA Phase 2
+	EXPORT contacts_bdid := dataset([], layouts.contact_bdid);
 END;

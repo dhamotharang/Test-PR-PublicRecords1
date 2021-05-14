@@ -25,9 +25,9 @@ EXPORT proc_build_quick_hdr(
 
 	// Update Orbit with the correct entries in build in progress mode.
 
-	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F', ,true,true);	
-	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N', ,true);	
-	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N', ,true);	
+	oQH_fcra      := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'FCRA_Quick_Header',filedate,'F',leMailTarget,runaddcomponentsonly := false);	
+	oQH_nonfcra   := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'Quick Header',filedate,'N',leMailTarget,runaddcomponentsonly := false);	
+	oQH_qhs       := Orbit3.proc_Orbit3_CreateBuild_AddItem ( 'QHsourceKeys',filedate,'N',leMailTarget,runaddcomponentsonly := false);	
 
 	EQ_records_in0 := header.fn_preprocess(true);
 
@@ -69,16 +69,6 @@ EXPORT proc_build_quick_hdr(
 	//note RID sequencing is not necessary for moxie
 	header.mac_despray(full_ShortSuppress, b, full_out)
 
-	//***//***//***//*** INSERT SUPPRESSION TEXT CNG 20070417***//***//***//***//
-	Suppression_Layout := suppress.ApplyRegulatory.layout_in;
-	header_services.Supplemental_Data.mac_verify('didaddress_sup.txt',Suppression_Layout,supp_ds_func);
-
-	Suppression_In := supp_ds_func();
-
-	dSuppressedIn := PROJECT(Suppression_In, header_services.Supplemental_Data.in_to_out(left));
-
-	rHashDIDAddress := header_services.Supplemental_Data.layout_out;
-
 	rFullOut := RECORD // Referenced string_rec layout in header.MAC_Despray
 		string15 did;
 		string15 rid;
@@ -114,32 +104,9 @@ EXPORT proc_build_quick_hdr(
 		string1  tnt;  
 		string1  valid_ssn;
 	END;
+	full_out_r := PROJECT(full_out, rFullOut);
+	full_out_suppress :=  Header.Prep_Build.applyDidAddressSup2(full_out_r );						  	
 
-	rFullOut_HashDIDAddress := RECORD
-		rFullOut;
-		rHashDIDAddress;
-	END;
-
-	rFullOut_HashDIDAddress tHashDIDAddress(full_out l) := TRANSFORM
-		self.hval := hashmd5(l.did,l.st,l.zip,l.city_name,l.prim_name,l.prim_range,l.predir,l.suffix,l.postdir,l.sec_range);
-		self := l;
-	END;
-
-	dHeader_withMD5 := PROJECT(full_out, tHashDIDAddress(left));
-
-	rFullOut tSuppress(dHeader_withMD5 l, dSuppressedIn r) := TRANSFORM
-		self := l;
-	END;
-
-	full_out_suppress := JOIN(
-		dHeader_withMD5,dSuppressedIn,
-		left.hval=right.hval,
-		tSuppress(left,right),
-		left only,lookup
-	);
-
-
-	//***//***//***//*** END SUPPRESSION TEXT ***//***//***//***//
 
 	fSendMail(string pSubject, string pBody) := fileservices.sendemail(leMailTarget,pSubject,pBody);
 

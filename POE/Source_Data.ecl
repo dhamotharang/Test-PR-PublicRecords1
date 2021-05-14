@@ -1,4 +1,4 @@
-﻿import corp2,jigsaw,spoke,zoom,one_click_data,teletrack,garnishments,POEsFromEmails,POEsFromUtilities,SalesChannel,thrive,Database_USA;
+﻿import corp2,jigsaw,spoke,zoom,one_click_data,teletrack,garnishments,POEsFromEmails,POEsFromUtilities,SalesChannel,thrive,Database_USA,DataBridge,OPM;
 
 export Source_Data(
 	 boolean																					pUseOtherEnvironment	= false
@@ -15,8 +15,9 @@ export Source_Data(
 	,dataset(POEsFromUtilities.layouts.base					) pPOEUtilityBase				= POEsFromUtilities.Files	(psourceversion	,pUseOtherEnvironment).base.new
 	,dataset(SalesChannel.layouts.Base_new					) pSalesChannelBase			= SalesChannel.Files			(psourceversion	,pUseOtherEnvironment).base.new
   ,dataset(thrive.layouts.base							      ) pThrive			          = Thrive.Files						(psourceversion ,pUseOtherEnvironment).base.new
-	// ,dataset(Database_USA.layouts.base				      ) pDatabase_USA         = Database_USA.Files			(psourceversion ,pUseOtherEnvironment).base.new
-
+	,dataset(Database_USA.layouts.base						  ) pDatabaseUSABase	    = Database_USA.Files			(psourceversion ,pUseOtherEnvironment).base.new
+	,dataset(DataBridge.layouts.base							  ) pDataBridgeBase       = DataBridge.Files				(psourceversion ,pUseOtherEnvironment).base.new
+	,dataset(OPM.layouts.base									      ) pOPMBase			        = OPM.Files								(psourceversion ,pUseOtherEnvironment).base.new
 
 ) :=
 function
@@ -32,8 +33,10 @@ function
 	+ POEsFromEmails.As_POE		(pPOEsFromEmailsBase)
 	+ POEsFromUtilities.As_POE(pPOEUtilityBase		)
 	+ SalesChannel.As_POE			(,,pSalesChannelBase)
-	+ Thrive.As_POE						(pThrive)
-	// + Database_USA.As_POE			(pDatabase_USA)	
+	+ Thrive.As_POE						(pThrive            )
+	+ Database_USA.As_POE			(pDatabaseUSABase		)
+	+ DataBridge.As_POE				(pDataBridgeBase		)
+	+ OPM.As_POE							(pOPMBase						)
 	;
 
 end;

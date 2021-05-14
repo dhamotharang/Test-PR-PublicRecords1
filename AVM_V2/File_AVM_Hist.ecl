@@ -71,6 +71,57 @@ hist2020_q2 := dataset('~thor_data400::avm_v2::2020_Q2_automated_valuations', AV
 hist2020_q3 := dataset('~thor_data400::avm_v2::2020_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
 hist2020_q4 := dataset('~thor_data400::avm_v2::2020_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
 
+hist2021_q1 := dataset('~thor_data400::avm_v2::2021_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2021_q2 := dataset('~thor_data400::avm_v2::2021_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2021_q3 := dataset('~thor_data400::avm_v2::2021_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2021_q4 := dataset('~thor_data400::avm_v2::2021_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2022_q1 := dataset('~thor_data400::avm_v2::2022_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2022_q2 := dataset('~thor_data400::avm_v2::2022_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2022_q3 := dataset('~thor_data400::avm_v2::2022_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2022_q4 := dataset('~thor_data400::avm_v2::2022_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2023_q1 := dataset('~thor_data400::avm_v2::2023_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2023_q2 := dataset('~thor_data400::avm_v2::2023_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2023_q3 := dataset('~thor_data400::avm_v2::2023_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2023_q4 := dataset('~thor_data400::avm_v2::2023_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2024_q1 := dataset('~thor_data400::avm_v2::2024_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2024_q2 := dataset('~thor_data400::avm_v2::2024_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2024_q3 := dataset('~thor_data400::avm_v2::2024_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2024_q4 := dataset('~thor_data400::avm_v2::2024_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2025_q1 := dataset('~thor_data400::avm_v2::2025_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2025_q2 := dataset('~thor_data400::avm_v2::2025_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2025_q3 := dataset('~thor_data400::avm_v2::2025_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2025_q4 := dataset('~thor_data400::avm_v2::2025_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2026_q1 := dataset('~thor_data400::avm_v2::2026_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2026_q2 := dataset('~thor_data400::avm_v2::2026_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2026_q3 := dataset('~thor_data400::avm_v2::2026_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2026_q4 := dataset('~thor_data400::avm_v2::2026_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2027_q1 := dataset('~thor_data400::avm_v2::2027_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2027_q2 := dataset('~thor_data400::avm_v2::2027_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2027_q3 := dataset('~thor_data400::avm_v2::2027_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2027_q4 := dataset('~thor_data400::avm_v2::2027_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2028_q1 := dataset('~thor_data400::avm_v2::2028_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2028_q2 := dataset('~thor_data400::avm_v2::2028_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2028_q3 := dataset('~thor_data400::avm_v2::2028_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2028_q4 := dataset('~thor_data400::avm_v2::2028_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2029_q1 := dataset('~thor_data400::avm_v2::2029_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2029_q2 := dataset('~thor_data400::avm_v2::2029_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2029_q3 := dataset('~thor_data400::avm_v2::2029_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2029_q4 := dataset('~thor_data400::avm_v2::2029_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+hist2030_q1 := dataset('~thor_data400::avm_v2::2030_Q1_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2030_q2 := dataset('~thor_data400::avm_v2::2030_Q2_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2030_q3 := dataset('~thor_data400::avm_v2::2030_Q3_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+hist2030_q4 := dataset('~thor_data400::avm_v2::2030_Q4_automated_valuations', AVM_V2.layouts.Layout_Automated_Valuations, thor)(automated_valuation<>0);
+
+
 
 AVM_V2.layouts.layout_base_with_history merge_base_with_archive1(AVM_V2.layouts.Layout_Automated_Valuations le, AVM_V2.layouts.Layout_Automated_Valuations rt) := transform 
 		self.history := project(rt, transform(AVM_V2.layouts.layout_history_slim, self := left));
@@ -797,9 +848,546 @@ j48 := join(j47, archive48,
 						left.unformatted_apn=right.unformatted_apn,
 					append_more_history(left, right),
 						full outer, local);	
+
+archive49 := distribute(hist2020_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j49 := join(j48, archive49,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);	
 						
-// will need to decide in 2020 if we can keep going with more child records or if we need to remove 2008 because of limits in nested child rows in roxie keys
+archive50 := distribute(hist2020_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j50 := join(j49, archive50,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);	
+
+archive51 := distribute(hist2020_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j51 := join(j50, archive51,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);	
+
+archive52 := distribute(hist2020_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j52 := join(j51, archive52,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+
+archive53 := distribute(hist2021_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j53 := join(j52, archive53,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+
+archive54 := distribute(hist2021_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j54 := join(j53, archive54,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive55 := distribute(hist2021_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j55 := join(j54, archive55,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive56 := distribute(hist2021_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j56 := join(j55, archive56,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive57 := distribute(hist2022_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j57 := join(j56, archive57,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive58 := distribute(hist2022_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j58 := join(j57, archive58,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive59 := distribute(hist2022_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j59 := join(j58, archive59,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive60 := distribute(hist2022_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j60 := join(j59, archive60,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive61:= distribute(hist2023_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j61 := join(j60, archive60,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive62 := distribute(hist2023_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j62 := join(j61, archive62,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+
+archive63 := distribute(hist2023_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j63 := join(j62, archive63,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive64 := distribute(hist2023_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j64 := join(j63, archive64,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive65 := distribute(hist2024_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j65 := join(j64, archive65,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive66 := distribute(hist2024_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j66 := join(j65, archive66,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive67 := distribute(hist2024_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j67 := join(j66, archive67,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive68 := distribute(hist2024_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j68 := join(j67, archive68,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive69 := distribute(hist2025_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j69 := join(j68, archive69,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive70 := distribute(hist2025_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j70 := join(j69, archive70,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive71 := distribute(hist2025_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j71 := join(j70, archive71,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive72 := distribute(hist2025_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j72 := join(j71, archive72,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive73 := distribute(hist2026_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j73 := join(j72, archive73,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive74 := distribute(hist2026_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j74 := join(j73, archive74,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive75 := distribute(hist2026_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j75 := join(j74, archive75,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive76 := distribute(hist2026_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j76 := join(j75, archive76,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive77 := distribute(hist2027_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j77 := join(j76, archive77,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive78 := distribute(hist2027_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j78 := join(j77, archive78,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive79 := distribute(hist2027_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j79 := join(j78, archive79,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive80 := distribute(hist2027_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j80 := join(j79, archive80,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive81 := distribute(hist2028_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j81 := join(j80, archive81,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive82 := distribute(hist2028_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j82 := join(j81, archive82,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive83 := distribute(hist2028_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j83 := join(j82, archive83,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive84 := distribute(hist2028_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j84 := join(j83, archive84,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive85 := distribute(hist2029_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j85 := join(j84, archive85,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive86 := distribute(hist2029_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j86 := join(j85, archive86,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+
+archive87 := distribute(hist2029_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j87 := join(j86, archive87,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive88 := distribute(hist2029_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j88 := join(j87, archive88,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive89 := distribute(hist2030_q1, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j89 := join(j88, archive89,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive90 := distribute(hist2030_q2, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j90 := join(j89, archive90,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive91 := distribute(hist2030_q3, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j91 := join(j90, archive91,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+archive92 := distribute(hist2030_q4, hash(unformatted_apn,zip,prim_range,prim_name,predir,suffix,postdir,sec_range));	
+j92 := join(j91, archive92,
+						left.zip=right.zip and
+						left.prim_range=right.prim_range and
+						left.predir=right.predir and
+						left.prim_name=right.prim_name and
+						left.suffix=right.suffix and
+						left.postdir=right.postdir and
+						left.sec_range=right.sec_range and 
+						left.unformatted_apn=right.unformatted_apn,
+					append_more_history(left, right),
+						full outer, local);
+
+
+// will need to decide in 2030 if we can keep going with more child records or if we need to remove 2008 because of limits in nested child rows in roxie keys
 						
-return j48;
+return j92;
 
 end;

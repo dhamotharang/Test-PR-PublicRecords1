@@ -1,4 +1,4 @@
-﻿IMPORT AID, ut, NID, codes, Address, _validate, std, SCRUBS;
+﻿IMPORT AID, ut, NID, codes, Address, _validate, std;
 
 EXPORT Standardize_NameAddr := MODULE	
 
@@ -10,6 +10,7 @@ EXPORT Standardize_NameAddr := MODULE
 			
 		// -- Mapping Clean company name and clean phone numbers
 		Equifax_Business_Data.Layouts.Base tMapCleanCompanyName(pPreProcessInput L) := TRANSFORM 
+      SELF.global_sid := 28781;	
 			SELF.clean_company_name := L.normCompany_Name;
 			SELF.clean_phone := ut.CleanPhone(L.EFX_PHONE); 
 			SELF.clean_secondary_phone := ut.CleanPhone(L.EFX_FAXPHONE);
@@ -73,16 +74,16 @@ EXPORT Standardize_NameAddr := MODULE
 			date_first_seen := ut.date_slashed_MMDDYYYY_to_YYYYMMDD(L.Record_Update_Refresh_Date);
  		 	SELF.dt_first_seen											:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
 			SELF.dt_last_seen												:= IF(_validate.date.fIsValid(date_first_seen) and _validate.date.fIsValid(date_first_seen,_validate.date.rules.DateInPast)	,(UNSIGNED4)date_first_seen, 0);
-      SELF.EFX_PRIMSIC					  := If(Scrubs.fn_valid_SicCode(l.EFX_PRIMSIC) = 1,ut.CleanSpacesAndUpper(l.EFX_PRIMSIC),'');      
-			SELF.EFX_SECSIC1					  := If(Scrubs.fn_valid_SicCode(l.EFX_SECSIC1) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC1),'');			
-			SELF.EFX_SECSIC2					  := If(Scrubs.fn_valid_SicCode(l.EFX_SECSIC2) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC2),'');
-			SELF.EFX_SECSIC3					  := If(Scrubs.fn_valid_SicCode(l.EFX_SECSIC3) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC3),'');
-			SELF.EFX_SECSIC4					  := If(Scrubs.fn_valid_SicCode(l.EFX_SECSIC4) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC4),'');
-			SELF.EFX_PRIMNAICSCODE			:= If(Scrubs.fn_valid_NAICSCode(l.EFX_PRIMNAICSCODE) = 1,ut.CleanSpacesAndUpper(l.EFX_PRIMNAICSCODE),'');
-			SELF.EFX_SECNAICS1					:= If(Scrubs.fn_valid_NAICSCode(l.EFX_SECNAICS1) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS1),'');
-			SELF.EFX_SECNAICS2					:= If(Scrubs.fn_valid_NAICSCode(l.EFX_SECNAICS2) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS2),'');
-			SELF.EFX_SECNAICS3					:= If(Scrubs.fn_valid_NAICSCode(l.EFX_SECNAICS3) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS3),'');
-			SELF.EFX_SECNAICS4					:= If(Scrubs.fn_valid_NAICSCode(l.EFX_SECNAICS4) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS4),'');			
+      SELF.EFX_PRIMSIC					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_PRIMSIC) = 1,ut.CleanSpacesAndUpper(l.EFX_PRIMSIC),'');      
+			SELF.EFX_SECSIC1					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC1) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC1),'');			
+			SELF.EFX_SECSIC2					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC2) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC2),'');
+			SELF.EFX_SECSIC3					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC3) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC3),'');
+			SELF.EFX_SECSIC4					  := If(ut.fn_SIC_functions.fn_validate_SICCode(l.EFX_SECSIC4) = 1,ut.CleanSpacesAndUpper(l.EFX_SECSIC4),'');
+			SELF.EFX_PRIMNAICSCODE			:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_PRIMNAICSCODE) = 1,ut.CleanSpacesAndUpper(l.EFX_PRIMNAICSCODE),'');
+			SELF.EFX_SECNAICS1					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS1) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS1),'');
+			SELF.EFX_SECNAICS2					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS2) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS2),'');
+			SELF.EFX_SECNAICS3					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS3) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS3),'');
+			SELF.EFX_SECNAICS4					:= If(ut.fn_NAICS_functions.fn_validate_NAICSCode(l.EFX_SECNAICS4) = 1,ut.CleanSpacesAndUpper(l.EFX_SECNAICS4),'');			
 			SELF								  := L;			
 		END;
 	
@@ -196,17 +197,13 @@ EXPORT Standardize_NameAddr := MODULE
 	EXPORT fAll( DATASET(Equifax_Business_Data.Layouts.Base) pBaseFile
 							,STRING pPersistname = Equifax_Business_Data.Persistnames().StandardizeNameAddr) := FUNCTION
 
-  	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile)
-: PERSIST(pPersistname)		
-		;			 
+  	dStandardizeName	:= fStandardizeNamesPhone(pBaseFile);			 
 								 
-		// dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName) : 
-		// PERSIST(pPersistname)
-		// PERSIST(pPersistname, REFRESH(TRUE), SINGLE)
+		dStandardizeAddr	:= fStandardizeAddresses(dStandardizeName)
+    : persist(pPersistname, SINGLE)		
 		;		
 		
-		// RETURN dStandardizeAddr;
-		RETURN dStandardizeName;
+		RETURN dStandardizeAddr;
 	
 	END;
 

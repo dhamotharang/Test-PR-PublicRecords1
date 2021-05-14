@@ -7,6 +7,19 @@
 
 EXPORT File_Lerg := MODULE
 
+	//Lerg1: Carrier Information
+	EXPORT Lerg1 									:= dataset('~thor_data400::in::phones::lerg1', 	 										PhonesInfo.Layout_Lerg.lerg1, 						csv(terminator('\n'), 	separator(','), quote('"')));
+	EXPORT Lerg1Hist							:= dataset('~thor_data400::in::phones::lerg1_history', 							PhonesInfo.Layout_Lerg.lerg1Hist, 				flat);
+	EXPORT Lerg1Hist_Father				:= dataset('~thor_data400::in::phones::lerg1_history_father', 			PhonesInfo.Layout_Lerg.lerg1Hist, 				flat);
+ 	
+	//Lerg1Con: Contact Information
+	EXPORT Lerg1Con 							:= dataset('~thor_data400::in::phones::lerg1con', 									PhonesInfo.Layout_Lerg.lerg1Con, 					csv(terminator('\n'), 	separator(','), quote('"')));
+	EXPORT Lerg1ConHist						:= dataset('~thor_data400::in::phones::lerg1con_history', 					PhonesInfo.Layout_Lerg.lerg1ConHist, 			flat);
+	
+	//Lerg Prep Files In Common Layout (Lerg1 + Lerg1Con)
+	EXPORT Lerg1Prep							:= dataset('~thor_data400::in::phones::lerg1_prep',									PhonesInfo.Layout_Lerg.lergPrep, 					flat);				
+	EXPORT Lerg1PrepClean					:= dataset('~thor400_data::persist::lerg_address_aid', 							PhonesInfo.Layout_Lerg.lergPrep, 					flat);	
+	
 	//Lerg6
 	EXPORT Lerg6									:= dataset('~thor_data400::in::phones::lerg6', 	 										PhonesInfo.Layout_Lerg.lerg6, 									csv(terminator('\n'), 	separator(','), quote('"')));
 	EXPORT Lerg6Hist							:= dataset('~thor_data400::in::phones::lerg6_history', 							PhonesInfo.Layout_Lerg.lerg6Hist, 							flat);

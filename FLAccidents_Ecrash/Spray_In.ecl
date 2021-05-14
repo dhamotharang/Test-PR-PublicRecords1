@@ -9,37 +9,34 @@ export Spray_In(
 ) :=
 function
 
-	lfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword + '.@version@.csv';
-	sfile(string pkeyword) := '~thor_data400::in::ecrash::' + pkeyword;
-	 agency_date :=  (STRING8) Std.Date.Today();
-
-	spry_raw:=DATASET([
-             {Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/'
-									,'mbs_ecrash_v_agency_hpcc_export.txt'
-																						,0 ,lfile('agency'				  ),[{sfile('agency'			  )}],Constants.DestinationCluster,agency_date,'[0-9]{8}','VARIABLE'}
-		 	], VersionControl.Layout_Sprays.Info);
-	
-verify_agency := FileServices.RemoteDirectory(FLAccidents_Ecrash.Constants.LandingZone,'/data/super_credit/ecrash/agency/'+agency_date+'/','*ecrash_v_agency*.txt');
-
-Agency_sp :=  if( ( EXISTS(verify_agency) and verify_agency[1].size <> 0 )  ,                  
-										sequential(fileservices.clearsuperfile('~thor_data400::in::ecrash::agency'),VersionControl.fSprayInputFiles(spry_raw,pIsTesting := pIsTesting)), 
-										output('NO Agency Files Recieved')); 
-
 //Incident Spray
+agency_date :=  (STRING8) Std.Date.Today();
 
- Incident_file := Constants.INCIDENT_SPRAYED_DAILY + '_'+ thorlib.wuid();
+ s_email(string filetype, string fname) := function
+
+return fileservices.sendemail(
+													'Sai.Nagula@lexisnexisrisk.com; Jorge.Pinto@lexisnexisrisk.com; Sudhir.Kasavajjala@lexisnexisrisk.com;  DataDevelopment-InsRiskeCrash@lexisnexisrisk.com',
+													'ECrash 0 byte '+filetype+' file received.  Build vs : ' + agency_date ,
+													'Please view Filename -- ' +  fname );	
+end;
+	
+fnvalid(string keyword,string name,integer size ) := module
+
+export doverify := if ( size > 0 ,
+                                  Output( 'file : ' +keyword+'  '+name+' is valid with size :'+size),
+								  Sequential ( 
+	                                           Output('file : ' +keyword+'  '+name+' is invalid with size :'+size),
+											   s_email(keyword,name)
+											   )
+                        );
+
+end;		
+
+Incident_file := Constants.INCIDENT_SPRAYED_DAILY + '_'+ thorlib.wuid();
  
  Incident_FileListing :=  FileServices.RemoteDirectory(Constants.LandingZone,
 																						 Constants.ProcessPathForIncident , 
 																						 '*');
-
-	
-fnvalid(string keyword,string name,integer size ) := module
-
-export doverify := if ( size > 0 ,Output( 'file : ' +keyword+'  '+name+' is valid with size :'+size),FAIL('file : ' +keyword+'  '+name+' is invalid with size :'+size));
-
-end;		
-			
 																						 
 Incident_validate := nothor(apply(Incident_FileListing,fnvalid('Incident',name,size).doverify));
 
@@ -50,8 +47,8 @@ Incident_addsuper := if ( FileServices.FindSuperFileSubName(Constants.INCIDENT_S
 										 						 FileServices.AddSuperFile(Constants.INCIDENT_SPRAYED_DAILY, Constants.INCIDENT_SPRAYED_DAILY +  '_' + thorlib.wuid() ),
 																 FileServices.FinishSuperFileTransaction(),Incident_move),Output('Incident_LogicalFile_Already_Added_To_SuperFile'));
 																 
-Incident_spy := if (  COUNT(Incident_FileListing) > 0 , Sequential(Incident_validate, FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForIncident + Constants.FileSeparator + Constants.IncidentFileMask,60000,,,'"',
-Constants.DestinationCluster,Incident_file,-1,,,true,true,true),Incident_addsuper),FAIL('Incident_Files_not_in_unix'));
+Incident_spy := if (  COUNT(Incident_FileListing (size > 0 )) > 0 , Sequential(Incident_validate, FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForIncident + Constants.FileSeparator + Constants.IncidentFileMask,60000,,,'"',
+Constants.DestinationCluster,Incident_file,-1,,,true,true,true),Incident_addsuper),Sequential(Incident_validate,FAIL('Valid_Incident_Files_not_in_unix')));
 			 
 
 
@@ -75,8 +72,8 @@ BillingAgency_move := nothor(apply(BillingAgency_FileListing,FileServices.MoveEx
 																 FileServices.FinishSuperFileTransaction(),BillingAgency_move),Output('BillingAgency_LogicalFile_Already_Added_To_SuperFile'));
 																 
 
-BillingAgency_spy := if (  COUNT(BillingAgency_FileListing) > 0 , Sequential( BillingAgency_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForBillingAgency + Constants.FileSeparator + Constants.BillingAgencyFileMask,60000,,,'"',
-Constants.DestinationCluster,BillingAgency_file,-1,,,true,true,true),BillingAgency_addsuper),FAIL('BillingAgency_Files_not_in_unix'));
+BillingAgency_spy := if (  COUNT(BillingAgency_FileListing (size > 0 )) > 0 , Sequential( BillingAgency_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForBillingAgency + Constants.FileSeparator + Constants.BillingAgencyFileMask,60000,,,'"',
+Constants.DestinationCluster,BillingAgency_file,-1,,,true,true,true),BillingAgency_addsuper),Sequential( BillingAgency_validate, FAIL('Valid_BillingAgency_Files_not_in_unix')));
 			 
 
 
@@ -100,8 +97,8 @@ Vehicle_move := nothor(apply(Vehicle_FileListing,FileServices.MoveExternalFile(C
 																 FileServices.FinishSuperFileTransaction(),Vehicle_move),Output('Vehicle_LogicalFile_Already_Added_To_SuperFile'));
 																 
 
-Vehicle_spy := if ( COUNT(Vehicle_FileListing) > 0 , Sequential(Vehicle_validate, FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForVehicle + Constants.FileSeparator + Constants.VehicleFileMask,50000,,,'"',
-       Constants.DestinationCluster,Vehicle_file,-1,,,true,true,true),Vehicle_addsuper),FAIL('Vehicle_Files_not_in_unix'));
+Vehicle_spy := if ( COUNT(Vehicle_FileListing (size > 0 )) > 0 , Sequential(Vehicle_validate, FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForVehicle + Constants.FileSeparator + Constants.VehicleFileMask,50000,,,'"',
+       Constants.DestinationCluster,Vehicle_file,-1,,,true,true,true),Vehicle_addsuper),Sequential(Vehicle_validate,FAIL('Valid_Vehicle_Files_not_in_unix')));
 
 
 
@@ -124,8 +121,8 @@ Person_move := nothor(apply(Person_FileListing,FileServices.MoveExternalFile(Con
 										 						 FileServices.AddSuperFile(Constants.PERSON_SPRAYED_DAILY, Constants.PERSON_SPRAYED_DAILY +  '_' + thorlib.wuid() ),
 																 FileServices.FinishSuperFileTransaction(),Person_move),Output('Person_LogicalFile_Already_Added_To_SuperFile'));
 
-Person_spy := if (  COUNT(Person_FileListing) > 0 , Sequential(Person_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForPerson + Constants.FileSeparator + Constants.PersonFileMask,,,,'"',
-       Constants.DestinationCluster,Person_file,-1,,,true,true,true),Person_addsuper),FAIL('Person_Files_not_in_unix'));
+Person_spy := if (  COUNT(Person_FileListing (size > 0 )) > 0 , Sequential(Person_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForPerson + Constants.FileSeparator + Constants.PersonFileMask,,,,'"',
+       Constants.DestinationCluster,Person_file,-1,,,true,true,true),Person_addsuper),Sequential(Person_validate,FAIL('Valid_Person_Files_not_in_unix')));
 
 
 //document Spray
@@ -145,8 +142,8 @@ Document_move := nothor(apply(Document_FileListing,FileServices.MoveExternalFile
 										 						 FileServices.AddSuperFile(Constants.DOCUMENT_SPRAYED_DAILY, Constants.DOCUMENT_SPRAYED_DAILY +  '_' + thorlib.wuid() ),
 																 FileServices.FinishSuperFileTransaction(),Document_move),Output('Document_Files_Missing_In_Unix'));
 
-Document_spy := if (  COUNT(Document_FileListing) > 0 , Sequential(Document_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForDocument + Constants.FileSeparator + Constants.DocumentFileMask,,,,'"',
-       Constants.DestinationCluster,Document_file,-1,,,true,true,true),Document_addsuper),Output('Document_Files_not_in_unix'));
+Document_spy := if (  COUNT(Document_FileListing (size > 0 )) > 0 , Sequential(Document_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForDocument + Constants.FileSeparator + Constants.DocumentFileMask,,,,'"',
+       Constants.DestinationCluster,Document_file,-1,,,true,true,true),Document_addsuper),Sequential(Document_validate,Output('Valid_Document_Files_not_in_unix')));
 
 
 																 
@@ -170,8 +167,8 @@ Commercial_move := nothor(apply(Commercial_FileListing,FileServices.MoveExternal
 																 FileServices.FinishSuperFileTransaction(),Commercial_move),Output('Commerical_LogicalFile_Already_Added_To_SuperFile'));
 																 
 
-Commercial_spy := if (ut.Weekday((integer) ut.GetDate) <> 'SUNDAY', if (  COUNT(Commercial_FileListing) > 0 , Sequential(Commercial_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForCommercial + Constants.FileSeparator + Constants.CommercialFileMask,,,,'"',
-       Constants.DestinationCluster,Commercial_file,-1,,,true,true,true),Commercial_addsuper),Output('Commercial_Files_not_in_unix')),Output('No_Commercial_Files_On_Sunday'));
+Commercial_spy := if (ut.Weekday((integer) mod_Utilities.StrSysDate) <> 'SUNDAY', if (  COUNT(Commercial_FileListing (size > 0 )) > 0 , Sequential(Commercial_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForCommercial + Constants.FileSeparator + Constants.CommercialFileMask,,,,'"',
+       Constants.DestinationCluster,Commercial_file,-1,,,true,true,true),Commercial_addsuper),Output('Valid_Commercial_Files_not_in_unix')),Sequential(Commercial_validate,Output('No_Commercial_Files_On_Sunday')));
 
 
 //Citation Spray
@@ -192,8 +189,8 @@ Citation_move := nothor(apply(Citation_FileListing,FileServices.MoveExternalFile
 										 						 FileServices.AddSuperFile(Constants.CITATION_SPRAYED_DAILY, Constants.CITATION_SPRAYED_DAILY +  '_' + thorlib.wuid() ),
 																 FileServices.FinishSuperFileTransaction(),Citation_move),Output('Citation_LogicalFile_Already_Added_To_SuperFile'));
 
-Citation_spy := if (  COUNT(Citation_FileListing) > 0 , Sequential(Citation_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForCitation + Constants.FileSeparator + Constants.CitationFileMask,,,,'"',
-       Constants.DestinationCluster,Citation_file,-1,,,true,true,true),Citation_addsuper),FAIL('Citation_Files_not_in_unix'));
+Citation_spy := if (  COUNT(Citation_FileListing (size > 0 )) > 0 , Sequential(Citation_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForCitation + Constants.FileSeparator + Constants.CitationFileMask,,,,'"',
+       Constants.DestinationCluster,Citation_file,-1,,,true,true,true),Citation_addsuper),Sequential(Citation_validate,FAIL('Valid_Citation_Files_not_in_unix')));
 			 
 
 
@@ -219,14 +216,14 @@ PTYD_move := nothor(apply(PTYD_FileListing,FileServices.MoveExternalFile(Constan
 																 
 
 
-PTYD_spy := if ( ut.Weekday((integer) ut.GetDate) <> 'SUNDAY' , if (  COUNT(PTYD_FileListing) > 0 , Sequential(PTYD_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForPtyDamage + Constants.FileSeparator + Constants.PtyDamageFileMask,50000,,,'"',
-       Constants.DestinationCluster,PropertyDamage_file,-1,,,true,true,true),PropertyDamage_addsuper),Output('PTYDamage_Files_not_in_unix')),Output('No_PTYDFiles_On_Sunday'));
+PTYD_spy := if ( ut.Weekday((integer) mod_Utilities.StrSysDate) <> 'SUNDAY' , if (  COUNT(PTYD_FileListing (size > 0 )) > 0 , Sequential(PTYD_validate,FileServices.SprayVariable(Constants.LandingZone, Constants.ProcessPathForPtyDamage + Constants.FileSeparator + Constants.PtyDamageFileMask,50000,,,'"',
+       Constants.DestinationCluster,PropertyDamage_file,-1,,,true,true,true),PropertyDamage_addsuper),Output('Valid_PTYDamage_Files_not_in_unix')),Output('No_PTYDFiles_On_Sunday'));
 
 
 
 
 																 
-return sequential(Agency_sp,Incident_spy,BillingAgency_spy,Vehicle_spy,Person_spy, Document_spy,Citation_spy,
+return sequential(/*Agency_sp,*/Incident_spy,BillingAgency_spy,Vehicle_spy,Person_spy, Document_spy,Citation_spy,
                   Commercial_spy,PTYD_spy);
 																 
 end;

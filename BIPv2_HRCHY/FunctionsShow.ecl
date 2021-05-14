@@ -1,4 +1,4 @@
-import BIPV2, BIPV2_Files,BIPV2_Entity,tools,MDR,BIPV2_Best,bizlinkfull,ut;
+﻿import BIPV2, BIPV2_Files,BIPV2_Entity,tools,MDR,BIPV2_Best,bizlinkfull,ut;
 
 EXPORT FunctionsShow := 
 MODULE
@@ -61,7 +61,7 @@ END;
 
 
 
-shared GetLGID(
+export GetLGID(
 	unsigned6 myproxid
 	,string1 SourcePicked = ''/*default is to pick based on availability of preferred hrchy sources, but you may specify one of BIPv2_HRCHY_Dev.Constants.Sources*/) :=
 FUNCTION

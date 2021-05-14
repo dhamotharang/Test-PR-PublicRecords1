@@ -1,7 +1,7 @@
-﻿IMPORT STD, _control, tools;
+﻿IMPORT STD, tools;
 
 EXPORT Send_Email(STRING pVersion, STRING pAddresses, STRING pMessage='', BOOLEAN pIsTesting = false):= MODULE
-	
+
 	EXPORT build_success := fileservices.sendemail(
 		Email_Notification_Lists(pAddresses, pIsTesting).BuildSuccess,
 		'DNBFEINV2 Roxie Build Succeeded ' + pVersion,

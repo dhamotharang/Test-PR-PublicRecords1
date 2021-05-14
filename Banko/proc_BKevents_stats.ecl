@@ -1,4 +1,4 @@
-import ut,STD;
+import ut,STD,Scrubs_BK_Events;
 EXPORT proc_BKevents_stats(string filedate) := module
 //For the Entered Date-Pacer Date combination
 
@@ -104,7 +104,13 @@ missing_dates   :=	if ( count ( pick_file ) > 0 and ut.Weekday((integer) ut.GetD
 																													 
 
 
-export out_all := Sequential(first_iter,second_iter,pdatecounts,missing_dates): success(fileservices.sendemail(Banko.Email_Notification_list.BuildFailure,'BANKO PACER DATES ALERT SUCCESS WU - '+workunit,'SUCCESS !!!.Please view Last 10 Pacer Alet Stats for any anamolies')),
+export out_all := Sequential(
+	first_iter,
+	second_iter,
+	pdatecounts,
+	missing_dates,
+	Scrubs_BK_Events.Fn_RunScrubs(filedate)
+): success(fileservices.sendemail(Banko.Email_Notification_list.BuildFailure,'BANKO PACER DATES ALERT SUCCESS WU - '+workunit,'SUCCESS !!!.Please view Last 10 Pacer Alet Stats for any anamolies')),
 		                                                                failure(fileservices.sendemail(Banko.Email_Notification_list.BuildFailure,'BANKO PACER DATES ALERT FAILED WU - '+workunit,'Please rerun PACER DATE alert code -- Banko.proc_BKevents_stats(filedate).out_all seperately'));
 end;
 

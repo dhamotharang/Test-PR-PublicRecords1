@@ -2,7 +2,7 @@
 EXPORT AllCategoriesFixed := DATASET([
 {359,'Adverse Media','Administrative','Adverse Media-Administrative'},
 {1,'Adverse Media','Aircraft Hijacking','Adverse Media-Aircraft Hijacking'},
-{2,'Adverse Media','AntiTrust violations','Adverse Media-AntiTrust violations'},
+{2,'Adverse Media','Antitrust Violations','Adverse Media-Antitrust Violations'},
 {3,'Adverse Media','Arms Trafficking','Adverse Media-Arms Trafficking'},
 {4,'Adverse Media','Asset Freeze','Adverse Media-Asset Freeze'},
 {5,'Adverse Media','Associate','Adverse Media-Associate'},
@@ -102,7 +102,7 @@ EXPORT AllCategoriesFixed := DATASET([
 {93,'Company of Interest','Unauthorized','Company of Interest-Unauthorized'},
 {362,'Enforcement','Administrative','Enforcement-Administrative'},
 {106,'Enforcement','Aircraft Hijacking','Enforcement-Aircraft Hijacking'},
-{107,'Enforcement','AntiTrust violations','Enforcement-AntiTrust violations'},
+{107,'Enforcement','Antitrust Violations','Enforcement-Antitrust Violations'},
 {108,'Enforcement','Arms Trafficking','Enforcement-Arms Trafficking'},
 {109,'Enforcement','Asset Freeze','Enforcement-Asset Freeze'},
 {110,'Enforcement','Associate','Enforcement-Associate'},

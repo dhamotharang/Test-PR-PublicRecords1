@@ -1,4 +1,4 @@
-#workunit('name','nonfcra-bnk4');
+﻿#workunit('name','nonfcra-bnk4');
 #option ('hthorMemoryLimit', 1000)
 
 IMPORT Models, Risk_Indicators, RiskWise, Scoring, UT;
@@ -67,7 +67,7 @@ Scoring.Layout_BC1O_soapcall into_BC1O_input(f le) := transform
 //	self.HistoryDateYYYYMM:=(integer)'200607';
 	self.dppapurpose := 3;
 	self.glbpurpose := 1;
-//	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+//	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 	self := le;
 	self := [];
 end;

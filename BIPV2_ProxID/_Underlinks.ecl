@@ -34,7 +34,7 @@ functionmacro
   
   // -- find unlinkable records
   // TotalWeight is from BIPV2_ProxID.match_candidates
-  TotalWeight           := ds_mc.active_enterprise_number_weight100 + ds_mc.hist_enterprise_number_weight100 + ds_mc.ebr_file_number_weight100 + ds_mc.active_domestic_corp_key_weight100 + ds_mc.hist_domestic_corp_key_weight100 + ds_mc.foreign_corp_key_weight100 + ds_mc.unk_corp_key_weight100 + ds_mc.active_duns_number_weight100 + ds_mc.hist_duns_number_weight100 + ds_mc.company_phone_weight100 + ds_mc.company_address_weight100 + ds_mc.company_fein_weight100 + ds_mc.cnp_number_weight100 + ds_mc.cnp_name_weight100 + ds_mc.cnp_btype_weight100 + ds_mc.company_name_type_derived_weight100;
+  TotalWeight := ds_mc.sbfe_id_weight100 + ds_mc.company_charter_number_weight100 + ds_mc.active_enterprise_number_weight100 + ds_mc.hist_enterprise_number_weight100 + ds_mc.ebr_file_number_weight100 + ds_mc.hist_corp_key_weight100 + ds_mc.active_duns_number_weight100 + ds_mc.hist_duns_number_weight100 + ds_mc.company_phone_weight100 + ds_mc.company_address_weight100 + ds_mc.company_fein_weight100 + ds_mc.cnp_number_weight100 + ds_mc.cnp_name_phonetic_weight100 + ds_mc.cnp_name_weight100 + ds_mc.company_inc_state_weight100 + ds_mc.cnp_btype_weight100 + ds_mc.company_name_type_derived_weight100;
   ds_unlinkable_records := ds_mc(~(TotalWeight >= MatchThreshold));
   // ds_unlinkable_records := BIPV2_ProxID.match_candidates(ih).Unlinkables;~Linkable
 
@@ -173,7 +173,7 @@ functionmacro
   END;
   lay_summary tosummary(ds_match_join le) := TRANSFORM
     SELF := le;
-    SELF.Summary := IF(le.cnp_number_Score = 0,'','|'+IF(le.cnp_number_Score < 0,'-','')+'cnp_number')+IF(le.st_Score = 0,'','|'+IF(le.st_Score < 0,'-','')+'st')+IF(le.prim_range_derived_Score = 0,'','|'+IF(le.prim_range_derived_Score < 0,'-','')+'prim_range_derived')+IF(le.hist_duns_number_Score = 0,'','|'+IF(le.hist_duns_number_Score < 0,'-','')+'hist_duns_number')+IF(le.ebr_file_number_Score = 0,'','|'+IF(le.ebr_file_number_Score < 0,'-','')+'ebr_file_number')+IF(le.active_duns_number_Score = 0,'','|'+IF(le.active_duns_number_Score < 0,'-','')+'active_duns_number')+IF(le.hist_enterprise_number_Score = 0,'','|'+IF(le.hist_enterprise_number_Score < 0,'-','')+'hist_enterprise_number')+IF(le.hist_domestic_corp_key_Score = 0,'','|'+IF(le.hist_domestic_corp_key_Score < 0,'-','')+'hist_domestic_corp_key')+IF(le.foreign_corp_key_Score = 0,'','|'+IF(le.foreign_corp_key_Score < 0,'-','')+'foreign_corp_key')+IF(le.unk_corp_key_Score = 0,'','|'+IF(le.unk_corp_key_Score < 0,'-','')+'unk_corp_key')+IF(le.company_fein_Score = 0,'','|'+IF(le.company_fein_Score < 0,'-','')+'company_fein')+IF(le.company_phone_Score = 0,'','|'+IF(le.company_phone_Score < 0,'-','')+'company_phone')+IF(le.active_enterprise_number_Score = 0,'','|'+IF(le.active_enterprise_number_Score < 0,'-','')+'active_enterprise_number')+IF(le.active_domestic_corp_key_Score = 0,'','|'+IF(le.active_domestic_corp_key_Score < 0,'-','')+'active_domestic_corp_key')+IF(le.company_addr1_Score = 0,'','|'+IF(le.company_addr1_Score < 0,'-','')+'company_addr1')+IF(le.cnp_name_Score = 0,'','|'+IF(le.cnp_name_Score < 0,'-','')+'cnp_name')+IF(le.zip_Score = 0,'','|'+IF(le.zip_Score < 0,'-','')+'zip')+IF(le.company_csz_Score = 0,'','|'+IF(le.company_csz_Score < 0,'-','')+'company_csz')+IF(le.prim_name_derived_Score = 0,'','|'+IF(le.prim_name_derived_Score < 0,'-','')+'prim_name_derived')+IF(le.sec_range_Score = 0,'','|'+IF(le.sec_range_Score < 0,'-','')+'sec_range')+IF(le.v_city_name_Score = 0,'','|'+IF(le.v_city_name_Score < 0,'-','')+'v_city_name')+IF(le.cnp_btype_Score = 0,'','|'+IF(le.cnp_btype_Score < 0,'-','')+'cnp_btype')+IF(le.company_name_type_derived_Score = 0,'','|'+IF(le.company_name_type_derived_Score < 0,'-','')+'company_name_type_derived')+IF(le.company_address_Score = 0,'','|'+IF(le.company_address_Score < 0,'-','')+'company_address');
+    SELF.Summary := IF(le.cnp_number_Score = 0,'','|'+IF(le.cnp_number_Score < 0,'-','')+'cnp_number')+IF(le.st_Score = 0,'','|'+IF(le.st_Score < 0,'-','')+'st')+IF(le.prim_range_derived_Score = 0,'','|'+IF(le.prim_range_derived_Score < 0,'-','')+'prim_range_derived')+IF(le.sbfe_id_Score = 0,'','|'+IF(le.sbfe_id_Score < 0,'-','')+'sbfe_id')+IF(le.company_charter_number_Score = 0,'','|'+IF(le.company_charter_number_Score < 0,'-','')+'company_charter_number')+IF(le.hist_enterprise_number_Score = 0,'','|'+IF(le.hist_enterprise_number_Score < 0,'-','')+'hist_enterprise_number')+IF(le.ebr_file_number_Score = 0,'','|'+IF(le.ebr_file_number_Score < 0,'-','')+'ebr_file_number')+IF(le.active_enterprise_number_Score = 0,'','|'+IF(le.active_enterprise_number_Score < 0,'-','')+'active_enterprise_number')+IF(le.hist_corp_key_Score = 0,'','|'+IF(le.hist_corp_key_Score < 0,'-','')+'hist_corp_key')+IF(le.hist_duns_number_Score = 0,'','|'+IF(le.hist_duns_number_Score < 0,'-','')+'hist_duns_number')+IF(le.active_duns_number_Score = 0,'','|'+IF(le.active_duns_number_Score < 0,'-','')+'active_duns_number')+IF(le.company_phone_Score = 0,'','|'+IF(le.company_phone_Score < 0,'-','')+'company_phone')+IF(le.company_fein_Score = 0,'','|'+IF(le.company_fein_Score < 0,'-','')+'company_fein')+IF(le.company_addr1_Score = 0,'','|'+IF(le.company_addr1_Score < 0,'-','')+'company_addr1')+IF(le.zip_Score = 0,'','|'+IF(le.zip_Score < 0,'-','')+'zip')+IF(le.company_csz_Score = 0,'','|'+IF(le.company_csz_Score < 0,'-','')+'company_csz')+IF(le.cnp_name_phonetic_Score = 0,'','|'+IF(le.cnp_name_phonetic_Score < 0,'-','')+'cnp_name_phonetic')+IF(le.cnp_name_Score = 0,'','|'+IF(le.cnp_name_Score < 0,'-','')+'cnp_name')+IF(le.prim_name_derived_Score = 0,'','|'+IF(le.prim_name_derived_Score < 0,'-','')+'prim_name_derived')+IF(le.sec_range_Score = 0,'','|'+IF(le.sec_range_Score < 0,'-','')+'sec_range')+IF(le.v_city_name_Score = 0,'','|'+IF(le.v_city_name_Score < 0,'-','')+'v_city_name')+IF(le.company_inc_state_Score = 0,'','|'+IF(le.company_inc_state_Score < 0,'-','')+'company_inc_state')+IF(le.cnp_btype_Score = 0,'','|'+IF(le.cnp_btype_Score < 0,'-','')+'cnp_btype')+IF(le.company_name_type_derived_Score = 0,'','|'+IF(le.company_name_type_derived_Score < 0,'-','')+'company_name_type_derived')+IF(le.company_address_Score = 0,'','|'+IF(le.company_address_Score < 0,'-','')+'company_address');
   END;
   ds_add_Summary := PROJECT(ds_match_join,tosummary(LEFT))    : PERSIST('~persist::BIPV2_ProxID::_Underlinks::ds_add_Summary'   );
 
@@ -374,13 +374,13 @@ end;
  
  // -- get address and name
  ds_get_address1 := join(pih  ,ds_rollup_match_scores_add_summary_prep  ,left.rcid = right.rcid1  ,transform({unsigned6 rcid2,lay_new_rollup}
-    ,self.recs := dataset([{left.proxid ,left.cnp_name  ,Address.Addr1FromComponents(left.prim_range,'',left.prim_name,'','','',left.sec_range) + ' ' + Address.Addr2FromComponents(left.v_city_name,left.st,left.zip),left.active_domestic_corp_key,left.active_duns_number,left.company_fein}]  ,lay_rec_child)
+    ,self.recs := dataset([{left.proxid ,left.cnp_name  ,Address.Addr1FromComponents(left.prim_range,'',left.prim_name,'','','',left.sec_range) + ' ' + Address.Addr2FromComponents(left.v_city_name,left.st,left.zip),left.active_corp_key,left.active_duns_number,left.company_fein}]  ,lay_rec_child)
     ,self.scores := right.child
     ,self      := right
  )  ,hash);
  
  ds_rollup_match_scores_add_summary := join(pih  ,ds_get_address1  ,left.rcid = right.rcid2  ,transform(lay_new_rollup
-    ,self.recs := right.recs + dataset([{left.proxid  ,left.cnp_name ,Address.Addr1FromComponents(left.prim_range,'',left.prim_name,'','','',left.sec_range) + ' ' + Address.Addr2FromComponents(left.v_city_name,left.st,left.zip),left.active_domestic_corp_key,left.active_duns_number,left.company_fein}]  ,lay_rec_child)
+    ,self.recs := right.recs + dataset([{left.proxid  ,left.cnp_name ,Address.Addr1FromComponents(left.prim_range,'',left.prim_name,'','','',left.sec_range) + ' ' + Address.Addr2FromComponents(left.v_city_name,left.st,left.zip),left.active_corp_key,left.active_duns_number,left.company_fein}]  ,lay_rec_child)
     ,self.scores := right.scores(~exists(child(regexfind('(left_company_name|right_company_name|left_cnp_name_phonetic|right_cnp_name_phonetic)',trim(fieldname),nocase))) )
     ,self      := right
  )  ,hash)
@@ -495,7 +495,7 @@ end;
 
   ds_top10_address_get_full_recs := join(ih ,ds_top10_addresses_with_most_proxids_proxids2  ,left.proxid = right.proxid ,transform({string address_rank,string cnt_proxids ,recordof(left)} ,self.cnt_proxids := (string)right.cnt_proxids,self.address_rank := (string)right.address_rank,self := left),keep(1),hash);
 
-  ds_agg_top10_address_proxids_prep := BIPV2_Tools.Agg_Slim(ds_top10_address_get_full_recs ,proxid,100,pSet_Add_Fields := ['cnt_proxids','address_rank']);
+  ds_agg_top10_address_proxids_prep := BIPV2_Tools.Agg_Slim(ds_top10_address_get_full_recs ,proxid,100,pSet_Add_Fields := ['cnt_proxids','address_rank'],pACorpkeyField := active_corp_key);
   
   ds_agg_top10_address_proxids := project(ds_agg_top10_address_proxids_prep ,transform({unsigned address_rank,unsigned cnt_proxids ,recordof(left) - cnt_proxidss - address_ranks},self.address_rank := (unsigned)left.address_ranks[1].address_rank
   ,self.cnt_proxids := (unsigned)left.cnt_proxidss[1].cnt_proxids ,self := left))
@@ -646,7 +646,7 @@ end;
 
 
   // -- aggregate samples of the xlink append
-  ds_agg_xlink_append := BIPV2_Tools.Agg_Slim(ds_new_xlink_append_persisted ,proxid,100,pSet_Add_Fields := ['proxid_orig'])  : persist('~persist::BIPV2_ProxID::_Underlinks::ds_agg_xlink_append');
+  ds_agg_xlink_append := BIPV2_Tools.Agg_Slim(ds_new_xlink_append_persisted ,proxid,100,pSet_Add_Fields := ['proxid_orig'],pACorpkeyField := active_corp_key)  : persist('~persist::BIPV2_ProxID::_Underlinks::ds_agg_xlink_append');
 
   ds_Overall_Underlink_Stats := dataset([
      {'Count Total Proxid Records'                                                                ,ut.fIntWithCommas(count(table(ih                                   ,{proxid},proxid,merge))) ,ut.fIntWithCommas(count(ih                                       )    )}  

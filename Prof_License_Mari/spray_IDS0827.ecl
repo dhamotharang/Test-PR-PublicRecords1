@@ -1,4 +1,4 @@
-// spray Ohio Department of Commerce Professional Licenses Files for MARI	   
+﻿// spray Ohio Department of Commerce Professional Licenses Files for MARI	   
 IMPORT Prof_License_Mari;
 
 EXPORT spray_IDS0827(string filedate) := MODULE
@@ -33,25 +33,6 @@ TransformFile_rel(string filename) := FUNCTION
 	
 END;		
 
-// Transform Timashare
-// TransformFile_reb(string filename) := FUNCTION
-	// n := StringLib.StringFind(filename, '.',1);
-	// newname := filename[1..(n-1)];
-	// sprayed_file	:= destination + filedate + '::' + StringLib.StringToLowerCase(newname)+ '.raw';
-	// dsraw := dataset(sprayed_file,
-										// Prof_License_Mari.Layout_IDS0827.raw,CSV(SEPARATOR(','),QUOTE('"'),TERMINATOR(['\r','\r\n'])));
-					
-	// ds := PROJECT(dsraw,TRANSFORM(Prof_License_Mari.Layout_IDS0827.Common,SELF.ln_file_type := 'BRK';
-																																				// SELF.ln_filedate := filedate; 
-																																				// SELF := LEFT; 
-																																				// self:= []));
-	
-	// RETURN ds;
-	
-// END;		
-
-
-
 
 AddToSuperfile_rel(string filename) := FUNCTION
 	RETURN 	
@@ -63,16 +44,26 @@ END;
 //  Spray All Files
 spray_all	:=
 	PARALLEL(
-		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'All_Licenses.csv','comma');
-		// Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Timeshare_Land_Registration.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Active_License_Search_Results.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Expired_License_Search_Results.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Inactive_License_Search_Results.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Revoked_License_Search_Results.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Surrendered_License_Search_Results.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Suspended_License_Search_Results.csv','comma');
+		Prof_License_Mari.spray_common_modified.spray_csv(filedate, code, 'Terminated_License_Search_Results.csv','comma');
 	);
 
 
 //  Transform All Files
 xform_all
 	:= PARALLEL(
-							OUTPUT(TransformFile_rel('All_Licenses.csv'),, 	destination + filedate + '::All_Licenses.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
-							// OUTPUT(TransformFile_rel('Timeshare_Land_Registration.csv'),, 	destination + filedate + '::Timeshare_Land_Registration.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Active_License_Search_Results.csv'),, 	destination + filedate + '::Active_License_Search_Results.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Expired_License_Search_Results.csv'),, 	destination + filedate + '::Expired_License_Search_Results.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Inactive_License_Search_Results.csv'),, 	destination + filedate + '::Inactive_License_Search_Results.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Revoked_License_Search_Results.csv'),, 	destination + filedate + '::Revoked_License_Search_Results.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Surrendered_License_Search_Results.csv'),, 	destination + filedate + '::Surrendered_License_Search_Results.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Suspended_License_Search_Results.csv'),, 	destination + filedate + '::Suspended_License_Search_Results.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
+							OUTPUT(TransformFile_rel('Terminated_License_Search_Results.csv'),, 	destination + filedate + '::Terminated_License_Search_Results.csv',	CSV(SEPARATOR(','),QUOTE('"')), OVERWRITE),
 					 	);	
 
 
@@ -81,8 +72,13 @@ super_all
 	:=	
 	SEQUENTIAL(
 		FileServices.StartSuperFileTransaction(),
-		AddToSuperfile_rel('All_Licenses.csv'),
-		// AddToSuperfile_rel('Timeshare_Land_Registration.csv'),
+		AddToSuperfile_rel('Active_License_Search_Results.csv'),
+		AddToSuperfile_rel('Expired_License_Search_Results.csv'),
+		AddToSuperfile_rel('Inactive_License_Search_Results.csv'),
+		AddToSuperfile_rel('Revoked_License_Search_Results.csv'),
+		AddToSuperfile_rel('Surrendered_License_Search_Results.csv'),
+		AddToSuperfile_rel('Suspended_License_Search_Results.csv'),
+		AddToSuperfile_rel('Terminated_License_Search_Results.csv'),
 		FileServices.FinishSuperFileTransaction()
 	);
 
@@ -90,8 +86,13 @@ super_all
 remove_raw 
 	:= 
 		SEQUENTIAL(
-							 FileServices.DeleteLogicalFile(destination + filedate + '::All_Licenses.raw'),
-							 // FileServices.DeleteLogicalFile(destination + filedate + '::Timeshare_Land_Registration.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Active_License_Search_Results.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Expired_License_Search_Results.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Inactive_License_Search_Results.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Revoked_License_Search_Results.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Surrendered_License_Search_Results.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Suspended_License_Search_Results.raw'),
+							 FileServices.DeleteLogicalFile(destination + filedate + '::Terminated_License_Search_Results.raw'),
 							 );
 
 
@@ -105,59 +106,4 @@ export S0827_SprayFiles := SEQUENTIAL(
 END;
 
 
-
-
-
-
-
-	//  Spray All Files
-	// EXPORT S0827_SprayFiles(string pVersion) := FUNCTION
-	
-		//Use for 20130502 and 20130807
-		/*RETURN PARALLEL(Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Company_modified.csv', 'company','comma'); 		
-					          Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Licensee_modified.csv', 'licensee','comma'); 		
-										);*/
-		//For 20130913		
-		//Associate Broker.csv is renamed to Broker.csv
-		// RETURN PARALLEL(//Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Broker.csv', 'associate_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Broker_not_active.csv', 'broker_inactive','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Cert_Instructor.csv', 'cert_instructor','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Companies.csv', 'companies','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Designated_Broker.csv', 'desig_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Limited_Broker.csv', 'limited_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Managing_Assoc_Broker.csv', 'managing_associate_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Managing_Broker.csv', 'managing_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Managing_Salesperson.csv', 'managing_salesperson','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Salesperson.csv', 'salesperson','comma'); 		
-
-										//For 20140714
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Licensees.csv', 'licensees','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'branch office all.csv', 'branchoffice','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'corporations all.csv', 'corporations','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'llc all.csv', 'llc','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'llp all.csv', 'llp','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'lp all.csv', 'lp','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'partnerships all.csv', 'partnerships','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'sp all.csv', 'sp','comma'); 		
-										
-										//For 20140813
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Assoc_Broker_Licensees.csv', 'associate_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Branch_Companies.csv', 'branch','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Broker_Licensees.csv', 'broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Corp_Companies.csv', 'corporation','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Desig_Broker_Licensees.csv', 'desig_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Limited_Broker_Licensees.csv', 'limited_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Limited_lib_Companies.csv', 'llc','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'limited_lib_part_Companies.csv', 'llp','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'limited_part_Companies.csv', 'lp','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'Manag_Assoc_broker_Licensees.csv', 'managing_associate_broker','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'partnership_Companies.csv', 'partnership','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'sales_Licensees.csv', 'salesperson','comma'); 		
-					          // Prof_License_Mari.spray_common.spray_csv(pVersion, code, 'sole_prop_Companies.csv', 'sp','comma'); 		
-
-										// );
-
-	// END;
-
-// END;
 

@@ -12,6 +12,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 import _Control;
+#option('skipFileFormatCrcCheck', 1);
 export IsNewProdHeaderVersion(string datasetname,string pkgvar='header_build_version',STRING roxie_ip=_Control.RoxieEnv.prod_batch_neutral,dataset(header.Layout_PackageVariable) ds  = dataset([],header.Layout_PackageVariable)) := 
 function
 

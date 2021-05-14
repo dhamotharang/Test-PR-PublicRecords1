@@ -22,7 +22,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_FILENAME := 'DataBridge';
   EXPORT spc_INGESTSTATUS := '';
   EXPORT spc_EXTERNAL_MAPPING := 'UniqueID:';
-  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,process_date,record_type,clean_company_name,clean_telephone_num,state,zip_code5,mail_score,name_gender,web_address,sic8_1,sic8_2,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,database_site_id,database_individual_id,email,email_present_flag,site_source1,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status';
+  EXPORT spc_EXTERNAL_BATCH_PARAM := ',/* MY_ */,dt_first_seen,dt_last_seen,dt_vendor_first_reported,dt_vendor_last_reported,process_date,record_type,clean_company_name,clean_telephone_num,state,zip_code5,mail_score,name_gender,web_address,sic8_1,sic8_2,sic8_3,sic8_4,sic6_1,sic6_2,sic6_3,sic6_4,sic6_5,transaction_date,database_site_id,database_individual_id,email,email_present_flag,site_source1,site_source2,site_source3,site_source4,site_source5,site_source6,site_source7,site_source8,site_source9,site_source10,individual_source1,individual_source2,individual_source3,individual_source4,individual_source5,individual_source6,individual_source7,individual_source8,individual_source9,individual_source10,email_status';
   EXPORT spc_HAS_TWOSTEP := FALSE;
   EXPORT spc_HAS_PARTITION := FALSE;
   EXPORT spc_HAS_FIELDTYPES := TRUE;
@@ -48,6 +48,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:invalid_mandatory:LENGTHS(1..)\n'
     + 'FIELDTYPE:invalid_generaldate:CUSTOM(Scrubs_DataBridge.Functions.fn_general_date > 0)\n'
     + 'FIELDTYPE:invalid_pastdate:CUSTOM(Scrubs_DataBridge.Functions.fn_past_yyyymmdd > 0)\n'
+    + 'FIELDTYPE:invalid_trans_date:CUSTOM(Scrubs_DataBridge.Functions.fn_trans_date > 0)\n'
     + 'FIELDTYPE:invalid_record_type:ENUM(C|H)\n'
     + 'FIELDTYPE:invalid_numeric:CUSTOM(Scrubs_DataBridge.Functions.fn_numeric > 0)\n'
     + 'FIELDTYPE:invalid_st:CUSTOM(Scrubs_DataBridge.Functions.fn_verify_state > 0)\n'
@@ -145,7 +146,7 @@ EXPORT Base_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELD:sic6_3:TYPE(STRING6):LIKE(invalid_sic):0,0\n'
     + 'FIELD:sic6_4:TYPE(STRING6):LIKE(invalid_sic):0,0\n'
     + 'FIELD:sic6_5:TYPE(STRING6):LIKE(invalid_sic):0,0\n'
-    + '// FIELD:transaction_date:TYPE(STRING6):0,0\n'
+    + 'FIELD:transaction_date:TYPE(STRING6):LIKE(invalid_trans_date):0,0\n'
     + 'FIELD:database_site_id:TYPE(STRING10):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:database_individual_id:TYPE(STRING10):LIKE(invalid_numeric):0,0\n'
     + 'FIELD:email:TYPE(STRING50):LIKE(invalid_email):0,0\n'

@@ -22,7 +22,7 @@ export Prefix(string serviceName='NoNameGiven') := function
 								'person_xADL2'     	=> '',
 								'IDL_Header'        => ut.foreign_aprod,
 								'LAB_xLink' 				=> map(ThorLib.Group() = 'thor400_44' => '~thor400_44::'
-                                          ,ThorLib.Group() = 'thor400_66' => '~thor400_66::'
+                                          ,ThorLib.Group() = 'thor400_36' => '~thor400_36::'
 																					,_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod+'thor400_60::'
 																					, '~thor_data400::'),	
 								'Vina'							=> map(_Control.ThisEnvironment.ThisDaliIp in SetDali  => foreign_prod

@@ -1,4 +1,4 @@
-import ln_propertyv2;
+import ln_propertyv2, D2C_Customers;
 
 ds_deed := ln_propertyv2.File_Deed(vendor_source_flag in ['D','O']);
 
@@ -58,7 +58,7 @@ r1 t1(ds_deed le) := transform
 end;
 
 p1        := distribute(project(ds_deed,t1(left)),hash(ln_fares_id));
-srch_dist := distribute(reunion.property_search1(ln_fares_id2[2] in ['D','M']),hash(ln_fares_id2));
+srch_dist := distribute(reunion.property_search1(ln_fares_id2[2] in ['D','M'] and D2C_Customers.SRC_Allowed.Check(20, ln_fares_id2)),hash(ln_fares_id2));
 
 r2 := record
  p1;
@@ -95,4 +95,4 @@ j2 := join(j1_dist,current_owners_dist,
 		   local
 		  );
 
-export deeds := j2 : persist('persist::reunion_deeds');
+export deeds(unsigned1 mode) := j2 : persist('persist::reunion_deeds::' + reunion.Constants.sMode(mode));

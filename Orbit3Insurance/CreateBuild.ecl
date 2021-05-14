@@ -34,6 +34,9 @@ dataset(Layouts.OrbitPlatformUpdateLayout) PlatformStatusUpdates {xpath('Platfor
 
 	rRequestCapsule	:=
 	record
+	 #IF(STD.System.Util.PlatformVersionCheck('7.8')) 
+	 Orbit3Insurance.Layouts.AdditionalNamespacesLayout;
+	 #END
 		rOrbitRequest						request			{xpath('request')};
 	end;
 

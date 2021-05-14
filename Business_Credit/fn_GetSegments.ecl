@@ -1,12 +1,14 @@
-IMPORT	Business_Credit, MDR, ut;
+﻿IMPORT	Business_Credit, MDR;
+
 EXPORT	fn_GetSegments	:=	MODULE
 
-	SHARED	dValidRecords	:=	Business_Credit.Files().active;
-
+	//SHARED	dValidRecords	:=	Business_Credit.Files().active;
+SHARED	dValidRecords	:=	Business_Credit.Files().active;
 	EXPORT	accountBase	:=	FUNCTION
 		
 		Business_Credit.Layouts.rAccountBase	tAccountBase(dValidRecords	pInput)	:=	TRANSFORM
 			SELF.Sbfe_Contributor_Number	:=	pInput.portfolioHeader.Sbfe_Contributor_Number;
+			self.Overall_File_Format_Version:=	pInput.portfolioHeader.Overall_File_Format_Version;
 			SELF.Extracted_Date						:=	pInput.portfolioHeader.Extracted_Date;
 			SELF.Cycle_End_Date						:=	pInput.portfolioHeader.Cycle_End_Date;
 			SELF													:=	pInput;
@@ -76,7 +78,78 @@ EXPORT	fn_GetSegments	:=	MODULE
 
 		RETURN	dBIClassification;
 	END;
+	export digitalfootprint:=function 
+	 	rPreDF	:=	RECORD
+			STRING2		record_type;
+			STRING30	Sbfe_Contributor_Number;
+			STRING50	Contract_Account_Number;
+			STRING50	Original_Contract_Account_Number;
+			STRING3		Account_Type_Reported;
+			STRING		process_date;
+			STRING		original_process_date;
+			STRING8		Extracted_Date;
+			STRING8		Cycle_End_Date;
+			BOOLEAN		active;
+			DATASET(Business_Credit.Layouts.DF)	DF{MAXCOUNT(25)};		//	BI
+		END;
+		rPreDF tBusinessOwner(dValidRecords	pInput,	UNSIGNED cnt)	:=	TRANSFORM
+			SELF.record_type											:=	Business_Credit.Constants().BS;
+			SELF.Sbfe_Contributor_Number					:=	pInput.portfolioHeader.Sbfe_Contributor_Number;
+			SELF.Contract_Account_Number					:=	pInput.Contract_Account_Number;
+			SELF.Original_Contract_Account_Number	:=	pInput.Original_Contract_Account_Number;
+			SELF.Account_Type_Reported						:=	pInput.Account_Type_Reported;
+			SELF.process_date											:=	pInput.process_date;
+			SELF.original_process_date						:=	pInput.original_process_date;
+			SELF.Extracted_Date										:=	pInput.portfolioHeader.Extracted_Date;
+			SELF.Cycle_End_Date										:=	pInput.portfolioHeader.Cycle_End_Date;
+			SELF.active														:=	pInput.active;
+			SELF.DF																:=	pInput.businessOwner[cnt].DigitalFootPrint;
+		END;
+		dBusinessOwner	:=	NORMALIZE(dValidRecords(COUNT(businessOwner.DigitalFootPrint)>0),
+													COUNT(LEFT.businessOwner),
+													tBusinessOwner(LEFT,COUNTER));
+		rPreDF tIndividualOwner(dValidRecords	pInput,	UNSIGNED cnt)	:=	TRANSFORM
+			SELF.record_type											:=	Business_Credit.Constants().BS;
+			SELF.Sbfe_Contributor_Number					:=	pInput.portfolioHeader.Sbfe_Contributor_Number;
+			SELF.Contract_Account_Number					:=	pInput.Contract_Account_Number;
+			SELF.Original_Contract_Account_Number	:=	pInput.Original_Contract_Account_Number;
+			SELF.Account_Type_Reported						:=	pInput.Account_Type_Reported;
+			SELF.process_date											:=	pInput.process_date;
+			SELF.original_process_date						:=	pInput.original_process_date;
+			SELF.Extracted_Date										:=	pInput.portfolioHeader.Extracted_Date;
+			SELF.Cycle_End_Date										:=	pInput.portfolioHeader.Cycle_End_Date;
+			SELF.active														:=	pInput.active;
+			SELF.DF																:=	pInput.individualOwner[cnt].DigitalFootPrint;
+		END;
+		dIndividualOwner	:=	NORMALIZE(dValidRecords(COUNT(individualOwner.DigitalFootPrint)>0),
+													COUNT(LEFT.individualOwner),
+													tIndividualOwner(LEFT,COUNTER));
+		rPreDF tAccountBase(dValidRecords	pInput)	:=	TRANSFORM
+			SELF.record_type											:=	Business_Credit.Constants().AB;
+			SELF.Sbfe_Contributor_Number					:=	pInput.portfolioHeader.Sbfe_Contributor_Number;
+			SELF.Contract_Account_Number					:=	pInput.Contract_Account_Number;
+			SELF.Original_Contract_Account_Number	:=	pInput.Original_Contract_Account_Number;
+			SELF.Account_Type_Reported						:=	pInput.Account_Type_Reported;
+			SELF.process_date											:=	pInput.process_date;
+			SELF.original_process_date						:=	pInput.original_process_date;
+			SELF.Extracted_Date										:=	pInput.portfolioHeader.Extracted_Date;
+			SELF.Cycle_End_Date										:=	pInput.portfolioHeader.Cycle_End_Date;
+			SELF.active														:=	pInput.active;
+			SELF.DF																:=	pInput.DigitalFootPrint;
+		END;
+		dAccountBase		:=	PROJECT(dValidRecords(COUNT(DigitalFootPrint)>0),tAccountBase(LEFT));
+		Business_Credit.Layouts.rDigitalFootprint	tDigitalFootprint(rPreDF	pInput,	UNSIGNED cnt)	:=	TRANSFORM
+			SELF	:=	pInput.DF[cnt];
+			SELF	:=	pInput;
+		END;
 
+		dDigitalFootprint	:=	NORMALIZE(dBusinessOwner+dIndividualOwner+dAccountBase,
+														COUNT(LEFT.DF),
+														tDigitalFootprint(LEFT,COUNTER));
+
+		RETURN	dDigitalFootprint;	
+	END;
+	
 	EXPORT	businessowner	:=	FUNCTION
 		
 		Business_Credit.Layouts.rBusinessOwner	tBusinessOwner(dValidRecords	pInput,	UNSIGNED cnt)	:=	TRANSFORM
@@ -97,6 +170,11 @@ EXPORT	fn_GetSegments	:=	MODULE
 		addGlobalSID 	:=  	MDR.macGetGlobalSID(dBusinessOwner,'SBFECV','','global_sid'); //DF-25791: Populate Global_SID	
 
 		RETURN	addGlobalSID;
+	END;
+
+	EXPORT	merchantprocessing	:=	FUNCTION
+		
+		Return Business_Credit.fn_PrepMDandChildren;
 	END;
 
 	EXPORT	collateral	:=	FUNCTION

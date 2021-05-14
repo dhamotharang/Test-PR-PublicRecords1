@@ -1,4 +1,4 @@
-/*
+﻿/*
 	Author: 		Gavin Witz
 	Date:   		05/06/2009
 	Revision:		1.1
@@ -11,12 +11,10 @@
 export File_Banko_FixedJoinRec(boolean isFCRA = false) := function
 	prefix :=  if(isFCRA, 
 						DATASET('~thor::banko::fcra::filter::qa::additionalevents',
-										{BankoJoinRecord,
-											UNSIGNED8 RecPos{virtual(fileposition)}}
-										,FLAT,__COMPRESSED__), 
+										Banko.Layout_Banko_Base,										
+										FLAT,__COMPRESSED__), 
 						DATASET('~thor::banko::filter::qa::additionalevents',
-										{BankoJoinRecord,
-											UNSIGNED8 RecPos{virtual(fileposition)}}
-										,FLAT,__COMPRESSED__));
+										Banko.Layout_Banko_Base,
+										FLAT,__COMPRESSED__));
 	return prefix;
 end;

@@ -3,7 +3,7 @@ import ut, business_header, mdr, lib_stringlib, email_data, _validate;
 
 EXPORT As_Business_Linking (	
 	 boolean pUseOtherEnviron = _Constants().IsDataland
-	,dataset(Equifax_Business_Data.layouts.Base) pBase = files(,pUseOtherEnviron).base.qa
+	,dataset(Equifax_Business_Data.layouts.Base) pBase = Equifax_Business_Data.files(,pUseOtherEnviron).base.Companies.qa
   ,boolean IsPersist = true	
 	) := function		
 																

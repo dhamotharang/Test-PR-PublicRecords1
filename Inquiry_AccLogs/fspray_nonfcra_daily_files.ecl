@@ -1,4 +1,4 @@
-﻿import Versioncontrol, _Control, std;
+﻿﻿import Versioncontrol, _Control, std, wk_ut, INQL_V2;
 
 EXPORT fspray_nonfcra_daily_files := module
 
@@ -36,7 +36,8 @@ EXPORT fspray_nonfcra_daily_files := module
 	export _spray := sequential(
 					nothor(apply(GetFiles(readyDir), STD.File.MoveExternalFile(pServerIP, readyDir + name, sprayingDir + name)))
 				 ,Inquiry_AccLogs.fSprayInputFiles(GetFiles(sprayingDir), false)
-				 ,Inquiry_AccLogs.FIDO_change_report.proc_FIDO_chg_report
+				 ,wk_ut.CreateWuid('notify(INQL_v2._CRON_ECL(\'FIDO CHANGE REPORT\',FALSE,true).EVENT_NAME, \'*\');','thor400_36',INQL_V2._constants.PROD_ESP)
+				 // ,Inquiry_AccLogs.FIDO_change_report.proc_FIDO_chg_report
 				 ,nothor(apply(GetFiles(sprayingDir), STD.File.MoveExternalFile(pServerIP, sprayingDir + name, doneDir + name)))
 			 	 // ,Inquiry_AccLogs.Inquiry_daily_SuperfileContents(false)
 				 ,notify('Spray Complete','*')

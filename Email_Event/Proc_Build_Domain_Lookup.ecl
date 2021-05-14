@@ -1,15 +1,16 @@
-﻿IMPORT Email_DataV2, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR,dops, Orbit3;
+﻿﻿IMPORT Email_DataV2, dx_Email, STD, PromoteSupers, RoxieKeyBuild, MDR,dops, Orbit3,ut;
 
 EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 	
 	ds_bv_in       := Email_Event.Files.BV_Domain_in;
 	ds_bv_delta_in := Email_Event.Files.BV_Delta_Domain_in;
 	ds_email_in    := Email_Event.Files.Email_Domain_in;
+	ds_whois_in    := Email_Event.Files.WhoIs_Domain_in;
 	
 	//Append to base file
 	ds_base := Email_Event.Files.Domain_lkp;
 	
-	CombineAll   := ds_base/* + ds_email_in + ds_bv_in*/ + ds_bv_delta_in;
+	CombineAll   := ds_base/* + ds_email_in + ds_bv_in*/ + ds_whois_in + ds_bv_delta_in;
 	ds_sort := SORT(CombineAll,domain_name, -date_last_seen);
 
   // Rollup 
@@ -21,7 +22,7 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 	END;
 	
   dBase_rollup := ROLLUP(ds_sort,
-								  	trim(LEFT.domain_name) = trim(RIGHT.domain_name),
+								  	trim(LEFT.domain_name) = trim(RIGHT.domain_name) and trim(LEFT.source) = trim(RIGHT.source),
 									  Xform(LEFT,RIGHT));
 
 	//Build base file	
@@ -47,10 +48,13 @@ EXPORT Proc_Build_Domain_Lookup(STRING version) := FUNCTION
 
 	dops_update :=  DOPS.updateversion('EmailDataV2EventKeys',version,'xia.sheng@lexisNexis.com',,'N');
 
-	orbit_update := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data V2 Events',version,'N');
+	orbit_update := if(ut.Weekday((integer)version) <> 'SATURDAY' and ut.Weekday((integer)version) <> 'SUNDAY',
+	                                                                                           Orbit3.proc_Orbit3_CreateBuild_AddItem ('Email Data V2 Events',version,'N')
+																		,output('No Orbit Entries Needed for weekend builds'));																												 
 
 	RETURN SEQUENTIAL(
 	                  Email_Event.Map_BV_Delta_Domain_Lookup(version)
+										,Email_Event.Map_WhoIs_Domain_Lookup(version)
 	                  // Email_Event.Map_BV_Domain_Lookup,
 										// Email_Event.Map_Email_Domain_Lookup,
 										,build_table

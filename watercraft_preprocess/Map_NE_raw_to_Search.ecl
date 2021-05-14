@@ -1,4 +1,4 @@
-import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
+﻿import lib_stringlib, watercraft, watercraft_preprocess, ut, STD;
 
 // Translates ne_phase01_update.mp
 
@@ -30,12 +30,12 @@ Watercraft_preprocess.Layout_Watercraft_Search_Common search_mapping_format(wDat
 	self.orig_name_type_code	:=	'O';
 	self.orig_name_type_description	:=	'OWNER';
 	self.orig_address_1			:=	L.ADDRESS_1;
-	self.orig_address_2			:=	L.TITLE_ADDRESS_2;
+	self.orig_address_2			:=	'';  //Was title_address_2 but that is a secondary address and will mess up the address cleaning
 	self.orig_city					:=	L.CITY;
 	self.orig_state					:=	L.STATE;
 	self.orig_zip						:=	L.ZIP;
 	self.orig_fips					:=	L.FIPS;
-	self.name_format					:= IF(StringLib.StringFind(L.NAME,',',1)>0, 'L','U');
+	self.name_format					:= IF(StringLib.StringFind(L.NAME,',',1)>0, 'L','F');
 	tempPrepAddress						:= IF(trim(L.ADDRESS_1) <> '' and trim(L.TITLE_ADDRESS_2) <> '', trim(L.ADDRESS_1)+' '+trim(L.TITLE_ADDRESS_2),trim(L.ADDRESS_1));
 	tempPrepLastSitus					:= trim(L.CITY,left,right)
 															+	IF(trim(L.CITY) <> '',', ','')

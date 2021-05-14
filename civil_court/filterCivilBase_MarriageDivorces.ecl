@@ -1,4 +1,4 @@
-import PromoteSupers;
+﻿import PromoteSupers;
 //#workunit('name','Civil Court: Marriage & Divorces Filter'+ civil_court.Version_Development);
 
 /* ************************************************************************************************************** */
@@ -193,8 +193,8 @@ email := fileservices.sendemail('kgummadi@seisint.com; cpettola@seisint.com',
 						        '              2) thor_data200::base::civil_court::matter::marriage_divorce' +'\n' +
 								'              have been built and ready for processing.'); 
 								
-PromoteSupers.MAC_SF_BuildProcess(dfinal_matter,'~thor_data200::base::civil_court::matter::marriage_divorce',build_civ_matter,2);
-PromoteSupers.MAC_SF_BuildProcess(dfinal_party, '~thor_data200::base::civil_court::party::marriage_divorce', build_civ_party, 2);
+PromoteSupers.MAC_SF_BuildProcess(dfinal_matter,'~thor_data200::base::civil_court::matter::marriage_divorce',build_civ_matter,2,,TRUE);
+PromoteSupers.MAC_SF_BuildProcess(dfinal_party, '~thor_data200::base::civil_court::party::marriage_divorce', build_civ_party, 2,,TRUE);
 
 /* Output Files*************************************************************************************************** */
 export filterCivilBase_MarriageDivorces := sequential(build_civ_matter,build_civ_party,email);

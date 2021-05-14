@@ -82,13 +82,14 @@ EXPORT CommonBase := MODULE
   export Clean_Common_Base        (string pversion = '',boolean	pUseOtherEnvironment	= false) := tools.macf_FilesBase(BIPV2.Filenames(pversion,pUseOtherEnvironment).Clean_Common_Base ,Layout       );
   
   shared clean_built_filename := BIPV2.Filenames().Clean_Common_Base.built;
+  shared clean_built_prod_filename := BIPV2.Filenames(,true).Clean_Common_Base.built;
 	EXPORT DS_CLEAN_old             := DATASET(clean_built_filename        ,BIPV2.CommonBase_mod.Layout_S40_old         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
 	EXPORT DS_CLEAN                 := DATASET(clean_built_filename        ,BIPV2.CommonBase_mod.Layout         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
 	// EXPORT DS_CLEAN                 := clean(DS_BUILT         );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
 	EXPORT DS_CLEAN_BASE            := clean(DS_BASE          );//USED OUTSIDE OF THE BUILD  
 	EXPORT DS_FATHER_CLEAN          := clean(DS_FATHER        );
 	EXPORT DS_FATHER_STATIC_CLEAN   := clean(DS_FATHER_STATIC );
-	EXPORT DS_PROD_CLEAN  	        := clean(DS_PROD          );
+	EXPORT DS_PROD_CLEAN            := DATASET(clean_built_prod_filename        ,BIPV2.CommonBase_mod.Layout         ,THOR );//USED INSIDE OF THE BIP BUILD TO ACCESS THE NEWLY CREATED FILE.
 	EXPORT DS_LOCAL_CLEAN           := clean(DS_LOCAL         );
 	EXPORT DS_LOCAL_STATIC_CLEAN    := clean(DS_LOCAL_STATIC  );
 	

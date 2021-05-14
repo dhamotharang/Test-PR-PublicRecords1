@@ -133,10 +133,10 @@ ck('EmergesKeys'        ,'~thor_data400::base::emergesHeader_Building'          
 ck('ATFKeys'            ,'~thor_data400::BASE::atfHeader_Building'               ,'~thor_data400::base::atf_firearms_explosives')+
 ck('ProfLicKeys'        ,'~thor_data400::Base::ProfLicHeader_Building'           ,'~thor_data400::base::prof_licenses_AID')+
 ck('FCRA_ProfLicKeys'   ,'~thor_data400::Base::ProfLicHeader_Building'           ,'~thor_data400::base::prof_licenses_AID','F')+
-ck('DeathMasterKeys'    ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterV2_SSA')+
-ck('DeathMasterKeys_F'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_father')+
-ck('DeathMasterKeys_G'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_grandfather')+
-// ck('DeathMasterKeys_D'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_delete')+
+ck('DeathMasterSsaKeys'    ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterV2_SSA')+
+ck('DeathMasterSsaKeys_F'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_father')+
+ck('DeathMasterSsaKeys_G'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_grandfather')+
+// ck('DeathMasterSsaKeys_D'  ,'~thor_data400::Base::DeathHeader_Building'             ,'~thor_data400::base::did_death_masterv2_ssa_delete')+
 ck('ForeclosureKeys'    ,'~thor_data400::Base::ForeclosureHeader_Building'       ,'~thor_data400::BASE::foreclosure')+
 ck('FAAKeys'            ,'~thor_data400::Base::AirmenHeader_Building'            ,'~thor_data400::base::faa_airmen_BUILT')+
 ck('WatercraftKeys'     ,'~thor_data400::Base::WatercraftSrchHeader_Building'    ,'~thor_data400::base::watercraft_search')+

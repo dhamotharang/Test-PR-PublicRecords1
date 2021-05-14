@@ -28,5 +28,11 @@ export Send_Email(string pversion, string pBody='') := module
 														INQL_FFD._Constants.DatasetName + ' - ' + pversion + ' build skipped', 
 														workunit + ' on '+ _Control.ThisEnvironment.Name + '\n\n' + pBody  );														
 	
-	
+	export ppcException    := fileservices.sendemail(  
+														Email_Notification_Lists.ppcException,
+														INQL_FFD._Constants.DatasetName + ' - ' + pversion + ' PPC Exception', 
+														workunit + ' on '+ _Control.ThisEnvironment.Name + '\n\n' + pBody  );	
+
+
+
 end;

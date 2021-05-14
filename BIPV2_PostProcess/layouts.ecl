@@ -38,6 +38,7 @@ EXPORT layouts := module
       string2   core        ;		// TC = tri core, DC = Dual Core, TS = trusted source, SS := Single Trusted Source
       string2   emergingCore;	  // Trusted source singleton
       string2   inactive    ;		// RI - Reported as inactive, NA - Inactive due to no activity
+      string1   status_score;
   end;
 
   export stats_layout := record

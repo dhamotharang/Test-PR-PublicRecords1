@@ -2,26 +2,27 @@
 
 export Build_Base(
 
-	 string														pversion
-	,boolean													pIsTesting		 = false
-	,dataset(Layouts.Sprayed_Input	)	pSprayedFile 	 = Files(,true).Input.Sprayed
-	,dataset(Layouts.Base           ) pBaseFile      = Files().base.qa
-	,dataset(Layouts.Base         	)	pNewBaseFile	 = Update_Base(pversion,pSprayedFile,pBaseFile)
-	,boolean													pWriteFileOnly = false
+	 string														        pversion
+	,boolean													        pIsTesting		        = false
+	,dataset(Layouts.Sprayed_Input	        )	pSprayedFile 	        = Files().Input.Companies.using																									
+	,dataset(Layouts.Sprayed_Input_Contacts	)	pSprayedContactsFile  = Files().Input.Contacts.using  
+	,dataset(Layouts.Base                   ) pBaseFile             = Files().base.Companies.qa										
+	,dataset(Layouts.Base_contacts					)	pBaseContactsFile			= Files().base.contacts.qa	
+	,boolean													        pWriteFileOnly        = false
 	
 ) :=
 function
-	
-	tools.mac_WriteFile(Filenames(pversion).base.new	,pNewBaseFile	,Build_Base_File	,pShouldExport := false);
-	
+
 	return
 		if(tools.fun_IsValidVersion(pversion)
-			,sequential(
+			,
+			sequential(
 				 if(not pWriteFileOnly	,Promote().Inputfiles.Sprayed2Using			)
-				,Build_Base_File
+		  		,Update_Base_Files(pversion,pSprayedFile,pBaseFile,pSprayedContactsFile,pBaseContactsFile)
 				,if(not pWriteFileOnly, Promote(pversion).buildfiles.New2Built	)	
 			)		
 			,output('No Valid version parameter passed, skipping Equifax_Business_Data.Build_Base atribute') 
-		);
+		)
+		;
 		
 end;

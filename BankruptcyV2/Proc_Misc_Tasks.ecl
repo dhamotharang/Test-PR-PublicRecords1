@@ -15,7 +15,7 @@ BankruptcyV3.proc_BK_stats(filedate,zRunStatsReferenceV3);
 
 proc_BK_Stats			    := zRunStatsReference					   : success(output(' V2 Stats created successfully.'));
 proc_BK_Stats_v3		    := zRunStatsReferenceV3					   : success(output(' V3 Stats created successfully.'));
-new_records_sample_for_qa	:= BankruptcyV2.New_records_sample        : success(fileservices.sendemail('wma@seisint.com;qualityassurance@seisint.com;christopher.brodeur@lexisnexis.com;CAmaral@seisint.com;mohammad.alam@lexisnexis.com;Sayeed.ahmed@lexisnexis.com;Manuel.Tarectecan@lexisnexisrisk.com',
+new_records_sample_for_qa	:= BankruptcyV2.New_records_sample        : success(fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com;Manuel.Tarectecan@lexisnexisrisk.com',
 			'BankruptcyV2 Full Build Process Completed ' + filedate,
 			'workunit: ' + workunit));
 //boolean_build := bankruptcyv2.Proc_Build_Boolean_Key(filedate);
@@ -23,9 +23,9 @@ new_records_sample_for_qa	:= BankruptcyV2.New_records_sample        : success(fi
 scrubs_step2 := bankruptcyV2.proc_build_scrubs_step2(filedate);
 Stats_For_DR := bankruptcyv2.BK_Stats_Metadata;
 orbit_report.Bankruptcy_Stats(orbitreport);
-build_relationships := BankruptcyV2.Proc_Create_Relationships(filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net');
-dops_update := Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com','Y',,,'Y');
-BIP_dops_update := RoxieKeyBuild.updateversion('BankruptcyV2Keys',filedate,'avenkatachalam@seisint.com,cbrodeur@seisint.com,Randy.Reyes@lexisnexis.com,Manuel.Tarectecan@lexisnexis.com,intel357@bellsouth.net,Sayeed.ahmed@lexisnexis.com',,'BN');
+build_relationships := BankruptcyV2.Proc_Create_Relationships(filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexis.com');
+dops_update := Roxiekeybuild.updateversion('BankruptcyV2Keys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexis.com','Y',,,'Y');
+BIP_dops_update := RoxieKeyBuild.updateversion('BankruptcyV2Keys',filedate,'Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexis.com',,'BN');
 send_package := if(_Control.ThisEnvironment.Name = 'Dataland',output('Package Sent'),
 			fileservices.sendemail('Roxiedeployment@seisint.com,QualityAssurance@seisint.com',
 			'Roxie Prod NonFCRA BK Package Files ' + ut.GetDate,
@@ -60,7 +60,7 @@ Bankruptcyv2.Consolidate_SubFiles(BankruptcyV2.layout_bankruptcy_search_in,'~tho
 
 // DF-22748 Bankruptcy: Send email when WithdrawnStatus records are added that contain valid LexID
 send_withdrawnstatus_email := IF(COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))>0,
-                               fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com,Stephen.Powers@lexisnexisrisk.com,Ruel.Barrina@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
+                               fileservices.sendemail('Christopher.Brodeur@lexisnexisrisk.com,Manuel.Tarectecan@lexisnexisrisk.com',
                                'Bankruptcy Build Version ' + filedate,
                                'BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus() contains '
                                +COUNT(BankruptcyV3.Key_BankruptcyV3_WithdrawnStatus()((UNSIGNED)did>0))
@@ -118,7 +118,7 @@ sequential(/*dops_update
 		,parallel(caseret,defret,mainret,searchret)
 		,output(dFileStatus)
 		,if (count(dFileStatus(status <> 'OK')) > 0
-				,FileServices.SendEmail('Christopher.Brodeur@LexisNexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com'
+				,FileServices.SendEmail('Christopher.Brodeur@lexisnexisrisk.com; Manuel.Tarectecan@lexisnexisrisk.com'
 				,'BK stats file verification Failure'
 				,WORKUNIT + '\n' + '\n' + 'Please check above WUID to see which file failed verification'))
   ,send_withdrawnstatus_email

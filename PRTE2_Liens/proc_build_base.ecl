@@ -129,7 +129,7 @@ PRTE2_Liens.Layouts.party_base_ext xfmNamesAddr(addr_clean L) := TRANSFORM
 	self.bdid						:= IF(trim(self.cname) != '', (string)Prte2.fn_AppendFakeID.bdid(self.cname, self.prim_range, self.prim_name, self.v_city_name, self.st, self.zip, L.cust_name),'');
 	self.DID						:= IF(trim(self.lname) != '', (string)prte2.fn_AppendFakeID.did(self.fname, self.lname, L.link_ssn, L.link_dob, L.cust_name), '');
 
-	vLinkingIds := Prte2.fn_AppendFakeID.LinkIds(L.orig_full_debtorname, L.link_fein, L.link_inc_date, L.prim_range, L.prim_name, L.sec_range, L.v_city_name, L.st, L.zip, L.cust_name);
+	vLinkingIds := Prte2.fn_AppendFakeID.LinkIds(self.cname, L.link_fein, L.link_inc_date, self.prim_range, self.prim_name, self.sec_range, self.v_city_name, self.st, self.zip, L.cust_name);
 	self.powid	:= vLinkingIds.powid;
 	self.proxid	:= vLinkingIds.proxid;
 	self.seleid	:= vLinkingIds.seleid;

@@ -6,7 +6,8 @@ sprayFile(string version, string filename, string outname) :=
 		std.File.SprayVariable(_control.IPAddress.bctlpedata10,
 							srcdir + version + '/' + filename,
 							8192,'|',,'\t',						// pipe delimited, no quote character
-							'thor400_44',
+							//'thor400_dev01',//test
+							'thor400_44',//prod
 							root + outname,
 							,,,true,true,false
 						);
@@ -16,6 +17,7 @@ sfAddress 				:= root + 'addresses';
 sfRelationship 		:= root + 'relationships'; 
 sfWhiteListEntity := root + 'whitelistentity';
 sfSanctionsDOB 		:= root + 'SanctionsDOB';
+sfWCOCategories 	:= root + 'WCOCategories';
 
 
 CreateSuperfiles := SEQUENTIAL(
@@ -29,6 +31,8 @@ CreateSuperfiles := SEQUENTIAL(
 				STD.File.CreateSuperFile(sfWhiteListEntity));
 		if (NOT STD.File.SuperFileExists(sfSanctionsDOB),
 				STD.File.CreateSuperFile(sfSanctionsDOB));
+		if (NOT STD.File.SuperFileExists(sfWCOCategories),
+				STD.File.CreateSuperFile(sfWCOCategories));
 );
 
 EXPORT SprayFiles(string version) := SEQUENTIAL
@@ -40,6 +44,7 @@ EXPORT SprayFiles(string version) := SEQUENTIAL
 		FileServices.ClearSuperFile(sfRelationship, false),
 		FileServices.ClearSuperFile(sfWhiteListEntity, false),
 		FileServices.ClearSuperFile(sfSanctionsDOB, false),
+		FileServices.ClearSuperFile(sfWCOCategories, false),
 	FileServices.FinishSuperFileTransaction( ),
 	PARALLEL(
 			sprayFile(version, 'Entities.txt', 'entities' + '::' + version),
@@ -52,6 +57,7 @@ EXPORT SprayFiles(string version) := SEQUENTIAL
 			sprayFile(version, 'EntitiesRelDefs.txt', 'reldefs'),
 			sprayFile(version, 'WhiteListEntities.txt', 'WhiteListEntities' + '::' + version),
 			sprayFile(version, 'SanctionsDOB.txt', 'SanctionsDOB' + '::' + version),
+			sprayFile(version, 'WCOCategories.txt', 'WCOCategories' + '::' + version),
 	),
 	FileServices.StartSuperFileTransaction( ),
 		FileServices.AddSuperFile(sfEntity, root + 'entities' + '::' + version),
@@ -59,5 +65,6 @@ EXPORT SprayFiles(string version) := SEQUENTIAL
 		FileServices.AddSuperFile(sfRelationship, root + 'relationships' + '::' + version),
 		FileServices.AddSuperFile(sfWhiteListEntity, root + 'WhiteListEntities' + '::' + version),
 		FileServices.AddSuperFile(sfSanctionsDOB, root + 'SanctionsDOB' + '::' + version),
+		FileServices.AddSuperFile(sfWCOCategories, root + 'WCOCategories' + '::' + version),
 	FileServices.FinishSuperFileTransaction( )
 );

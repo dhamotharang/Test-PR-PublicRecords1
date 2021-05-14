@@ -63,6 +63,8 @@ Rec tranBC(Layout_Common.Contact pLeft, Layout_Common.Business pRight)
 	self.ssn 								:= pLeft.ssn;
 	self.global_sid 				:= pLeft.global_sid;
 	self.record_sid 				:= pLeft.record_sid;
+	self.tmsid 							:= if(trim(pRight.tmsid) <> '', pRight.tmsid, pLeft.tmsid);
+	self.rmsid 							:= if(trim(pRight.rmsid) <> '', pRight.rmsid, pLeft.rmsid);
 	self 										:= pLeft;
 	self 										:= pRight;
 end;

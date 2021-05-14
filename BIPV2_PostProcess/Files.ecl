@@ -1,4 +1,4 @@
-import tools,BIPV2_Files,Business_DOT; 
+﻿import tools,BIPV2_Files,Business_DOT; 
 
 export Files(
 
@@ -16,4 +16,6 @@ module
 	export OrgidSegs    := tools.macf_FilesBase	(fnames.OrgidSegs 	,layouts.laysegmentation);
 	export UltidSegs    := tools.macf_FilesBase	(fnames.UltidSegs 	,layouts.laysegmentation);
 	
+	export EntityReportData := dataset(filenames().EntityStatsSuperFilename, layout_Entity_Report.file_layout, thor);
+  
 end;

@@ -6,7 +6,7 @@
 							building and versioning (and maintaining history) of each of the keys
 ***********************************************************************************************************/
 
-IMPORT PRTE2_Watercraft,roxiekeybuild,ut,autokey, promotesupers, VersionControl, PRTE, PRTE2_Common, _control,strata;
+IMPORT PRTE2_Watercraft,roxiekeybuild,ut,autokey, promotesupers, VersionControl, PRTE, PRTE2_Common, _control,strata, Orbit3, dops, prte2;
 
 EXPORT Proc_build_keys (string filedate) := function
 
@@ -106,11 +106,28 @@ cnt_watercraft_wid_fcra := OUTPUT(strata.macf_pops(PRTE2_Watercraft.keys.key_wat
 	//---------- making DOPS optional and only in PROD build -------------------------------
 	is_running_in_prod 	:= PRTE2_Common.Constants.is_running_in_prod;
 	NoUpdate 						:= OUTPUT('Skipping DOPS update because we are not in PROD'); 
-	updatedops   		 		:= PRTE.UpdateVersion('WatercraftKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
-	updatedops_fcra  		:= PRTE.UpdateVersion('FCRA_WatercraftKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+	updatedops := 		PRTE.UpdateVersion('WatercraftKeys',					//	Package name
+																				filedate,									//	Package version
+																				_control.MyInfo.EmailAddressNormal,								//	Who to email with specifics
+																				l_inloc:='B',							//	B = Boca, A = Alpharetta
+																				l_inenvment:='N',					//	N = Non-FCRA, F = FCRA
+																				l_includeboolean :='N'		  //	N = Do not also include boolean, Y = Include boolean, too
+																				);
+																						
+																						
+	updatedops_fcra := 		PRTE.UpdateVersion('FCRA_WatercraftKeys',					//	Package name
+																					 filedate,									//	Package version
+																					 _control.MyInfo.EmailAddressNormal,								//	Who to email with specifics
+																					 l_inloc:='B',							//	B = Boca, A = Alpharetta
+																					 l_inenvment:='F',					//	N = Non-FCRA, F = FCRA
+																					 l_includeboolean :='N'		  //	N = Do not also include boolean, Y = Include boolean, too
+																						);
 	PerformUpdateOrNot	:= IF(is_running_in_prod,parallel(updatedops,updatedops_fcra),NoUpdate);
+//---------------------------------------------------------------------------------------------
 	
-	
+//Key Validations
+	key_validation 			:= output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,constants.dataset_name, 'N'), named(constants.dataset_name +'Validation'));
+	key_validation_fcra := output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,constants.dataset_name_fcra, 'F'), named(constants.dataset_name_fcra +'Validation'));
 	
 	BuildKeys := sequential(
 													parallel(bdid_key, cid_key, did_key, hullnum_key, offnum_key, sid_key, SIDlinkids_key,
@@ -126,6 +143,8 @@ cnt_watercraft_wid_fcra := OUTPUT(strata.macf_pops(PRTE2_Watercraft.keys.key_wat
 													PRTE2_Watercraft.Proc_build_autokeys(filedate),
 													parallel(cnt_watercraft_sid_fcra, cnt_watercraft_cid_fcra,cnt_watercraft_wid_fcra),
 													PerformUpdateOrNot,
+													//key validation
+													parallel(key_validation, key_validation_fcra)
 												 );
 										
 	RETURN BuildKeys;

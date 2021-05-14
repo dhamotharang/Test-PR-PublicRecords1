@@ -14,14 +14,14 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_inquiry(
 		// Linkid key, Inquiry_AccLogs.Key_Inquiry_LinkIds.key
 		Key_Linkids := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.inquiry.inquiryLinkid_key, 
+				AccountMonitoring.product_files.inquiry.inquiryLinkid_key_monitor, 
 				HASH64(seleid)
 			);
 	
 		// Update Linkid key, Inquiry_AccLogs.Key_Inquiry_LinkIds_Update.key
 		Key_Linkids_Update := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_key, 
+				AccountMonitoring.product_files.inquiry.inquiryUpdLinkid_key_monitor, 
 				HASH64(seleid)
 			);
 			

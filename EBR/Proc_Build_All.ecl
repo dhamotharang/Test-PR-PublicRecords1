@@ -30,6 +30,7 @@ run_stats					:= Query_BDID_Stats								  : success(output('BDID Stats complete
 superfiles_clear 	:= Clear_All_Input_Superfiles 			: success(output('Cleared all input superfiles'));
 accept_sk_to_qa		:= Proc_Accept_SK_to_QA;
 accept_sk_to_qa_LD:= Proc_Accept_SK_to_QA_LinkIDs;
+accept_sk_to_qa_DR:= Proc_Accept_SK_to_QA_Delta_rids;
 output_new_recs		:= Query_New_Records;
 send_email 				:= Send_Build_Completion_Email(filedate);
 updatedops    	  := RoxieKeyBuild.updateversion('EBRKeys',filedate,_Control.MyInfo.EmailAddressNotify,,'N');
@@ -67,6 +68,7 @@ retval := sequential(
 	,output_new_recs
 	,accept_sk_to_qa
 	,accept_sk_to_qa_LD	//move LinkIDS to QA
+	,accept_sk_to_qa_DR	//move Delta Rids to QA
 	,Out_Population_Stats(filedate).All
 	,send_email
 );

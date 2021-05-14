@@ -42,7 +42,15 @@ EXPORT Functions := MODULE
     RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
               Stringlib.StringFilterOut(ut.CleanSpacesAndUpper(nmbr), '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') = '',1,0);
   END;
-
+	
+	//****************************************************************************
+  //fn_non_empty_alphanum_specials: 	returns true if only populated with alphanumeric_specials
+  //****************************************************************************
+  EXPORT fn_non_empty_alphanum_specials(STRING nmbr, UNSIGNED1 size = 0) := FUNCTION
+    RETURN IF(IF(size = 0, LENGTH(TRIM(nmbr, ALL)) > 0, LENGTH(TRIM(nmbr, ALL)) = size) AND
+              Stringlib.StringFilterOut(ut.CleanSpacesAndUpper(nmbr), '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ()@#-:./,`&\'ãñèóéàÂáÔíöËú ') = '',1,0);
+    END;
+		
   //*******************************************************************************
   //fn_dependent_strings: 	returns true or false based upon the incoming strings.
   //													

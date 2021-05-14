@@ -1,4 +1,4 @@
-﻿Import Lib_FileServices, STRATA, PromoteSupers, Roxiekeybuild, _control, dops;
+﻿Import Lib_FileServices, STRATA, PromoteSupers, Roxiekeybuild, _control, dops, scrubs, scrubs_addressfeedback;
 Export Proc_Build_All(String InFileName, String Filedate) := Function
 #workunit('name','Yogurt: AddressFeedback Build - ' + filedate);
 #workunit('priority','high');
@@ -24,7 +24,8 @@ build_keys := AddressFeedback.Proc_Build_AddressFeedback_keys(filedate) :
 build_stats 	:= AddressFeedback.Out_Base_Stats_Population(filedate);
 build_qa_sample := AddressFeedback.Out_qa_samples;
 
-dops_update 	:= dops.updateversion('AddressFeedbackKeys',Filedate,'kevin.reeder@lexisnexis.com',,'N');
+run_Scrubs		:= Scrubs_AddressFeedback.fn_RunScrubs(filedate);
+dops_update 	:= If(scrubs.mac_ScrubsFailureTest('scrubs_addressfeedback',filedate),dops.updateversion('AddressFeedbackKeys',Filedate,'kevin.reeder@lexisnexis.com',,'N'),OUTPUT('Scrubs failed due to rejection warnings',NAMED('Scrubs_Failure')));
 
 //////** Delete Sprayed File 
 Delete_Files(STRING pInFileName) := FUNCTION
@@ -41,6 +42,7 @@ Build_All := 	Sequential(
 											,build_base		
 											,parallel(build_keys, build_stats)
 											,build_qa_sample
+											,run_scrubs
 											,dops_update
 											// idops_update,
 											// ORBITi,*/

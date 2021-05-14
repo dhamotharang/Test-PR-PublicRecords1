@@ -55,5 +55,8 @@ export Layout_Override_Impulse :=  RECORD
 	string KRAFTBLOCK;
 	string SCRAPED;
 	string2 source;
+	//CCPA-1051 Add CCPA new fields
+	unsigned4 global_sid:=0;
+	unsigned8 record_sid:=0;
 	string20 flag_file_id;
 END;

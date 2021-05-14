@@ -186,7 +186,7 @@ EXPORT Build_Datacard(
 		Unsigned8 postdir, Unsigned8 unit_desig,Unsigned8 sec_range,Unsigned8 p_city_name, Unsigned8 v_city_name,Unsigned8 st,Unsigned8 zip, 
 		Unsigned8 zip4,Unsigned8 cart,Unsigned8 cr_sort_sz, Unsigned8 lot, Unsigned8 lot_order,Unsigned8 dbpc,Unsigned8 chk_digit, Unsigned8 rec_type, 
 		Unsigned8 fips_state,Unsigned8 fips_county,Unsigned8 geo_lat, Unsigned8 geo_long, Unsigned8 msa, Unsigned8 geo_blk, Unsigned8 geo_match, 
-		Unsigned8 err_stat,Unsigned8 corp_legal_name,Unsigned8 dba_name, Unsigned8 active_duns_number, Unsigned8 hist_duns_number,
+		Unsigned8 err_stat, Unsigned8 locid, Unsigned8 corp_legal_name,Unsigned8 dba_name, Unsigned8 active_duns_number, Unsigned8 hist_duns_number,
 		Unsigned8 deleted_key, Unsigned8 deleted_fein, /*Newly added ????????? !!!!!!!!!!!!!!!  W20160503-114312 */
 		Unsigned8 active_enterprise_number, Unsigned8 hist_enterprise_number,Unsigned8 ebr_file_number, Unsigned8 active_domestic_corp_key,
 		Unsigned8 hist_domestic_corp_key, Unsigned8 foreign_corp_key, Unsigned8 unk_corp_key,Unsigned8 dt_first_seen, Unsigned8 dt_last_seen, 
@@ -401,7 +401,7 @@ EXPORT Build_Datacard(
 	  g29 := Attribute_Table_SELEID_V2(description=s29)[1].cnt;  
 
 	  g33	:= sum(Attribute_Table_SELEID_V2(not isgold, isactive, not hasSuperCoreSrc, not hasOtherCoreSrc, not has2TSrc, not hasMultipleSources, hasBizAddr, isNotJustPoBox), cnt);
-   g34	:= sum(Attribute_Table_SELEID_V2(not isgold, isactive, hasSuperCoreSrc or hasOtherCoreSrc or has2TSrc, not hasMultipleSources, hasBizAddr, isNotJustPoBox), cnt);
+   g34	:= sum(Attribute_Table_SELEID_V2(not isgold, isactive, hasSuperCoreSrc or hasOtherCoreSrc or has2TSrc, not hasMultipleSources, hasBizAddr, isNotJustPoBox), cnt)          ;
    g33_34 := g33+g34;
 	 
    g36	:= Attribute_Table_SELEID_V2(description=s36)[1].cnt;
@@ -426,62 +426,62 @@ EXPORT Build_Datacard(
   
 	  export GOLD_ds :=dataset([
 												{'GOLD/Non-GOLD Profile', '', '', '',           BIPV2_PostProcess.FormatDate(pVersion)},
-												{'GOLD (Active)', '', '', '',                   (String) (g6_12 + g15_21 + g24_26 + g29)},
+												{'GOLD (Active)', '', '', '',                   (String) (sum(Attribute_Table_SELEID_V2(isgold = true) ,cnt))},
 												
-												{'Business Address -Mult. Sources', '', '', '', (String) g6_12},
-												{'',     'DMI/EBR', '2nd Tier', '',             (String) g6},
-												{'',     '',        '2nd Tier', '',             (String) g7},
-												{'',     'DMI/EBR', '',         '',             (String) g8},
-												{'LNCA', 'DMI/EBR', '2nd Tier', '',             (String) g9},
-												{'LNCA', 'DMI/EBR', '',         '',             (String) g10},
-												{'LNCA', '',        '2nd Tier', '',             (String) g11},
-												{'LNCA', '',        '',         '',             (String) g12},
+												{'Business Address -Mult. Sources', '', '', '', (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true                                                                     ) ,cnt))},
+												{'',     'DMI/EBR', '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true  ,hassupercoresrc = false,hasothercoresrc = true  ,has2tsrc = true  ) ,cnt))},
+												{'',     '',        '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true  ,hassupercoresrc = false,hasothercoresrc = false ,has2tsrc = true  ) ,cnt))},
+												{'',     'DMI/EBR', '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true  ,hassupercoresrc = false,hasothercoresrc = true  ,has2tsrc = false ) ,cnt))},
+												{'LNCA', 'DMI/EBR', '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true  ,hassupercoresrc = true ,hasothercoresrc = true  ,has2tsrc = true  ) ,cnt))},
+												{'LNCA', 'DMI/EBR', '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true  ,hassupercoresrc = true ,hasothercoresrc = true  ,has2tsrc = false ) ,cnt))},
+												{'LNCA', '',        '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true  ,hassupercoresrc = true ,hasothercoresrc = false ,has2tsrc = true  ) ,cnt))},
+												{'LNCA', '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = true  ,hassupercoresrc = true ,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},
 												
-												{'Residential or Unk - Mult. Sources','','','', (String) g15_21},
-												{'',     'DMI/EBR', '2nd Tier', '',             (String) g15},
-												{'',     '',        '2nd Tier', '',             (String) g16},
-												{'',     'DMI/EBR', '',         '',             (String) g17},
-												{'LNCA', 'DMI/EBR', '2nd Tier', '',             (String) g18},
-												{'LNCA', 'DMI/EBR', '',         '',             (String) g19},
-												{'LNCA', '',        '2nd Tier', '',             (String) g20},
-												{'LNCA', '',        '',         '',             (String) g21},
+												{'Residential or Unk - Mult. Sources','','','', (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false                                                                    ) ,cnt))},
+												{'',     'DMI/EBR', '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false ,hassupercoresrc = false,hasothercoresrc = true  ,has2tsrc = true  ) ,cnt))},
+												{'',     '',        '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false ,hassupercoresrc = false,hasothercoresrc = false ,has2tsrc = true  ) ,cnt))},
+												{'',     'DMI/EBR', '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false ,hassupercoresrc = false,hasothercoresrc = true  ,has2tsrc = false ) ,cnt))},
+												{'LNCA', 'DMI/EBR', '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false ,hassupercoresrc = true ,hasothercoresrc = true  ,has2tsrc = true  ) ,cnt))},
+												{'LNCA', 'DMI/EBR', '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false ,hassupercoresrc = true ,hasothercoresrc = true  ,has2tsrc = false ) ,cnt))},
+												{'LNCA', '',        '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false ,hassupercoresrc = true ,hasothercoresrc = false ,has2tsrc = true  ) ,cnt))},
+												{'LNCA', '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = true  ,hasbizaddr = false ,hassupercoresrc = true ,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},     
 												
-												{'Business Address - 1 Source','','','',        (String) g24_26},
-												{'',     'DMI/EBR', '2nd Tier', '',             (String) g24},
-												{'',     'DMI/EBR', '',         '',             (String) g25},
-												{'LNCA', '',        '',         '',             (String) g26},
+												{'Business Address - 1 Source','','','',        (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = false ,hasbizaddr = true                                                                     ) ,cnt))},
+												{'',     'DMI/EBR', '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = false ,hasbizaddr = true  ,hassupercoresrc = false,hasothercoresrc = true  ,has2tsrc = true  ) ,cnt))},
+												{'',     'DMI/EBR', '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = false ,hasbizaddr = true  ,hassupercoresrc = false,hasothercoresrc = true  ,has2tsrc = false ) ,cnt))},
+												{'LNCA', '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = false ,hasbizaddr = true  ,hassupercoresrc = true ,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},  
 		 
-												{'Residential or Unk - 1 Source','','','',      (String) g29},
-												{'LNCA', '',        '',         '',             (String) g29},
-												{' ',     '',        '',         '',            ' '},
+												{'Residential or Unk - 1 Source','','','',      (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = false ,hasbizaddr = false                                                                    ) ,cnt))},
+												{'LNCA', '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = false ,hasbizaddr = false ,hassupercoresrc = true ,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},
+												{' ',     '',        '',         '',            (String) (sum(Attribute_Table_SELEID_V2(isgold = true ,hasmultiplesources = false ,hasbizaddr = false ,hassupercoresrc = false,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},    
 			 
-											{'NON-GOLD (Active)','','',     '',             (String) (g33_34 + g36_39 + g41_42 + g44_45 + g47 + g50)},
-												{'Business Address -1 Sources','','','',        (String) g33_34},
-												{'',     '',        '',         '',             (String) g33},
-												{'',     '',        '',         'HV Source',    (String) g34},
+											{'NON-GOLD (Active)','','',     '',               (String) (sum(Attribute_Table_SELEID_V2(isgold = false,isactive = true) ,cnt))},
+												{'Business Address -1 Sources','','','',        (String) (sum(Attribute_Table_SELEID_V2(isgold = false,isactive = true,hasmultiplesources = false ,hasbizaddr = true  ,isNotJustPoBox = true    ,((hassupercoresrc = false and hasothercoresrc = false and has2tsrc = false) or (hasSuperCoreSrc = true or hasOtherCoreSrc = true or has2TSrc = true) )) ,cnt))}, 
+												{'',     '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false,isactive = true,hasmultiplesources = false ,hasbizaddr = true  ,isNotJustPoBox = true    ,(hassupercoresrc = false and hasothercoresrc = false and has2tsrc = false) ) ,cnt))}, 
+												{'',     '',        '',         'HV Source',    (String) (sum(Attribute_Table_SELEID_V2(isgold = false,isactive = true,hasmultiplesources = false ,hasbizaddr = true  ,isNotJustPoBox = true    ,(hasSuperCoreSrc = true  or  hasOtherCoreSrc = true  or  has2TSrc = true ) ) ,cnt))},        
 			 
-												{'Residential or Unk - 1 Source','','','',      (String) g36_39},
-												{'',     '',        '2nd Tier', '',             (String) g36},
-												{'',     'DMI/EBR', '',         '',             (String) g37},
-											{'',     '',        '',         '',             (String) g38},
-												{'LNCA', '',        '',         '',             (String) g39},
+												{'Residential or Unk - 1 Source','','','',      (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = false  ,hasbizaddr = false ,isNotJustPoBox = true                                                          ) ,cnt))},
+												{'',     '',        '2nd Tier', '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = false  ,hasbizaddr = false ,isNotJustPoBox = true  ,hassupercoresrc = false,hasothercoresrc = false ,has2tsrc = true  ) ,cnt))},
+												{'',     'DMI/EBR', '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = false  ,hasbizaddr = false ,isNotJustPoBox = true  ,hassupercoresrc = false,hasothercoresrc = true  ,has2tsrc = false ) ,cnt))},
+										  	{'',     '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = false  ,hasbizaddr = false ,isNotJustPoBox = true  ,hassupercoresrc = false,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},
+												{'LNCA', '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = false  ,hasbizaddr = false ,isNotJustPoBox = true  ,hassupercoresrc = true ,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},   
 			 
-												{'Residential or Unk - Mult. Sources','','','', (String) g41_42},
-												{'',     '',        '',         '',             (String) g41},
-												{'',     '',        '',         'HV Source',    (String) g42},
+												{'Residential or Unk - Mult. Sources','','','', (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = true  ,hasbizaddr = false ,isNotJustPoBox = true                                                                     ) ,cnt))},
+												{'',     '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = true  ,hasbizaddr = false ,isNotJustPoBox = true  , hassupercoresrc = false,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},
+												{'',     '',        '',         'HV Source',    (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = true  ,hasbizaddr = false ,isNotJustPoBox = true  ,(hasSuperCoreSrc = true  or  hasOtherCoreSrc = true  or  has2TSrc = true ) ) ,cnt))},     
 
-												{'Business Address -Mult. Sources','','','',    (String) g44_45},
-												{'',     '',        '',         '',             (String) g44},
-												{'',     '',        '',         'HV Source',    (String) g45},
+												{'Business Address -Mult. Sources','','','',    (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = true  ,hasbizaddr = true ,isNotJustPoBox = true                                                                     ) ,cnt))},
+												{'',     '',        '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = true  ,hasbizaddr = true ,isNotJustPoBox = true  , hassupercoresrc = false,hasothercoresrc = false ,has2tsrc = false ) ,cnt))},
+												{'',     '',        '',         'HV Source',    (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = true  ,hasbizaddr = true ,isNotJustPoBox = true  ,(hasSuperCoreSrc = true  or  hasOtherCoreSrc = true  or  has2TSrc = true ) ) ,cnt))},   
 
-												{'Single Source at PO Box','','','',            (String) g47},
-												{'Multiple Sources at PO Box','','','',         (String) g50},
-												{' ',     '',        '',         '',            ' '},
+												{'Single Source at PO Box','','','',            (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = false  ,isNotJustPoBox = false                                                                    ) ,cnt))},
+												{'Multiple Sources at PO Box','','','',         (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = true,hasmultiplesources = true   ,isNotJustPoBox = false                                                                    ) ,cnt))},    
+												{' ',     '',        '',         '',            ' '},             
 												
-												{'Inactive','',     '',         '',             (String) g52},
-												{' ',     '',        '',         '',            ' '},
+												{'Inactive','',     '',         '',             (String) (sum(Attribute_Table_SELEID_V2(isgold = false ,isactive = false                                                                                                                       ) ,cnt))},  
+												{' ',     '',        '',         '',            ' '},             
 												
-												{'Total Header SELEs','','',    '',    									(String) (g6_12 + g15_21 + g24_26 + g29 + g33_34 + g36_39 + g41_42 + g44_45 + g47 + g50 + g52)} 
+												{'Total Header SELEs','','',    '',    									(String) (sum(Attribute_Table_SELEID_V2 ,cnt))} 
 							],gold_layout);
 	 
 		 

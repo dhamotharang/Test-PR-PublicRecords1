@@ -4,6 +4,7 @@ EXPORT Agg_Slim(
    ,pID                         = 'proxid'
    ,pLimit_ChildDatasets        = '100'
    ,pSet_Add_Fields             = '[]'
+   ,pACorpkeyField              = 'active_domestic_corp_key'
 ) :=
 functionmacro
 
@@ -28,7 +29,7 @@ functionmacro
   ,string a_corpkey
 
   ,pDataset.cnp_number,pDataset.cnp_btype
-  ,string1 company_foreign_domestic,string foreign_corp_key
+  ,string1 company_foreign_domestic//,string foreign_corp_key
   #IF(count(pSet_Add_Fields) > 0)
     #LOOP
       #IF(%CNTR% > count(pSet_Add_Fields))
@@ -51,7 +52,7 @@ functionmacro
     self.fein       := left.company_fein;
     self.a_duns     := left.active_duns_number;
     self.a_entnum   := left.active_enterprise_number;
-    self.a_corpkey  := left.active_domestic_corp_key;
+    self.a_corpkey  := left.pACorpkeyField;
     self.address    := stringlib.stringcleanspaces(trim(left.prim_range_derived,left,right) + ' ' + trim(left.prim_name_derived,left,right) + ' ' + trim(left.sec_range,left,right) + ' ' + trim(left.v_city_name,left,right) + ' ' + trim(left.st,left,right) + ' ' + trim(left.zip));
 
     self          := left;  

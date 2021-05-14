@@ -1,16 +1,16 @@
-// NES0842 / Nebraska Real Estate Commission / Real Estate //
+﻿// NES0842 / Nebraska Real Estate Commission / Real Estate //
 
 
 EXPORT layout_NES0842 := MODULE
 
 EXPORT incoming := RECORD
 	STRING150  NAME;
-	STRING30   CITY;
 	STRING50   ADDRESS1;
-	STRING10   ZIP;
+	// STRING10   ZIP;
 	STRING50   ADDRESS2;
+	STRING30   CITY;
 	STRING30   STATE;
-	STRING10   ZIP2;
+	STRING10   ZIP;
 	// STRING200	 LABEL1;
 	STRING200	 LABEL2;   //comment this line out with 20130507, 20130610, 20130822
 	STRING30   CURISSUEDT;	//M/DD/YYYY

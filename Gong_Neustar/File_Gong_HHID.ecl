@@ -1,11 +1,11 @@
-IMPORT ut, didville, header_slimsort,_control, header;
+﻿IMPORT ut, didville, header_slimsort,_control, header;
 
 ////// Changed to match hhid process for master and history files. after hhid append find hhids by did
 
 g_raw := File_Gong_Did;
 	
 layout_gng_hhid_temp := RECORD
-	//UNSIGNED6 did := 0;
+	// UNSIGNED6 did := 0;
 	UNSIGNED6 hhid := 0;
 	recordof(File_Gong_Full_Prepped_For_Keys);
 END;
@@ -31,7 +31,7 @@ hhid_file := distribute(header.file_hhid_current(ver=1),hash(did));
 
 layout_gng_hhid := RECORD
 	UNSIGNED6 hhid := 0;
-	recordof(File_Gong_full) - did;
+	recordof(File_Gong_full);			//CCPA-1067 Add lexid field to thor_data400::key::gong_hhid_qa key
 END;
 
 layout_gng_hhid get_hhid_by_did(outf_dist l, hhid_file r) := transform

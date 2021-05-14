@@ -1,4 +1,4 @@
-
+﻿
 
 import doxie_files, doxie,ut,Address,did_Add,header_slimsort,watchdog,RoxieKeyBuild;
 
@@ -38,16 +38,26 @@ fcra_opt_out.layout_infile_appended tarecs(al_file L) := transform
 	self.date_YYYYMMDD :=  if(l.date_added <> '',convert_date(l.date_added,2),'');
 	self.address1 := L.address;
 	self.address2 := L.city + ' '+ L.state + ' '+ L.zip;
+	//DF-28591
+    self.global_sid:=0;
+    self.record_sid := 0;
+    self.dt_effective_first := 0;
+    self.dt_effective_last := 0;
 	self := l;
 end;
 
 arecs := project(al_file,tarecs(left));
 
 fcra_opt_out.layout_infile_appended trecs(f L) := transform
-self.date_YYYYMMDD :=  if(l.julian_date <> '',ut.JultoYYYYMMDD(l.julian_date),'');
-self.address1 := L.address;
-self.address2 := L.city + ' '+ L.state + ' '+ L.zip5;
-self := L;
+	self.date_YYYYMMDD :=  if(l.julian_date <> '',ut.JultoYYYYMMDD(l.julian_date),'');
+	self.address1 := L.address;
+	self.address2 := L.city + ' '+ L.state + ' '+ L.zip5;
+	//DF-28591
+    self.global_sid:=0;
+    self.record_sid := 0;
+    self.dt_effective_first := 0;
+    self.dt_effective_last := 0;
+	self := L;
 end;
 
 erecs := project(f,trecs(left));

@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_4500_Collateral_Accounts_Delta_rid := trim(GetSegmentKeyName_Delta_RID('4500'));

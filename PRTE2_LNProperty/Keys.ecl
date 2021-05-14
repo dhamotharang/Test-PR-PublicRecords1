@@ -88,7 +88,6 @@ EXPORT key_deed_parcelnum := INDEX(
 		Constants.KeyName_ln_propertyv2 + doxie.Version_SuperKey + '::deed.parcelnum');
 
 
-
 EXPORT key_deed_zip_loanamt := INDEX(	
 		Files.dZipLoanAmt,
 		{zip,loan_amount,loan_date},
@@ -103,12 +102,6 @@ EXPORT Key_Search_BDID := INDEX(
 		Constants.KeyName_ln_propertyv2 + doxie.Version_SuperKey + '::search.bdid');
 													
 				
-EXPORT key_search_fid_linkids := INDEX(
-		FILES.file_search_fid_linkid(ln_fares_id <> ''),  
-		{ln_fares_id, which_orig, source_code_2 := source_code[2], source_code_1 := source_code[1]},  
-		{FILES.file_search_fid_linkid}, 
-		Constants.KeyName_ln_propertyv2 + doxie.Version_SuperKey + '::search.fid_linkids');
-
 EXPORT Key_LinkIds := MODULE
 	shared superfile_name		:= '~prte::key::ln_propertyv2::' + doxie.Version_SuperKey + '::search.linkids';
 	shared Base				:= Files.file_search_fid_linkid;

@@ -1,14 +1,14 @@
-﻿IMPORT UT,_Control,doxie,header; 
+﻿IMPORT InsuranceHeader_xLink;
+IMPORT Doxie;
+IMPORT IDL_header;
+IMPORT _Control;
+IMPORT Data_Services;
 
-rm_score0  := header.fn_persistent_record_ID(doxie.header_pre_keybuild) ; 
+// Full Payload definition
+ds_payload := InsuranceHeader_xLink.fn_insuranceheader_full_payload(
+  ds_boca_prekey := doxie.header_pre_keybuild,
+  ds_alpha_header := IDL_header.files.DS_IDL_POLICY_HEADER_BASE
+);
 
-rm_score := PROJECT(rm_score0, TRANSFORM({rm_score0 , UNSIGNED4 DT_EFFECTIVE_FIRST, UNSIGNED4	DT_EFFECTIVE_LAST := 0}, 
-                                 SELF.DT_EFFECTIVE_FIRST := 20160101, 
-                                 SELF := LEFT
-                                 )); 
-
-rm_score_ccpa_compliant := header.fn_suppress_ccpa(rm_score,true);
-
-EXPORT Key_InsuranceHeader_DID := INDEX(rm_score_ccpa_compliant, {unsigned6 s_did := did}, {rm_score_ccpa_compliant}-_Control.Layout_KeyExclusions, 
-						                      '~thor_data400::key::insuranceheader_xlink::' + doxie.Version_SuperKey + '::did' );
-
+EXPORT Key_InsuranceHeader_DID := INDEX(ds_payload, {unsigned6 s_did := did}, {ds_payload}-_Control.Layout_KeyExclusions, 
+						                      Data_Services.Data_location.person_header + 'thor_data400::key::insuranceheader_xlink::' + doxie.Version_SuperKey + '::did' );

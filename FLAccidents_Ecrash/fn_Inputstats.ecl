@@ -1,7 +1,7 @@
-import ut;
+﻿import Data_Services, ut, STD;
 EXPORT fn_Inputstats  := module
 
-dInbase := dataset(ut.foreign_prod+'thor_data400::base::ecrash',FLAccidents_Ecrash.Layout_Basefile,thor) ( regexreplace('-',sent_to_hpcc_datetime[1..10],'') = ut.getDateOffset(-1,ut.GetDate));
+dInbase := Files_eCrash.DS_BASE_ECRASH ( regexreplace('-',sent_to_hpcc_datetime[1..10],'') = ut.getDateOffset(-1,mod_Utilities.StrSysDate));
 
 
 rec := record
@@ -23,7 +23,7 @@ string delay_flag := 'N';
 
 end;
 
-dInstats2 := project ( dInstats1,transform(rec1,self.sent_to_hpcc_datetime := StringLib.StringFilterout( regexreplace('-|:|',left.sent_to_hpcc_datetime,''), ' '),self := left));
+dInstats2 := project ( dInstats1,transform(rec1,self.sent_to_hpcc_datetime := STD.Str.FilterOut( regexreplace('-|:|',left.sent_to_hpcc_datetime,''), ' '),self := left));
 
 
 dInstats3 := project(dInstats2,transform( rec1 ,self.time := map ( (integer) left.sent_to_hpcc_datetime[9..10] = 00 => '12AM',
@@ -80,14 +80,14 @@ mail_data convertToString(rec2 L) := TRANSFORM
    attachment := textDs[1].mail_text;
 
 export sentemail := if ( count(dInstats5 ( missed_flag = 'Y')) > 0 or count(dInstats5 ( count_ = 0)) > 1, 
-                                           FileServices.SendEmail ( 'bipin.jha@lexisnexisrisk.com ; Sai.Nagula@lexisnexis.com ;sudhir.kasavajjala@lexisnexis.com',
-                                                                        'MISSING ECRASH FILES PROCESSED '+ut.getDateOffset(-1,ut.GetDate),
-																																				'Previous 8 sent date time file counts for '+ut.getDateOffset(-1,ut.GetDate) + '.Please look into it' +'\n\n'+ textDs[1].mail_text
+                                           FileServices.SendEmail ( 'DataDevelopment-InsRiskeCrash@lexisnexisrisk.com; bipin.jha@lexisnexisrisk.com ; Sai.Nagula@lexisnexis.com ;sudhir.kasavajjala@lexisnexis.com',
+                                                                        'MISSING ECRASH FILES PROCESSED '+ut.getDateOffset(-1,mod_Utilities.StrSysDate),
+																																				'Previous 8 sent date time file counts for '+ut.getDateOffset(-1,mod_Utilities.StrSysDate) + '.Please look into it' +'\n\n'+ textDs[1].mail_text
 																																		),	
 																																				 
 																							FileServices.SendEmail ( 'sudhir.kasavajjala@lexisnexis.com',
-                                                                        ' ECRASH FILES PROCESSED '+ut.getDateOffset(-1,ut.GetDate),
-																																				' ECRASH FILES PROCESSED ON '+ut.getDateOffset(-1,ut.GetDate) + '.Please look into it' +'\n\n'+ textDs[1].mail_text
+                                                                        ' ECRASH FILES PROCESSED '+ut.getDateOffset(-1,mod_Utilities.StrSysDate),
+																																				' ECRASH FILES PROCESSED ON '+ut.getDateOffset(-1,mod_Utilities.StrSysDate) + '.Please look into it' +'\n\n'+ textDs[1].mail_text
 																																			)
 																																				 
 													);

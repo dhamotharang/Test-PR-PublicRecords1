@@ -3,7 +3,7 @@
 trimUpper(STRING s) := 
   std.str.CleanSpaces(std.Str.ToUppercase(s));
 	
-asIndustryBase := dataset('~thor::cortera::executives', cortera.Layout_Executives, thor);
+asIndustryBase := Cortera.Files().Base.Executives.QA;//dataset('~thor::cortera::executives', cortera.Layout_Executives, thor);
 
 EXPORT As_Industry() := FUNCTION
 
@@ -29,7 +29,7 @@ EXPORT As_Industry() := FUNCTION
 			SELF 													:=	[];
 		END;
 
-		Industry := PROJECT(asIndustryBase(cnt=1),MapIndustry(LEFT));
+		Industry := PROJECT(asIndustryBase(name_sequence=1),MapIndustry(LEFT));
 
 Industry_sort := SORT(Industry(siccode <> '' OR naics <> '' OR industry_description <> '' OR business_description <> '')
 	,bdid 										

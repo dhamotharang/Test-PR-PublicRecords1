@@ -1,4 +1,4 @@
-IMPORT AccountMonitoring, BIPV2, BIPV2_Best;
+﻿IMPORT AccountMonitoring, BIPV2, BIPV2_Best;
 
 EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_bipupdate(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -14,7 +14,7 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_bipupdate(
 		// BIPV2_Best.Key_LinkIds.key (pre-filtered in product_files to only return best rec proxid=0)
 		Key_BIPBest := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.bipbest_header_key, 
+				AccountMonitoring.product_files.header_files.r_bipbest_header_key, 
 				HASH64(seleid)
 			);
 			
@@ -110,6 +110,6 @@ EXPORT DATASET(AccountMonitoring.layouts.history) fn_cgm_bipupdate(
 				SELF.hash_value := LEFT.hash_value + RIGHT.hash_value,
 				SELF := LEFT),
 			pid,rid,LOCAL);
-	
+
 		RETURN temp_rolled_hashes;
 END;		

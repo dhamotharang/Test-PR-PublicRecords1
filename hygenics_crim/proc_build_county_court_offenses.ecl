@@ -1336,6 +1336,36 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																							       => regexreplace('ADDITIONAL SENTENCING INFORMATION: ',l.casecomments,''),''));             // added by tp	
    
 	
+	//added for IE phase3
+	addl_prov_desc_I0121 := trim(map(vVendor = 'I0121' and regexfind('SENTENCE: ',l.casecomments) = true  
+							                                       => regexreplace('SENTENCE: ',l.casecomments,''),''),left,right);	
+																										 
+  addl_prov_desc_I0126 := trim(map(vVendor = 'I0126' and regexfind('SENTENCING INFORMATION: ',l.casecomments) = true  
+							                                       => regexreplace('SENTENCING INFORMATION: ',l.casecomments,''),''),left,right);																											 
+																										 
+	addl_prov_desc_I0128 := trim(map(vVendor = 'I0128' => l.casecomments,''));
+	
+	addl_prov_desc_I0133 := trim(map(vVendor = 'I0133' and regexfind('(.*)(ADDITIONAL INFORMATION: CC SANCTIONS: )(.*)',l.casecomments) = true  
+						     	                      => regexreplace('(.*)(ADDITIONAL INFORMATION: CC SANCTIONS: )(.*)',l.casecomments,'$3'),																
+															  	 vVendor = 'I0133' and regexfind('(.*)(ADDITIONAL INFORMATION: C/C SANCTIONS IMPOSED. )(.*)',l.casecomments) = true  
+						     	                      => regexreplace('(.*)(ADDITIONAL INFORMATION: C/C SANCTIONS IMPOSED. )(.*)',l.casecomments,'$3'),
+	                                 vVendor = 'I0133' and regexfind('(.*)(ADDITIONAL INFORMATION: C/C SANCTIONS RESERVED: )(.*)',l.casecomments) = true  
+						     	                        => regexreplace('(.*)(ADDITIONAL INFORMATION: C/C SANCTIONS RESERVED: )(.*)',l.casecomments,'$3'),''));
+	
+  addl_prov_desc_I0156 :=  trim(map(vVendor = 'I0156' and regexfind('(.*)(CASE FINE/COST TOTAL: )(\\$)([0-9]+)(.)([0-9]+)(.*)',l.casecomments) = true  
+						     	                => regexreplace('(.*)(CASE FINE/COST TOTAL: )(\\$)([0-9]+)(.)([0-9]+)(.*)',l.casecomments,'$2$3$4$5$6'),''));	
+
+	
+	addl_prov_desc_I0132 :=  map(vVendor = 'I0132' and  regexfind('(JOUR ON ABOVE DATE. )(SUBJ TO RESENT OF )(.*)',l.sentenceadditionalinfo) = true  
+						                   => regexreplace('(JOUR ON ABOVE DATE. )(SUBJ TO RESENT OF )(.*)',l.sentenceadditionalinfo,'$2$3'),'');	
+	
+	addl_prov_desc_I0148 :=  trim(map(vVendor = 'I0148' => l.sentenceadditionalinfo,''));
+	
+	addl_prov_desc_I0152 := trim(map(vVendor = 'I0152' and regexfind('(THE TOTAL BALANCE DUE IS )(\\$)([0-9]+)(.)([0-9]+)(.*)',l.sentenceadditionalinfo) = true  
+						     	                => regexreplace('(THE TOTAL BALANCE DUE IS )(\\$)([0-9]+)(.)([0-9]+)(.*)',l.sentenceadditionalinfo,'$1$2$3$4$5'),''));	
+
+	
+	
 	addl_prov_desc_1          := MAP( vVendor ='TI' and regexfind('GUILTY - ',temp_disp) => regexreplace('(GUILTY - )(.*)',temp_disp,'$2'), //removing sentences from disp and mapping here
 	                                  vVendor ='TI' and regexfind('GUILTY PLEA- JURY VERDICT - ',temp_disp) => regexreplace('(GUILTY PLEA- JURY VERDICT - )(.*)',temp_disp,'$2'), //removing sentences from disp and mapping here
 																		vVendor ='TI' and regexfind('GUILTY BY JURY - ',temp_disp) => regexreplace('(GUILTY BY JURY - )(.*)',temp_disp,'$2'), //removing sentences from disp and mapping here
@@ -1381,7 +1411,17 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																		vVendor IN ['I0092'] => addl_prov_desc_I0092,   // added by tp
 																		vVendor IN ['I0093'] => addl_prov_desc_I0093,   // added by tp
 																		vVendor IN ['I0094'] => addl_prov_desc_I0094,   // added by tp
-                                    vVendor IN ['I0059'] => addl_prov_desc_I0059,   // added by tp																		
+                                    vVendor IN ['I0059'] => addl_prov_desc_I0059,   // added by tp	
+																		
+																		vVendor IN ['I0121']  =>  addl_prov_desc_I0121,   // added by tp IE phase3
+ 	                                  vVendor IN ['I0126']  =>  addl_prov_desc_I0126,   // added by tp IE phase3
+	                                  vVendor IN ['I0128']  =>  addl_prov_desc_I0128,   // added by tp IE phase3
+	                                  vVendor IN ['I0133']  =>  addl_prov_desc_I0133,   // added by tp IE phase3
+	                                  vVendor IN ['I0156']  =>  addl_prov_desc_I0156,   // added by tp IE phase3
+																		
+                                    vVendor IN ['I0132']  =>  addl_prov_desc_I0132,		// added by tp IE phase3															
+																	  vVendor IN ['I0148']  =>  addl_prov_desc_I0148,    // added by tp IE phase3
+																	  vVendor IN ['I0152']  =>  addl_prov_desc_I0152,    // added by tp IE phase3																		
 																		
                                     l.sentenceadditionalinfo);
 
@@ -1424,6 +1464,16 @@ self.court_off_desc_1         := trim(MAP(vVendor ='TS' and regexfind('[0-9.]+[ 
 																	 vVendor IN ['I0093'] => addl_prov_desc_I0093[41..],   // added by tp
 																	 vVendor IN ['I0094'] => addl_prov_desc_I0094[41..],   // added by tp
                                    vVendor IN ['I0059'] => addl_prov_desc_I0059[41..],   // added by tp
+
+																	 vVendor IN ['I0121']  =>  addl_prov_desc_I0121[41..],   // added by tp IE phase3
+	                                 vVendor IN ['I0126']  =>  addl_prov_desc_I0126[41..],   // added by tp IE phase3
+	                                 vVendor IN ['I0128']  =>  addl_prov_desc_I0128[41..],   // added by tp IE phase3
+	                                 vVendor IN ['I0133']  =>  addl_prov_desc_I0133[41..],   // added by tp IE phase3
+	                                 vVendor IN ['I0156']  =>  addl_prov_desc_I0156[41..],   // added by tp IE phase3
+																	 
+																	 vVendor IN ['I0132']  =>  addl_prov_desc_I0132[41..],		// added by tp IE phase3															
+																	 vVendor IN ['I0148']  =>  addl_prov_desc_I0148[41..],    // added by tp IE phase3
+																	 vVendor IN ['I0152']  =>  addl_prov_desc_I0152[41..],    // added by tp IE phase3
 
                                    l.sentencestatus                                                                                                                                                                                                                                                                             
                                    );

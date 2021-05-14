@@ -124,7 +124,8 @@ export Key_ConsumerToBip := module
                     set of string sourcesToInclude = ALL,
                     set of string sourceGroupsToInclude = ALL,
                     boolean applyMarketingRestrictions = false,
-                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END
+                    doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END,
+										boolean execsOnly = true
      ) := function
                               
            remove_restricted := kfetch(inputs, in_mod, JoinLimit, JoinType, applyMarketingRestrictions, mod_access);
@@ -191,10 +192,10 @@ export Key_ConsumerToBip := module
                                                                                        right.dt_first_seen_at_business, left.dt_first_seen_at_business);
                                                   self.dt_last_seen_at_business  := if(right.dt_last_seen_at_business > left.dt_last_seen_at_business,
                                                                                        right.dt_last_seen_at_business, left.dt_last_seen_at_business);
-                                                  newJobTitle     := if(right.job_title1 in [left.job_title1, left.job_title2, left.job_title3],
+                                                  newJobTitle     := if(right.job_title1 in [left.job_title1, left.job_title2, left.job_title3] or (execsOnly and right.executive_ind_order=0),
                                                                         '',right.job_title1);
-                                                  self.job_title1 := left.job_title1,
-                                                  self.job_title2 := if(left.job_title2='',newJobTitle, left.job_title2),
+                                                  self.job_title1 := if(left.job_title1='' or (execsOnly and left.executive_ind_order=0),newJobTitle,left.job_title1);
+                                                  self.job_title2 := if(left.job_title2='' and self.job_title1!=newJobTitle and self.job_title1!='',newJobTitle, left.job_title2),
                                                   self.job_title3 := if(left.job_title3='' and left.job_title2!='',newJobTitle, left.job_title3),
                                                   self            := left));
                                                   

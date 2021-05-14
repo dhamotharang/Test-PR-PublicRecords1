@@ -1,4 +1,9 @@
-import autokeyb,doxie,EBR, BIPV2;
+﻿import autokeyb,doxie,EBR, BIPV2;
+
+// ---------------------------------------------------------------
+// For delta rollup logic (dx_common.mac_incremental_rollup) use:
+//  $.mod_delta_rid.key_autokey_payload_delta_rid
+// ---------------------------------------------------------------
 
 layout_autokeyready :=record
 layout_0010_header_base_slim;

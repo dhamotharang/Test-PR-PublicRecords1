@@ -1,4 +1,4 @@
-/*--SOAP--
+﻿/*--SOAP--
 <message name="Address_Attributes_Batch_Service" wuTimeout="300000">
   <part name="Batch_In" type="tns:XmlDataSet" cols="100" rows="100"/>
   <part name="GLBPurpose" type="xsd:integer"/>
@@ -33,7 +33,7 @@
 &lt;gateways&gt;
   &lt;row&gt;
     &lt;servicename&gt;reportservice&lt;/servicename&gt;
-    &lt;url&gt;http://roxiestaging.br.seisint.com:9876&lt;/url&gt;
+    &lt;url&gt;http://certstagingvip.hpcc.risk.regn.net:9876&lt;/url&gt;
   &lt;/row&gt;
 &lt;/gateways&gt;
 </pre>

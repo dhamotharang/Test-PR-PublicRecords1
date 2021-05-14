@@ -18,8 +18,8 @@ import BIPV2;
 
 EXPORT Best_Industry_Codes(
 
-   dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base = Marketing_List.Source_Files().bip_base
-  ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep    = Marketing_List.Best_From_BIP_Best_seleid()
+   dataset(recordof(Marketing_List.Source_Files().bip_base) ) pDataset_Base   = Marketing_List.Source_Files().bip_base
+  ,dataset(Marketing_List.Layouts.business_information_prep ) pBest_Prep      = Marketing_List.Best_From_BIP_Best_seleid()
   ,boolean                                                    pDebug          = false
   ,set of unsigned6                                           pSampleProxids  = []
 ) :=
@@ -58,49 +58,70 @@ function
                                     ,     company_naics_code1         ,     company_naics_code2         ,     company_naics_code3         ,     company_naics_code4         ,     company_naics_code5  
                    ,merge);
 
+  key_sics  := Marketing_List.Source_Files().key_sic  ;
+  key_naics := Marketing_List.Source_Files().key_naics;
+  
+  set_sics  := set(key_sics (trim(sic4_code ) != '')  ,sic4_code );
+  set_naics := set(key_naics(trim(naics_code) != '')  ,(unsigned)naics_code);
+  
   ds_Base_Prep2 := project(ds_Base_Prep ,transform(recordof(left)
-    ,self.company_sic_code1 := map(length(trim(left.company_sic_code1)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code1,nocase) =>       left.company_sic_code1  
-                                  ,length(trim(left.company_sic_code1)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code1,nocase) => '0' + left.company_sic_code1
-                                  ,                                             ''                                               
-                               )                                                                           
-    ,self.company_sic_code2 := map(length(trim(left.company_sic_code2)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code2,nocase) =>       left.company_sic_code2  
-                                  ,length(trim(left.company_sic_code2)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code2,nocase) => '0' + left.company_sic_code2
-                                  ,                                             ''                                               
-                               )                                                                           
-    ,self.company_sic_code3 := map(length(trim(left.company_sic_code3)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code3,nocase) =>       left.company_sic_code3  
-                                  ,length(trim(left.company_sic_code3)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code3,nocase) => '0' + left.company_sic_code3
-                                  ,                                             ''                                               
-                               )                                                                           
-    ,self.company_sic_code4 := map(length(trim(left.company_sic_code4)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code4,nocase) =>       left.company_sic_code4  
-                                  ,length(trim(left.company_sic_code4)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code4,nocase) => '0' + left.company_sic_code4
-                                  ,                                             ''                                               
-                               )                                                                           
-    ,self.company_sic_code5 := map(length(trim(left.company_sic_code5)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code5,nocase) =>       left.company_sic_code5  
-                                  ,length(trim(left.company_sic_code5)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code5,nocase) => '0' + left.company_sic_code5
-                                  ,                                             ''
-                               )
+    ,company_sic_code1 := map(length(trim(left.company_sic_code1)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code1,nocase) =>       left.company_sic_code1  
+                             ,length(trim(left.company_sic_code1)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code1,nocase) => '0' + left.company_sic_code1
+                             ,                                             ''                                               
+                          );                                                                           
+     company_sic_code2 := map(length(trim(left.company_sic_code2)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code2,nocase) =>       left.company_sic_code2  
+                             ,length(trim(left.company_sic_code2)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code2,nocase) => '0' + left.company_sic_code2
+                             ,                                             ''                                               
+                          );                                                                           
+     company_sic_code3 := map(length(trim(left.company_sic_code3)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code3,nocase) =>       left.company_sic_code3  
+                              ,length(trim(left.company_sic_code3)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code3,nocase) => '0' + left.company_sic_code3
+                              ,                                             ''                                               
+                          );                                                                           
+     company_sic_code4 := map(length(trim(left.company_sic_code4)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code4,nocase) =>       left.company_sic_code4  
+                              ,length(trim(left.company_sic_code4)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code4,nocase) => '0' + left.company_sic_code4
+                              ,                                             ''                                               
+                          );                                                                           
+     company_sic_code5 := map(length(trim(left.company_sic_code5)) = 4 and regexfind('^[[:digit:]]*$',left.company_sic_code5,nocase) =>       left.company_sic_code5  
+                              ,length(trim(left.company_sic_code5)) = 3 and regexfind('^[[:digit:]]*$',left.company_sic_code5,nocase) => '0' + left.company_sic_code5
+                              ,                                             ''
+                          );
 
-    ,self.company_naics_code1 := map(length(trim(left.company_naics_code1)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code1,nocase) =>       left.company_naics_code1  
-                                    ,length(trim(left.company_naics_code1)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code1,nocase) => '0' + left.company_naics_code1
-                                    ,                                             ''                                                   
-                                 )                                                                             
-    ,self.company_naics_code2 := map(length(trim(left.company_naics_code2)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code2,nocase) =>       left.company_naics_code2  
-                                    ,length(trim(left.company_naics_code2)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code2,nocase) => '0' + left.company_naics_code2
-                                    ,                                             ''                                                   
-                                 )                                                                             
-    ,self.company_naics_code3 := map(length(trim(left.company_naics_code3)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code3,nocase) =>       left.company_naics_code3  
-                                    ,length(trim(left.company_naics_code3)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code3,nocase) => '0' + left.company_naics_code3
-                                    ,                                             ''                                                   
-                                 )                                                                             
-    ,self.company_naics_code4 := map(length(trim(left.company_naics_code4)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code4,nocase) =>       left.company_naics_code4  
-                                    ,length(trim(left.company_naics_code4)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code4,nocase) => '0' + left.company_naics_code4
-                                    ,                                             ''                                                   
-                                 )                                                                             
-    ,self.company_naics_code5 := map(length(trim(left.company_naics_code5)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code5,nocase) =>       left.company_naics_code5  
-                                    ,length(trim(left.company_naics_code5)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code5,nocase) => '0' + left.company_naics_code5
-                                    ,                                             ''
-                                 )
-    ,self := left
+
+     self.company_sic_code1 := if(trim(company_sic_code1) in set_sics ,company_sic_code1  ,'');                                                                        
+     self.company_sic_code2 := if(trim(company_sic_code2) in set_sics ,company_sic_code2  ,'');                                                                           
+     self.company_sic_code3 := if(trim(company_sic_code3) in set_sics ,company_sic_code3  ,'');                                                                          
+     self.company_sic_code4 := if(trim(company_sic_code4) in set_sics ,company_sic_code4  ,'');                                                                         
+     self.company_sic_code5 := if(trim(company_sic_code5) in set_sics ,company_sic_code5  ,'');
+
+     company_naics_code1 := map(length(trim(left.company_naics_code1)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code1,nocase) =>       left.company_naics_code1  
+                               ,length(trim(left.company_naics_code1)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code1,nocase) => '0' + left.company_naics_code1
+                               ,                                             ''                                                   
+                           ) ;                                                                            
+     company_naics_code2 := map(length(trim(left.company_naics_code2)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code2,nocase) =>       left.company_naics_code2  
+                               ,length(trim(left.company_naics_code2)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code2,nocase) => '0' + left.company_naics_code2
+                               ,                                             ''                                                   
+                           );                                                                             
+     company_naics_code3 := map(length(trim(left.company_naics_code3)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code3,nocase) =>       left.company_naics_code3  
+                               ,length(trim(left.company_naics_code3)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code3,nocase) => '0' + left.company_naics_code3
+                               ,                                             ''                                                   
+                           );                                                                             
+     company_naics_code4 := map(length(trim(left.company_naics_code4)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code4,nocase) =>       left.company_naics_code4  
+                               ,length(trim(left.company_naics_code4)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code4,nocase) => '0' + left.company_naics_code4
+                               ,                                             ''                                                   
+                           );                                                                             
+     company_naics_code5 := map(length(trim(left.company_naics_code5)) = 6 and regexfind('^[[:digit:]]*$',left.company_naics_code5,nocase) =>       left.company_naics_code5  
+                               ,length(trim(left.company_naics_code5)) = 5 and regexfind('^[[:digit:]]*$',left.company_naics_code5,nocase) => '0' + left.company_naics_code5
+                               ,                                             ''
+                           );
+
+
+     self.company_naics_code1 := if((unsigned)company_naics_code1 in set_naics ,company_naics_code1  ,'');                                                                           
+     self.company_naics_code2 := if((unsigned)company_naics_code2 in set_naics ,company_naics_code2  ,'');                                                                             
+     self.company_naics_code3 := if((unsigned)company_naics_code3 in set_naics ,company_naics_code3  ,'');                                                                            
+     self.company_naics_code4 := if((unsigned)company_naics_code4 in set_naics ,company_naics_code4  ,'');                                                                             
+     self.company_naics_code5 := if((unsigned)company_naics_code5 in set_naics ,company_naics_code5  ,'');
+     
+     self := left;
   
   ));
   ds_Base_Prep3 := ds_Base_Prep2(     trim(company_sic_code1  ) != ''  or trim(company_sic_code2  ) != '' or trim(company_sic_code3  ) != '' or trim(company_sic_code4  ) != '' or trim(company_sic_code5  ) != ''
@@ -129,11 +150,13 @@ function
     self.SIC3               := ds_sics_nonblank [3].sic;
     self.SIC4               := ds_sics_nonblank [4].sic;
     self.SIC5               := ds_sics_nonblank [5].sic;
+    self.src_sics           := left.source             ;
     self.NAICS_Primary      := ds_naics_nonblank[1].naics;
     self.NAICS2             := ds_naics_nonblank[2].naics;
     self.NAICS3             := ds_naics_nonblank[3].naics;
     self.NAICS4             := ds_naics_nonblank[4].naics;
     self.NAICS5             := ds_naics_nonblank[5].naics;
+    self.src_naics          := left.source               ;
 
     self                    := left;
     self                    := []

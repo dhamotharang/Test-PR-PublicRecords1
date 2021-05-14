@@ -1,4 +1,4 @@
-﻿import versioncontrol, _control, ut,Roxiekeybuild, orbit3;
+﻿import versioncontrol, _control, ut,Roxiekeybuild, orbit3, scrubs_ecrulings,scrubs;
 
 export Build_all(string	pVersion,string filedate) := function 
 							 
@@ -12,7 +12,7 @@ export Build_all(string	pVersion,string filedate) := function
 				self.dt_vendor_first_reported  	:=  if(l.dt_vendor_first_reported > r.dt_vendor_first_reported, r.dt_vendor_first_reported, l.dt_vendor_first_reported);
 				self.dt_vendor_last_reported   	:= 	if(l.dt_vendor_last_reported  < r.dt_vendor_last_reported,  r.dt_vendor_last_reported,  l.dt_vendor_last_reported);
 				self.dt_first_seen							:=	if(l.dt_first_seen > r.dt_first_seen, r.dt_first_seen, l.dt_first_seen);
-				self.dt_last_seen								:=	if(l.dt_last_seen  < r.dt_last_seen,  r.dt_last_seen,  l.dt_last_seen);
+				self.dt_last_seen							:=	if(l.dt_last_seen  < r.dt_last_seen,  r.dt_last_seen,  l.dt_last_seen);
 				self                						:= 	l;
 		 end;
   
@@ -20,7 +20,9 @@ export Build_all(string	pVersion,string filedate) := function
    
 		 VersionControl.macBuildNewLogicalFile(Filenames(pversion).base.new,new_base,Build_Base_File);
 							
-		 dops_update := Roxiekeybuild.updateversion('ECRulingKeys',pVersion,'saritha.myana@lexisnexis.com, charlene.ros@lexisnexis.com',,'N'); 
+		 dops_update := if(Scrubs.mac_ScrubsFailureTest('Scrubs_ECRulings',pversion),Roxiekeybuild.updateversion('ECRulingKeys',pVersion,'saritha.myana@lexisnexis.com, charlene.ros@lexisnexis.com',,'N'),OUTPUT('Dops update has failed due to Scrubs reject warnings...',NAMED('Scrubs_Failure')));
+
+		 run_scrubs := scrubs_ecrulings.fn_RunScrubs(pversion);
 
 		 orbitUpdate := Orbit3.proc_Orbit3_CreateBuild_AddItem('ECRulings',pversion,'N');
 																	
@@ -32,6 +34,7 @@ export Build_all(string	pVersion,string filedate) := function
 														 ,Promote(pversion).New2Built
 														 ,Promote(pversion).Built2Qa
 														 ,output(choosen(sort(Files().Base.qa,-DateAdded), 5000), named ('BaseFile_SampleRecords'))
+														 ,run_scrubs
 														 ,dops_update
 														 ,Out_Strata_Population_Stats(pversion)
 														 ,orbitUpdate

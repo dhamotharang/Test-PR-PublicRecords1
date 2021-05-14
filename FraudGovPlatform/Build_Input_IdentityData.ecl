@@ -7,9 +7,10 @@ EXPORT Build_Input_IdentityData(
 ) :=
 module
 
-	inIdentityDataUpdate :=	  if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0, 
-		Files(pversion).Sprayed.IdentityData, 
-		dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
+	inIdentityDataUpdate :=	  
+		if( nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.IdentityData)) > 0, 
+				Build_Prepped_IdentityData(pversion),
+				dataset([],{string75 fn { virtual(logicalfilename)},FraudGovPlatform.Layouts.Sprayed.IdentityData})
 		)   
 		+ if (nothor(STD.File.GetSuperFileSubCount(Filenames().Sprayed.NAC)) > 0, 
 				Build_Prepped_NAC(pversion).NACIDDTUpdate,
@@ -43,9 +44,8 @@ module
 		self.FileTime := fn[7];
 		self.ind_type := functions.ind_type_fn(fn[4]);
 		self.file_type := 3 ;
-		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Source+Identification: 
-		self.RIN_Source := map(	l.RIN_Source = 0 => 1, //identity
-								l.RIN_Source); // NAC or RDP							
+		//https://confluence.rsi.lexisnexis.com/display/GTG/Data+Dictionary: 
+		self.RIN_Source := L.RIN_Source;			
 		self:=l;
 		self:=[];
 	end;

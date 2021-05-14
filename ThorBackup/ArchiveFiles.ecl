@@ -1,4 +1,4 @@
-﻿import STD,lib_fileservices,ut;
+﻿import STD,lib_fileservices,ut,_Control;
 export ArchiveFiles(string location, string environment, integer noofpartitions = 0, integer whichpartition = 0) := module
 	
 	export rundatetime := ut.GetTimeDate() : independent;
@@ -84,6 +84,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 	
 	export SlimmedFilesToCopy := function
 		SlimmedDs := dedup(sort(dataset('~'+filestoprocess, filesrec, thor, opt)(~(regexfind('foreign',files) 
+																																							or regexfind(' ', trim(files,left,right))
 																																							or regexfind(':: ',files)
 																																							or regexfind('thor::base::aid_nonheader::ace',files)
 																																							or regexfind('::nid::',files))),files),files)
@@ -203,6 +204,19 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		end;
 		
 		filesrec_cnt addcnt_trans(SlimmedFilesToCopy l, integer cnt) := transform
+		
+			tb := if (~regexfind('transferbuffersize',l.cmd,nocase)
+														,l.cmd + ' transferbuffersize=10000000 '
+															,l.cmd);
+		
+			nc := if (~regexfind('nocommon',tb,nocase)
+													,tb + ' noCommon=1 '
+													,tb
+												);
+			mc := if (~regexfind('connect',nc,nocase)
+													,nc + ' connect=400 '
+													,nc
+												);
 			self.isChanged := if (~fileservices.fileexists('~'+l.files),
 														true,
 														// there are scenarios when the file copied to destination
@@ -214,6 +228,8 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 																// false)
 																false
 														);
+			self.cmd := mc;
+													
 			self.l_cnt := cnt;
 			self := l;
 		end;
@@ -231,12 +247,62 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 		
 	end;
 	
+	export DeleteFilesBeforeCopy() := function
+		dFilesList := GetActualFileListToCopy();
+		files_layout := record
+			string name;
+			integer filecnt;
+		end;
+		Layout_DeleteFiles := record
+			//string superfile;
+			string deletepattern;
+			integer files_to_keep;
+			dataset(files_layout) filematches;
+		end;
+		
+		Layout_DeleteFiles GetMatchedFiles(dFilesList l) := transform
+			l_pattern := regexreplace('[*]+',regexreplace('[-_]',regexreplace('[0-9]+',regexreplace('[0-9]+[a-z]',l.files,'*',nocase),'*',nocase),'*'),'*');
+			/*counttocompare := if (count(thorbackup.SetDeleteFileCount(trim(superfile,left,right)=trim(l.name,left,right))) > 0, // check if the superfile exists in the threshold setup list
+														thorbackup.constants.yogurt(l.name).no_of_files_to_keep, // if yes get the filecnt to keep from list
+															thorbackup.constants.yogurt().no_of_files_to_keep);*/
+			no_of_files_to_keep := if (count(thorbackup.SetDeleteFileCount(trim(filepattern,left,right)=trim(l_pattern,left,right))) > 0, // check if the superfile exists in the threshold setup list
+														thorbackup.constants.yogurt(filepattern := l_pattern).no_of_files_to_keep, // if yes get the filecnt to keep from list
+															thorbackup.constants.yogurt().no_of_files_to_keep);									
+			//self.superfile := l.name;
+			self.deletepattern := l_pattern;
+			self.files_to_keep := no_of_files_to_keep;
+			self.filematches := thorbackup.DeleteFiles(location, environment,'').GetFileList(trim(l_pattern,left,right),no_of_files_to_keep);
+		end;
+		
+		MatchedFiles := project(dFilesList,GetMatchedFiles(left));
+		
+		Layout_FilesToDelete := record
+			//string superfile;
+			string name;
+			integer filecnt;
+		end;	
+		
+		Layout_FilesToDelete FilesToDelete(MatchedFiles l,files_layout r) := transform
+			//self.superfile := l.superfile;
+			self.name := r.name;
+			// if filecnt > threshold set it to 0
+			self.filecnt := r.filecnt;
+		end;
+		
+		GetFilesToDelete := normalize(MatchedFiles,left.filematches,FilesToDelete(left,right));
+		
+		return apply(GetFilesToDelete
+								,STD.File.DeleteLogicalFile('~'+name)
+								);
+	end;
+	
 	export CopyFiles := function
 	
 		return 	apply(GetActualFileListToCopy(),
 														sequential(
 																output( 'Copying file ' + (string) l_cnt),
-																STD.File.DfuPlusExec(cmd)
+																if (STD.File.FileExists('~foreign::'+_Control.Config.prod_dali+'::'+files)
+																	,STD.File.DfuPlusExec(cmd))
 																)
 														 );
 	end;
@@ -364,6 +430,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 														writejobstatusfile,
 														output(mincnt, named('Start_Count')),
 														output(maxcnt, named('End_Count')),
+														DeleteFilesBeforeCopy(),
 														CopyFiles,
 														PostCopy(),
 														GetErrorMessages(WORKUNIT),
@@ -395,6 +462,7 @@ export ArchiveFiles(string location, string environment, integer noofpartitions 
 														writejobstatusfile,
 														output(mincnt, named('Start_Count')),
 														output(maxcnt, named('End_Count')),
+														DeleteFilesBeforeCopy(),
 														CopyFiles,
 														PostCopy(),
 														GetErrorMessages(WORKUNIT),

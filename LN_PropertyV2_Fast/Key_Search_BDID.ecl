@@ -6,7 +6,7 @@ keyPrefix	:= if(isFast,'property_fast','ln_propertyv2');
 
 
 df0	:= LN_PropertyV2_Fast.CleanSearch(false);
-df1	:= LN_PropertyV2_Fast.CleanSearch(true);
+df1	:= LN_PropertyV2_Fast.CleanSearch(true, true);
 
 df2	:= if(isFast,df1,df0);
 

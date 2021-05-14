@@ -1,4 +1,4 @@
-IMPORT corp2, corp2_mapping, corp2_raw_sc;
+﻿IMPORT corp2, corp2_mapping, corp2_raw_sc;
 
 EXPORT Functions := Module
 
@@ -1402,7 +1402,7 @@ EXPORT Functions := Module
 											uc_s = 'AGT' 							=> 'AGENT',
 											uc_s = 'AMD' 							=> 'AMENDMENT',					
 											uc_s = 'ANG' 							=> 'HIGH GROWTH SMALL BUSINESS',
-											uc_s = 'ANP' and uc_c in['CORP','ELE']=>'ARTICLES OF INCORPORATION', // Per CI:due to discrepancy for 'ANP' on the stateâ€™s site ,we are looking to check for corptypecode code to populate desc!
+											uc_s = 'ANP' and uc_c in['CORP','ELE']=>'ARTICLES OF INCORPORATION', // Per CI:due to discrepancy for 'ANP' on the stateÃ¢â‚¬â„¢s site ,we are looking to check for corptypecode code to populate desc!
 											uc_s = 'ANP' and uc_c = 'LLC' =>'ORGANIZATION',
 											uc_s = 'ANP' and uc_c = 'RES' =>'NAME RESERVATION',
 											uc_s = 'ASM' 							=> 'ASSUMED NAME',
@@ -1442,6 +1442,7 @@ EXPORT Functions := Module
 											uc_s = 'MIL'							=> 'ARTICLES OF INCORPORATION FOR A MILITARY CORPORATION',
 											uc_s = 'MSC' 							=> 'MERGER SURVIVOR',
 											uc_s = 'NAG' 							=> 'NO AGENT, NOT IN GOOD STANDING',
+											uc_s = 'NAL' 							=> 'ADMINISTRATIVE DISSOLUTION',
 											uc_s = 'NEW' 							=> 'CORPORATION',
 											uc_s = 'PSC' 							=> 'PUBLIC SERVICE DISTRICT CONVERSION',
 											uc_s = 'PSD' 							=> 'PUBLIC SERVICE DISTRICT CONVERSION',

@@ -1,4 +1,4 @@
-/*2012-05-04T20:47:13Z (vern_p bentley)
+﻿/*2012-05-04T20:47:13Z (vern_p bentley)
 
 */
 IMPORT  
@@ -33,6 +33,7 @@ IMPORT
 	,lobbyists
 	,martindale_hubbell
 	,oshair
+	,onekey
 	,phonesplus
 	,prof_license
 	,sda_sdaa
@@ -119,8 +120,9 @@ module
 	VersionControl.macBuildFileVersions(Source_Filenames.sdaa												,bus_cont_layout											,sdaa												);
 	VersionControl.macBuildFileVersions(Source_Filenames.SEC 												,govdata.Layout_SEC_Broker_Dealer_In	,SEC 												);
 	VersionControl.macBuildFileVersions(Source_Filenames.SEC2												,govdata.layout_sec_broker_dealer_BDID,SEC2												);
-	VersionControl.macBuildFileVersions(Source_Filenames.SKA_Nixie									,busdata.layout_ska_nixie_bdid				,SKA_Nixie									);
-	VersionControl.macBuildFileVersions(Source_Filenames.ska_verified								,busdata.layout_ska_verified_bdid			,ska_verified								);
+	//*** Modified code to replace ska with OneKey as per Jira# DF-26195
+	//VersionControl.macBuildFileVersions(Source_Filenames.SKA_Nixie									,busdata.layout_ska_nixie_bdid				,SKA_Nixie									);
+	//VersionControl.macBuildFileVersions(Source_Filenames.ska_verified								,busdata.layout_ska_verified_bdid			,ska_verified								);
 	VersionControl.macBuildFileVersions(Source_Filenames.txbus											,TXBUS.Layouts_Txbus.Layout_Base			,txbus											);
 	VersionControl.macBuildFileVersions(Source_Filenames.ucc_party 									,uccv2.Layout_UCC_Common.Layout_Party_with_AID	,ucc_party 									);
 	VersionControl.macBuildFileVersions(Source_Filenames.vickers_13d13g							,vickers.layout_13d13g_base						,vickers_13d13g							);

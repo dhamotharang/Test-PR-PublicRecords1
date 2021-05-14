@@ -1,4 +1,4 @@
-import Address,AID,codes,Lib_StringLib,standard,ut,vehlic,vehicleCodes,PromoteSupers;
+﻿import Address,AID,codes,Lib_StringLib,standard,ut,vehlic,vehicleCodes,PromoteSupers;
 
 dOHUpdate	:=	VehicleV2.Map_OH_Update;
 
@@ -120,16 +120,17 @@ transform
 																									and	length(trim(pInput.orig_vin))	=	17
 																									and	length(trim(pInput.VINA_vin))	!=	17,
 																									pInput.orig_vin,
-																									if(			pInput.orig_vin[1..4]	in	['','NONE','HMDE','HOME','UNK','N0NE','UNKN']	or	StringLib.StringFilterOut(pInput.orig_vin,'0|*')	=	''
-																											or	regexfind('HOMEMADE$|H0MEMADE|NONE|N0NE|UNKNOWN|VEHICLE|UNKNOWN|UNKOWN|UNK0WN|NUMBER',pInput.orig_vin) or pInput.orig_vin in ['N/A','N','NR','NA','ASPT','01','SPCN','O','NO VIN','UKN'],
-																											(string30)hash64(pInput.state_origin,pInput.orig_vin,pInput.TITLE_NUMBERxBG9,pInput.vina_make_desc,Best_Model_Year),
-																											(string30)hash64(pInput.state_origin,pInput.orig_vin,pInput.vina_make_desc,Best_Model_Year)
+																									if(	pInput.orig_vin[1..4]	in	['','NONE','HMDE','HOME','UNK','N0NE','UNKN']	or	StringLib.StringFilterOut(pInput.orig_vin,'0|*')	=	''
+																										or	regexfind('HOMEMADE$|H0MEMADE|NONE|N0NE|UNKNOWN|VEHICLE|UNKNOWN|UNKOWN|UNK0WN|NUMBER',pInput.orig_vin) or pInput.orig_vin in ['N/A','N','NR','NA','ASPT','01','SPCN','O','NO VIN','UKN'],
+																											// DF-27425 - add 2 new fields, orig_reg_1_customer_name and true_license_plste_number, to input fields of vehicle_key when valid vin is not available
+																											(string30)hash64(pInput.state_origin,pInput.orig_vin,pInput.TITLE_NUMBERxBG9,pInput.vina_make_desc,Best_Model_Year,pInput.orig_reg_1_customer_name,pInput.true_license_plste_number),
+																											(string30)hash64(pInput.state_origin,pInput.orig_vin,pInput.vina_make_desc,Best_Model_Year,pInput.orig_reg_1_customer_name,pInput.true_license_plste_number)
 																										)
 																								)
 																							)
 																							,left,right
 																					);
-	
+
 	best_major_color_desc 				:=	VehicleCodes.getColor(pInput.best_Major_Color_Code);
 	best_minor_color_desc 				:=	VehicleCodes.getColor(pInput.best_Minor_Color_Code);
 	
@@ -198,7 +199,7 @@ removeOHBldg	:=	sequential(	fileservices.startsuperfiletransaction(),
 
 buildOHAll	:=	sequential(buildOHBase,removeOHBldg);
 
-export	OH_as_Base	:=	if(	fileservices.getsuperfilesubcount('~thor_data400::in::vehiclev2::di::oh_building')	>	0,
+EXPORT	OH_as_Base	:=	if(	fileservices.getsuperfilesubcount('~thor_data400::in::vehiclev2::di::oh_building')	>	0,
 														buildOHAll,
 														output('Not building OH base file as there are no update files available')
 													);

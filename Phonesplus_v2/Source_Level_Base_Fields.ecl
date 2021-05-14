@@ -1,13 +1,13 @@
 ﻿IMPORT SALT311;
 EXPORT Source_Level_Base_Fields := MODULE
  
-EXPORT NumFields := 70;
+EXPORT NumFields := 73;
  
-EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'cellphoneidkey','source','household_flag','cellphone','npa','phone7','phone7_did_key','pdid','did','did_score','datefirstseen','datelastseen','datevendorfirstreported','datevendorlastreported','dt_nonglb_last_seen','glb_dppa_flag','did_type','origname','address1','address2','origcity','origstate','origzip','orig_phone','orig_carrier_name','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','state','zip5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','ace_fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','title','fname','mname','lname','name_suffix','name_score','rawaid','cleanaid','current_rec','first_build_date','last_build_date','ingest_tpe','verified','cord_cutter','activity_status','prepaid','global_sid','record_sid');
-EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'cellphoneidkey','source','household_flag','cellphone','npa','phone7','phone7_did_key','pdid','did','did_score','datefirstseen','datelastseen','datevendorfirstreported','datevendorlastreported','dt_nonglb_last_seen','glb_dppa_flag','did_type','origname','address1','address2','origcity','origstate','origzip','orig_phone','orig_carrier_name','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','state','zip5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','ace_fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','title','fname','mname','lname','name_suffix','name_score','rawaid','cleanaid','current_rec','first_build_date','last_build_date','ingest_tpe','verified','cord_cutter','activity_status','prepaid','global_sid','record_sid');
-EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'cellphoneidkey' => 0,'source' => 1,'household_flag' => 2,'cellphone' => 3,'npa' => 4,'phone7' => 5,'phone7_did_key' => 6,'pdid' => 7,'did' => 8,'did_score' => 9,'datefirstseen' => 10,'datelastseen' => 11,'datevendorfirstreported' => 12,'datevendorlastreported' => 13,'dt_nonglb_last_seen' => 14,'glb_dppa_flag' => 15,'did_type' => 16,'origname' => 17,'address1' => 18,'address2' => 19,'origcity' => 20,'origstate' => 21,'origzip' => 22,'orig_phone' => 23,'orig_carrier_name' => 24,'prim_range' => 25,'predir' => 26,'prim_name' => 27,'addr_suffix' => 28,'postdir' => 29,'unit_desig' => 30,'sec_range' => 31,'p_city_name' => 32,'v_city_name' => 33,'state' => 34,'zip5' => 35,'zip4' => 36,'cart' => 37,'cr_sort_sz' => 38,'lot' => 39,'lot_order' => 40,'dpbc' => 41,'chk_digit' => 42,'rec_type' => 43,'ace_fips_st' => 44,'ace_fips_county' => 45,'geo_lat' => 46,'geo_long' => 47,'msa' => 48,'geo_blk' => 49,'geo_match' => 50,'err_stat' => 51,'title' => 52,'fname' => 53,'mname' => 54,'lname' => 55,'name_suffix' => 56,'name_score' => 57,'rawaid' => 58,'cleanaid' => 59,'current_rec' => 60,'first_build_date' => 61,'last_build_date' => 62,'ingest_tpe' => 63,'verified' => 64,'cord_cutter' => 65,'activity_status' => 66,'prepaid' => 67,'global_sid' => 68,'record_sid' => 69,0);
-EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
-EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
+EXPORT SALT311.StrType FieldName(UNSIGNED2 i) := CHOOSE(i,'cellphoneidkey','source','src_bitmap','household_flag','rules','cellphone','npa','phone7','phone7_did_key','pdid','did','did_score','datefirstseen','datelastseen','datevendorfirstreported','datevendorlastreported','dt_nonglb_last_seen','glb_dppa_flag','did_type','origname','address1','address2','origcity','origstate','origzip','orig_phone','orig_carrier_name','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','state','zip5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','ace_fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','title','fname','mname','lname','name_suffix','name_score','dob','rawaid','cleanaid','current_rec','first_build_date','last_build_date','ingest_tpe','verified','cord_cutter','activity_status','prepaid','global_sid','record_sid');
+EXPORT SALT311.StrType FlatName(UNSIGNED2 i) := CHOOSE(i,'cellphoneidkey','source','src_bitmap','household_flag','rules','cellphone','npa','phone7','phone7_did_key','pdid','did','did_score','datefirstseen','datelastseen','datevendorfirstreported','datevendorlastreported','dt_nonglb_last_seen','glb_dppa_flag','did_type','origname','address1','address2','origcity','origstate','origzip','orig_phone','orig_carrier_name','prim_range','predir','prim_name','addr_suffix','postdir','unit_desig','sec_range','p_city_name','v_city_name','state','zip5','zip4','cart','cr_sort_sz','lot','lot_order','dpbc','chk_digit','rec_type','ace_fips_st','ace_fips_county','geo_lat','geo_long','msa','geo_blk','geo_match','err_stat','title','fname','mname','lname','name_suffix','name_score','dob','rawaid','cleanaid','current_rec','first_build_date','last_build_date','ingest_tpe','verified','cord_cutter','activity_status','prepaid','global_sid','record_sid');
+EXPORT FieldNum(SALT311.StrType fn) := CASE(fn,'cellphoneidkey' => 0,'source' => 1,'src_bitmap' => 2,'household_flag' => 3,'rules' => 4,'cellphone' => 5,'npa' => 6,'phone7' => 7,'phone7_did_key' => 8,'pdid' => 9,'did' => 10,'did_score' => 11,'datefirstseen' => 12,'datelastseen' => 13,'datevendorfirstreported' => 14,'datevendorlastreported' => 15,'dt_nonglb_last_seen' => 16,'glb_dppa_flag' => 17,'did_type' => 18,'origname' => 19,'address1' => 20,'address2' => 21,'origcity' => 22,'origstate' => 23,'origzip' => 24,'orig_phone' => 25,'orig_carrier_name' => 26,'prim_range' => 27,'predir' => 28,'prim_name' => 29,'addr_suffix' => 30,'postdir' => 31,'unit_desig' => 32,'sec_range' => 33,'p_city_name' => 34,'v_city_name' => 35,'state' => 36,'zip5' => 37,'zip4' => 38,'cart' => 39,'cr_sort_sz' => 40,'lot' => 41,'lot_order' => 42,'dpbc' => 43,'chk_digit' => 44,'rec_type' => 45,'ace_fips_st' => 46,'ace_fips_county' => 47,'geo_lat' => 48,'geo_long' => 49,'msa' => 50,'geo_blk' => 51,'geo_match' => 52,'err_stat' => 53,'title' => 54,'fname' => 55,'mname' => 56,'lname' => 57,'name_suffix' => 58,'name_score' => 59,'dob' => 60,'rawaid' => 61,'cleanaid' => 62,'current_rec' => 63,'first_build_date' => 64,'last_build_date' => 65,'ingest_tpe' => 66,'verified' => 67,'cord_cutter' => 68,'activity_status' => 69,'prepaid' => 70,'global_sid' => 71,'record_sid' => 72,0);
+EXPORT SET OF SALT311.StrType FieldRules(UNSIGNED2 i) := CHOOSE(i,[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]);
+EXPORT BOOLEAN InBaseLayout(UNSIGNED2 i) := CHOOSE(i,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,TRUE,FALSE);
  
 //Individual field level validation
  
@@ -19,9 +19,17 @@ EXPORT Make_source(SALT311.StrType s0) := s0;
 EXPORT InValid_source(SALT311.StrType s) := 0;
 EXPORT InValidMessage_source(UNSIGNED1 wh) := '';
  
+EXPORT Make_src_bitmap(SALT311.StrType s0) := s0;
+EXPORT InValid_src_bitmap(SALT311.StrType s) := 0;
+EXPORT InValidMessage_src_bitmap(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_household_flag(SALT311.StrType s0) := s0;
 EXPORT InValid_household_flag(SALT311.StrType s) := 0;
 EXPORT InValidMessage_household_flag(UNSIGNED1 wh) := '';
+ 
+EXPORT Make_rules(SALT311.StrType s0) := s0;
+EXPORT InValid_rules(SALT311.StrType s) := 0;
+EXPORT InValidMessage_rules(UNSIGNED1 wh) := '';
  
 EXPORT Make_cellphone(SALT311.StrType s0) := s0;
 EXPORT InValid_cellphone(SALT311.StrType s) := 0;
@@ -243,6 +251,10 @@ EXPORT Make_name_score(SALT311.StrType s0) := s0;
 EXPORT InValid_name_score(SALT311.StrType s) := 0;
 EXPORT InValidMessage_name_score(UNSIGNED1 wh) := '';
  
+EXPORT Make_dob(SALT311.StrType s0) := s0;
+EXPORT InValid_dob(SALT311.StrType s) := 0;
+EXPORT InValidMessage_dob(UNSIGNED1 wh) := '';
+ 
 EXPORT Make_rawaid(SALT311.StrType s0) := s0;
 EXPORT InValid_rawaid(SALT311.StrType s) := 0;
 EXPORT InValidMessage_rawaid(UNSIGNED1 wh) := '';
@@ -314,7 +326,9 @@ Bad_Pivots := %t2%(Cnt>100);
   %dl% := RECORD
     BOOLEAN Diff_cellphoneidkey;
     BOOLEAN Diff_source;
+    BOOLEAN Diff_src_bitmap;
     BOOLEAN Diff_household_flag;
+    BOOLEAN Diff_rules;
     BOOLEAN Diff_cellphone;
     BOOLEAN Diff_npa;
     BOOLEAN Diff_phone7;
@@ -370,6 +384,7 @@ Bad_Pivots := %t2%(Cnt>100);
     BOOLEAN Diff_lname;
     BOOLEAN Diff_name_suffix;
     BOOLEAN Diff_name_score;
+    BOOLEAN Diff_dob;
     BOOLEAN Diff_rawaid;
     BOOLEAN Diff_cleanaid;
     BOOLEAN Diff_current_rec;
@@ -390,7 +405,9 @@ Bad_Pivots := %t2%(Cnt>100);
   %dl% %fd%(in_left le,in_right ri) := TRANSFORM
     SELF.Diff_cellphoneidkey := le.cellphoneidkey <> ri.cellphoneidkey;
     SELF.Diff_source := le.source <> ri.source;
+    SELF.Diff_src_bitmap := le.src_bitmap <> ri.src_bitmap;
     SELF.Diff_household_flag := le.household_flag <> ri.household_flag;
+    SELF.Diff_rules := le.rules <> ri.rules;
     SELF.Diff_cellphone := le.cellphone <> ri.cellphone;
     SELF.Diff_npa := le.npa <> ri.npa;
     SELF.Diff_phone7 := le.phone7 <> ri.phone7;
@@ -446,6 +463,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_lname := le.lname <> ri.lname;
     SELF.Diff_name_suffix := le.name_suffix <> ri.name_suffix;
     SELF.Diff_name_score := le.name_score <> ri.name_score;
+    SELF.Diff_dob := le.dob <> ri.dob;
     SELF.Diff_rawaid := le.rawaid <> ri.rawaid;
     SELF.Diff_cleanaid := le.cleanaid <> ri.cleanaid;
     SELF.Diff_current_rec := le.current_rec <> ri.current_rec;
@@ -460,7 +478,7 @@ Bad_Pivots := %t2%(Cnt>100);
     SELF.Diff_record_sid := le.record_sid <> ri.record_sid;
     SELF.Val := (SALT311.StrType)evaluate(le,pivot_exp);
     SELF.SourceField := le.source;
-    SELF.Num_Diffs := 0+ IF( SELF.Diff_cellphoneidkey,1,0)+ IF( SELF.Diff_source,1,0)+ IF( SELF.Diff_household_flag,1,0)+ IF( SELF.Diff_cellphone,1,0)+ IF( SELF.Diff_npa,1,0)+ IF( SELF.Diff_phone7,1,0)+ IF( SELF.Diff_phone7_did_key,1,0)+ IF( SELF.Diff_pdid,1,0)+ IF( SELF.Diff_did,1,0)+ IF( SELF.Diff_did_score,1,0)+ IF( SELF.Diff_datefirstseen,1,0)+ IF( SELF.Diff_datelastseen,1,0)+ IF( SELF.Diff_datevendorfirstreported,1,0)+ IF( SELF.Diff_datevendorlastreported,1,0)+ IF( SELF.Diff_dt_nonglb_last_seen,1,0)+ IF( SELF.Diff_glb_dppa_flag,1,0)+ IF( SELF.Diff_did_type,1,0)+ IF( SELF.Diff_origname,1,0)+ IF( SELF.Diff_address1,1,0)+ IF( SELF.Diff_address2,1,0)+ IF( SELF.Diff_origcity,1,0)+ IF( SELF.Diff_origstate,1,0)+ IF( SELF.Diff_origzip,1,0)+ IF( SELF.Diff_orig_phone,1,0)+ IF( SELF.Diff_orig_carrier_name,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_state,1,0)+ IF( SELF.Diff_zip5,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0)+ IF( SELF.Diff_lot,1,0)+ IF( SELF.Diff_lot_order,1,0)+ IF( SELF.Diff_dpbc,1,0)+ IF( SELF.Diff_chk_digit,1,0)+ IF( SELF.Diff_rec_type,1,0)+ IF( SELF.Diff_ace_fips_st,1,0)+ IF( SELF.Diff_ace_fips_county,1,0)+ IF( SELF.Diff_geo_lat,1,0)+ IF( SELF.Diff_geo_long,1,0)+ IF( SELF.Diff_msa,1,0)+ IF( SELF.Diff_geo_blk,1,0)+ IF( SELF.Diff_geo_match,1,0)+ IF( SELF.Diff_err_stat,1,0)+ IF( SELF.Diff_title,1,0)+ IF( SELF.Diff_fname,1,0)+ IF( SELF.Diff_mname,1,0)+ IF( SELF.Diff_lname,1,0)+ IF( SELF.Diff_name_suffix,1,0)+ IF( SELF.Diff_name_score,1,0)+ IF( SELF.Diff_rawaid,1,0)+ IF( SELF.Diff_cleanaid,1,0)+ IF( SELF.Diff_current_rec,1,0)+ IF( SELF.Diff_first_build_date,1,0)+ IF( SELF.Diff_last_build_date,1,0)+ IF( SELF.Diff_ingest_tpe,1,0)+ IF( SELF.Diff_verified,1,0)+ IF( SELF.Diff_cord_cutter,1,0)+ IF( SELF.Diff_activity_status,1,0)+ IF( SELF.Diff_prepaid,1,0)+ IF( SELF.Diff_global_sid,1,0)+ IF( SELF.Diff_record_sid,1,0);
+    SELF.Num_Diffs := 0+ IF( SELF.Diff_cellphoneidkey,1,0)+ IF( SELF.Diff_source,1,0)+ IF( SELF.Diff_src_bitmap,1,0)+ IF( SELF.Diff_household_flag,1,0)+ IF( SELF.Diff_rules,1,0)+ IF( SELF.Diff_cellphone,1,0)+ IF( SELF.Diff_npa,1,0)+ IF( SELF.Diff_phone7,1,0)+ IF( SELF.Diff_phone7_did_key,1,0)+ IF( SELF.Diff_pdid,1,0)+ IF( SELF.Diff_did,1,0)+ IF( SELF.Diff_did_score,1,0)+ IF( SELF.Diff_datefirstseen,1,0)+ IF( SELF.Diff_datelastseen,1,0)+ IF( SELF.Diff_datevendorfirstreported,1,0)+ IF( SELF.Diff_datevendorlastreported,1,0)+ IF( SELF.Diff_dt_nonglb_last_seen,1,0)+ IF( SELF.Diff_glb_dppa_flag,1,0)+ IF( SELF.Diff_did_type,1,0)+ IF( SELF.Diff_origname,1,0)+ IF( SELF.Diff_address1,1,0)+ IF( SELF.Diff_address2,1,0)+ IF( SELF.Diff_origcity,1,0)+ IF( SELF.Diff_origstate,1,0)+ IF( SELF.Diff_origzip,1,0)+ IF( SELF.Diff_orig_phone,1,0)+ IF( SELF.Diff_orig_carrier_name,1,0)+ IF( SELF.Diff_prim_range,1,0)+ IF( SELF.Diff_predir,1,0)+ IF( SELF.Diff_prim_name,1,0)+ IF( SELF.Diff_addr_suffix,1,0)+ IF( SELF.Diff_postdir,1,0)+ IF( SELF.Diff_unit_desig,1,0)+ IF( SELF.Diff_sec_range,1,0)+ IF( SELF.Diff_p_city_name,1,0)+ IF( SELF.Diff_v_city_name,1,0)+ IF( SELF.Diff_state,1,0)+ IF( SELF.Diff_zip5,1,0)+ IF( SELF.Diff_zip4,1,0)+ IF( SELF.Diff_cart,1,0)+ IF( SELF.Diff_cr_sort_sz,1,0)+ IF( SELF.Diff_lot,1,0)+ IF( SELF.Diff_lot_order,1,0)+ IF( SELF.Diff_dpbc,1,0)+ IF( SELF.Diff_chk_digit,1,0)+ IF( SELF.Diff_rec_type,1,0)+ IF( SELF.Diff_ace_fips_st,1,0)+ IF( SELF.Diff_ace_fips_county,1,0)+ IF( SELF.Diff_geo_lat,1,0)+ IF( SELF.Diff_geo_long,1,0)+ IF( SELF.Diff_msa,1,0)+ IF( SELF.Diff_geo_blk,1,0)+ IF( SELF.Diff_geo_match,1,0)+ IF( SELF.Diff_err_stat,1,0)+ IF( SELF.Diff_title,1,0)+ IF( SELF.Diff_fname,1,0)+ IF( SELF.Diff_mname,1,0)+ IF( SELF.Diff_lname,1,0)+ IF( SELF.Diff_name_suffix,1,0)+ IF( SELF.Diff_name_score,1,0)+ IF( SELF.Diff_dob,1,0)+ IF( SELF.Diff_rawaid,1,0)+ IF( SELF.Diff_cleanaid,1,0)+ IF( SELF.Diff_current_rec,1,0)+ IF( SELF.Diff_first_build_date,1,0)+ IF( SELF.Diff_last_build_date,1,0)+ IF( SELF.Diff_ingest_tpe,1,0)+ IF( SELF.Diff_verified,1,0)+ IF( SELF.Diff_cord_cutter,1,0)+ IF( SELF.Diff_activity_status,1,0)+ IF( SELF.Diff_prepaid,1,0)+ IF( SELF.Diff_global_sid,1,0)+ IF( SELF.Diff_record_sid,1,0);
   END;
 // Now need to remove bad pivots from comparison
 #uniquename(L)
@@ -475,7 +493,9 @@ Bad_Pivots := %t2%(Cnt>100);
   %AggRec% := RECORD
     Count_Diff_cellphoneidkey := COUNT(GROUP,%Closest%.Diff_cellphoneidkey);
     Count_Diff_source := COUNT(GROUP,%Closest%.Diff_source);
+    Count_Diff_src_bitmap := COUNT(GROUP,%Closest%.Diff_src_bitmap);
     Count_Diff_household_flag := COUNT(GROUP,%Closest%.Diff_household_flag);
+    Count_Diff_rules := COUNT(GROUP,%Closest%.Diff_rules);
     Count_Diff_cellphone := COUNT(GROUP,%Closest%.Diff_cellphone);
     Count_Diff_npa := COUNT(GROUP,%Closest%.Diff_npa);
     Count_Diff_phone7 := COUNT(GROUP,%Closest%.Diff_phone7);
@@ -531,6 +551,7 @@ Bad_Pivots := %t2%(Cnt>100);
     Count_Diff_lname := COUNT(GROUP,%Closest%.Diff_lname);
     Count_Diff_name_suffix := COUNT(GROUP,%Closest%.Diff_name_suffix);
     Count_Diff_name_score := COUNT(GROUP,%Closest%.Diff_name_score);
+    Count_Diff_dob := COUNT(GROUP,%Closest%.Diff_dob);
     Count_Diff_rawaid := COUNT(GROUP,%Closest%.Diff_rawaid);
     Count_Diff_cleanaid := COUNT(GROUP,%Closest%.Diff_cleanaid);
     Count_Diff_current_rec := COUNT(GROUP,%Closest%.Diff_current_rec);

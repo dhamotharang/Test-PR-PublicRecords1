@@ -1,6 +1,6 @@
-// This is used to build OptOut test key until PRTE is ready
+﻿// This is used to build OptOut test key until PRTE is ready
 IMPORT RoxieKeyBuild, dops, _Control;
-export Proc_Build_Key_OptOut_Test(String pVersion) := FUNCTION
+export Proc_Build_Key_OptOut_Test(String pVersion, string pContact ='\' \'') := FUNCTION
 
     filedate := TRIM(pVersion);
 	spray_opt_out_input_file	:= Suppress.fSprayFiles.OptOutSrc(filedate
@@ -23,7 +23,7 @@ export Proc_Build_Key_OptOut_Test(String pVersion) := FUNCTION
 	END;
 	input_raw 	:= Suppress.Files.OptOut.Input_Raw(ENTRY_TYPE NOT IN ['','ROWCOUNT']);
 	input_0		:= PROJECT(input_raw, tInputC(LEFT));
-    ds_key_input:= dedup(sort(distribute(input_0,lexid),lexid,local),lexid,local);
+    ds_key_input:= dedup(sort(distribute(input_0,lexid),lexid,-date_added,local),lexid,local);
 	key         := INDEX(ds_key_input, {lexid}, {ds_key_input}, '~thor::key::new_suppression::qa::opt_out');
 
     RoxieKeyBuild.Mac_SK_BuildProcess_v2_local(key,'','~thor::key::new_suppression::'+filedate+'::opt_out',bld_optout_key,true);

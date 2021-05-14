@@ -1,5 +1,5 @@
-
-import impulse_email, emailservice, mdr, _validate, entiera;
+﻿
+import impulse_email, emailservice, mdr, _validate, entiera, ut;
 export Map_Impulse_As_Email(version) := function
 
 with_email := impulse_email.files.file_Impulse_Email_Base(length(trim(email,left, right)) > 4 and StringLib.StringFindCount(email,  '@') > 0);
@@ -18,14 +18,14 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	self.activecode     							:= '';
 	SELF.orig_pmghousehold_id  				:= '';
 	SELF.orig_pmgindividual_id  			:= '';
-	SELF.orig_first_name  						:= StringLib.StringToUpperCase(trim(trim(input.firstname, left, right) + ' ' + trim(input.middlename, left, right), left, right));
-	SELF.orig_last_name  							:= StringLib.StringToUpperCase(trim(input.lastname, left, right));
-	SELF.Orig_Address  								:= StringLib.StringToUpperCase(trim(input.address1 + ' ' + input.address2, left, right));
-	SELF.Orig_City  									:= StringLib.StringToUpperCase(input.city);
-	SELF.Orig_State  									:= StringLib.StringToUpperCase(input.state);
+	SELF.orig_first_name  						:= ut.CleanSpacesAndUpper(trim(trim(input.firstname, left, right) + ' ' + trim(input.middlename, left, right), left, right));
+	SELF.orig_last_name  							:= ut.CleanSpacesAndUpper(trim(input.lastname, left, right));
+	SELF.Orig_Address  								:= ut.CleanSpacesAndUpper(trim(input.address1 + ' ' + input.address2, left, right));
+	SELF.Orig_City  									:= ut.CleanSpacesAndUpper(input.city);
+	SELF.Orig_State  									:= ut.CleanSpacesAndUpper(input.state);
 	SELF.Orig_Zip  										:= input.zip;
 	SELF.orig_zip4  									:= '';
-	SELF.orig_email 									:= stringlib.stringtouppercase(input.email);
+	SELF.orig_email 									:= ut.CleanSpacesAndUpper(input.email);
 	SELF.orig_ip  										:= input.ipaddress;
 	SELF.orig_e360_id  								:= '';
 	SELF.orig_teramedia_id  					:= '';
@@ -68,16 +68,16 @@ Email_Data.Layout_Email.Base t_map_to_common (domain_d input) := transform
 	SELF.date_last_seen  							:= _validate.date.fCorrectedDateString(StringLib.StringFindReplace(input.lastmodified, '-', '')[..8]);
 	SELF.Date_Vendor_First_Reported   := if(_validate.date.fCorrectedDateString((string)input.datevendorfirstreported) = '', _validate.date.fCorrectedDateString((string)input.datevendorfirstreported), (string)version);
 	SELF.Date_Vendor_Last_Reported  	:= if(_validate.date.fCorrectedDateString((string)input.datevendorlastreported) = '', _validate.date.fCorrectedDateString((string)input.datevendorlastreported), (string)version);
-	self.append_domain 											:= stringlib.stringtouppercase(input.domain);
-	self.append_domain_type 									:= stringlib.stringtouppercase(input.domain_type);
-	self.append_domain_root 									:= stringlib.stringtouppercase(input.domain_root);
-	self.append_domain_ext 									:= stringlib.stringtouppercase(input.domain_ext);
-	self.append_is_tld_state									:= input.is_tld_state;
+	self.append_domain 								:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Domain(input.domain));
+	self.append_domain_type 					:= ut.CleanSpacesAndUpper(input.domain_type);
+	self.append_domain_root 								:= ut.CleanSpacesAndUpper(input.domain_root);
+	self.append_domain_ext 									:= ut.CleanSpacesAndUpper(input.domain_ext);
+	self.append_is_tld_state								:= input.is_tld_state;
 	self.append_is_tld_generic 							:= input.is_tld_generic;
 	self.append_is_tld_country 							:= input.is_tld_country;
-	self.append_is_valid_domain_ext 					:= input.is_valid_domain_ext;
+	self.append_is_valid_domain_ext 				:= input.is_valid_domain_ext;
 	self 															:= input;
-	self.append_email_username 							:= stringlib.stringtouppercase(Fn_Clean_Email_Username(self.orig_email));
+	self.append_email_username 						:= ut.CleanSpacesAndUpper(Fn_Clean_Email_Username(self.orig_email));
 	self.clean_email    							:= trim(self.append_email_username, left, right) + '@' + trim(self.append_domain, left, right);
 										 
 	self.Email_rec_key    						:= Email_rec_key(self.clean_email ,

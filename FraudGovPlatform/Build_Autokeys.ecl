@@ -109,6 +109,11 @@ FUNCTION
 							                                     AutoKeyI.BuildI_Indv.DoBuild,
 							                                     AutoKeyI.BuildI_Biz.DoBuild)); 
 
-	return Build_autokeys;
+	AutoKeyB2.MAC_AcceptSK_to_QA(_Dataset().autokeytemplate	, moveToQA);
+
+	return SEQUENTIAL(
+		 Build_autokeys
+		,moveToQA
+	);
 
 end;

@@ -97,22 +97,24 @@ export mod_sources := module
 	
 	export iParams := interface(
 		AutoStandardI.DataRestrictionI.params,
+		AutoStandardI.DataPermissionI.params,  
 		AutoStandardI.PermissionI_Tools.params,
 		AutoStandardI.InterfaceTranslator.ln_branded_value.params)
 	end;
 	
-	export in_mod_values(iParams in_mod, boolean dnbWillMask=false) := module
+	export in_mod_values(iParams in_mod, boolean dnbPermitted=false) := module
 		export DRM				:= AutoStandardI.DataRestrictionI.val(in_mod);
+		export DPM				:= AutoStandardI.DataPermissionI.val(in_mod);
 		export GLB				:= AutoStandardI.PermissionI_Tools.val(in_mod).GLB;
 		export DPPA				:= AutoStandardI.PermissionI_Tools.val(in_mod).DPPA;
 		export AllowAll		:= AutoStandardI.PermissionI_Tools.val(in_mod).AllowAll_value;
 		export LnBranded	:= AutoStandardI.InterfaceTranslator.ln_branded_value.val(in_mod);
-		
+    
 		// Potential issue...
 		// - Is it OK that we're not using DPPA.state_ok? We don't know the source in aggregates like best.
 		export my_bmap 		:= code2bmap_multi(
 			[code.UNRESTRICTED]
-			+ if(AllowAll OR dnbWillMask, [code.DNB], [])
+			+ if((DPM.use_DnB or AllowAll) and dnbPermitted, [code.DNB], [])
 			+ if(~DRM.EBR, [code.EBR], [])
 			+ if(DPPA.ok(DPPA.stored_value), [code.DPPA], [])
 			+ if(~DRM.FARES, [code.PROP_FARES], [])
@@ -123,10 +125,16 @@ export mod_sources := module
 		);
 	end;
 
-	// When caller sets dnbWillMask=true, he must also apply DNB masking to the resulting records!
-	export isPermitted(iParams in_mod, boolean dnbWillMask=false) := module
+	// When DNB is being returned, the caller should also apply masking to the resulting records! 
+  
+	// Before addition of AutoStandardI.DataPermissionsI.useDnB, the 2nd parameter formerly called 
+ // "willMaskDnb" controlled whether or not DnB data was permitted. Those interfaces relying on 
+ // the default value will not be getting DNB regardless of the value of AutoStandardI.DataPermissionsI.useDnB.
+ // Interfaces requiring DnB control through the new AutoStandardI.DataPermissionsI.useDnB will 
+ // need to pass TRUE for the 2nd argument dnbPermitted.
+export isPermitted(iParams in_mod, boolean dnbPermitted=false) := module
 	
-		shared ivals := in_mod_values(in_mod, dnbWillMask);
+		shared ivals := in_mod_values(in_mod, dnbPermitted);
 		
 		// inspired by TopBusiness_Services.Functions
 		export boolean bySource(string2 src, string34 vl_id='',unsigned4 dt_first_seen=0) := function
@@ -136,7 +144,7 @@ export mod_sources := module
       boolean other_restrictions := case(
                                           exclusiveSrc2code(src,vl_id),
                                           code.DPPA						=> ivals.DPPA.state_ok(MDR.SourceTools.DPPAOriginState(src),ivals.DPPA.stored_value,,src),
-                                          code.DNB						=> ivals.AllowAll OR dnbWillMask,
+                                          code.DNB						=> (ivals.DPM.use_DnB OR ivals.AllowAll) and dnbPermitted,
                                           code.EBR						=> ~ivals.DRM.EBR,
                                           code.PROP_FARES			=> ~ivals.DRM.FARES,
                                           code.PROP_FIDELITY	=> ~ivals.DRM.Fidelity,
@@ -156,8 +164,8 @@ export mod_sources := module
 		
 	end;
 	
-	export isPermitted_Thor(in_mod, inDs, dnbWillMask) := functionmacro
-          ivals := BIPV2.mod_sources.in_mod_values(in_mod, dnbWillMask);
+	export isPermitted_Thor(in_mod, inDs, dnbPermitted) := functionmacro
+          ivals := BIPV2.mod_sources.in_mod_values(in_mod, dnbPermitted);
 
           PermittedThorRec := record
                string2 source;
@@ -177,7 +185,7 @@ export mod_sources := module
                                              case(
                                           BIPV2.mod_sources.exclusiveSrc2code_Thor(source,isDaytonVlid),
                                           BIPV2.mod_sources.code.DPPA          => ivals.DPPA.state_ok(MDR.SourceTools.DPPAOriginState(source),ivals.DPPA.stored_value,,source),
-                                          BIPV2.mod_sources.code.DNB           => ivals.AllowAll OR dnbWillMask,
+                                          BIPV2.mod_sources.code.DNB           => (ivals.DPM.use_DnB OR ivals.AllowAll) and dnbPermitted,
                                           BIPV2.mod_sources.code.EBR           => ~ivals.DRM.EBR,
                                           BIPV2.mod_sources.code.PROP_FARES    => ~ivals.DRM.FARES,
                                           BIPV2.mod_sources.code.PROP_FIDELITY => ~ivals.DRM.Fidelity,
@@ -246,8 +254,20 @@ export mod_sources := module
 			BIPV2.mod_sources.setField(ds,L,sele_Proxid);
 			BIPV2.mod_sources.setField(ds,L,parent_Proxid);
 			BIPV2.mod_sources.setField(ds,L,org_Proxid);		
-      BIPv2.mod_sources.setField(ds,L,sources); // this will allow source information to be seen.
-			
+			BIPv2.mod_sources.setField(ds,L,sources); // this will allow source information to be seen.
+   
+			BIPv2.mod_sources.setField(ds,L,company_sic_code1); // retain SIC codes.
+			BIPv2.mod_sources.setField(ds,L,company_sic_code2); 
+			BIPv2.mod_sources.setField(ds,L,company_sic_code3); 
+			BIPv2.mod_sources.setField(ds,L,company_sic_code4); 
+			BIPv2.mod_sources.setField(ds,L,company_sic_code5);
+      
+			BIPv2.mod_sources.setField(ds,L,company_naics_code1); // retain NAICS codes.
+			BIPv2.mod_sources.setField(ds,L,company_naics_code2); 
+			BIPv2.mod_sources.setField(ds,L,company_naics_code3); 
+			BIPv2.mod_sources.setField(ds,L,company_naics_code4); 
+			BIPv2.mod_sources.setField(ds,L,company_naics_code5);
+   
 			BIPV2.mod_sources.setField(ds,L,company_name_data_permits);
 			BIPV2.mod_sources.setField(ds,L,company_name_method);
 			BIPV2.mod_sources.setField(ds,L,company_address_data_permits);
@@ -278,7 +298,7 @@ export mod_sources := module
 	// This is the "master list" of sources included in the BIPv2 header,
 	// mapped to a short code suitable for matching.  If a source isn't listed
 	// here it will NOT be allowed into the internal linking process.
-  import bipv2_tools;
+  
   export string2 nonCode := 'xx';
 
   export ingest_whitelist := 

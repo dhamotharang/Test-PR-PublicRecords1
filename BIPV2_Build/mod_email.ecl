@@ -9,17 +9,19 @@ export mod_email := module
 											
 	export emailList := if(tools._Constants.IsDataland  ,_control.myinfo.EmailAddressNotify
                                                       ,   if(_control.myinfo.EmailAddressNotify = 'nobody@seisint.com'  ,'',_control.myinfo.EmailAddressNotify + ',')
-                                                      +   'Charles.Morton@LexisNexis.com'
+                                                      // +   'Charles.Morton@LexisNexis.com'
                                                       // +   ',Todd.Leonard@LexisNexis.com'
-                                                      +   ',Laverne.Bentley@LexisNexis.com'
-                                                      +   ',Aleida.Lima@LexisNexis.com'
+                                                      +   'Laverne.Bentley@LexisNexis.com'
+                                                      // +   ',Aleida.Lima@LexisNexis.com'
                                                       +   ',Kevin.Wilmoth@lexisnexisrisk.com'
-                                                      +   ',Janet.Anderson@lexisnexisrisk.com'
-                                                      +   ',Paul.Wahbe@lexisnexis.com'
+                                                      // +   ',Janet.Anderson@lexisnexisrisk.com'
+                                                      // +   ',Paul.Wahbe@lexisnexis.com'
                                                       +   ',dustin.skaggs@lexisnexis.com'
                                                       +   ',Sudhir.Kasavajjala@lexisnexis.com'
                                                       +   ',Ayeesha.Kayttala@lexisnexis.com'
                                                       +   ',Robert.Pressel@lexisnexis.com'
+                                                      +   ',Matheus.DePaulo@lexisnexisrisk.com'
+                                                      +   ',janielle.goolgar@lexisnexisrisk.com'
                       );
 	 
 	SHARED String COMPLETED_STATUS 	:= 'COMPLETED';

@@ -42,5 +42,6 @@ statsOffense := scrubs_sexoffender_offense.fnRunScrubs((string)std.date.today(),
 	exceptList 	:= project(inf2(trim(offense_category, left, right)=''), findExcept(left)): persist('~thor_data400::Persist::hd::Sex_Offender_Offenses_no_category');
 
 export Proc_Build_SO_Search_Base := parallel(stat1, stat2, out1, out2, output(exceptList)
-                                         ,statsMain,statsOffense//,emailReport																		 
+                                         ,statsMain,statsOffense//,emailReport
+																				 ,Proc_build_co_base
 																			 );

@@ -1,4 +1,4 @@
-IMPORT ut,RoxieKeyBuild,AutoKeyB2,PRTE,_control, PRTE2_Oshair, PRTE2_Common;
+﻿IMPORT ut,RoxieKeyBuild, AutoKeyB2, PRTE,_control, PRTE2_Oshair, PRTE2_Common, Prte2, dops;
 
 EXPORT proc_build_keys(string filedate) := FUNCTION
 
@@ -90,8 +90,11 @@ RoxieKeyBuild.MAC_SK_Move_v2(constants.keyName_oshair + 'program_@version@',
 //---------- making DOPS optional and only in PROD build -------------------------------
  is_running_in_prod := PRTE2_Common.Constants.is_running_in_prod;
  NoUpdate           := OUTPUT('Skipping DOPS update because it was requested to not do it, or we are not in PROD'); 
- updatedops         := PRTE.UpdateVersion('OshairKeys', filedate, _control.MyInfo.EmailAddressNormal,'B','N','N');
+ 
+  updatedops   		 		:= PRTE.UpdateVersion(constants.dops_name,filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
  PerformUpdateOrNot := IF(is_running_in_prod,updatedops,NoUpdate);
+ 
+ 	key_validation :=  output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation'));
 
 RETURN 		sequential(
       parallel(
@@ -119,6 +122,8 @@ RETURN 		sequential(
 			move_qa_key_oshairprogram, 
 			move_qa_key_oshairviolations,	
 			proc_build_autokeys(filedate)),
-			PerformUpdateOrNot);
+			key_validation,
+			PerformUpdateOrNot
+			);
 																
 END;

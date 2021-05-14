@@ -1,6 +1,6 @@
-import RiskWise;
+﻿import RiskWise;
 
-export NP2O_Soapcall(dataset(layout_NP2O_soapcall) indata, string roxieIP='http://roxiestaging.br.seisint.com:9876') := function
+export NP2O_Soapcall(dataset(layout_NP2O_soapcall) indata, string roxieIP='http://certstagingvip.hpcc.risk.regn.net:9876') := function
 	
 errx := record
 	string errorcode := '';

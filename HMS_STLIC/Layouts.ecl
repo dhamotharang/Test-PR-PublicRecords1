@@ -1,7 +1,4 @@
-﻿/*2019-06-19T17:11:54Z (Hennigar, Jennifer (RIS-BCT))
-CCPA-260
-*/
-IMPORT Address, BIPV2, AID, HMS_STLIC;
+﻿IMPORT Address, BIPV2, AID, HMS_STLIC;
 
 EXPORT layouts := MODULE
 
@@ -220,7 +217,8 @@ EXPORT layouts := MODULE
 				string10 		middle;
 				string50 		last;
 				string10 		suffix;
-				string25		typecode;
+				// string25		typecode;
+				string1			typecode := ''; // possible values: 'I', 'O', '' - stripped off for PR build - used in HC build
 				string25		position;
 				string10 		cred;
 				string6			gender;
@@ -228,6 +226,7 @@ EXPORT layouts := MODULE
 				string20 		dateofbirth;
 				string25		dateofdeath;
 				string50 		email;
+				string1			is_healthcare := ''; //possible values: 'Y', 'N' - stripped off for PR build - used in HC build
 		END;
 		
 		EXPORT language_layout := RECORD
@@ -289,15 +288,17 @@ EXPORT layouts := MODULE
 				string2 		state;
 				string 			class_type;
 				string25		subtype;
+				varstring		compact_type := ''; // stripped off for PR build
 				string 			number;
 				string 			status;
 				string25		sub_status;
+				string			disciplined; // moved from below - stripped off for PR build
 				string 			issue_date;
 				string25		effective_date;
 				string25		renewal_date;
 				string 			expiration_date;
 				string25		status_date;
-				string25		disciplined;
+				// string25		disciplined;
 				string 			qualifier1;
 				string 			qualifier2;
 				string 			qualifier3;
@@ -305,9 +306,11 @@ EXPORT layouts := MODULE
 				string 			qualifier5;
 				string 			rawclass;
 				string25		raw_subtype;
+				varstring		raw_compact_type; // stripped off for PR build
 				string25		raw_number;
 				string25		rawstatus;
 				string25		raw_sub_status;
+				varstring		raw_disciplined; // stripped off for PR build
 				string 			rawissue_date;
 				string25		raw_effective_date;
 				string25		rawrenewal_date;
@@ -387,6 +390,23 @@ EXPORT layouts := MODULE
 		
 		EXPORT stliclookup_layout_new := RECORD
 				stliclookup_layout;
+		END;
+		
+		EXPORT stliclookup_layout_from_alpha := RECORD
+			string load_id;
+			string lic_state;
+			string lic_class_type;
+			string lic_subtype;
+			string lic_status;
+			string lic_substatus;
+			string lic_qualifier1;
+			string lic_qualifier2;
+			string mapped_class;
+			string mapped_status;
+			string mapped_qualifier1;
+			string mapped_qualifier2;
+			string mapped_pdma;
+			string mapped_pract_type;
 		END;
 		
 		EXPORT statelicense_layout := RECORD

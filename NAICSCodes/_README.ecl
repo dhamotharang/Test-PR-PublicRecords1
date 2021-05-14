@@ -3,9 +3,11 @@
 
 	
 		Overview: Creates NAICSCode lookup table for use by builds to validate NAICSCodes.  Creates the 
-              table from the following NAIC website:
+              table from the following NAIC websites:
 
-              https://www.census.gov/eos/www/naics/downloadables/downloadables.html
+              Government website - https://www.census.gov/eos/www/naics/downloadables/downloadables.html
+
+              DNB DMI Website - https://www.dnb.com/utility-pages/dnb-demographic-firmographic-code-tables.html
 
 		          Needs to be run at least every 5 years when the NAICSCodes are updated 
               in order to have a current version of the NAICSCodes.  The current table 
@@ -18,10 +20,11 @@
 			
       1. Edit NAICSCodes._BWR_Create_NAICSCode_Lookup_Table. Parameters defined below.
 
-				pversion	  : date in Unix directory
-				pDirectory  : /data/hds_180/NAICSCodes/build/<pversion>
-				pServerIP	  : _control.IPAddress.bctlpedata11
-				pFileName		: '*NAICS*.csv';
+				pversion	      := date in Unix directory
+				pDirectory      := /data/hds_180/NAICSCodes/build/<pversion>
+				pServerIP	      := _control.IPAddress.bctlpedata11
+	      pFilename				:= 'NAICS*Codes.csv'; 
+	      pDnbDmiFileName := 'naics*dnb_dmi.csv';
 
       2. Submit NAICSCodes._BWR_Create_NAICSCode_Lookup_Table
      

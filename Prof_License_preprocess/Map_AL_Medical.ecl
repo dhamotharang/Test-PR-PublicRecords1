@@ -29,7 +29,7 @@
       self.phone                       :=    StringLib.stringfilter(l.Telephone,'0123456789')[1..10];
       self.orig_zip                      :=    StringLib.stringfilter(l.Zip,'0123456789')[1..9];
       self.personal_pob_desc              :=    '';                                                                                                                                                            
-      self.status                       :=    l.Status;
+     self.status                       :=    l.QACSC_Status;
       self.county_str                    :=    '';
       self  := l;
       self  := [];
@@ -49,7 +49,7 @@ dWithPA := project( File_AL_Medical.phya, map2pa(left));
    self.vendor                                := 'Alabama State Board of Medical Examiners';                                                                                                                                                                                                                                     
    self.orig_name                              := trim(l.Last_Name)+' '+trim(l.First_Name)+' '+trim(l.Middle_Name)+' '+trim(l.Suffix);                                                                                                                       
    self.company_name                           := ' ';                                                                                                                                                                                                                                                                 
-   self.status                                 := l.Status;                                                                                                                                                                                                                                                                       
+   self.status                                 := l.QACSC_Status;                                                                                                                                                                                                                                                                       
    self.orig_addr_1                             := trim(l.Address_1)[1..80];                                                                                                                                                                                                                         
    self.orig_addr_2                             := l.Address_2;                                                                                                                                                                                                                                                               
    self.orig_addr_3                             := trim(l.Address_3)[1..80];                                                                                                                                                                                                                         

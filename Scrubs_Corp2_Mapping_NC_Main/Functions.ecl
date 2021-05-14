@@ -29,8 +29,8 @@ EXPORT Functions := MODULE
 																	'NPCT','NINP','L3C','LLLP','CO54','CAPI','RESA',''];
 																	
 	 //Below table needs to be updated when we see new status codes in Raw updates!
-		EXPORT set_valid_status_codes:=['1','2','3','5','7','8','9','10','11','12','13','14','15','16','17','18',
-																	  '19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34',''];
+		EXPORT set_valid_status_codes:=['1','2','3','5','7','8','9','10','11','12','13','14','15','16','17','18','19','20',
+																	  '21','22','23','24','25','26','27','28','29','30','31','32','33','34','36','37','38',''];
 																		
     //Below table needs to be updated when we see new Event codes in Raw updates!
 		EXPORT set_valid_Event_codes :=['AADR','AAUT','ACOP','ADIS','ADMN','AGT','AINC','ALLC','AMLP','AMNC','AMND','AMU','AMU1','ANNX','AOV',

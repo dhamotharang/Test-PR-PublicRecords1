@@ -1,1 +1,1 @@
-export File_Banko_Base(string envmt) := DATASET('~thor::base::Banko::'+envmt+'::qa::additionalevents',Banko.BankoJoinRecord,FLAT,__COMPRESSED__)(DocketEntryID not in Suppress_DocketEntry);
+﻿export File_Banko_Base(string envmt) := DATASET('~thor::base::Banko::'+envmt+'::qa::additionalevents',Banko.Layout_Banko_Base,FLAT,__COMPRESSED__)(DocketEntryID not in Suppress_DocketEntry);

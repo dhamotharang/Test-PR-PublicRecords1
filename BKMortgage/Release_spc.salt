@@ -24,8 +24,8 @@ FIELD:mortgagepayoffdate:TYPE(STRING8):0,0
 FIELD:releasedoc:TYPE(STRING20):0,0
 FIELD:releasebk:TYPE(STRING10):0,0
 FIELD:releasepg:TYPE(STRING10):0,0
-FIELD:multiplepageimage:TYPE(STRING1):0,0
-FIELD:bkfsimageid:TYPE(STRING50):0,0
+FIELD:multiplepageimage:DERIVED:TYPE(STRING1):0,0
+FIELD:bkfsimageid:DERIVED:TYPE(STRING50):0,0
 FIELD:origdotrecdate:TYPE(STRING8):0,0
 FIELD:origdotcontractdate:TYPE(STRING8):0,0
 FIELD:origdotdoc:TYPE(STRING20):0,0
@@ -55,8 +55,8 @@ FIELD:propertycity:TYPE(STRING30):0,0
 FIELD:propertystate:TYPE(STRING2):0,0
 FIELD:propertyzip:TYPE(STRING5):0,0
 FIELD:propertyzip4:TYPE(STRING4):0,0
-FIELD:dataentrydate:TYPE(STRING8):0,0
-FIELD:dataentryopercode:TYPE(STRING4):0,0
+FIELD:dataentrydate:DERIVED:TYPE(STRING8):0,0
+FIELD:dataentryopercode:DERIVED:TYPE(STRING4):0,0
 FIELD:vendorsourcecode:TYPE(STRING3):0,0
 FIELD:hids_recordingflag:TYPE(STRING1):0,0
 FIELD:hids_docnumber:TYPE(STRING9):0,0
@@ -80,7 +80,6 @@ FIELD:assessorpropertyzip4:DERIVED:TYPE(STRING4):0,0
 FIELD:assessorpropertyaddrsource:DERIVED:TYPE(STRING1):0,0
 FIELD:clnlenderben:DERIVED:TYPE(STRING):0,0
 FIELD:clncurrentlenderben:DERIVED:TYPE(STRING):0,0
-FIELD:clnborrowername:DERIVED:TYPE(STRING):0,0
 FIELD:DBALenderBen:DERIVED:TYPE(STRING):0,0
 FIELD:DBACurrentLenderBen:DERIVED:TYPE(STRING):0,0
 FIELD:raw_file_name:DERIVED:TYPE(STRING100):0,0

@@ -1,4 +1,6 @@
-import ln_propertyv2;
+import ln_propertyv2, D2C_Customers;
+
+EXPORT assessments(unsigned1 mode = 1, STRING sVersion = reunion.constants.sVersion) := MODULE
 
 ds_tax  := ln_propertyv2.File_Assessment(vendor_source_flag in ['D','O']);
 
@@ -91,7 +93,7 @@ r1 t1(ds_tax le) := transform
 end;
 
 p1        := distribute(project(ds_tax,t1(left)),hash(ln_fares_id));
-srch_dist := distribute(reunion.property_search2(ln_fares_id2[2]='A'),hash(ln_fares_id2));
+srch_dist := distribute(reunion.property_search2(mode, sVersion)(ln_fares_id2[2]='A' and D2C_Customers.SRC_Allowed.Check(21, ln_fares_id2)),hash(ln_fares_id2));
 
 r2 := record
  p1;
@@ -122,4 +124,6 @@ j2 := join(j1_dist,current_owners_dist,
 		   local
 		  );
 
-export assessments := j2 : persist('persist::reunion_assessments');
+EXPORT all := j2 : persist('persist::reunion_assessments::' + reunion.Constants.sMode(mode));
+
+END;

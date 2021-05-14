@@ -1,5 +1,5 @@
-
-IMPORT ut;
+﻿
+IMPORT ut, STD;
 EXPORT Dates := MODULE
 
 	string FixMonth(string s) := FUNCTION
@@ -7,19 +7,19 @@ EXPORT Dates := MODULE
 		outmon := CASE(stringlib.stringtolowercase(inmon),
 			'janvier' => 'January',
 			'fevrier' => 'February',
-			'fÃ©vrier' => 'February',
+			'fÃƒÂ©vrier' => 'February',
 			'mars' => 'March',
 			'avril' => 'April',
 			'mai' => 'May',
 			'juin' => 'June',
 			'juillet' => 'July',
 			'aout' => 'August',
-			'aoÃ»t' => 'August',
+			'aoÃƒÂ»t' => 'August',
 			'septembre' => 'September',
 			'octobre' => 'October',
 			'novembre' => 'November',
 			'decembre' => 'December',
-			'dÃ©cembre' => 'December',
+			'dÃƒÂ©cembre' => 'December',
 			'');
 
 		return if(outmon='',s,
@@ -82,7 +82,8 @@ EXPORT Dates := MODULE
 			REGEXFIND('[0-9]+ +[A-Z.]+ +[0-9]+',s2,NOCASE) =>		// see if date is in French or needs correction
 				FixMonth(s2),
 			s1);
-		dt := ut.ConvertDateMultiple(FixSlashCentury(s), fmts, fmtout);
+		// dt := ut.ConvertDateMultiple(FixSlashCentury(s), fmts, fmtout);
+		dt := Std.Date.ConvertDateFormatMultiple(FixSlashCentury(s), fmts, fmtout);
 		return dt;
 		//return IF(dt='','',
 		//			if(doCheck,SanityCheck(FixSlashCentury(dt)),dt));

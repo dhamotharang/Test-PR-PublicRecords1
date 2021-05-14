@@ -1,4 +1,4 @@
-IMPORT PRTE2_UCC;
+﻿IMPORT PRTE2_UCC;
 
 EXPORT Constants := MODULE
 		
@@ -20,5 +20,8 @@ EXPORT Constants := MODULE
 						// B in this set to skip ALL Business data
 
 		EXPORT ak_typeStr := 'BC';
+		
+ export dops_name                    :='UCCV2Keys';
+ export fcra_dops_name               :='FCRA_UCCKeys';
 		
 END;

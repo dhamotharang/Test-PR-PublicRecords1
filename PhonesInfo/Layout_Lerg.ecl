@@ -64,40 +64,6 @@ EXPORT Layout_Lerg := MODULE
 		string255 filename;
 	END;
 	
-	//Lerg1ConOver
-	EXPORT lerg1ConOver_in := RECORD
-		string ocn;	
-		string ocn_name;
-		string empty;
-		string category;	
-		string overall_ocn;	
-		string contact_function;	
-		string overall_company;
-		string first_name;	
-		string mi;	
-		string last_name;	
-		string title;	
-		string address;	
-		string floor;	
-		string room;	
-		string city;	
-		string state;	
-		string zip;	
-		string contact_phone;	
-		string email;	
-		string fax;
-	END;
-	
-	EXPORT lerg1ConOver := RECORD
-		lerg1ConOver_in;	
-		string255 filename{virtual (logicalfilename)};
-	END;
-	
-	EXPORT lerg1ConOverHist := RECORD
-		lerg1ConOver_in;	
-		string255 filename;
-	END;
-	
 	//Lerg Prep	
 	EXPORT lergPrep := RECORD
 		dx_PhonesInfo.Layouts.sourceRefBase;

@@ -1,4 +1,4 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
@@ -43,7 +43,8 @@ transform
 	self.DEBT_91_PLUS_PERCENT	:= choose(cnt,	
 		l.DEBT_91_PLUS_PERCENT_1,	l.DEBT_91_PLUS_PERCENT_2,	l.DEBT_91_PLUS_PERCENT_3,
 		l.DEBT_91_PLUS_PERCENT_4,	l.DEBT_91_PLUS_PERCENT_5);
-	self 					:= l;
+	self 					:= 	l;
+	self					:=	[];
 end;
 
 File_in2base := normalize(File_in, 5, Convert2Base(left, counter));

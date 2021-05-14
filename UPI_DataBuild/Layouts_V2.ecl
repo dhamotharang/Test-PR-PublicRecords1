@@ -226,6 +226,10 @@ EXPORT Layouts_V2 := MODULE
 		base.record_sid;
 		base.batch_jobid;
 		base.batch_seq_number;
+		base.Lexid_changed;
+		typeof(base.prev_lexid) old_lexid;
+		base.crk_changed;
+		typeof(base.prev_crk) old_crk;
 	END;
 	
 	EXPORT temp_header := record
@@ -258,6 +262,8 @@ EXPORT Layouts_V2 := MODULE
 		base.lexid;
 		base.lexid_score;
 		base.lexid_changed;
+		base.prev_Lexid;
+		base.prev_crk;
 	END;
 	
 	EXPORT aggregate_fields := RECORD

@@ -3,7 +3,8 @@
 export files_suppressions(string pversion = '', pUseOtherEnvironment = false) := module
 
 	export Layout_Suppression := record
-		BIPV2.CommonBase.Layout;
+		// BIPV2.CommonBase.Layout;
+		BIPV2.CommonBase.Layout - seleid_status_private_score - seleid_status_public_score;
 		string25  userid;
 		unsigned4 dt_added;		
 		boolean   suppressed;

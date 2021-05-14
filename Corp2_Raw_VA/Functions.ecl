@@ -1,32 +1,23 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 
 EXPORT Functions := Module		
 		//****************************************************************************
 		//Valid_US_State_Codes: returns whether the state is a valid us state.
 		//****************************************************************************
 		EXPORT Valid_US_State_Codes(string s) := FUNCTION
-					 RETURN map (corp2.t2u(s) in ['AK','AL','AR','AS','AZ','CA','CO','CT','CZ','DC','DE','FL','FN','GA','GU','HI',
-																						  'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MI','MN','MO','MS','MT','NC',
-																						  'NH','NJ','NM','NV','NY','OH','OK','OR','PA','PR','RI','SC','SD','TN','TT',
-																						  'ND','NE','TX','US','UT','VA','VI','VT','WA','WI','WV','WY',''] => true,false);
+					 RETURN map (corp2.t2u(s) in ['AK','AL','AR','AS','AZ','CA','CO','CT','CZ','DC','DE','FL','GA','GU','HI',
+																				'IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO','MS',
+																				'MT','NC','NH','NJ','NM','NV','NY','OH','OK','OR','PA','PR','RI','SC','SD',
+																				'TN','TT','ND','NE','TX','UT','VA','VI','VT','WA','WI','WV','WY',''] => true,false);
 		END;
 		
-		//****************************************************************************
-		//Valid_US_State_Description: returns whether the state is a valid us state.
-		//****************************************************************************
-		EXPORT Valid_US_State_Description(string s) := FUNCTION
-					 RETURN map (corp2.t2u(s) in ['ALASKA','ALABAMA','ARKANSAS','AMERICAN SAMOA','ARIZONA','CALIFORNIA',    
-																							'COLORADO','CONNECTICUT','CANAL ZONE','WASHINGTON, D.C.','DELAWARE','FLORIDA', 
-																							'FOREIGN','GEORGIA','GUAM','HAWAII','IOWA','IDAHO','ILLINOIS',
-																							'INDIANA','KANSAS','KENTUCKY','LOUISIANA','MASSACHUSETTS','MARYLAND',
-																							'MAINE','MICHIGAN','MINNESOTA','MISSOURI','MISSISSIPPI','MONTANA', 
-																							'NORTH CAROLINA','NORTH DAKOTA','NEBRASKA','NEW HAMPSHIRE','NEW JERSEY',
-																							'NEW MEXICO','NEVADA','NEW YORK','OHIO','OKLAHOMA','OREGON','PENNSYLVANIA',  
-																							'PUERTO RICO','RHODE ISLAND','SOUTH CAROLINA','SOUTH DAKOTA','TENNESSEE',
-																							'TRUST TERRITORIES','TEXAS','UNITED STATES','UTAH','VIRGINIA','VIRGIN ISLANDS',
-																							'VERMONT','WASHINGTON','WISCONSIN','WEST VIRGINIA','WYOMING',''] => true,false);
-		END;
-
+		//Per CI:Vendor is sending below Foreign codes & will be populated in "corp_forgn_state_desc" field(corresponding "corp_forgn_state_cd" will have blank)
+    EXPORT Special_Codes(string s) := FUNCTION
+		 RETURN map (corp2.t2u(s) in ['AF','AI','AU','BE','BG','BH','BL','BM','BR','CB','CH','CONFEDERATED SALISH AND KOOTENAI TR',          
+																	'CQ','CR','CY','DN','EASTERN BAND OF CHEROKEE INDIANS','EG','ES','ET','FEDERAL','FI','FR','GB',
+																	'GE','GH','HK','IR','IS','IT','JP','KN','KO','LB','LC','LU','MU','NG','NL','NO','NT','NZ','PH',
+																	'PO','SA','SG','SL','SV','SW','TC','TU','VG','U.S. GOVERNMENT','ZA'] => true,false);
+	END;																				
 		//****************************************************************************
 		//State_Description: returns whether the state is a valid us state.
 		//****************************************************************************
@@ -46,7 +37,6 @@ EXPORT Functions := Module
 											uc_s = 'DC' => 'DISTRICT OF COLUMBIA', 
 											uc_s = 'DE' => 'DELAWARE', 
 											uc_s = 'FL' => 'FLORIDA',
-											uc_s = 'FN' => 'FOREIGN',
 											uc_s = 'GA' => 'GEORGIA', 
 											uc_s = 'GU' => 'GUAM', 
 											uc_s = 'HI' => 'HAWAII', 
@@ -60,6 +50,7 @@ EXPORT Functions := Module
 											uc_s = 'MA' => 'MASSACHUSETTS', 
 											uc_s = 'MD' => 'MARYLAND', 
 											uc_s = 'ME' => 'MAINE' , 
+											uc_s = 'MH' => 'MARSHALL ISLANDS' , 
 											uc_s = 'MI' => 'MICHIGAN', 
 											uc_s = 'MN' => 'MINNESOTA', 
 											uc_s = 'MO' => 'MISSOURI', 
@@ -84,7 +75,6 @@ EXPORT Functions := Module
 											uc_s = 'TN' => 'TENNESSEE', 
 											uc_s = 'TT' => 'TRUST TERRITORIES',
 											uc_s = 'TX' => 'TEXAS',
-											uc_s = 'US' => 'UNITED STATES', 
 											uc_s = 'UT' => 'UTAH', 
 											uc_s = 'VA' => 'VIRGINIA', 
 											uc_s = 'VI' => 'VIRGIN ISLANDS', 
@@ -97,86 +87,262 @@ EXPORT Functions := Module
 										 );
 		END;
 
+
+		//****************************************************************************
+		//CorpOrigBusTypeDesc: returns the corp_status_desc.
+		//****************************************************************************
+		EXPORT CorpOrigBusTypeDesc(string s) := FUNCTION
+					 uc_s := corp2.t2u(s);
+	         RETURN map(uc_s in ['0','00'] => 'GENERAL',
+											uc_s = '11'        => 'ELECTRIC',
+											uc_s = '12'        => 'TELEPHONE',
+											uc_s = '13'        => 'GAS',
+											uc_s = '14'        => 'WATER',
+											uc_s = '15'        => 'WATER-SEWER',
+											uc_s = '16'        => 'SEWER',
+											uc_s = '18'        => 'RADIO COMMON CARRIER',
+											uc_s = '20'        => 'BANKS AND CREDIT UNIONS',
+											uc_s = '22'        => 'FEDERAL BANKS',
+											uc_s = '23'        => 'BANK W/LIMITED CERTIFICATE',
+											uc_s = '25'        => 'BANK & INSURANCE AGENT',
+											uc_s = '26'        => 'MRTG/INSURANCE',
+											uc_s = '30'        => 'INSURANCE COMPANIES',
+											uc_s = '31'        => 'INSURANCE CONSULTANT',
+											uc_s = '35'        => 'INSURANCE AGENCIES',
+											uc_s = '36'        => 'MORTGAGE CO',
+											uc_s = '40'        => 'OTHER FINANCIAL INSTITUTIONS',
+											uc_s = '41'        => 'INSURANCE REGULATED ENTITIES',
+											uc_s = '42'        => 'INS COMPANY & INS AGENCY',
+											uc_s = '43'        => 'INS COMPANY & INS REG ENTITY',
+											uc_s = '50'        => 'OTHER PUBLIC SERVICE',
+											uc_s = '51'        => 'RAILWAYS',
+											uc_s = '60'        => 'OTHER CHARITABLE INSTITUTIONS',
+											uc_s = '61'        => 'FOUNDATIONS',
+											uc_s = '62'        => 'VOLUNTEER RESCUE SQUADS/FIRE DEPTS',
+											uc_s = '63'        => 'RELIGIOUS CEMETERIES',
+											uc_s = '64'        => 'ORPHANAGES',
+											uc_s = '65'        => 'CHURCHES AND RELIGIOUS DENOMINATIONS',
+											uc_s = '66'        => 'ANIMAL AND CHILDREN\'S WELFARE',
+											uc_s = '67'        => 'SPECIAL HOSPITALS AND COLLEGES',
+											uc_s = '68'        => 'HISTORICAL/LITERARY SOCIETIES',
+											uc_s = '69'        => 'ARTS AND SCIENCES',
+											uc_s = '70'        => 'OTHER PROFESSIONAL COMPANIES',
+											uc_s = '71'        => 'DOCTORS',
+											uc_s = '72'        => 'LAWYERS/ATTORNEYS',
+											uc_s = '73'        => 'ARCHITECTS',
+											uc_s = '74'        => 'AUDIOLOGIST',
+											uc_s = '75'        => 'SPEECH PATHOLOGIST',
+											uc_s = '76'        => 'CLINICAL NURSE SPECIALIST',
+											uc_s = '77'        => 'HOUSING COOPERATIVES',
+											uc_s = '80'        => 'AGRICULTURAL COOPERATIVES',
+											uc_s = '81'        => 'OTHER COOPERATIVES',
+											uc_s = '84'        => 'WATER & SEWER AUTHORITIES',
+											uc_s = '85'        => 'COMMUNITY DEVELOPMENT AUTHORITIES',
+											uc_s = '86'        => 'WIRELESS SERVICE (BROADBAND) AUTHORITIES',
+											uc_s = '87'        => 'ELECTRIC AUTHORITIES',
+											uc_s = '89'        => 'OTHER AUTHORITIES',
+											uc_s = '95'        => 'BENEFIT CORPORATIONS',
+											''
+										 );
+		END;
+
+
+
 		//****************************************************************************
 		//CorpStatusDesc: returns the corp_status_desc.
 		//****************************************************************************
-		//Please note:  We are no longer using the table_id = '01' which 
-		//							contains the status desciption for the Corps,
-		//							LLC & LP file.  The value is now being derived to 
-		//							match the vendor's website. 	
+		//Please note:  The vendor shall provide text values instead of codes. 
+		//							The value is NO LONGER being derived based on a code. 
 		//****************************************************************************
 		EXPORT CorpStatusDesc(string s) := FUNCTION
 					 uc_s := corp2.t2u(s);
-	         RETURN map(uc_s = '00' => 'ACTIVE',
-											uc_s = '01' => 'FEE DELINQUENT',
-											uc_s = '02' => 'FEE DELINQUENT',
-											uc_s = '08' => 'CANCELED',    
-											uc_s = '09' => 'TERMINATED',    
-											uc_s = '10' => 'TERMINATED',
-											uc_s = '11' => 'TERMINATED',
-											uc_s = '12' => 'TERMINATED',
-											uc_s = '13' => 'TERMINATED',
-											uc_s = '14' => 'DISSOLVING',
-											uc_s = '15' => 'CANCELED',
-											uc_s = '16' => 'DISSOLUTION',
-											uc_s = '17' => 'CANCELED',
-											uc_s = '18' => 'SURRENDERED',
-											uc_s = '19' => 'CANCELED',
-											uc_s = '20' => 'MERGED',
-											uc_s = '21' => 'MERGED',
-											uc_s = '22' => 'CONVERTED',
-											uc_s = '23' => 'EXPIRED',
-											uc_s = '24' => 'CANCELED',
-											uc_s = '25' => 'CANCELED',
-											uc_s = '26' => 'SURRENDERED',
-											uc_s = '30' => 'REVOKED',
-											uc_s = '31' => 'REVOKED',
-											uc_s = '32' => 'REVOKED',
-											uc_s = '40' => 'WITHDRAWN',
-											uc_s = '42' => 'WITHDRAWN',
-											uc_s = '43' => 'WITHDRAWN',
-											uc_s = '44' => 'CANCELED',
-											uc_s = '45' => 'CONVERTED',
-											uc_s = '46' => 'CONVERTED',
-											uc_s = '50' => 'LLP STATUS ONLY',
-											uc_s = '51' => 'LLP STATUS CANCELLED',
-											uc_s = '67' => 'REPEALED',
-											uc_s = '76' => 'CANCELED',
-											uc_s = '98' => 'CONVERTED',
-											uc_s = '99' => 'VOID',
-											uc_s
-								);
+	         RETURN map(uc_s = 'ACTIVE'    => 'ACTIVE',
+											uc_s = 'INACTIVE'  => 'INACTIVE',
+											uc_s = 'PENDINACT' => 'PENDING ACTIVE',
+											uc_s = ''          => '',
+											'**|'+uc_s
+										 );
 		END;
 
 		//****************************************************************************
-		//Stock_Class_Translation: returns the stock_class.
-		//Note: The stock_class field in corp2_mapping.layouts_common.stock only can
-		//			hold 20 characters. Therefore, we cannot use the vendor's table to 
-		//      translate the stock class.  An abbreviated stock class is done here
-		// 			ONLY if the stock description exceeded 20 characters.
+		//CorpAgentStatusDesc: returns the corp_agent_status_desc.
 		//****************************************************************************
-		EXPORT Stock_Class_Translation(string code, string desc) := FUNCTION
+		//Please note:  The vendor shall provide text values instead of codes. 
+		//							The value is NO LONGER being derived based on a code. 
+		//****************************************************************************
+		EXPORT CorpAgentStatusDesc(string s) := FUNCTION
+					 uc_s := corp2.t2u(s);
+	         RETURN map(uc_s = 'ACTIVE'              => 'ACTIVE',
+											uc_s = 'INACTIVE'            => 'INACTIVE',
+											uc_s = 'RESIGNED'            => 'RESIGNED',
+											uc_s = 'PENDING RESIGNATION' => 'PENDING RESIGNATION',
+											uc_s = ''                    => '',
+											'**|'+uc_s
 
-					 uc_code := corp2.t2u(stringlib.stringfilter(corp2.t2u(code),' ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
-					 uc_desc := corp2.t2u(stringlib.stringfilter(corp2.t2u(desc),' ABCDEFGHIJKLMNOPQRSTUVWXYZ'));
-
-	         RETURN map(uc_code = 'CUMPNV' 	=> 'CUM PREF NONVOTING',
-											uc_code = 'CONVPA' 	=> 'CONV PREF A',
-											uc_code = 'CONVPB' 	=> 'CONV PREF B',
-											uc_code = 'CONVPC'  => 'CONV PREF C',
-											uc_code = 'CONVPD'  => 'CONV PREF D',
-											uc_code = 'CONVP'   => 'CON PREF',
-											uc_code = 'PREFCC'  => 'CUM CONV PREF',
-											uc_code = 'CUMPA'   => 'CUM PREF A',
-											uc_code = 'CUMPB'   => 'CUM PREF B',
-											uc_code = 'CUMPV'   => 'CUM PREF VOTING',
-											uc_code = 'NCPREF'  => 'NON CUM PREF',
-											uc_code = 'NRCOM'   => 'NON-REDEEM COMMON',
-											uc_code = 'PREFANV' => 'PREF A NONVOTING',
-											uc_code = 'PREFBNV' => 'PREF CL B NONVOTING',
-											uc_code = 'PREFCNV' => 'PREF CL C NONVOTING',
-											uc_desc
-										);
+										 );
 		END;
+		
+		//****************************************************************************
+		//Corps_Assess_Ind_Translation: returns the assessment description.
+		//****************************************************************************
+		EXPORT Corps_Assess_Ind_Translation(string s) := FUNCTION
+					 uc_s := corp2.t2u(s);
+	         RETURN map(uc_s = '0'  => 'NORMAL ASSESSMENT',
+											uc_s = '1'  => 'NON-ASSESSED-MUST FILE ANNUAL REPORT AND RA',
+											uc_s = '2'  => 'NON-ASSESSED-NOT REQ TO FILE RA OR ANNUAL REPORT',
+											uc_s = '3'  => 'NORMAL ASSESSMENT-RA, ANNUAL REPORT NOT REQUIRED',
+											uc_s = '4'  => 'COOPERATIVES-(STORING AND MARKETING)',
+											'' 
+										 );
+		END;
+		
+		//****************************************************************************
+		//CorpRALocation: returns whether the location is a valid location.
+		//****************************************************************************
+		//Commenting out per code review feedback. Since the vendor has not sent us a 
+		//table with the correct RA County information we will not map it at this time
+		//****************************************************************************
+		// EXPORT CorpRALocation(string s) := FUNCTION
+
+					 // uc_s := corp2.t2u(stringlib.stringfilter(corp2.t2u(s),' 0123456789'));
+
+	         // RETURN map(uc_s = '001' => 'FOREIGN',                                          
+											// uc_s = '100' => 'ACCOMACK',                                   
+											// uc_s = '101' => 'ALBEMARLE',                                  
+											// uc_s = '102' => 'ALLEGHANY',                                  
+											// uc_s = '103' => 'AMELIA',                                     
+											// uc_s = '104' => 'AMHERST',                                    
+											// uc_s = '105' => 'APPOMATTOX',                                 
+											// uc_s = '106' => 'ARLINGTON',                                  
+											// uc_s = '107' => 'AUGUSTA',                                    
+											// uc_s = '108' => 'BATH',                                       
+											// uc_s = '109' => 'BEDFORD',                                    
+											// uc_s = '110' => 'BLAND',                                      
+											// uc_s = '111' => 'BOTETOURT',                                  
+											// uc_s = '112' => 'BRUNSWICK',                                  
+											// uc_s = '113' => 'BUCHANAN',                                   
+											// uc_s = '114' => 'BUCKINGHAM',                                 
+											// uc_s = '115' => 'CAMPBELL',                                   
+											// uc_s = '116' => 'CAROLINE',                                   
+											// uc_s = '117' => 'CARROLL',                                    
+											// uc_s = '118' => 'CHARLES CITY',                               
+											// uc_s = '119' => 'CHARLOTTE',                                  
+											// uc_s = '120' => 'CHESTERFIELD',                               
+											// uc_s = '121' => 'CLARKE',                                     
+											// uc_s = '122' => 'CRAIG',                                      
+											// uc_s = '123' => 'CULPEPER',                                   
+											// uc_s = '124' => 'CUMBERLAND',                                 
+											// uc_s = '125' => 'DICKENSON',                                  
+											// uc_s = '126' => 'DINWIDDIE',                                  
+											// uc_s = '128' => 'ESSEX',                                      
+											// uc_s = '129' => 'FAIRFAX',                                    
+											// uc_s = '130' => 'FAUQUIER',                                   
+											// uc_s = '131' => 'FLOYD',                                     
+											// uc_s = '132' => 'FLUVANNA',                                   
+											// uc_s = '133' => 'FRANKLIN',                                   
+											// uc_s = '134' => 'FREDERICK',                                  
+											// uc_s = '135' => 'GILES',                                      
+											// uc_s = '136' => 'GLOUCESTER',                                 
+											// uc_s = '137' => 'GOOCHLAND',                                  
+											// uc_s = '138' => 'GRAYSON',                                    
+											// uc_s = '139' => 'GREENE',                                     
+											// uc_s = '140' => 'GREENSVILLE',                                
+											// uc_s = '141' => 'HALIFAX',                                    
+											// uc_s = '142' => 'HANOVER',                                    
+											// uc_s = '143' => 'HENRICO',                                    
+											// uc_s = '144' => 'HENRY',                                      
+											// uc_s = '145' => 'HIGHLAND',                                   
+											// uc_s = '146' => 'ISLE OF WIGHT',                              
+											// uc_s = '147' => 'JAMES CITY',                                 
+											// uc_s = '148' => 'KING GEORGE',                                
+											// uc_s = '149' => 'KING & QUEEN',                               
+											// uc_s = '150' => 'KING WILLIAM',                               
+											// uc_s = '151' => 'LANCASTER',                                  
+											// uc_s = '152' => 'LEE',                                        
+											// uc_s = '153' => 'LOUDOUN',                                    
+											// uc_s = '154' => 'LOUISA',                                     
+											// uc_s = '155' => 'LUNENBURG',                                  
+											// uc_s = '156' => 'MADISON',                                    
+											// uc_s = '157' => 'MATHEWS',                                    
+											// uc_s = '158' => 'MECKLENBURG',                                
+											// uc_s = '159' => 'MIDDLESEX',                                  
+											// uc_s = '160' => 'MONTGOMERY',                                 
+											// uc_s = '162' => 'NELSON',                                     
+											// uc_s = '163' => 'NEW KENT',                                   
+											// uc_s = '165' => 'NORTHAMPTON',                                
+											// uc_s = '166' => 'NORTHUMBERLAND',                             
+											// uc_s = '167' => 'NOTTOWAY',                                   
+											// uc_s = '168' => 'ORANGE',                                     
+											// uc_s = '169' => 'PAGE',                                       
+											// uc_s = '170' => 'PATRICK',                                    
+											// uc_s = '171' => 'PITTSYLVANIA',                               
+											// uc_s = '173' => 'PRINCE EDWARD',                              
+											// uc_s = '174' => 'PRINCE GEORGE',                              
+											// uc_s = '176' => 'PRINCE WILLIAM',                             
+											// uc_s = '177' => 'PULASKI',                                    
+											// uc_s = '178' => 'RAPPAHANNOCK',                               
+											// uc_s = '179' => 'RICHMOND',                                   
+											// uc_s = '180' => 'ROANOKE',                                    
+											// uc_s = '181' => 'ROCKBRIDGE',                                 
+											// uc_s = '182' => 'ROCKINGHAM',                                 
+											// uc_s = '183' => 'RUSSELL',                                    
+											// uc_s = '184' => 'SCOTT',                                      
+											// uc_s = '185' => 'SHENANDOAH',                                 
+											// uc_s = '186' => 'SMYTH',                                      
+											// uc_s = '187' => 'SOUTHAMPTON',                                
+											// uc_s = '188' => 'SPOTSYLVANIA',                               
+											// uc_s = '189' => 'STAFFORD',                                   
+											// uc_s = '190' => 'SURRY',                                      
+											// uc_s = '191' => 'SUSSEX',                                     
+											// uc_s = '192' => 'TAZEWELL',                                   
+											// uc_s = '193' => 'WARREN',                                     
+											// uc_s = '195' => 'WASHINGTON',                                 
+											// uc_s = '196' => 'WESTMORELAND',                               
+											// uc_s = '197' => 'WISE',                                       
+											// uc_s = '198' => 'WYTHE',
+											// uc_s = '199' => 'YORK',                                       
+											// uc_s = '200' => 'ALEXANDRIA CITY',                                   
+											// uc_s = '201' => 'BRISTOL CITY',                                      
+											// uc_s = '202' => 'BUENA VISTA CITY',                                  
+											// uc_s = '203' => 'CHARLOTTESVILLE CITY',                              
+											// uc_s = '205' => 'DANVILLE CITY',                                     
+											// uc_s = '206' => 'FREDERICKSBURG CITY',                               
+											// uc_s = '207' => 'HAMPTON CITY',                                      
+											// uc_s = '209' => 'HOPEWELL CITY',                                     
+											// uc_s = '210' => 'LYNCHBURG CITY',                                    
+											// uc_s = '211' => 'NEWPORT NEWS CITY',                                 
+											// uc_s = '212' => 'NORFOLK CITY',                                      
+											// uc_s = '213' => 'PETERSBURG CITY',                                   
+											// uc_s = '214' => 'PORTSMOUTH CITY',                                   
+											// uc_s = '215' => 'RADFORD CITY',                                      
+											// uc_s = '216' => 'RICHMOND CITY',                                     
+											// uc_s = '217' => 'ROANOKE CITY',                                      
+											// uc_s = '219' => 'STAUNTON CITY',                                     
+											// uc_s = '220' => 'SUFFOLK CITY',                                      
+											// uc_s = '222' => 'WINCHESTER CITY',                                   
+											// uc_s = '223' => 'MARTINSVILLE CITY',                                 
+											// uc_s = '225' => 'WAYNESBORO CITY',                                   
+											// uc_s = '227' => 'COLONIAL HEIGHTS CITY',                             
+											// uc_s = '228' => 'VIRGINIA BEACH CITY',                               
+											// uc_s = '236' => 'CHESAPEAKE CITY',                                   
+											// uc_s = '239' => 'SALEM CITY',                                        
+											// uc_s = '301' => 'COVINGTON CITY',        
+											// uc_s = '302' => 'EMPORIA CITY',        
+											// uc_s = '303' => 'FAIRFAX CITY',           
+											// uc_s = '304' => 'FALLS CHURCH',         
+											// uc_s = '305' => 'FRANKLIN CITY',     
+											// uc_s = '306' => 'GALAX CITY',                                        
+											// uc_s = '308' => 'MANASSAS CITY',    
+											// uc_s = '309' => 'HARRISONBURG CITY',      
+											// uc_s = '310' => 'LEXINGTON CITY',       
+											// uc_s = '311' => 'POQUOSON CITY',              
+											// uc_s = '312' => 'NORTON CITY',                		
+											// uc_s = '315' => 'MANASSAS PARK',          
+											// uc_s = '316' => 'WILLIAMSBURG CITY',    
+											// uc_s = '901' => 'EXEMPT',
+											// '');
+		// END;
+		
+
 
 END;

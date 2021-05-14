@@ -47,6 +47,8 @@ norun := if(filedate = lastestIkbVersionOnThor and status = 9
           ,true   //norun
           ,false
           ));
+
+// norun := false;          
           
 wuname1 := filedate + ' IKB - Running Right Now';
 wuname2 := filedate + ' IKB - Data Was Already Built';

@@ -1,0 +1,1 @@
+﻿﻿EXPORT KeyName_6000_Inquiries_Delta_rid := trim(GetSegmentKeyName_Delta_RID('6000'));

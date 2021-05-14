@@ -1,4 +1,4 @@
-IMPORT corp2;
+﻿IMPORT corp2;
 	
 EXPORT Functions := MODULE
 
@@ -6,7 +6,7 @@ EXPORT Functions := MODULE
 		
 			 uc_s := corp2.t2u(s);
 					 
-			 isValidCD := MAP(uc_s in ['','CS','CU','DC55-PBC','DC55','DC56','DC56-PBC','DLCA','DLLC','DLLLP',
+			 isValidCD := MAP(uc_s in ['','CS','CU','DC55-PBC','DC55','DC56','DC56-PBC','DLCA','DLCA-PBC','DLLC','DLLLP',
 																 'DLLP','DLP','DLPA','DNC','DNCDT','DNCIC','DNCSL','DNCWC',
 																 'DPC','DPC-PBC','DPC-PBC','DPCCU','DPCDT','DPCIC','DPCSL','DPCWC',
 																 'DT','FCOOP','FLCA','FLLC','FLLLP','FLLP','FLP','FLPA',

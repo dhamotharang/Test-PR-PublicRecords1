@@ -4,9 +4,8 @@
 /*2015-02-18T00:03:55Z (Ayeesha Kayttala)
 bug# 173256 code review
 */
+import Data_Services, STD;
 export proc_build_dupe_extract(string filedate,string timestamp):= function
-
-import ut;
 
 //state_report_number is unique for TF.
 incident := project(FLAccidents_Ecrash.Infiles.incident(work_type_id in ['1', 'NULL','0'] and source_id in ['TF','EA']), 
@@ -14,7 +13,7 @@ incident := project(FLAccidents_Ecrash.Infiles.incident(work_type_id in ['1', 'N
                                                                   self.case_identifier := if(left.source_id = 'TF', left.state_report_number, left.case_identifier);
 																										                                        self:= left;));
 																										 
-allrecs := sort(distribute(incident,hash(case_identifier))
+allrecs := sort(distribute(incident,hash32(case_identifier))
 			,case_identifier,agency_id,loss_state_abbr,report_type_id,source_id,crash_date,Sent_to_HPCC_DateTime,report_id,local)(hash_key != '"Hash_Key"');
 				
 keepers := dedup(allrecs
@@ -46,9 +45,9 @@ end;
 header_row := dataset(
 [
 {'filedate','flag','del_incident_id','add_incident_id'}
-],outrec);
+],Layouts.DupesExtract);
 
-outrec trecs1(dels L, keepers R) := transform
+Layouts.DupesExtract trecs1(dels L, keepers R) := transform
 self.filedate := filedate;
 
 self.flag := if(L.corrected_incident = '1','U','D');	
@@ -68,14 +67,14 @@ alldupes := sort(join(dels,keepers,
 
 
 //Remove dupes already reported
-dupehistory := dataset(ut.foreign_prod+'thor_data400::out::ecrash::dupes',outrec,csv(terminator('\n'), separator(',')));
+dupehistory := Files_eCrash.DS_DUPES_EXTRACT;
 
 alldupes trecs2(alldupes L, dupehistory R) := transform
 self := L;
 end;
 
-newdupes := sort(join(distribute(alldupes,hash(del_incident_id)),
-								 distribute(dupehistory,hash(del_incident_id)),
+newdupes := sort(join(distribute(alldupes,hash32(del_incident_id)),
+								 distribute(dupehistory,hash32(del_incident_id)),
 								left.del_incident_id = right.del_incident_id and
 								left.add_incident_id = right.add_incident_id and 
 								left.flag = right.flag,
@@ -83,7 +82,7 @@ newdupes := sort(join(distribute(alldupes,hash(del_incident_id)),
 
 ////////////////////////////////////////////////////////////////////////////////////
 slim_layout := record
-outrec;
+Layouts.DupesExtract;
 string date_vendor_last_reported;
 string incident_id;
 string case_identifier; 
@@ -127,9 +126,9 @@ string11 report_id ;
 string11 super_report_id ; 
 end;
 
-base := FLAccidents_Ecrash.BaseFile;
+dsEcrashBase := BaseFile;
 
-slim_layout trecs_base(base L, newdupes R) := transform
+slim_layout trecs_base(dsEcrashBase L, newdupes R) := transform
 
 self.case_identifier :=if(l.source_id = 'TF', l.state_report_number,l.case_identifier);
 self.accident_location	:= map(L.loss_cross_street!='' and L.loss_cross_street!= 'N/A' => L.loss_street+' & '+L.loss_cross_street,L.loss_street);
@@ -178,15 +177,16 @@ self := L;
 self := [];
 end;
 
-jrecs_base := join(base(report_code <>'TM'),sort(newdupes, - del_incident_id),
+jrecs_base := join(dsEcrashBase(report_code <>'TM'),sort(newdupes, - del_incident_id),
 								left.incident_id = right.add_incident_id,
 								trecs_base(left,right),lookup);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////								
-prevbase:= dataset('~thor_data400::base::ecrash_father',FLAccidents_Ecrash.Layout_Basefile,thor);
+dsPrevEcrashBaseAll := Files_eCrash.DS_BASE_ECRASH_FATHER;
+dsEcrashPrevBase := dsPrevEcrashBaseAll(is_Terminated_Agency = FALSE);
 		
 									 
-slim_layout trecs_prev(prevbase L, newdupes R) := transform
+slim_layout trecs_prev(dsEcrashPrevBase L, newdupes R) := transform
 self.case_identifier :=if(l.source_id = 'TF', l.state_report_number,l.case_identifier);
 self.accident_location	:= map(L.loss_cross_street!='' and L.loss_cross_street!= 'N/A' => L.loss_street+' & '+L.loss_cross_street,L.loss_street);
 self.accident_street		:= L.loss_street;
@@ -233,7 +233,7 @@ self := L;
 self := [];
 end;
 
-jrecs_prevbase := join(prevbase(report_code <>'TM'),sort(newdupes, - del_incident_id),
+jrecs_prevbase := join(dsEcrashPrevBase(report_code <>'TM'),sort(newdupes, - del_incident_id),
 								left.incident_id = right.del_incident_id,
 								trecs_prev(left,right),lookup);
 		
@@ -256,26 +256,14 @@ jrecs_diffs := join(jrecs_base,jrecs_prevbase,
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //create alerts file
 
-layout_corrections := record
-string entity_type;
-string entity_id;
-string entity_id2;
-string entity_id3; 
-string create_date;
-string extra_data; 
-string super_report_id; 
-end;
-
 //Notify if TM DE matches with TF/EA report type id recieved after TM DE 
 
-//TFDE := base (report_code ='TF' and report_type_id = 'DE'); 
+//TFDE := dsEcrashBase (report_code ='TF' and report_type_id = 'DE'); 
 
-TFDE := dedup(Sort(distribute(base (report_code ='TF' and report_type_id = 'DE' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
+TFDE := dedup(sort(distribute(dsEcrashBase (report_code ='TF' and report_type_id = 'DE' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
-//TM_TF_A := base(report_code in ['TM','TF'] and report_type_id = 'A'); 
-TM_TF_A := dedup(Sort(distribute(base(report_code in ['TM','TF'] and report_type_id = 'A' ), hash64(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
-
-
+//TM_TF_A := dsEcrashBase(report_code in ['TM','TF'] and report_type_id = 'A'); 
+TM_TF_A := dedup(sort(distribute(dsEcrashBase(report_code in ['TM','TF'] and report_type_id = 'A' ), hash32(incident_id)),incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local), incident_id, crash_date,state_report_number, Agency_name, Loss_state_abbr, creation_date, local);
 
 NotifyDE := join (TFDE , TM_TF_A , //left.ReportLinkID = right.ReportLinkID and 
 														trim(left.state_report_number, left,right) = trim(Right.State_report_number, left,right) and
@@ -283,7 +271,7 @@ NotifyDE := join (TFDE , TM_TF_A , //left.ReportLinkID = right.ReportLinkID and
 														trim(left.Loss_state_Abbr, left,right) = trim(Right.Loss_state_Abbr, left,right) and
 														trim(left.crash_date, left,right) = trim(Right.crash_date, left,right) and
 														trim(left.incident_id, left,right) < trim(Right.incident_id, left,right) 
-														,	transform(layout_corrections ,
+														,	transform(Layouts.ReportUpdate,
 self.entity_type  := 'DE-rpt';
 self.entity_id    := Left.state_report_number; 
 self.entity_id2   := Left.loss_state_abbr;
@@ -295,7 +283,7 @@ self.super_report_id := left.super_report_id ;
 
 dup_NotifyDE := dedup(NotifyDE, all, local);
 
-layout_corrections trecs4(jrecs_diffs L) := transform
+Layouts.ReportUpdate trecs4(jrecs_diffs L) := transform
 self.entity_type  := 'ecr-rpt';
 self.entity_id    := L.Case_Identifier; 
 self.entity_id2   := L.loss_state_abbr;
@@ -306,40 +294,21 @@ self              := L;
 end;
 
 precs := project(dedup(jrecs_diffs(case_identifier!='' and agency_name !='' and work_type_id in ['1', 'NULL','0']),case_identifier,IMAGE_HASH,all),trecs4(left));
-       
 
 string fd := filedate;
 
-return
-
-sequential(
-
-	 output(dedup(precs+dup_NotifyDE,record,all)(extra_data <> ''),,'~thor_data400::out::ecrash::'+fd+'::report_update'
-												,csv(terminator('\n')
-												,separator(','),quote('"'))
-												,overwrite) 
-	,fileservices.Despray('~thor_data400::out::ecrash::'+filedate+'::report_update'
-												, Constants.LandingZone
-												, '/data/super_credit/ecrash/account_monitoring/toprocess/ecrash_'
-																+filedate[1..4]+'-'+filedate[5..6]+'-'+filedate[7..8]+'_'+ 
-																timestamp[1..2]+'_'+timestamp[3..4]+'_'+timestamp[5..6]+'_report-update.csv'),
-			output(header_row+newdupes,,'~thor_data400::out::ecrash::'+fd+'::extract::caseDupes'
-												 ,csv(terminator('\n')
-												 ,separator(','))
-												 ,overwrite,__compressed__)
-				 ,fileservices.addsuperfile('~thor_data400::out::ecrash::dupes','~thor_data400::out::ecrash::'+filedate+'::extract::caseDupes')
-				 ,fileservices.Despray('~thor_data400::out::ecrash::'+filedate+'::extract::caseDupes'
-												  , Constants.LandingZone
-												  , '/data/super_credit/ecrash/despray/dbdupes/ecrash_'+filedate+'_'+timestamp+'_extract_casedupes.csv',,,,true)
-					 );					
-
+return sequential(
+	         output(dedup(precs+dup_NotifyDE,record,all)(extra_data <> ''),,'~thor_data400::out::ecrash::'+fd+'::report_update'
+                  ,csv(terminator('\n'), separator(','), quote('"'))
+                  ,overwrite, __compressed__, expire(Constants.ThorFile_Dupe_Days_To_Expire)) 
+	         ,STD.File.DeSpray('~thor_data400::out::ecrash::'+filedate+'::report_update'
+												         ,Constants.LandingZone
+												         ,'/data/super_credit/ecrash/account_monitoring/toprocess/ecrash_'
+												         +filedate[1..4]+'-'+filedate[5..6]+'-'+filedate[7..8]+'_'+ 
+												         timestamp[1..2]+'_'+timestamp[3..4]+'_'+timestamp[5..6]+'_report-update.csv'),
+	         output(header_row+newdupes,,'~thor_data400::out::ecrash::'+fd+'::extract::caseDupes'
+                  ,csv(terminator('\n'),separator(','))
+                  ,overwrite,__compressed__, expire(Constants.ThorFile_Dupe_Days_To_Expire))
+				   ,STD.File.AddSuperFile('~thor_data400::out::ecrash::dupes','~thor_data400::out::ecrash::'+filedate+'::extract::caseDupes')
+					 );
 end;
-
-
-
-
-								
-								
-								
-								
-

@@ -44,7 +44,7 @@ functionmacro
         ,BizLinkFull.Promote(pversion,pkeyfilter,,pIsTesting,tools.fun_Clustername_DFU('36')).new2Built
       ))
       ,if(pSkipDatalandCopy = false ,kickDatalandCopy )
-      ,if(pSkipAlphaCopy    = false ,kickAlphaCopy    )
+      // ,if(pSkipAlphaCopy    = false ,kickAlphaCopy    )
       ,semail.BuildSuccess
     )
     //copies to dataland from prod

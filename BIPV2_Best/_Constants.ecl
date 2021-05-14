@@ -10,5 +10,5 @@ tools.Constants(
 	,pUseOtherEnvironment	:= pUseOtherEnvironment
 	,pGroupname						:= ''
 	,pMaxRecordSize				:= 4096
-	,pIsTesting						:= Tools._Constants.IsDataland
+	,pIsTesting						:= Tools._Constants.IsDataland OR Tools._Constants.IsAlpha_dev
 );

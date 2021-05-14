@@ -1,6 +1,6 @@
 ﻿IMPORT Equifax_Business_Data, TopBusiness_BIPV2, MDR, ut, _Validate;
 
-Base := Equifax_Business_Data.Files().base.qa;
+Base := Equifax_Business_Data.Files().base.companies.qa;
 
 Industry_Layout := TopBusiness_BIPV2.Layouts.rec_industry_combined_layout;
 

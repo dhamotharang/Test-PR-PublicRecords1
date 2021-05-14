@@ -131,7 +131,7 @@ $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
 	self.name_suffix		:=	newbase.name_suffix;
 	
 	self.updated := newbase.created;
-	self.filename := newbase.filename;
+	self.filename := base.filename;		// keep original filename
 	self.NCF_FileDate := newbase.NCF_FileDate;
 	self.NCF_FileTime := newbase.NCF_FileTime;
 
@@ -139,7 +139,7 @@ $.Layout_Base2 xForm($.Layout_Base2 newbase, $.Layout_Base2 base)	 :=	TRANSFORM
 
 END;
 
-EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
+ver1_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
 	c1 := DISTRIBUTE(newbase, HASH32(ClientId)); 
 	clients := DEDUP(SORT(c1, ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate,-$.fn_lfnversion(filename), local),
 									ClientId,CaseId,ProgramState,ProgramCode,GroupId,StartDate,EndDate, local);
@@ -164,8 +164,8 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 						), right only, local);
 						
 	// find records with possible changes
-	candidates := current - unchanged;
-	updates := clients - newClients;
+	candidates := current - unchanged;		// base files that could be updated
+	updates := clients - newClients;			// new files to update base file
 
 	// do direct updates first with no change to eligibility
 	// TO DO: add historical record for a name change
@@ -193,4 +193,87 @@ EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) 
 	result := unchanged + directUpdates + remaining + newClients;
 
 	return result;
+END;
+
+/**
+	set the case name from the HOH indicator
+**/
+SetCaseName(DATASET(nac_V2.Layout_Base2) base) := FUNCTION
+	hoh := DISTRIBUTE(base(hoh_indicator='Y'),hash32(groupid,caseid));
+	nothoh := DISTRIBUTE(base(hoh_indicator<>'Y'),hash32(groupid,caseid));
+
+	j := JOIN(nothoh, hoh, left.groupid=right.groupid AND left.caseid=right.caseid AND left.programcode=right.programcode AND
+							left.startdate=right.startdate and left.enddate=right.enddate,
+						TRANSFORM(nac_V2.Layout_Base2,
+							self.case_Last_Name := right.LastName;
+							self.case_First_Name := right.FirstName;
+							self.case_Middle_Name := right.MiddleName;
+							self.case_Name_Suffix := right.NameSuffix;
+							self := left;),
+							LEFT OUTER, KEEP(1), LOCAL);
+		return hoh + j;
+END;
+
+EXPORT fn_MergeClients(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2) base) := FUNCTION
+	clients := DISTRIBUTE(SetCaseName(newbase), HASH32(GroupId, CaseId, ClientId)); // new client records
+	
+	current := DISTRIBUTE(base(clientid<>''),HASH32(GroupId, CaseId, ClientId)); // in current base file
+	
+	// find unchanged records
+	unchanged := JOIN(current, clients,
+					left.GroupId=right.GroupId AND
+					left.caseId=right.caseId and left.ClientId=right.ClientId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode,
+					TRANSFORM(nac_v2.Layout_Base2,
+						self := left;), left only, local);
+
+// new client, case 
+	newClients := JOIN(current, clients,
+					left.GroupId=right.GroupId AND
+					left.caseId=right.caseId and left.ClientId=right.ClientId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode,
+					TRANSFORM(nac_v2.Layout_Base2,
+							self.Created := RIGHT.Created;
+							self := right;
+						), right only, local);
+						
+	// find records with possible changes
+//	candidates := DISTRIBUTE(current - unchanged,HASH32(GroupId, CaseId, ClientId));		// base files that could be updated
+		candidates := 
+				JOIN(current, clients,
+					left.GroupId=right.GroupId AND
+					left.caseId=right.caseId and left.ClientId=right.ClientId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode,
+					TRANSFORM(nac_v2.Layout_Base2,
+						self := left;), inner, local);
+		
+	updates := DISTRIBUTE(clients - newClients,HASH32(GroupId, CaseId, ClientId));			// new files to update base file
+
+// only update if timeframe overlaps
+	directUpdates := JOIN(candidates, updates,
+					left.GroupId=right.GroupId AND
+					left.caseId=right.caseId and left.ClientId=right.ClientId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and	left.StartDate <= right.EndDate and left.EndDate >= right.StartDate,
+					xForm(RIGHT, LEFT),
+					inner, local);
+// different timeframe, so new base records
+	remaining := JOIN(updates, directUpdates,
+					left.GroupId=right.GroupId AND
+					left.caseId=right.caseId and left.ClientId=right.ClientId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and	left.StartDate <= right.EndDate and left.EndDate >= right.StartDate,
+					TRANSFORM(nac_v2.Layout_Base2,
+						self := left;), left only, local);
+// did not get modified
+asis := JOIN(candidates,updates,
+					left.GroupId=right.GroupId AND
+					left.caseId=right.caseId and left.ClientId=right.ClientId 
+					and left.ProgramState=right.ProgramState and left.ProgramCode=right.ProgramCode
+					and	left.StartDate <= right.EndDate and left.EndDate >= right.StartDate,
+					TRANSFORM(nac_v2.Layout_Base2,
+						self := left;), left only, local);
+	result := unchanged + directUpdates + remaining + asis + newClients;
+
+	return result(clientId<>'');
 END;

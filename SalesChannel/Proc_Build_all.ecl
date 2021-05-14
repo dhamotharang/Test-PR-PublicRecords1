@@ -1,16 +1,16 @@
-﻿import tools, _control;
+﻿import tools, _control, Scrubs_SalesChannel, SalesChannel;
 
 export proc_Build_All(
 
 	 string											pversion
 	,string											pDirectory		= '/data/hds_180/SalesChannel/data_files/'+pversion
-	,string											pServerIP			= _control.IPAddress.bctlpedata11
-	,string											pFilename			= '*txt'
+	,string											pServerIP		= _control.IPAddress.bctlpedata11
+	,string											pFilename		= '*txt'
 	,string											pGroupName		= _Constants().groupname																		
 	,boolean										pIsTesting		= false
 	,boolean										pOverwrite		= false																															
 	,dataset(Layouts.Input		)	pSprayedFile	= Files().Input.using
-	,dataset(Layouts.Base_new	)	pBaseFile			= Files().base.qa										
+	,dataset(Layouts.Base_new	)	pBaseFile		= Files().base.qa										
 
 ) :=
 function
@@ -20,6 +20,7 @@ function
 		 Create_Supers
 		,Spray								(pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)
 		,proc_Build_Base			(pversion,pIsTesting,pSprayedFile,pBaseFile	)
+		,scrubs_salesChannel.fn_RunScrubs(pversion, SalesChannel.Email_Notification_Lists().BuildFailure)	
 		,Build_Keys						(pversion).all
 		,proc_Build_Strata		(pversion,pOverwrite,,pIsTesting		)
 		,Promote().Inputfiles.using2used

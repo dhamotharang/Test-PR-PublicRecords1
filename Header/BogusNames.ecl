@@ -925,18 +925,28 @@ home_builders := [
 ];
 
 single_name_segment_obscenities := [
+'ARSEHOLE',
+'ASS',
 'ASSFUCK',
 'ASSHOLE',
 'ASSHOLES',
+'BASTARD',
 'BITCH',
 'BLOWME',
 'BLOWMEBITCH',
 'BLOWMEDOWN',
+'BOLLOCKS',
+// 'BUGGER', // Pssible legitimate name
+'BULLSHIT',
+// 'COCK', // Pssible legitimate name
 'COCKLICKING',
 'COCKSUCKER',
 'COCKSUCKERS',
+'CRAP',
 'CUNT',
 'CUNTLIPS',
+'DAMN',
+'DICKHEAD',
 'FAGGOT',
 'FUCK',
 'FUCKCHOPS',
@@ -952,8 +962,11 @@ single_name_segment_obscenities := [
 'FUCKYOUMORE',
 'FUCKYOURSELF',
 'FUKFACE',
+// 'HOE', // Pssible legitimate name
 'MOTHERFOURKER',
 'MOTHERFUCKER',
+'NIGGER',
+'PISS',
 'PUSSY',
 'PUSSYDILDOHEAD',
 'PUSSYEAT',
@@ -963,6 +976,10 @@ single_name_segment_obscenities := [
 'PUSSYLOVER',
 'SHIT',
 'SLHeader',
+'SLUT',
+'TWAT',
+// 'WANKER', // Pssible legitimate name
+'WHORE',
 'WHOREFACE',
 'YOUBLOW',
 'YOUBLOWME'
@@ -1049,6 +1066,7 @@ export BogusNames(string fname_field, string mname_field, string lname_field) :=
 	(lname_field[1..9]='TECHNICAL') or
 	(stringlib.stringcleanspaces(fname_field+mname_field+lname_field) in home_builders ) or
 	(fname_field in single_name_segment_obscenities)                                     or
+ (mname_field in single_name_segment_obscenities)                                     or
 	(lname_field in single_name_segment_obscenities)                                     or
 	(stringlib.stringcleanspaces(fname_field+lname_field) in full_name_obscenities)      or
 	//To catch name flipping

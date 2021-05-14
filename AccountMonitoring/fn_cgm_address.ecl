@@ -1,4 +1,4 @@
-import Business_Header,Watchdog,ut;
+﻿import Business_Header,Watchdog,ut;
  
 EXPORT DATASET(layouts.history) fn_cgm_address(
 		DATASET(AccountMonitoring.layouts.portfolio.base) in_portfolio,
@@ -21,21 +21,21 @@ EXPORT DATASET(layouts.history) fn_cgm_address(
 		// doxie.key_header
 		key_header := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.doxie_key_header_slim, 
+				AccountMonitoring.product_files.header_files.r_doxie_key_header_slim,
 				HASH64(DID)
 			); // by DID only
 			
 		// header_quick.key_DID
 		quick_header :=
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.quick_header_key_DID_slim, 
+				AccountMonitoring.product_files.header_files.r_quick_header_key_DID_slim,
 				HASH64(DID)
 			); 
 
 		// utilfile.key_util_daily_did
 		daily_utility := 
 			DISTRIBUTED(
-				AccountMonitoring.product_files.header_files.daily_utility_key_DID_slim, 
+				AccountMonitoring.product_files.header_files.r_daily_utility_key_DID_slim,
 				HASH64((UNSIGNED6)DID)
 			);
 		

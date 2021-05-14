@@ -1,6 +1,9 @@
 ﻿EXPORT GetConsolidatedCriteria(DATASET($.Layouts.rEntity) infile = $.Files.dsEntities) := FUNCTION
 
-		dSources := DICTIONARY($.GetSanctionsCriteria, {sourceabbrev => sourceid});
+ 		dSources := DICTIONARY($.GetSanctionsCriteria, {sourceabbrev => sourceid});
+//		usefile := DEDUP(SORT($.Files.dsMasters_base, ent_id, EntryCategory, EntrySubcategory, local),
+//								Ent_ID, EntryCategory, EntrySubcategory,All);
+								
 		srcs := DISTRIBUTE(
 							JOIN(infile, $.dsConsolidatedSanctions, left.ent_id=right.masterid,
 												TRANSFORM($.rCriteriaRollup,
@@ -11,7 +14,7 @@
 														, LEFT OUTER),
 								id);
 												
-		s2 := PROJECT(SORT(srcs(criteriaValue <> 0),id, criteriaValue, local),
+		s2 := PROJECT(Dedup(SORT(srcs(criteriaValue <> 0),id, criteriaValue, local),id, criteriaValue, local),
 							TRANSFORM($.rSearchCriteria,
 								self.id := left.id;
 								self.criteria := (unicode)left.criteriaValue;));

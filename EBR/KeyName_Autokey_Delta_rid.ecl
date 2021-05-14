@@ -1,0 +1,1 @@
+﻿EXPORT KeyName_Autokey_Delta_rid := trim(GetSegmentKeyName_Delta_RID('AUTO'));

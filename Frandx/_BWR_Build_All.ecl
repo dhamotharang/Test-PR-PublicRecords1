@@ -1,4 +1,4 @@
-pversion 	:= '20120810'											;		// modify to current date
+﻿pversion 	:= '20180502'											;		// modify to current date
 directory := '/data_build_1/frandx/in/'+pversion[1..8];
 /////////////////////////////////////////////////////////////
 // -- Quick Documentation

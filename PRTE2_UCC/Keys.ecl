@@ -1,4 +1,4 @@
-IMPORT doxie, bipv2, ut, Data_Services, autokeyb2, PRTE2_UCC, UCCV2;
+﻿IMPORT doxie, bipv2, ut, Data_Services, autokeyb2, PRTE2_UCC, UCCV2;
 
 EXPORT Keys := MODULE
 
@@ -81,7 +81,6 @@ EXPORT Keys := MODULE
 	PartySort := sort(dedup(sort(Files.Party_base, tmsid,rmsid,fname,lname,mname,prim_name,prim_range,company_name,party_type),
                        tmsid,fname,lname,mname,prim_name,prim_range,company_name),tmsid,rmsid);
 	
-	EXPORT key_rmsid_party_linkids := INDEX(PartySort,{tmsid,rmsid},{PartySort}, Constants.KEY_PREFIX + doxie.Version_SuperKey + '::party_rmsid_linkids');
 	
 	//Linkids
 	EXPORT Key_LinkIds := MODULE

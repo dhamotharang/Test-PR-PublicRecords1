@@ -1,6 +1,6 @@
 ﻿import PAW;
 
 export Layout_Override_PAW := record
-	paw.layout.Employment_Out - [global_sid, record_sid]; //*** Jira# CCPA-111, Not affecting the Override key at this time, so removing the new CCPA fields from this layout.
+	PAW.layout.Employment_Out; //CCPA-1052 Add CCPA fields global_sid and record_sid to Override PAW key
 	STRING20 flag_file_id;
 end;

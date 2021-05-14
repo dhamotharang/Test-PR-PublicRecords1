@@ -12,6 +12,7 @@ EXPORT Files(STRING  pversion = '',
 		EXPORT Nurses1              := DATASET(ALC.Filenames(pversion, pUseProd).Nurses1_lInputTemplate, ALC.Layouts.Input.Nurses, CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n', '\r\n']), QUOTE('"')));
 		EXPORT Nurses2              := DATASET(ALC.Filenames(pversion, pUseProd).Nurses2_lInputTemplate, ALC.Layouts.Input.Nurses, CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n', '\r\n']), QUOTE('"')));
 		EXPORT Nurses3              := DATASET(ALC.Filenames(pversion, pUseProd).Nurses3_lInputTemplate, ALC.Layouts.Input.Nurses, CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n', '\r\n']), QUOTE('"')));
+		EXPORT Nurses4              := DATASET(ALC.Filenames(pversion, pUseProd).Nurses4_lInputTemplate, ALC.Layouts.Input.Nurses4, CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n', '\r\n']), QUOTE('"')));		
 		EXPORT Pharmacists          := DATASET(ALC.Filenames(pversion, pUseProd).Pharmacists_lInputTemplate, ALC.Layouts.Input.Pharmacists, CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n', '\r\n']), QUOTE('"')));
 		EXPORT Pilots               := DATASET(ALC.Filenames(pversion, pUseProd).Pilots_lInputTemplate, ALC.Layouts.Input.Pilots, CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n', '\r\n']), QUOTE('"')));
 		EXPORT Professionals1       := DATASET(ALC.Filenames(pversion, pUseProd).Professionals1_lInputTemplate, ALC.Layouts.Input.Professionals, CSV(HEADING(1), SEPARATOR(','), TERMINATOR(['\n', '\r\n']), QUOTE('"')));

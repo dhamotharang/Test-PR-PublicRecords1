@@ -1,20 +1,25 @@
-IMPORT	Business_Credit, Business_Credit_Scoring,	doxie,	Std;
+﻿IMPORT	Business_Credit, Business_Credit_Scoring, STD;
+
 EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 											Constants().buildType	pBuildType	=	Constants().buildType.Daily)	:=	FUNCTION
 
-	rTradelines	:=	RECORD
-		STRING		Version;
-		STRING		Original_Version;
-		Business_Credit.Layouts.rAccountBase AND NOT [active];
-		STRING3		DBT;
-	END;
 	
-	rTradelines	tTradelines(Business_Credit.Layouts.rAccountBase pInput)	:=	TRANSFORM
-		SELF.Version					:=	pInput.process_date;
-		SELF.Original_Version	:=	IF(	pInput.original_process_date<>'',
-																	pInput.original_process_date,
-																	pInput.process_date);
+    addSeqNum := PROJECT(Business_Credit.fn_GetSegments.accountBase(active), TRANSFORM(Business_Credit.Layouts.rAccountBaseSeq, SELF.seq_num := 0; SELF := LEFT;));
+    
+    CalculationsForDBTV5:=business_credit.CalculateDBTV5(addSeqNum);
+    
+    Loadfile:=project(CalculationsForDBTV5,transform(business_credit.layouts.rTradelineKey,
+		SELF.Version					:=	left.process_date;
+		SELF.Original_Version	:=	IF(	left.original_process_date<>'',
+																	left.original_process_date,
+																	left.process_date);
 		SELF.Original_Process_Date	:=	SELF.Original_Version;
+		self:=left;
+		self:=[];
+	));
+
+	
+	business_credit.layouts.rTradelineKey	tTradelines(business_credit.layouts.rTradelineKey pInput)	:=	TRANSFORM
 		bHasData				:=	TRIM(pInput.Past_Due_Aging_Amount_Bucket_1,ALL)	<>	''	OR
 												TRIM(pInput.Past_Due_Aging_Amount_Bucket_2,ALL)	<>	''	OR
 												TRIM(pInput.Past_Due_Aging_Amount_Bucket_3,ALL)	<>	''	OR
@@ -50,7 +55,7 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 		SELF					:=	pInput;
 	END;
 	
-	dTradelines			:=	PROJECT(Business_Credit.fn_GetSegments.accountBase(active),tTradelines(LEFT));
+	dTradelines			:=	PROJECT(Loadfile,tTradelines(LEFT));
 	dTradelinesDist	:=	SORT(DISTRIBUTE(dTradelines,HASH(	Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,Cycle_End_Date)),
 																												Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,Cycle_End_Date,LOCAL);
 		// If this is a daily build then only create a key with today's records
@@ -58,4 +63,5 @@ EXPORT	key_tradeline(STRING pVersion	=	(STRING8)Std.Date.Today(),
 													dTradelinesDist(Version=pVersion),
 													dTradelinesDist);
 	RETURN	INDEX(dKeyResult,{Sbfe_Contributor_Number,Contract_Account_Number,Account_Type_Reported,Cycle_End_Date},{dKeyResult},Business_Credit.keynames().Tradeline.QA);
+
 END;

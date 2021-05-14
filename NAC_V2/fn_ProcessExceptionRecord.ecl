@@ -5,13 +5,27 @@ sfList := [$.Superfile_List.sfExceptionRecords,
 						$.Superfile_List.sfExceptionRecords + '_delete'
 					];
 lfn := $.Superfile_List.sfExceptionRecords + '_' + WORKUNIT;
-EXPORT fn_ProcessExceptionRecord(DATASET($.Layouts2.rExceptionRecord) inrec) := FUNCTION
+/**
+ Process new exception records
+**/
+EXPORT fn_ProcessExceptionRecord(DATASET($.Layouts2.rNac2Ex) nac2) := FUNCTION
 
-	exceptions := $.Process_ExceptionRecords(inrec); 
+	newexceptions := PROJECT(nac2(RecordCode = 'EX01'), TRANSFORM(Nac_V2.Layouts2.rExceptionEx,
+										self.RecordCode := left.RecordCode;
+										self := LEFT.ExceptionRec;
+										))(errors=0);
+										
+	formattedExceptions := PROJECT(newexceptions, TRANSFORM($.Layouts2.rExceptionRecord,
+										self.SourceGroupId := left.GroupId;
+										self := left;));
 
-	return ORDERED(
-			OUTPUT(exceptions,,lfn, COMPRESSED),
-			Std.file.fPromoteSuperFileList(sfList, lfn, deltail := true)
-	);
+	exceptions := $.Process_ExceptionRecords(formattedExceptions); 
+
+	return IF(EXISTS(newexceptions),
+						ORDERED(
+							OUTPUT(exceptions,,lfn, COMPRESSED),
+							Std.file.fPromoteSuperFileList(sfList, lfn, deltail := true)
+						)
+					);
 
 END;

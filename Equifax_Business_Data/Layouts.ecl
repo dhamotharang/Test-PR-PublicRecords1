@@ -196,7 +196,17 @@ EXPORT Sprayed_Input := RECORD
   STRING19 Record_Update_Refresh_Date;
 	STRING10 EFX_DATE_CREATED;
 END;
-	
+
+EXPORT Sprayed_Input_Contacts := RECORD, MAXLENGTH(3000000)
+	STRING10  EFX_ID;
+	STRING130 EFX_CONTCT;
+	STRING2   EFX_TITLECD;
+	STRING50  EFX_TITLEDESC;
+	STRING75  EFX_LASTNAM;
+	STRING50  EFX_FSTNAM;
+	STRING100 EFX_EMAIL;
+	STRING10  EFX_DATE;
+END;	
 	
 	////////////////////////////////////////////////////////////////////////
 	// -- Base Layout
@@ -247,8 +257,7 @@ END;
 		STRING50      Exploded_Desc_Corpamountprec                     := '';
 		STRING50      Exploded_Desc_Corpamounttp                       := '';
 		STRING9       Exploded_Desc_Corpempcd                          := '';
-		STRING100     Exploded_Desc_Ctrytelcd                          := '';
-		
+		STRING100     Exploded_Desc_Ctrytelcd                          := '';		
 		Address.Layout_Clean182_fips; 
     STRING100   									clean_company_name                := '';		
 		string10											clean_phone												:='';
@@ -281,15 +290,48 @@ END;
 															 // In new development using the ingest process, it will be the record id from SALT.  
 															 // For CCPA, this field is not required to be populated.  
 
+END;	
+
+EXPORT clean_phones :=
+	record
+		string10   	Phone                        ;     
+		string10   	Fax                          ;      
+		string10   	Telex                        ;     
+END;
+
+EXPORT Base_Contacts := RECORD 
+			unsigned6														rcid											;
+			unsigned6														did												;
+			unsigned1														did_score									;
+			BIPV2.IDlayouts.l_xlink_ids																		;
+			unsigned4   												dt_first_seen							;
+			unsigned4   												dt_last_seen							;
+			unsigned4   												dt_vendor_first_reported	;
+			unsigned4   												dt_vendor_last_reported		;
+			string1  													  record_type					 := ''; 
+		  unsigned4         									process_date          := 0;
+			Address.Layout_Clean_Name           clean_name                ; 
+			Address.Layout_Clean182_fips        clean_company_address     ;	
+		  string10									      		clean_company_phone		:='';			
+			string75                            company_name         := '';
+			string10                            company_phone        := '';
+			string1                             company_record_type  := '';
+			unsigned4  	                     company_date_first_seen :=  0;
+			unsigned4  	                     company_date_last_seen  :=  0;
+			unsigned8     	 				  					raw_aid							 :=  0;
+		  unsigned8					      						ace_aid							 :=  0;
+	    Sprayed_Input_Contacts                                        ;	
+			string50                      Exploded_Title_Description := '';
+		  unsigned4                                     global_sid :=  0;   
+      unsigned8                                     record_sid :=  0; 
+		  string6    							                			source     := '';
 END;		
-	
-	
-  		
+	  		
 	////////////////////////////////////////////////////////////////////////
 	// -- Temporary Layouts for processing
 	////////////////////////////////////////////////////////////////////////
 	EXPORT Temp := MODULE
-
+				
 	  EXPORT BIPSlim := RECORD
 			UNSIGNED8		unique_id;
 			STRING80  	company;
@@ -299,14 +341,45 @@ END;
 			STRING25 		city;   		      // p_city
 			STRING2			state;
 			STRING5			zip5;
+			string20 		fname;
+			string20 		mname;
+			string20 		lname;
 			STRING10		phone;
 			STRING      url;
+			string      email;
 			BIPV2.IDlayouts.l_xlink_ids;
 	  END;
+					
+	  EXPORT DidSlim := RECORD
+			UNSIGNED8		unique_id    :=  0;
+			STRING50    title        := '';
+			STRING20 		fname        := '';
+			STRING20 		mname        := '';
+			STRING20 		lname        := '';
+			string5  		name_suffix		    ;
+			string10  	prim_range			  ;
+			string28		prim_name				  ;
+			string8			sec_range			 	  ;
+			string5			zip5						  ;
+			string2			state						  ;
+			string10		phone						  ;
+			string8			dob							  ;
+			string9			ssn							  ;
+			UNSIGNED6		did           := 0;
+			UNSIGNED1		did_score		  := 0;	
+			UNSIGNED6		bdid				  := 0;
+			UNSIGNED1		bdid_score	  := 0;		
+			BIPV2.IDlayouts.l_xlink_ids   ;
+	  END;
 		
-	  EXPORT UniqueId := RECORD
+		EXPORT UniqueId := RECORD
  		  UNSIGNED8		unique_id;
 		  Base;
+		END;		
+		
+		EXPORT UniqueIdContacts := RECORD
+ 		  UNSIGNED8		unique_id;
+		  Base_Contacts;
 		END;
     
 	END;  //End Temporary

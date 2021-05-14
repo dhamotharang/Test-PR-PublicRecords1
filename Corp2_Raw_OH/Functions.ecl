@@ -320,27 +320,25 @@ EXPORT Functions := Module
 																				'MER','MEX','MFC','MIS','MNL','MOA','MOB','MOD','MOE','MOO','MOR','MOX','MPL','MRF','MRL','MRN','MRO',
 																				'MRP','MUA','MUC','MUF','MUL','N/R','NEW','NFA','NFB','NFE','NFL','NFO','NFR','NFX','NRO','NRR','NRT',
 																				'PAM','PCS','PDA','PDN','PDS','PEN','PER','PLF','PLL','PLR','PLT','PLW','PQD','PQF','PRS','PRT','PSC',
-																				'PSX','RCA','RCB','RCE','RCO','RCR','RCX','REN','RNA','RNB','RNE','RNL','RNO','RNR','RNX','RQG','RTA',
-																				'RTC','RTF','RTO','RTP','RTR','RTS','RTX','RXM','SAN','SMA','SMB','SME','SMO','SMR','SMX','SUB','SUC',
-																				'SUD','RTD','SUR','TEM','TMA','TMB','TME','TMO','TMR','TMX','UNA','UNC','UND','UNL','UNO','UNR','UNS',
-																				'UTH','VXC','SUM','VXE','VXF','VXI','VXL','VXP','VXU','VXX','XCE','XFF','XGA','XOL','XPA','XSS','XTD',
-																				'XXX','VQD','VQF','VPR','TIC','ICR','RCN','CAA','CBA','CDD','CDG','CFB','CFD','CFG','CFN','CFP','CHL',
-																				'CHN','CHP','CHS','CHV','CLD','CLG','CLR','CLT','CMA','CMD','CMP','COA','CPE','CPF','CPO','CSN','CSS',
-																				'DEC','FPP','INC','MOC','MON','MOP','NFC','NFN','NFP','RCC','RNC','RNN','RNP','SAA','SMC','SMN','SMP',
-																				'TMC','TMN','TMP','TRA','TRC','ADF','CFO','CHC','AAL','CSP','CFS','CFA','CAF','VCD','VCP','VCF','VCB',
-																				'VCS','VCE','VCH','VCC','VCJ','VCK','VCR','VCT','VCN','VCA','VCI','VCG','VCM','VCO','VCQ','VCW','VCX',
-																				'VCU','VCV','VCL','VCY','VNP','VNN','VNF','VNO',''];
-																	
-
+																				'PSX','RCA','RCB','RCE','RCO','RCR','RCX','REN','RNA','RNB','RNE','RNL','RNO','RNR','RNX','RQG','RQ1',
+																				'RTA','RTC','RTF','RTO','RTP','RTR','RTS','RTX','RXM','SAN','SMA','SMB','SME','SMO','SMR','SMX','SUB',
+																				'SUC','SUD','RTD','SUR','TEM','TMA','TMB','TME','TMO','TMR','TMX','UNA','UNC','UND','UNL','UNO','UNR',
+																				'UNS','UTH','VXC','SUM','VXE','VXF','VXI','VXL','VXP','VXU','VXX','XCE','XFF','XGA','XOL','XPA','XSS',
+																				'XTD','XXX','VQD','VQF','VPR','TIC','ICR','RCN','CAA','CBA','CDD','CDG','CFB','CFD','CFG','CFN','CFP',
+																				'CHL','CHN','CHP','CHS','CHV','CLD','CLG','CLR','CLT','CMA','CMD','CMP','COA','CPE','CPF','CPO','CSN',
+																				'CSS','DEC','FPP','INC','MOC','MON','MOP','NFC','NFN','NFP','RCC','RNC','RNN','RNP','SAA','SMC','SMN',
+																				'SMP','TMC','TMN','TMP','TRA','TRC','ADF','CFO','CHC','AAL','CSP','CFS','CFA','CAF','VCD','VCP','VCF',
+																				'VCB','VCS','VCE','VCH','VCC','VCJ','VCK','VCR','VCT','VCN','VCA','VCI','VCG','VCM','VCO','VCQ','VCW',
+																				'VCX','VCU','VCV','VCL','VCY','VNP','VNN','VNF','VNO',''];
 		
 		//Below table needs to be updated when we see new AR Type codes in Raw updates!	
 		EXPORT Set_Of_Ar_FilingCodes :=['00A','00L','01A','01L','02A','02L','03L','04A','05L','06A','07L','08A','09L','10A',
-																		'11L','12A','13L','14A','16A','15L','17L','18A','19L','60A','61A','62A','63A','64A',
-																		'65A','66A','67A','68A','69A','70A','71A','72A','73A','74A','75A','76A','77A','78A',
-																		'79A','80A','81A','82A','83A','84A','85A','86A','87A','88A','89A','90A','91A','92A',
-																		'92L','93A','94A','95A','95L','96A','96L','97A','97L','98A','98L','99A','99L','ANR',
-																		'71L','72L','73L','74L','75L','76L','77L','78L','79L','80L','81L','82L','84L','85L',
-																		'86L','87L','88L','89L','90L','91L','93L','94L','04L','06L','08L','10L'];
+																		'11L','12A','13L','14A','16A','15L','17L','18A','20A','19L','60A','61A','62A','63A',
+																		'64A','65A','66A','67A','68A','69A','70A','71A','72A','73A','74A','75A','76A','77A',
+																		'78A','79A','80A','81A','82A','83A','84A','85A','86A','87A','88A','89A','90A','91A',
+																		'92A','92L','93A','94A','95A','95L','96A','96L','97A','97L','98A','98L','99A','99L',
+																		'ANR','71L','72L','73L','74L','75L','76L','77L','78L','79L','80L','81L','82L','84L',
+																		'85L','86L','87L','88L','89L','90L','91L','93L','94L','04L','06L','08L','10L'];
 																	
 		//****************************************************************************
 		//AR_TypeDesc: returns the "ar_type".
@@ -360,7 +358,7 @@ EXPORT Functions := Module
 															 '86L','87L','88L','89L','90L','91L','92L',
 															 '93L','94L','95L','96L','97L','98L','99L',
 															 '00L','01L','02L','04L','06L','08L','10L'] 		       => 'ANNUAL REPORT/LIMITED LIABILITY PARTNERSHIP',
-											code in['02A','04A','08A','10A','12A','14A','06A','18A']       => 'BIENNIAL REPORT OF PROFESSIONAL CORP',
+											code in['02A','04A','08A','10A','12A','14A','06A','18A','20A'] => 'BIENNIAL REPORT OF PROFESSIONAL CORP',
 											code in['03L','05L','07L','09L','11L','13L','15L','17L','19L'] => 'BIENNIAL REPORT/LIMITED LIABILITY PARTNERSHIP',
 											'');																
 																	

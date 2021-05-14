@@ -1,8 +1,8 @@
-import Ingenix_NatlProf, AutoKeyB2, RoxieKeyBuild; 
+﻿import Ingenix_NatlProf, AutoKeyB2, RoxieKeyBuild; 
 
 export Proc_Sanctions_Autokeybuild(string filedate) := function
 
-	base_sanc := Ingenix_NatlProf.file_SearchAutokey_Sanctions;
+	base_sanc := dedup(Ingenix_NatlProf.file_SearchAutokey_Sanctions, record);
 	
 	skip_set := Ingenix_NatlProf.Constants.autokey_skip_set_sanc;
 

@@ -1,4 +1,4 @@
-﻿import _control, tools, ut, Orbit3;
+﻿import _control, tools, ut, Orbit3, scrubs, Scrubs_CrashCarrier;
 
 export Build_All( 
 	 string		pversion
@@ -18,6 +18,11 @@ function
 	sequential(
 		 Create_Supers
 		,Spray					(pversion,pServerIP,pDirectory,pFilename,pGroupName,pIsTesting,pOverwrite)
+		,Scrubs.ScrubsPlus('CrashCarrier','Scrubs_CrashCarrier','Scrubs_CrashCarrier','', pversion,CrashCarrier.Email_Notification_Lists(pIsTesting).BuildFailure,false)
+		,if(scrubs.mac_ScrubsFailureTest('Scrubs_CrashCarrier',pversion)
+		 	 ,OUTPUT('Scrubs passed.  Continuing to the Build_Base step.')				
+			 ,FAIL('Scrubs failed.  Base and keys not built.  Processing stopped.  Resolve scrubs issues before you run again.')
+		   )		
 		,Build_Base			(pversion,pIsTesting,pSprayedFile,pBaseFile	)
 		,Build_Keys			(pversion																		).all
 		,Build_Strata		(pversion	,pOverwrite,,,pUseOtherEnviron,,pIsTesting				)

@@ -21,9 +21,11 @@
 	{'18','Political Individual','','2'},
 	{'19','Political Party','','2'},
 	{'20','Religion','','2'},
+	{'27','Special Jurisdiction','','2'},
 	//{'21','Terrorism','1','2'},
 	{'22','Trade Union','','2'},
 	{'23','Port','','2'},
-	{'24','Vessel','','2'}
+	{'24','Vessel','','2'},
+	{'28','Website','','2'}
 	],
 	Layout_Category);

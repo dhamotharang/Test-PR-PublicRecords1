@@ -1,0 +1,7 @@
+﻿//This is the code to execute in a builder window
+#OPTION('multiplePersistInstances', FALSE);
+#workunit('name','Scrubs_PhoneFinder.Transactions_BWR_PopulationStatistics - Population Statistics - SALT V3.11.11');
+IMPORT Scrubs_PhoneFinder,SALT311;
+// In the line below substitute the file you want statistics for; and substitute any field names you can
+  Scrubs_PhoneFinder.Transactions_MAC_PopulationStatistics(YourFileName,/*Reference Field*/,/* transaction_id_field */,/* transaction_date_field */,/* user_id_field */,/* product_code_field */,/* company_id_field */,/* source_code_field */,/* batch_job_id_field */,/* batch_acctno_field */,/* response_time_field */,/* reference_code_field */,/* phonefinder_type_field */,/* submitted_lexid_field */,/* submitted_phonenumber_field */,/* submitted_firstname_field */,/* submitted_lastname_field */,/* submitted_middlename_field */,/* submitted_streetaddress1_field */,/* submitted_city_field */,/* submitted_state_field */,/* submitted_zip_field */,/* phonenumber_field */,/* data_source_field */,/* royalty_used_field */,/* carrier_field */,/* risk_indicator_field */,/* phone_type_field */,/* phone_status_field */,/* ported_count_field */,/* last_ported_date_field */,/* otp_count_field */,/* last_otp_date_field */,/* spoof_count_field */,/* last_spoof_date_field */,/* phone_forwarded_field */,/* date_added_field */,/* filename_field */,outfile);
+  OUTPUT(outfile,NAMED('PopulationStatistics'));

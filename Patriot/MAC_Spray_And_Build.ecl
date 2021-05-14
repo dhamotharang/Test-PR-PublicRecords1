@@ -59,6 +59,9 @@ fieldstats.mac_stat_file(%inf%,%stats%,'patriot',50,6,false,
 											'	     6) thor_data400::key::annotated_names_qa(thor_data400::key::patriot::'+filedate+'::annotated_names),\n' +
 											'	     7) thor_data400::key::patriot::baddies_with_name_qa(thor_data400::key::patriot::'+filedate+'::baddies_with_name), \n' +
 											'	     8) thor_data400::key::patriot_file_full_qa(thor_data400::key::patriot::'+filedate+'::file_full),\n' + 
+											'	     9) thor_data400::key::patriot_file_full_qa(thor_data400::key::patriot::'+filedate+'::patriot_file_delta_rid),\n' + 
+											'	    10) thor_data400::key::patriot_file_full_qa(thor_data400::key::patriot::'+filedate+'::annotated_names::delta_rid),\n' + 
+											'	    11) thor_data400::key::patriot_file_full_qa(thor_data400::key::patriot::'+filedate+'::baddids::delta_rid),\n' + 
 											'      have been built and ready to be deployed to QA.');
 					
 %e_mail_fail% := fileservices.sendemail(
@@ -66,22 +69,26 @@ fieldstats.mac_stat_file(%inf%,%stats%,'patriot',50,6,false,
 										'Patriot Build FAILED ' + filedate,
 										'');
 
+#uniquename(scrubs)
+%scrubs%	:= Scrubs_Patriot.BaseBuildScrubs(filedate);
 
 // Do STRATA stats work
 Patriot.Out_Patriot_File_Stats_Population(filedate,strata_output)
 
 // Update DOPS page
-%do9% := dops.updateversion('PatriotKeys',filedate,'kgummadi@seisint.com',,'N');
+%do9% := IF(scrubs.mac_ScrubsFailureTest('Scrubs_Patriot',filedate)
+						,dops.updateversion('PatriotKeys',filedate,'kgummadi@seisint.com',,'N')
+						,OUTPUT('Scrubs has failed!',NAMED('Scrubs_Failure')));
 
 //Create Orbit Entry
 %do10% := Orbit3.proc_Orbit3_CreateBuild_AddItem ('Patriot Act',filedate);
 
 #if(doscore)
-	sequential(%pre%, /*%stats%,*/ %do1%, %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output) : 
+	sequential(%pre%, /*%stats%,*/ %do1%, %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%scrubs%,%do9%,%do10%,strata_output) : 
 	success(%e_mail_success%),
 	failure(%e_mail_fail%);
 #else
-	sequential(%pre%, /*%stats%,*/ %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output) :
+	sequential(%pre%, /*%stats%,*/ %do2%,/*%do3%,*/%do4%,%do6%,%do8%,%do9%,%do10%,strata_output,%scrubs%) :
 	success(%e_mail_success%),
 	failure(%e_mail_fail%);
 #end

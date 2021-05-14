@@ -22,6 +22,25 @@ EXPORT map_LAS0832_conversion(STRING pVersion) := FUNCTION
 	
   SUFFIX_PATTERN  := '( JR.$| JR$| SR.$| SR$| III$| II$| IV$)';	
 	
+	invalid_addr  := '(N/A|NONE |NO VALID|SAME|ATTN |EY|ATTN EY )';
+	C_O_Ind       := '(C/O |ATTN: |ATTN )';
+	DBA_Ind       := '( DBA |D/B/A |/DBA | A/K/A | AKA )';
+	CoPattern	    := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* COMPANY$|^.* CORP$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+					         '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
+					         '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN.*$|' +
+					         '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
+					         '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$' +
+					         ')';
+RemovePattern := '(^.* LLC$|^.* LLC\\.$|^.* INC$|^.* INC\\.$|^.* INC.*$|^.* COMPANY$|^.* COMPANY .*$|^.* CORP$|^.* CORP.$|^.*APPRAISAL$|^.*APPRAISALS$|' +
+					         '^.* APPR\\.$|^.* APPRAISAL SERVICE$|^.* APPRAISAL GROUP$|^.* APPRAISAL CO$|^.* FINANCIAL$|' +
+					         '^.* APPRAISAL SV[C|S]$|^.* SERVICE[S]?$|^.* & ASSOCIATES$|^.* ADVISORS$|^CO .*$|^ATTN: .*$|^ATTN.*$|^ATT: .*$| C/O .*$|^.* ATTN; EY.*$|' +
+					         '^.* REALTY$|^.* REAL ESTATE$|^.* REAL ESTATE CO$|^.* MANAGEMENT$|^.* MGMT$|^.* COMPANIES|' +
+					         '^C-21 .*$|^PRUDENTIAL .*$|^.* REALTORS$|^.* PROPERTIES$|' +
+					         '^SACKS$|^.* AT GLACIER$|^.* RENTALS$|^.* BY WYNDHAM$|^.* OFFICE$|GENERAL DELIVERY| VISTA VILLAGE$|' +
+					         '^.* BUILDING$|^.* LAKE RESORT$| ATTN:.*$' +
+					         ')';
+
+	
 	//Remove bad records before processing
 	//Not using the BadNameFilter here. It elimimated 3 good records.
 	//BROK.0000033776.A-ASA         	DAVID LAVOID HOLLOWAY   - contains void                                                                                                                             	BROK.ASA - Broker Associate Active                	ACTIVE                                            	NORMAL LICENSE STATU
@@ -78,7 +97,7 @@ EXPORT map_LAS0832_conversion(STRING pVersion) := FUNCTION
 	
 		tempStdLicType        := MAP(tempRawType[1..4]='SALE' => 'SALE',
 			                           tempRawType[1..4]='BROK' => 'BROK',
-			                           tempRawType[1..3]='TS.' => 'TSDEV',
+			                           tempRawType[1..4]='TIME' => 'TSDEV',
 																 '');															 
   	SELF.STD_LICENSE_TYPE := tempStdLicType;
 		//assigning type code based on license type. Example of license type: BROK.ACT, BROK.INA, BROK.CORP, BROK.ASA,
@@ -193,11 +212,18 @@ EXPORT map_LAS0832_conversion(STRING pVersion) := FUNCTION
 																SELF.type_cd = 'GR' => '',
 																tempNick);
 		//Use address cleaner to clean address
+		//Extract company name				
 		trimAddress1          := ut.CleanSpacesAndUpper(pInput.ADDRESS1_1);
 		trimAddress2          := ut.CleanSpacesAndUpper(pInput.ADDRESS2_1);
-  		
+ 		care_of_ind := '^([0-9A-Z\\s]+)C/O (.*)$';
+
+		tmpNameContact1				:= IF(REGEXFIND(care_of_ind,trimAddress1),REGEXFIND(care_of_ind,trimAddress1,2),
+																Prof_License_Mari.mod_clean_name_addr.extractNameFromAddr(trimAddress1, CoPattern));
+		clnAddress1						:= IF(REGEXFIND(care_of_ind,trimAddress1),REGEXFIND(care_of_ind,trimAddress1,1),
+																Prof_License_Mari.mod_clean_name_addr.removeNameFromAddr(trimAddress1, RemovePattern));
+																
 		//Prepare the input to address cleaner
-		temp_preaddr1 				:= StringLib.StringCleanSpaces(trimAddress1+' '+trimAddress2); 
+		temp_preaddr1 				:= StringLib.StringCleanSpaces(clnAddress1); 
 		temp_preaddr2 				:= StringLib.StringCleanSpaces(pInput.CITY_1+' '+pInput.STATE_1 +' '+
 		                                                     MAP(LENGTH(TRIM(pInput.ZIP))=3=>'00'+TRIM(pInput.ZIP),
 																												     LENGTH(TRIM(pInput.ZIP))=4=>'0'+TRIM(pInput.ZIP),

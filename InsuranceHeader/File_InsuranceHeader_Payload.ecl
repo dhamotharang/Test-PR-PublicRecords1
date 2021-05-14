@@ -12,7 +12,7 @@ EXPORT File_InsuranceHeader_Payload := JOIN(hr,DISTRIBUTE(Alphabase,HASH(source_
                                    SELF.jflag2 := RIGHT.ambiguous;		
                                    SELF.src := RIGHT.src[4..5];
                                    SELF.vendor_id := RIGHT.vendor_id;
-                                   SELF.phone := RIGHT.phone;
+                                   SELF.phone := if(LEFT.src = 'WP', '', RIGHT.phone);
                                    SELF.ssn := RIGHT.ssn;
                                    SELF.dob := RIGHT.dob;
                                    SELF.title := RIGHT.title;

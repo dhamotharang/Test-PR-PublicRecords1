@@ -1,4 +1,4 @@
-#workunit('name','nonfcra-fd23');
+﻿#workunit('name','nonfcra-fd23');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -71,7 +71,7 @@ end;
 soap_in := project(f,into_PR2O_input(LEFT));
 output(soap_in, named('soap_in'));
 
-roxieIP:='http://roxiebatch.br.seisint.com:9856';  // Roxiebatch
+roxieIP:='http://roxiethorvip.hpcc.risk.regn.net:9856';  // Roxiebatch
 
 
 xlayout := RECORD

@@ -176,7 +176,27 @@ EXPORT Functions := MODULE
 		isValidDate := IF(clean_date = '0' or _validate.date.fIsValid(clean_date), TRUE, FALSE);
 		RETURN IF(isValidDate, 1, 0);
   end;	
+				
+	//*******************************************************************************
+  //date_hyphen_YYYYMMDD_to_YYYYMMDD: 	format date to YYYYMMDD
+  //*******************************************************************************	
+	EXPORT date_slashed_YYYYMMDD_to_YYYYMMDD (STRING s) := FUNCTION
+    // UNSIGNED1 _yyyy := (UNSIGNED1) s[1..StringLib.StringFind(s,'-',1) - 1];
+    // UNSIGNED1 _mm := (UNSIGNED1) s[StringLib.StringFind(s,'-',1) + 1 .. StringLib.StringFind(s,'-',2) - 1 ];
+    // UNSIGNED2 _dd := (UNSIGNED2) s[StringLib.StringFind(s,'-',2) + 1	.. ];
+    // RETURN if(_yyyy > 0, (string4) _yyyy, '') + if(_mm > 0, intformat(_mm,2,1), '')  + IF(_dd > 0, intformat(_dd,2,1), '');
+		RETURN REGEXREPLACE('-',s,'');
+  END;
 	
+  //*******************************************************************************
+  //fn_valid_Load_Date: 	returns true if valid date, else false
+  //*******************************************************************************	
+  EXPORT fn_valid_Load_Date(string sDate) :=function
+		clean_date := date_slashed_YYYYMMDD_to_YYYYMMDD(sDate);
+		isValidDate := IF(clean_date = '' or _validate.date.fIsValid(clean_date), TRUE, FALSE);
+		RETURN IF(isValidDate, 1, 0);
+  end;			
+
   //****************************************************************************
   //fn_numeric_or_blank: 	returns true if only populated with numbers or blanks
   //****************************************************************************  
@@ -381,6 +401,20 @@ EXPORT Functions := MODULE
 	 //****************************************************************************
 	 EXPORT fn_verify_stkexc(STRING code) := function    
 			RETURN IF(Equifax_Business_Data.EFX_STKEXC_TABLE.STKEXC(code) = 'INVALID', 0, 1);
+  END;	
+				
+   //****************************************************************************
+	 //fn_verify_title
+	 //****************************************************************************
+	 EXPORT fn_verify_title(STRING code) := function    
+			RETURN IF(Equifax_Business_Data.EFX_TITLE_TABLE.TITLE(code) = 'INVALID', 0, 1);
+  END;	
+	
+   //****************************************************************************
+	 //fn_verify_title_desc
+	 //****************************************************************************
+	 EXPORT fn_verify_title_desc(STRING code) := function    
+			RETURN IF(Equifax_Business_Data.EFX_TITLE_DESC_TABLE.TITLE_DESC(code) = 'INVALID', 0, 1);
   END;	
 	
 END;

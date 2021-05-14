@@ -1,4 +1,4 @@
-﻿import business_header_ss, business_risk, EDA_VIA_XML, Risk_Indicators, govdata, Marketing_Best,_control,Business_HeaderV2, versioncontrol,Business_Header_BDL2,paw;
+﻿import business_header_ss, business_risk, EDA_VIA_XML, Risk_Indicators, govdata, _control,Business_HeaderV2, versioncontrol,Business_Header_BDL2,paw;
 
 // Check Business_Header.Filters
 
@@ -37,12 +37,13 @@ module
 		
 	) : success(Send_Email(pversion).BasesFinished), failure(Send_Email(pversion).BuildFailure);
 
+	//Jira# DF-28406, Marketing_Best - Remove deprecated key; Commented the Marketing_Best code since the keys are deprecated from roxie.
 	export proc_Build_Other := sequential(
 	
 		 business_risk.proc_build_brisk_keys								(pversion).all	
 		,risk_indicators.proc_build_hri_all									(pversion,false,false,'built')									
 		,EDA_VIA_XML.proc_build_bizword_key									(pversion).all						
-		,Marketing_Best.Proc_Build_Marketing_Best						(pversion,false,pShouldSendToStrata,false)								
+		//,Marketing_Best.Proc_Build_Marketing_Best						(pversion,false,pShouldSendToStrata,false)								
 		,govdata.proc_build_all_keys												(pversion).all
 		,govdata.QA_Records
 //		,Proc_Build_Keydiffs																() 

@@ -1,4 +1,6 @@
+import dx_common;
 EXPORT layout_SANCTN_license_clean := RECORD
+	dx_common.layout_metadata;
 	STRING8   	BATCH_NUMBER;
 	STRING8   	INCIDENT_NUMBER;
 	STRING8   	PARTY_NUMBER;

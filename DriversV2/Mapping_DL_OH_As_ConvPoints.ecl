@@ -1,583 +1,492 @@
-﻿import Drivers, DriversV2, lib_stringlib, ut, VersionControl;
- 
-export Mapping_DL_OH_As_ConvPoints( string  pversion, dataset(DriversV2.Layouts_DL_OH_In.Layout_OH_CP_Pdate) in_file) := module
+﻿import Std, Corp2_Mapping, VersionControl, _Validate, ut;
 
-	 // function to suppress all zero and parenthesis string data to empty string
-	 export AllZeroClean(string instr) := function
-	    filteredStr := StringLib.stringFilter(trim(instr,left,right), '0{}');
-			outstr := if (length(trim(instr,left,right)) = length(trim(filteredStr,left,right)), '', trim(instr,left,right));
-			return(outstr);
-	 end;
-	 
-	export Map_Signed_Field(string sfield) :=	FUNCTION
-			string	clean_sfield	:=	map(	sfield[length(trim(sfield))] in ['{'] => sfield[1..(length(trim(sfield))-1)] + '0',
-																			sfield[length(trim(sfield))] in ['A'] => sfield[1..(length(trim(sfield))-1)] + '1',
-																			sfield[length(trim(sfield))] in ['B'] => sfield[1..(length(trim(sfield))-1)] + '2',
-																			sfield[length(trim(sfield))] in ['C'] => sfield[1..(length(trim(sfield))-1)] + '3',
-																			sfield[length(trim(sfield))] in ['D'] => sfield[1..(length(trim(sfield))-1)] + '4',
-																			sfield[length(trim(sfield))] in ['E'] => sfield[1..(length(trim(sfield))-1)] + '5',
-																			sfield[length(trim(sfield))] in ['F'] => sfield[1..(length(trim(sfield))-1)] + '6',
-																			sfield[length(trim(sfield))] in ['G'] => sfield[1..(length(trim(sfield))-1)] + '7',
-																			sfield[length(trim(sfield))] in ['H'] => sfield[1..(length(trim(sfield))-1)] + '8',
-																			sfield[length(trim(sfield))] in ['I'] => sfield[1..(length(trim(sfield))-1)] + '9',
-																			sfield[1..length(trim(sfield))]);
-			return clean_sfield;
-	end;	 
-   
-   //**************** CONVICTIONS Mapping **********************************************************************************
-   Conviction_Type_Cd := Tables_CP_OH.Conviction_Type_Cd;
-   
-   in_OH_Convictions := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Conviction_Type_Cd);
-   
-   Layout_Oh_Conv_out := Layouts_DL_OH_In.Layout_OH_CONVICTIONS;
-   
-   Layout_Oh_Conv_out trfOHConv(in_OH_Convictions l) := transform
-			self.process_date                    := l.process_date;
-			self.KEY_NUMBER                      := Map_Signed_Field(l.KEY_NUMBER);
-			self.REC_SEQ_NUM                     := Map_Signed_Field(l.REC_SEQ_NUM);
-			self.DRIVER_RECORD_DELETE_DATE       := l.DRIVER_RECORD_DELETE_DATE;
-			self.DRIVERS_DETAIL_RECORD_TYPE_CODE := l.DRIVERS_DETAIL_RECORD_TYPE_CODE;
-			self.OFFENSE_VIOLATION_DATE          := l.payload[1..8];
-			self.PLATE_NUMBER                    := l.payload[9..16];
-			self.CONVICTION_DATE                 := l.payload[17..24];
-			self.COURT_CODE                      := l.payload[25..30];
-			self.DRIVERS_OHIO_OFFENSE_CONVICTION := l.payload[31..33];
-			self.DRIVERS_SENTENCE_CODE           := l.payload[34..34];
-			self.COURT_ASSESSED_POINTS           := Map_Signed_Field(l.payload[35..36]);
-			self.HAZARDOUS_MATERIALS_FLAG        := l.payload[37..37];
-			self.DRIVERS_BATCH_NUMBER            := l.payload[38..43];
-			self.CONVICTION_PLEA_FLAG            := l.payload[44..44];
-			self.COURT_CASE_NUMBER               := l.payload[45..60];
-			self.ACD_OFFENSE_CODE                := l.payload[61..63];
-			self.ACD_CONVICTION_OFFENSE_DETAILS  := Map_Signed_Field(l.payload[64..68]);
-			self.DRIVERS_COMMERCIAL_VEHICLE_IND  := l.payload[69..69];
-			self.DRIVERS_REFERENCE_LOCATOR_NBR   := l.payload[70..87];
-			self.OFFENSE_REDUCED_FROM_CODE       := l.payload[88..90];
-			self.DATABASE_RECORD_CREATE_DATE     := l.payload[91..98];
-			self.MERGED_FROM_KEYNUMBER           := Map_Signed_Field(l.payload[99..107]);
-			self.BMV_S1_CASE_NUMBER              := l.payload[108..117];
-			self.BMV_P2_CASE_NUMBER              := l.payload[118..127];
-			self.BMV_P3_CASE_NUMBER              := l.payload[128..137];
-			self.BMV_DL_CASE_NUMBER              := l.payload[138..147];
-			self.BMV_HABITUAL_CASE_NUMBER        := l.payload[148..157];
-			self.PROOF_FILING_SHOWN_DATE         := l.payload[158..165];
-			self.RECORD_EXPUNGED_DATE            := l.payload[166..173];
-			self.JURISDICTION_CODE               := l.payload[174..175];
-			self.SOA_CONVICTION_WITHDRAWL_OFFENSE:= l.payload[176..183];
-			self.COURT_TYPE_CODE                 := l.payload[184..187];
-			self.BMV_SP_CASE_NUMBER              := l.payload[188..197];
-			self.PROGRAM_ID                      := l.payload[198..201];
-			self.SYSTEM_DATE_TIME_STAMP          := l.payload[202..217];
-			self.USER_IDENTIFICATION_CODE        := l.payload[218..223];
-			self.OUT_OF_STATE_DRIVER_LICENSE_NBR := l.payload[224..248];
-			self.STATE_OF_ORIGIN                 := l.payload[249..250];
-			self.SUSPENSION_CLASS_CODE           := l.payload[251..251];  //string1
-			self.COURT_ORDERED_REMEDIAL_COURSE   := l.payload[252..252]; //string1
-			//self.FILLER                          := l.payload[253..578];
-			self                                 := l;
-			self := [];
-   end;
-  
-   export file_Oh_Conviction := project(in_OH_Convictions, trfOHConv(left));
-   
-   Layout_Conviction_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Convictions;
-   
-   Layout_Conviction_Common trfOHToConvictions(file_Oh_Conviction l) := transform
-			self.process_date         := StringLib.stringFilter(l.process_date, '0123456789');
-			self.dt_first_seen        := self.process_date;
-			self.dt_last_seen         := self.process_date;
-			self.src_state            := 'OH';
-			self.DLCP_KEY             := trim(l.KEY_NUMBER, left, right);
-			self.TYPE_CD              := StringLib.StringToUpperCase(trim(l.DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right));
-			self.TYPE_DESC            := StringLib.StringToUpperCase(Tables_CP_OH.RECORD_TYPE_CODE(self.TYPE_CD));
-			self.VIOLATION_DATE       := StringLib.stringFilter(l.OFFENSE_VIOLATION_DATE, '0123456789');
-			self.PLATE_NBR            := StringLib.StringToUpperCase(trim(l.PLATE_NUMBER,left,right));
-			self.CONVICTION_DATE      := StringLib.stringFilter(l.CONVICTION_DATE, '0123456789');
-			self.COURT_COUNTY         := StringLib.StringToUpperCase(trim(l.COURT_CODE,left,right));
-			self.COURT_TYPE_CD        := StringLib.StringToUpperCase(trim(l.COURT_TYPE_CODE,left,right));
-			self.COURT_TYPE_DESC      := StringLib.StringToUpperCase(Tables_CP_OH.COURT_TYPE_CODE(SELF.COURT_TYPE_CD));
-			self.ST_OFFENSE_CONV_CD   := StringLib.StringToUpperCase(trim(l.DRIVERS_OHIO_OFFENSE_CONVICTION,left,right));
-			self.ST_OFFENSE_CONV_DESC := StringLib.StringToUpperCase(Tables_CP_OH.OFFENSE_CONV_CODE(self.ST_OFFENSE_CONV_CD));
-			self.SENTENCE             := StringLib.StringToUpperCase(trim(l.DRIVERS_SENTENCE_CODE,left,right));
-			self.SENTENCE_DESC        := StringLib.StringToUpperCase(Tables_CP_OH.SENTENCE_CODE(self.SENTENCE));
-			                          //Modified code to translate the 2nd alpha char code to its equivalent numeric value for points. Bug# 29605 
-			self.POINTS               := StringLib.StringToUpperCase(trim(l.COURT_ASSESSED_POINTS[1])) + 
-			                             DriversV2.Tables_CP_OH.POINT_CODE(StringLib.StringToUpperCase(trim(l.COURT_ASSESSED_POINTS[2])));
-			self.HAZARDOUS_CD         := StringLib.StringToUpperCase(trim(l.HAZARDOUS_MATERIALS_FLAG,left,right));
-			self.HAZARDOUS_DESC       := StringLib.StringToUpperCase(Tables_CP_OH.HAZARDOUS_MAT_FLAG(self.HAZARDOUS_CD));
-			self.PLEA_CD              := StringLib.StringToUpperCase(trim(l.CONVICTION_PLEA_FLAG,left,right));
-			self.PLEA_DESC            := StringLib.StringToUpperCase(Tables_CP_OH.CONVICTION_PLEA_FLAG(self.PLEA_CD));
-			self.COURT_CASE_NBR       := StringLib.StringToUpperCase(trim(l.COURT_CASE_NUMBER,left,right));
-			self.ACD_OFFENSE_CD       := StringLib.StringToUpperCase(trim(l.ACD_OFFENSE_CODE,left,right));
-			self.ACD_OFFENSE_DESC     := StringLib.StringToUpperCase(Tables_CP_OH.ACD_Offense_Codes(self.ACD_OFFENSE_CD));
-			self.VEHICLE_NO           := StringLib.StringToUpperCase(trim(l.DRIVERS_COMMERCIAL_VEHICLE_IND,left,right));
-			self.REDUCED_CD           := StringLib.StringToUpperCase(trim(l.OFFENSE_REDUCED_FROM_CODE,left,right));
-			self.REDUCED_DESC         := '';
-			self.CREATE_DATE          := StringLib.stringFilter(l.DATABASE_RECORD_CREATE_DATE, '0123456789');
-			self.BMV_CASE_NBR_1       := StringLib.StringToUpperCase(trim(l.BMV_S1_CASE_NUMBER,left,right));
-			self.BMV_CASE_NBR_2       := StringLib.StringToUpperCase(trim(l.BMV_P2_CASE_NUMBER,left,right));
-			self.BMV_CASE_NBR_3       := StringLib.StringToUpperCase(trim(l.BMV_P3_CASE_NUMBER,left,right));
-			self.HABITUAL_CASE_NBR    := StringLib.StringToUpperCase(trim(l.BMV_HABITUAL_CASE_NUMBER,left,right));
-			self.FILED_DATE           := StringLib.stringFilter(l.PROOF_FILING_SHOWN_DATE, '0123456789');
-			self.EXPUNGED_DATE        := StringLib.stringFilter(l.RECORD_EXPUNGED_DATE, '0123456789');
-			self.JURISDICTION         := StringLib.StringToUpperCase(trim(l.JURISDICTION_CODE,left,right));
-			self.SOA_CONVICTION       := StringLib.StringToUpperCase(trim(l.SOA_CONVICTION_WITHDRAWL_OFFENSE,left,right));
-			self.BMV_SP_CASE_NBR      := StringLib.StringToUpperCase(trim(l.BMV_SP_CASE_NUMBER,left,right));
-			self.OUT_OF_STATE_DL_NBR  := StringLib.StringToUpperCase(trim(l.OUT_OF_STATE_DRIVER_LICENSE_NBR,left,right));
-			self.STATE_OF_ORIGIN      := StringLib.StringToUpperCase(trim(l.STATE_OF_ORIGIN,left,right));
-			self                      := l;
-			self                      := [];	  
-   end;
-   
-   Oh_As_Conviction := project(file_Oh_Conviction, trfOHToConvictions(left));
-   
-   export OH_As_Convictions := Oh_As_Conviction;
-   
-   
-   //**************** SUSPENSIONS Mapping **********************************************************************************
-   Suspension_Type_Cd := Tables_CP_OH.Suspension_Type_Cd;
-   
-   in_OH_Suspention := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Suspension_Type_Cd);
-   
-   Layout_Oh_Susp_out := Layouts_DL_OH_In.Layout_OH_SUSPENSIONS;
-   
-   Layout_Oh_Susp_out trfOHSusp(in_OH_Suspention l) := transform
-			self.process_date                    := l.process_date;
-			self.KEY_NUMBER                      := Map_Signed_Field(l.KEY_NUMBER);
-			self.REC_SEQ_NUM                     := Map_Signed_Field(l.REC_SEQ_NUM);
-			self.DRIVER_RECORD_DELETE_DATE       := l.DRIVER_RECORD_DELETE_DATE;
-			self.DRIVERS_DETAIL_RECORD_TYPE_CODE := l.DRIVERS_DETAIL_RECORD_TYPE_CODE;
-			self.OFFENSE_VIOLATION_DATE          := l.payload[1..8];
-			self.CLEAR_DATE                      := l.payload[9..16];
-			self.PROOF_FILING_SHOWN_DATE         := l.payload[17..24];
-			self.RECORD_TYPE_ACTION_DATE         := l.payload[25..32];
-			self.START_DATE_FROM                 := l.payload[33..40];
-			self.END_DATE_TO                     := l.payload[41..48];
-			self.BMV_CASE_NUMBER                 := l.payload[49..58];
-			self.COURT_CASE_NUMBER               := l.payload[59..74];
-			self.COURT_CODE                      := l.payload[75..80];
-			self.DRIVERS_OHIO_OFFENSE_CONVICTION := l.payload[81..83];
-			self.DRIVERS_COMMERCIAL_VEHICLE_IND  := l.payload[84..84];
-			self.HAZARDOUS_MATERIALS_FLAG        := l.payload[85..85];
-			self.JURISDICTION_CODE               := l.payload[86..87];
-			self.FEE_PAID_DATE                   := l.payload[88..95];
-			self.DRIVERS_RECEIPT_NUMBER          := l.payload[96..105];
-			self.PLATE_NUMBER                    := l.payload[106..113];
-			self.CDL_DISQUALIFICATION_REASON_CODE:= l.payload[114..116];
-			self.CDL_OUT_OF_STATE_DISQUAL_TYPE   := l.payload[117..119];
-			self.DRIVERS_DISQUALIFICATION_EXTEN  := l.payload[120..120];
-			self.DRIVERS_DISQUAL_REASON_REFEREN  := l.payload[121..128];
-			self.DRIVERS_REFERENCE_LOCATOR_NUMBER:= l.payload[129..146];
-			self.SCHOOL_DISTRICT_NUMBER          := Map_Signed_Field(l.payload[147..152]);
-			self.WITHDRAWAL_CLEARANCE_REASON     := l.payload[153..153];
-			self.NAIC_INSURANCE_CODE             := l.payload[154..158];
-			self.INSURANCE_BOND_FILING_INDICATOR := l.payload[159..159];
-			self.CLEARED_FOR_RESTRICTED_DRIVING  := l.payload[160..167];
-			self.WITHDRAWAL_REASON_CODE          := Map_Signed_Field(l.payload[168..170]);
-			self.DRIVERS_REMEDIAL_DRIVING_COURSE := l.payload[171..178];
-			self.DRIVERS_LICENSE_EXAM_DATE       := l.payload[179..186];
-			self.ACD_OFFENSE_CODE                := l.payload[187..189];
-			self.WITHDRAWAL_STATUS_CODE          := l.payload[190..190];
-			self.MODIFIED_DRIVING_DATE           := l.payload[191..198];
-			self.SETTLEMENT_AGREEMENT_DATE       := l.payload[199..206];
-			self.DRIVERS_RESTRICTION_CODE        := l.payload[207..208];
-			self.CONVICTION_DATE                 := l.payload[209..216];
-			self.APPEAL_FILED_DATE               := l.payload[217..224];
-			self.APPEAL_DENIED_DATE              := l.payload[225..232];
-			self.APPEAL_GRANTED_DATE             := l.payload[233..240];
-			self.CONVICTION_PLEA_FLAG            := l.payload[241..241];
-			self.DRIVERS_SUSPENSION_REVOCATION   := l.payload[242..242];
-			self.COUNTY_NUMBER                   := l.payload[243..244];
-			self.DRIVERS_ARREST_DATE             := l.payload[245..252];
-			self.DRIVERS_LICENSE_NUMBER          := l.payload[253..260];
-			self.MERGED_FROM_KEYNUMBER           := Map_Signed_Field(l.payload[261..269]);
-			self.DATABASE_RECORD_CREATE_DATE     := l.payload[270..277];
-			self.DRIVERS_LICENSE_RECEIVED_DATE   := l.payload[278..285];
-			self.PLATE_RECEIVED_DATE             := l.payload[286..293];
-			self.FRA_SUSPENSION_START_DATE       := l.payload[294..301];
-			self.FRA_SUSPENSION_END_DATE         := l.payload[302..309];
-			self.DRIVERS_ACCIDENT_DATE           := l.payload[310..317];
-			self.RELATED_BMV_CASE_NUMBER_1       := l.payload[318..327];
-			self.NARRATIVE_LITERAL_CODE          := l.payload[328..328];
-			self.FEE_REQUIRED_FLAG               := l.payload[329..329];
-			self.VEHICLE_OWNER_INDICATOR         := l.payload[330..330];
-			self.SOA_CONV_WITHDRAWAL_OFFENSE     := l.payload[331..338];
-			self.RECORD_EXPUNGED_DATE            := l.payload[339..346];
-			self.DRIVERS_BATCH_NUMBER            := l.payload[347..352];
-			self.INQUIRY_REFERRAL_CODE           := l.payload[353..353];
-			self.MODIFIED_DRIVING_END_DATE       := l.payload[354..361];
-			self.APPEAL_SUSPENSION_STAY_FLAG     := l.payload[362..362];
-			self.FEE_RECORD_SEQUENCE_NUM_BMV     := Map_Signed_Field(l.payload[363..365]);
-			self.FRA_RECORD_SEQUENCE_NUM_BMV     := Map_Signed_Field(l.payload[366..368]);
-			self.C1_SEQUENCE_NUMBER              := Map_Signed_Field(l.payload[369..371]);
-			self.WITHDRAWAL_TYPE_DETAIL          := Map_Signed_Field(l.payload[372..374]);
-			self.HIGHWAY_PATROL_LIC_CANCELLATION := l.payload[375..375];
-			self.BMV_DL_CASE_NUMBER              := l.payload[376..385];
-			self.RELATED_BMV_CASE_NUMBER_2       := l.payload[386..395];
-			self.PROGRAM_ID                      := l.payload[396..399];
-			self.SYSTEM_DATE_TIME_STAMP          := l.payload[400..415];
-			self.USER_IDENTIFICATION_CODE        := l.payload[416..421];
-			self.FIND_PAID_DATE                  := l.payload[422..429];
-			self.MAIL_BY_DATE                    := l.payload[430..437];
-			self.CHILD_SUPPORT_ENFORCE_AGENCY    := Map_Signed_Field(l.payload[438..441]);
-			self.CHILD_SUPPORT_ENFORCE_CASE_NBR  := Map_Signed_Field(l.payload[442..451]);
-			self.CHILD_SUPPORT_ENFORCE_ORDER_NBR := l.payload[452..468];
-			self.CHILD_SUPP_ENF_PARTICIPANT_NBR  := Map_Signed_Field(l.payload[469..480]);
-			self.SIX_POINT_LETTER_DATE           := l.payload[481..488]; //string8
-			self.APPEAL_HEARING_DEADLINE_DATE    := l.payload[489..496]; //string8
-			self.REMEDIAL_DRIVING_SCHOOL_CERTIF  := l.payload[497..502]; //string6
-			self.COURT_APPEARANCE_EFFECTIVE_DATE := l.payload[503..510]; //string8
-			self.SUSPENSION_CLASS_CODE           := l.payload[511..511]; //string1
-			self.BLOCKING_TYPE_CODE              := l.payload[512..512]; //string1
-			self.MODIFY_ORDER_BY_CODE            := l.payload[513..518]; //string6
-			//self.FILLER                          := l.payload[519..578]; //string60
-			self                                 := l;
-			self                                 := [];
-   end;
-  
-   export file_Oh_Suspension := project(in_OH_Suspention, trfOHSusp(left));
-   
-   Layout_Suspension_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Suspensions;
-   
-   Layout_Suspension_Common trfOHToSuspension(file_Oh_Suspension l) := transform
-			self.process_date           := StringLib.stringFilter(l.process_date, '0123456789');
-			self.dt_first_seen          := self.process_date;
-			self.dt_last_seen           := self.process_date;
-			self.src_state              := 'OH';	  
-			self.DLCP_KEY               := trim(l.KEY_NUMBER, left, right);
-			self.TYPE_CD                := StringLib.StringToUpperCase(trim(l.DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right));
-			self.TYPE_DESC              := StringLib.StringToUpperCase(Tables_CP_OH.RECORD_TYPE_CODE(self.TYPE_CD));
-			self.VIOLATION_DATE         := StringLib.stringFilter(l.OFFENSE_VIOLATION_DATE, '0123456789');
-			self.FILED_DATE             := StringLib.stringFilter(l.PROOF_FILING_SHOWN_DATE, '0123456789');  
-			self.CLEAR_DATE             := StringLib.stringFilter(l.CLEAR_DATE, '0123456789');
-			self.ACTION_DATE            := StringLib.stringFilter(l.RECORD_TYPE_ACTION_DATE, '0123456789');
-			self.START_DATE             := StringLib.stringFilter(l.START_DATE_FROM, '0123456789');
-			self.END_DATE               := StringLib.stringFilter(l.END_DATE_TO, '0123456789');	  
-			self.BMV_CASE_NBR_1         := StringLib.StringToUpperCase(trim(l.BMV_CASE_NUMBER,left,right));
-			self.COURT_CASE_NBR         := StringLib.StringToUpperCase(trim(l.COURT_CASE_NUMBER,left,right));
-			self.COURT_NAME_CD          := StringLib.StringToUpperCase(trim(l.COURT_CODE,left,right));
-			self.COURT_NAME_DESC        := StringLib.StringToUpperCase('');	  
-			self.COURT_COUNTY           := StringLib.StringToUpperCase(trim(l.COURT_CODE,left,right));
-			self.COURT_TYPE             := StringLib.StringToUpperCase(trim(l.COURT_CODE,left,right));	  
-			self.ST_OFFENSE_CONV_CD     := StringLib.StringToUpperCase(trim(l.DRIVERS_OHIO_OFFENSE_CONVICTION,left,right));
-			self.ST_OFFENSE_CONV_DESC   := StringLib.StringToUpperCase(Tables_CP_OH.OFFENSE_CONV_cODE(self.ST_OFFENSE_CONV_CD));
-			self.VEHICLE_NO_CD          := StringLib.StringToUpperCase(trim(l.DRIVERS_COMMERCIAL_VEHICLE_IND,left,right));
-			self.VEHICLE_NO_DESC        := StringLib.StringToUpperCase(Tables_CP_OH.VEHICLE_IND_CODE(self.VEHICLE_NO_CD));	  
-			self.HAZARDOUS_CD           := StringLib.StringToUpperCase(trim(l.HAZARDOUS_MATERIALS_FLAG,left,right));
-			self.HAZARDOUS_DESC         := StringLib.StringToUpperCase(Tables_CP_OH.HAZARDOUS_MAT_FLAG(self.HAZARDOUS_CD));
-			self.JURISDICTION           := StringLib.StringToUpperCase(trim(l.JURISDICTION_CODE,left,right));
-			self.FEE_PD_DATE            := StringLib.stringFilter(l.FEE_PAID_DATE, '0123456789');
-			self.PLATE_NBR              := StringLib.StringToUpperCase(trim(l.PLATE_NUMBER,left,right));
-			self.CDL_DISQ_REASON_CD     := StringLib.StringToUpperCase(trim(l.CDL_DISQUALIFICATION_REASON_CODE,left,right));
-			self.CDL_DISQ_REASON_DESC   := StringLib.StringToUpperCase(Tables_CP_OH.CDI_DISQ_REASON_CODE(self.CDL_DISQ_REASON_CD));
-			self.CDL_OFS_DISQUAL_REASON_CD   := StringLib.StringToUpperCase(trim(l.CDL_OUT_OF_STATE_DISQUAL_TYPE,left,right));
-			self.CDL_OFS_DISQUAL_REASON_DESC := StringLib.StringToUpperCase(Tables_CP_OH.CDI_OOS_DISQ_TYPE(self.CDL_OFS_DISQUAL_REASON_CD));
-			self.DISQ_EXT_CD            := StringLib.StringToUpperCase(trim(l.DRIVERS_DISQUALIFICATION_EXTEN,left,right));
-			self.DISQ_EXT_DESC          := StringLib.StringToUpperCase('');
-			self.DISQ_REASON_REF        := StringLib.StringToUpperCase(trim(l.DRIVERS_DISQUAL_REASON_REFEREN,left,right));
-			self.DISQ_REASON_DESC       := StringLib.StringToUpperCase('');
-			self.SD_NBR                 := AllZeroClean(StringLib.StringToUpperCase(trim(l.SCHOOL_DISTRICT_NUMBER,left,right)));
-			self.WD_CLEAR_REASON_CD     := StringLib.StringToUpperCase(trim(l.WITHDRAWAL_CLEARANCE_REASON,left,right));
-			self.WD_CLEAR_REASON_DESC   := StringLib.StringToUpperCase(Tables_CP_OH.WD_CLE_REASON_CODE(self.WD_CLEAR_REASON_CD));
-			self.NAIC_INS_CD            := StringLib.StringToUpperCase(trim(l.NAIC_INSURANCE_CODE,left,right));
-			self.NAIC_INS_DESC          := StringLib.StringToUpperCase(Tables_CP_OH.INSURANCE_CODE(self.NAIC_INS_CD));
-			self.INS_BND_FILING_IND     := StringLib.StringToUpperCase(trim(l.INSURANCE_BOND_FILING_INDICATOR,left,right));
-			self.CLEARED_DATE           := StringLib.stringFilter(l.CLEARED_FOR_RESTRICTED_DRIVING, '0123456789');
-			self.WD_REASON_CD           := StringLib.StringToUpperCase(trim(l.WITHDRAWAL_REASON_CODE,left,right));
-			self.WD_REASON_DESC         := StringLib.StringToUpperCase(Tables_CP_OH.WD_REASON_CODE(SELF.WD_REASON_CD));
-			self.REMEDIAL_DRV_CRS_DT    := StringLib.StringToUpperCase(trim(l.DRIVERS_REMEDIAL_DRIVING_COURSE,left,right));
-			self.EXAM_DATE              := StringLib.stringFilter(l.DRIVERS_LICENSE_EXAM_DATE, '0123456789');
-			self.ACD_OFFENSE_CD         := StringLib.StringToUpperCase(trim(l.ACD_OFFENSE_CODE,left,right));
-			self.ACD_OFFENSE_DESC       := StringLib.StringToUpperCase(Tables_CP_OH.ACD_Offense_Codes(self.ACD_OFFENSE_CD));
-			self.WD_STATUS_CD           := StringLib.StringToUpperCase(trim(l.WITHDRAWAL_STATUS_CODE,left,right));
-			self.WD_STATUS_DESC         := StringLib.StringToUpperCase(Tables_CP_OH.Withdrawal_Status_Code(self.WD_STATUS_CD));
-			self.MOD_DRV_DATE           := StringLib.stringFilter(l.MODIFIED_DRIVING_DATE, '0123456789');
-			self.SETTLE_AGREE_DATE      := StringLib.stringFilter(l.SETTLEMENT_AGREEMENT_DATE, '0123456789');
-			self.RESTRICTION_CD         := StringLib.StringToUpperCase(trim(l.DRIVERS_RESTRICTION_CODE,left,right));
-			self.RESTRICTION_DESC       := StringLib.StringToUpperCase(Tables_CP_OH.RESTRICTION_CODE(self.RESTRICTION_CD));
-			self.CONVICTION_DATE        := StringLib.stringFilter(l.CONVICTION_DATE, '0123456789');
-			self.APPEAL_FILE_DATE       := StringLib.stringFilter(l.APPEAL_FILED_DATE, '0123456789');
-			self.APPEAL_DENY_DATE       := StringLib.stringFilter(l.APPEAL_DENIED_DATE, '0123456789');
-			self.APPEAL_GRANTED_DATE    := StringLib.stringFilter(l.APPEAL_GRANTED_DATE, '0123456789');
-			self.PLEA_CD                := StringLib.StringToUpperCase(trim(l.CONVICTION_PLEA_FLAG,left,right));
-			self.PLEA_DESC              := StringLib.StringToUpperCase(Tables_CP_OH.CONVICTION_PLEA_FLAG(self.PLEA_CD));
-			self.SUSPENSION_REVOCATION  := StringLib.StringToUpperCase(trim(l.DRIVERS_SUSPENSION_REVOCATION,left,right));
-			self.COUNTY_CD              := StringLib.StringToUpperCase(trim(l.COUNTY_NUMBER,left,right));
-			self.COUNTY_DESC            := StringLib.StringToUpperCase('');
-			self.ARREST_DATE            := StringLib.stringFilter(l.DRIVERS_ARREST_DATE, '0123456789');
-			self.LICENSE_NUMBER         := StringLib.StringToUpperCase(trim(l.DRIVERS_LICENSE_NUMBER,left,right));
-			self.CREATE_DATE            := StringLib.stringFilter(l.DATABASE_RECORD_CREATE_DATE, '0123456789');
-			self.LICENSE_REC_DATE       := StringLib.stringFilter(l.DRIVERS_LICENSE_RECEIVED_DATE, '0123456789');
-			self.PLATE_REC_DATE         := StringLib.stringFilter(l.PLATE_RECEIVED_DATE, '0123456789');
-			self.FRA_SUP_START_DATE     := StringLib.stringFilter(l.FRA_SUSPENSION_START_DATE, '0123456789');
-			self.FRA_SUP_END_DATE       := StringLib.stringFilter(l.FRA_SUSPENSION_END_DATE, '0123456789');
-			self.ACCIDENT_DATE          := StringLib.stringFilter(l.DRIVERS_ACCIDENT_DATE, '0123456789');
-			self.RELATED_BMV_CASE_NBR   := StringLib.StringToUpperCase(trim(l.RELATED_BMV_CASE_NUMBER_1,left,right));
-			self.NARRATIVE_CD           := StringLib.StringToUpperCase(trim(l.NARRATIVE_LITERAL_CODE,left,right));
-			self.NARRATIVE_DESC         := StringLib.StringToUpperCase(Tables_CP_OH.NARRATIVE_CODE(self.NARRATIVE_CD));
-			self.FEE_REQUIRED           := StringLib.StringToUpperCase(trim(l.FEE_REQUIRED_FLAG,left,right));
-			self.VEHICLE_OWNER_IND      := StringLib.StringToUpperCase(trim(l.VEHICLE_OWNER_INDICATOR,left,right));
-			self.SOA_CONVICTION         := StringLib.StringToUpperCase(trim(l.SOA_CONV_WITHDRAWAL_OFFENSE,left,right));
-			self.EXPUNGED_DATE          := StringLib.stringFilter(l.RECORD_EXPUNGED_DATE, '0123456789');
-			self.MODIFIED_DRV_END_DT    := StringLib.stringFilter(l.MODIFIED_DRIVING_END_DATE, '0123456789');
-			self.APPEAL_SUP_STAY        := StringLib.StringToUpperCase(trim(l.APPEAL_SUSPENSION_STAY_FLAG,left,right)); 
-			self.WD_TYPE_DETAIL         := AllZeroClean(StringLib.StringToUpperCase(trim(l.WITHDRAWAL_TYPE_DETAIL,left,right)));
-			self.HP_LICENSE_CANCEL      := StringLib.StringToUpperCase(trim(l.HIGHWAY_PATROL_LIC_CANCELLATION,left,right));
-			self.BMV_DL_CASE_NBR        := StringLib.StringToUpperCase(trim(l.BMV_DL_CASE_NUMBER,left,right));
-			self.RELATED_BMV_CASE_NBR_2 := StringLib.StringToUpperCase(trim(l.RELATED_BMV_CASE_NUMBER_2,left,right));
-			self.FINE_PAID_DATE         := StringLib.stringFilter(l.FIND_PAID_DATE, '0123456789');
-			self.CSEA                   := AllZeroClean(StringLib.StringToUpperCase(trim(l.CHILD_SUPPORT_ENFORCE_AGENCY,left,right)));
-			self.CSEA_CASE_NBR          := AllZeroClean(StringLib.StringToUpperCase(trim(l.CHILD_SUPPORT_ENFORCE_CASE_NBR,left,right)));
-			self.CSEA_ORDER_NBR         := AllZeroClean(StringLib.StringToUpperCase(trim(l.CHILD_SUPPORT_ENFORCE_ORDER_NBR,left,right)));
-			self.CSEA_PART_NBR          := AllZeroClean(StringLib.StringToUpperCase(trim(l.CHILD_SUPP_ENF_PARTICIPANT_NBR,left,right)));
-			self                        := l;
-			self                        := [];	  
-   end;
-   
-   Oh_Suspension := project(file_Oh_Suspension, trfOHToSuspension(left));
-   
-   export OH_As_Suspension := Oh_Suspension;
-   
-   //**************** DRIVER RECORD INFORMATION Mapping ********************************************************************
-   DR_Info_Type_Cd := Tables_CP_OH.DR_Info_Type_Cd;
-   
-   in_OH_DR_Info := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in DR_Info_Type_Cd);
-   
-   Layout_Oh_DR_Info_out := Layouts_DL_OH_In.Layout_OH_DR_INFo;
-   
-   Layout_Oh_DR_Info_out trfOHDRInfo(in_OH_DR_Info l) := transform
-			self.process_date                    := l.process_date;
-			self.KEY_NUMBER                      := Map_Signed_Field(l.KEY_NUMBER);
-			self.REC_SEQ_NUM                     := Map_Signed_Field(l.REC_SEQ_NUM);
-			self.DRIVER_RECORD_DELETE_DATE       := l.DRIVER_RECORD_DELETE_DATE;
-			self.DRIVERS_DETAIL_RECORD_TYPE_CODE := l.DRIVERS_DETAIL_RECORD_TYPE_CODE;
-			self.FREE_FORM_NARRATIVE_TEXT        := l.payload[1..150];
-			self.RECORD_TYPE_ACTION_DATE         := l.payload[151..158];
-			self.DRIVERS_COSIGNERS_RELATIONSHIP  := l.payload[159..159];
-			self.DRIVERS_COSIGNERS_NAME          := l.payload[160..194];
-			self.COSIGNERS_DRIVERS_LICENSE_NBR   := l.payload[195..202];
-			self.MICROFILM_NUMBER                := l.payload[203..208];
-			self.DATABASE_RECORD_CREATE_DATE     := l.payload[209..216];
-			self.MERGED_FROM_KEYNUMBER           := Map_Signed_Field(l.payload[217..225]);	   
-			self.OUT_OF_STATE_DL_DATE_OF_ISSUANCE:= l.payload[226..233];
-			self.PERSONS_NEW_STATE_OF_RECORD     := l.payload[234..235];	   
-			self.OUT_OF_STATE_DL_NBR             := l.payload[236..260];	   
-			self.DRIVERS_LICENSE_NUMBER          := l.payload[261..268];	   
-			self.REMEDIAL_REQUIREMENTS_COMPLETE  := l.payload[269..276];
-			self.REMEDIAL_REQUIRE_DENIED_DATE    := l.payload[277..284];	   
-			self.DOCUMENT_MAILED_DATE            := l.payload[285..292];	   
-			self.RECORD_EXPUNGED_DATE            := l.payload[293..300];	   
-			self.BMV_CASE_NUMBER                 := l.payload[301..310];	   
-			self.COURT_CASE_NUMBER               := l.payload[311..326];	   
-			self.COURT_CODE                      := l.payload[327..332];
-			self.CLEAR_DATE                      := l.payload[333..340];	   
-			self.DRIVERS_BATCH_NUMBER            := l.payload[341..346];	   
-			self.PROGRAM_ID                      := l.payload[347..350];	   
-			self.SYSTEM_DATE_TIME_STAMP          := l.payload[351..366];	   
-			self.USER_IDENTIFICATION_CODE        := l.payload[367..372];	   
-			self.WARRANT_BLOCK_EFFECTIVE_DATE    := l.payload[373..380];
-			self.NARRATIVE_RECORD_DISPLAY_FLAG   := l.payload[381..381];
-			self.REMEDIAL_DRIVING_SCHOOL_CERTIF  := l.payload[382..387]; //string6   
-			self.RETENTION_DATE                  := l.payload[388..395];//string8   
-			self.COURT_ORDERED_REMEDIAL_COURSE   := l.payload[396..396];//string1   
-			self.PAYMENT_PLAN_CODE               := l.payload[397..397];//string1   
-			self.PAYMENT_PLAN_START_DATE         := l.payload[398..405];//string8   
-			self.PAYMENT_PLAN_END_DATE           := l.payload[406..413];//string8   
-			self.MODIFIED_DRIVING_DATE           := l.payload[414..421];//string8   
-			self.MODIFIED_DRIVING_END_DATE       := l.payload[422..429];//string8   
-			self.NOTIFY_COURT_FLAG               := l.payload[430..430];//string1   
-			self.PAYMENT_PLAN_TERMINATION_DATE   := l.payload[431..438];//string8   
-			self.FEE_REQUIRED_FLAG               := l.payload[439..439];//string1   
-			self.FEE_PAID_DATE                   := l.payload[440..447];//string8   
-			self.RELEASE_DATE                    := l.payload[448..455];//string8   
-			self.BANKRUPTCY_FLAG                 := l.payload[456..456];//string1   
-			self.FAILURE_TO_REINSTATE_DATE       := l.payload[457..464];//string8   
-			//self.FILLER                          := l.payload[465..578];//string114 
-			self                                 := l;
-			self  															 := [];
-   end;
-  
-   export file_Oh_DR_Info := project(in_OH_DR_Info, trfOHDRInfo(left));
-   
-   Layout_DR_Info_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Driver_Record_Info;
-   
-   Layout_DR_Info_Common trfOHToDR_Info(file_Oh_DR_Info l) := transform
-			self.process_date            := StringLib.stringFilter(l.process_date, '0123456789');
-			self.dt_first_seen           := self.process_date;
-			self.dt_last_seen            := self.process_date;
-			self.src_state               := 'OH';	  
-			self.DLCP_KEY                := trim(l.KEY_NUMBER, left, right);
-			self.TYPE_CD                 := StringLib.StringToUpperCase(trim(l.DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right));
-			self.TYPE_DESC               := StringLib.StringToUpperCase(Tables_CP_OH.RECORD_TYPE_CODE(self.TYPE_CD));
-			self.ACTION_DATE             := StringLib.stringFilter(l.RECORD_TYPE_ACTION_DATE, '0123456789');
-			self.BMV_CASE_NBR_1          := StringLib.StringToUpperCase(trim(l.BMV_CASE_NUMBER,left,right));
-			self.CLEAR_DATE              := StringLib.stringFilter(l.CLEAR_DATE, '0123456789');	  
-			self.COSIGNERS_DL_NBR        := StringLib.StringToUpperCase(trim(l.COSIGNERS_DRIVERS_LICENSE_NBR,left,right));      
-			self.COSIGNERS_NAME          := StringLib.StringToUpperCase(trim(l.DRIVERS_COSIGNERS_NAME,left,right));	  
-			self.COSIGNERS_RELATIONSHIP  := StringLib.StringToUpperCase(trim(l.DRIVERS_COSIGNERS_RELATIONSHIP,left,right));	  
-			self.COURT_CASE_NBR          := StringLib.StringToUpperCase(trim(l.COURT_CASE_NUMBER,left,right));
-			self.CREATE_DATE             := StringLib.stringFilter(l.DATABASE_RECORD_CREATE_DATE, '0123456789');
-			self.DL_NBR                  := StringLib.StringToUpperCase(trim(l.DRIVERS_LICENSE_NUMBER,left,right));
-			self.EXPUNGED_DATE           := StringLib.stringFilter(l.RECORD_EXPUNGED_DATE, '0123456789');
-			self.MAILED_DATE             := StringLib.stringFilter(l.DOCUMENT_MAILED_DATE, '0123456789');
-			self.NARRATIVE               := StringLib.StringToUpperCase(trim(l.FREE_FORM_NARRATIVE_TEXT,left,right));
-			self.OUT_OF_STATE_DL_NBR     := StringLib.StringToUpperCase(trim(l.OUT_OF_STATE_DL_NBR,left,right));
-			self.REMEDIAL_REQUIRE_COMP   := StringLib.StringToUpperCase(trim(l.REMEDIAL_REQUIREMENTS_COMPLETE,left,right));            
-			self.REMEDIAL_REQUIRE_DENIED := StringLib.stringFilter(l.REMEDIAL_REQUIRE_DENIED_DATE, '0123456789');
-			self.WARRANT_EFF_DATE        := StringLib.stringFilter(l.WARRANT_BLOCK_EFFECTIVE_DATE, '0123456789');
-			self                         := l;
-   end;
-   
-   Oh_DR_Info := project(file_Oh_DR_Info, trfOHToDR_Info(left));
-   
-   export OH_As_DR_Info := Oh_DR_Info;
-   
-   //**************** ACCIDENT Mapping *************************************************************************************
-   Accident_Type_Cd := Tables_CP_OH.Accident_Type_Cd;
-   
-   in_OH_Accident := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) in Accident_Type_Cd);
-   
-   Layout_Oh_Accident_out := Layouts_DL_OH_In.Layout_OH_ACCIDENT;
-   
-   Layout_Oh_Accident_out trfOHRawToAccident(in_OH_Accident l) := transform
-			self.process_date                    := l.process_date;
-			self.KEY_NUMBER                      := Map_Signed_Field(l.KEY_NUMBER);
-			self.REC_SEQ_NUM                     := Map_Signed_Field(l.REC_SEQ_NUM);
-			self.DRIVER_RECORD_DELETE_DATE       := l.DRIVER_RECORD_DELETE_DATE;
-			self.DRIVERS_DETAIL_RECORD_TYPE_CODE := l.DRIVERS_DETAIL_RECORD_TYPE_CODE;	   
-			self.COUNTY_NUMBER                   := l.payload[1..2];
-			self.JURISDICTION_CODE               := l.payload[3..4];
-			self.DRIVERS_ACCIDENT_SEVERITY_IND   := l.payload[5..5];
-			self.DRIVERS_ACCIDENT_DATE           := l.payload[6..13];	   
-			self.DRIVERS_COMMERCIAL_VEHICLE_IND  := l.payload[14..14];
-			self.HAZARDOUS_MATERIALS_FLAG        := l.payload[15..15];	   
-			self.DRIVERS_REFERENCE_LOCATOR_NBR   := l.payload[16..33];	   
-			self.DATABASE_RECORD_CREATE_DATE     := l.payload[34..41];	   
-			self.MERGED_FROM_KEYNUMBER           := Map_Signed_Field(l.payload[42..50]);	   
-			self.A1_CHANGED_TO_L1_DATE           := l.payload[51..58];	   
-			self.BMV_CASE_NUMBER                 := l.payload[59..68];	   
-			self.RECORD_EXPUNGED_DATE            := l.payload[69..76];	   
-			self.PROGRAM_ID                      := l.payload[77..80];
-			self.SYSTEM_DATE_TIME_STAMP          := l.payload[81..96];	   
-			self.USER_IDENTIFICATION_CODE        := l.payload[97..102];       
-			self.FILLER                          := l.payload[103..578];
-			self                                 := l;
-   end;
-  
-   file_Oh_Accident := project(in_OH_Accident, trfOHRawToAccident(left));
-   
-   Layout_Accident_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Accident;
-   
-   Layout_Accident_Common trfOHToAccident(file_Oh_Accident l) := transform
-			self.process_date       := StringLib.stringFilter(l.process_date, '0123456789');
-			self.dt_first_seen      := self.process_date;
-			self.dt_last_seen       := self.process_date;
-			self.src_state          := 'OH';	  
-			self.DLCP_KEY           := trim(l.KEY_NUMBER, left, right);
-			self.TYPE_CD            := StringLib.StringToUpperCase(trim(l.DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right));
-			self.TYPE_DESC          := StringLib.StringToUpperCase(Tables_CP_OH.RECORD_TYPE_CODE(self.TYPE_CD));
-			self.COUNTY             := StringLib.StringToUpperCase(trim(l.COUNTY_NUMBER,left, right));      
-			self.JURISDICTION       := StringLib.StringToUpperCase(trim(l.JURISDICTION_CODE,left,right));
-			self.SEVERITY_CD        := StringLib.StringToUpperCase(trim(l.DRIVERS_ACCIDENT_SEVERITY_IND,left,right));	  
-			self.SEVERITY_DESC      := StringLib.StringToUpperCase(Tables_CP_OH.ACCIDENT_SEVERITY_CODE(self.SEVERITY_CD));
-			self.ACCIDENT_DATE      := StringLib.stringFilter(l.DRIVERS_ACCIDENT_DATE, '0123456789');
-			self.VEHICLE_NO         := StringLib.StringToUpperCase(trim(l.DRIVERS_COMMERCIAL_VEHICLE_IND,left,right));
-			self.HAZARDOUS_CD       := StringLib.StringToUpperCase(trim(l.HAZARDOUS_MATERIALS_FLAG,left,right));
-			self.HAZARDOUS_DESC     := StringLib.StringToUpperCase(Tables_CP_OH.HAZARDOUS_MAT_FLAG(self.HAZARDOUS_CD));            
-			self.CREATE_DATE        := StringLib.stringFilter(l.DATABASE_RECORD_CREATE_DATE, '0123456789');	  
-			self.BMV_CASE_NBR_1     := StringLib.StringToUpperCase(trim(l.BMV_CASE_NUMBER,left, right));
-			self.EXPUNGED_DATE      := StringLib.stringFilter(l.RECORD_EXPUNGED_DATE, '0123456789');
-			self                    := l;
-   end;
-   
-   Oh_Accident := project(file_Oh_Accident, trfOHToAccident(left));
-   
-   export OH_As_Accident := Oh_Accident;
+export Mapping_DL_OH_As_ConvPoints( string  pversion, dataset(DriversV2.Layouts_DL_OH_In.Layout_OH_CP_PDate) in_file) := module
 
-   //**************** FRA Insurance Mapping ********************************************************************************
-   FRA_Insurance_Type_Cd := Tables_CP_OH.Conviction_Type_Cd + 
-														Tables_CP_OH.Suspension_Type_Cd +
-														Tables_CP_OH.DR_Info_Type_Cd +
-														Tables_CP_OH.Accident_Type_Cd;
-   
-   in_OH_FRA_Insurance := in_file(trim(DRIVERS_DETAIL_RECORD_TYPE_CODE,left,right) not in FRA_Insurance_Type_Cd);
-   
-   Layout_Oh_FRA_Insurance_out := Layouts_DL_OH_In.Layout_OH_FRA_Insurance;
-   
-   Layout_Oh_FRA_Insurance_out trfOHRawToFRA(in_OH_FRA_Insurance l) := transform
-			self.process_date                     := l.process_date;
-			self.KEY_NUMBER                       := Map_Signed_Field(l.KEY_NUMBER);
-			self.REC_SEQ_NUM                      := Map_Signed_Field(l.REC_SEQ_NUM);
-			self.DRIVERS_INSURANE_COMPANY_CODE    := Map_Signed_Field(l.DRIVER_RECORD_DELETE_DATE[1..3]);
-			self.PROOF_FILING_START_DATE          := trim(l.DRIVER_RECORD_DELETE_DATE[4..8],left, right) + 
-																							 trim(l.DRIVERS_DETAIL_RECORD_TYPE_CODE,left, right) +
-																							 l.payload[1..1];	   
-			self.PROOF_FILING_END_DATE            := l.payload[2..9];
-			self.DRIVERS_INSURANCE_POLICY_NBR     := l.payload[10..25];
-			self.DRIVERS_PROOF_OF_INS_CANCELATION := l.payload[26..33];
-			self.MERGED_FROM_KEYNUMBER            := Map_Signed_Field(l.payload[34..42]);	   
-			self.DATABASE_RECORD_CREATE_DATE      := l.payload[43..50];	   
-			self.PROGRAM_ID                       := l.payload[51..54];	   
-			self.SYSTEM_DATE_TIME_STAMP           := l.payload[55..70];	   
-			self.USER_IDENTIFICATION_CODE         := l.payload[71..76];
-			self.PROOF_FILING_START_DATE_LATEST   := l.payload[77..84];	   
-			self.DRIVERS_PROOF_CANCEL_POSTED_DATE := l.payload[85..92];	   
-			self.DRIVERS_PROOF_FILING_POSTED_DATE := l.payload[93..100];
-			self.FILLER                           := l.payload[101..578];
-			self                                  := l;
-   end;
-  
-   file_Oh_FRA_Insurance := project(in_OH_FRA_Insurance, trfOHRawToFRA(left));
-   //output(choosen(file_Oh_FRA_Insurance,100));
-   
-   Layout_FRA_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_FRA_Insurance;
-   
-   Layout_FRA_Common trfOHToFRA(file_Oh_FRA_Insurance l) := transform
-			self.process_date          := StringLib.stringFilter(l.process_date, '0123456789');
-			self.dt_first_seen         := self.process_date;
-			self.dt_last_seen          := self.process_date;
-			self.src_state             := 'OH';	  
-			self.DLCP_KEY              := trim(l.KEY_NUMBER, left, right);      
-			self.CANCEL_POSTED_DATE    := StringLib.stringFilter(l.DRIVERS_PROOF_CANCEL_POSTED_DATE, '0123456789');
-			self.CREATE_DATE           := StringLib.stringFilter(l.DATABASE_RECORD_CREATE_DATE, '0123456789');
-			self.FILED_DATE            := StringLib.stringFilter(l.DRIVERS_PROOF_FILING_POSTED_DATE, '0123456789');
-			self.INS_CANCEL_DT         := StringLib.stringFilter(l.DRIVERS_PROOF_OF_INS_CANCELATION, '0123456789');	  
-			self.INS_POLICY_NBR        := StringLib.StringToUpperCase(trim(l.DRIVERS_INSURANCE_POLICY_NBR,left,right));
-			self.INSURANCE_CO_CD       := StringLib.StringToUpperCase(trim(l.DRIVERS_INSURANE_COMPANY_CODE,left,right));
-			self.INSURANCE_CO_DESC     := StringLib.StringToUpperCase(Tables_CP_OH.INSURANCE_CODE(self.INSURANCE_CO_CD));            
-			self.LATEST_PROOF_START_DT := StringLib.stringFilter(l.PROOF_FILING_START_DATE_LATEST, '0123456789');
-			self.PROOF_START_DATE      := StringLib.stringFilter(l.PROOF_FILING_START_DATE, '0123456789');
-			self.PROOF_END_DATE        := StringLib.stringFilter(l.PROOF_FILING_END_DATE, '0123456789');
-			self                       := l;
-   end;
-   
-   Oh_FRA_Insurance := project(file_Oh_FRA_Insurance, trfOHToFRA(left));
-   
-   export OH_As_FRA_Insurance := Oh_FRA_Insurance;
-	 
-	 shared logical_name := DriversV2.Constants.Cluster+'in::dl2::'+pversion+'::OH::';	 
+	DriversV2.Layouts_DL_OH_In.Layout_OH_CP_PDate trfFixChars(DriversV2.Layouts_DL_OH_In.Layout_OH_CP_PDate l)	:=	transform
+		self.blob 	 		:= DriversV2.functions.fn_RemoveRawDataSpecialChars(l.blob);
+		self            := l;
+	end;
+	
+	RemoveBadChars	  := project(in_file, trfFixChars(left));
+	
+	export in_OH_Viol := project(RemoveBadChars,
+															 transform(DriversV2.Layouts_DL_OH_In.Header_Raw_Pdate,
+																				 self.Key_Number       := left.blob[1..9];
+																				 self.Record_Type_Code := left.blob[10..11];
+																				 self.blob    				 := left.blob[12..];
+																				 self                  := left; 
+																			  ) );
+	
+  //**************** CONVICTIONS Mapping **********************************************************************************
+	ds_Convictions      := in_OH_Viol(trim(Record_Type_Code,left,right) = 'CN');   
+	Layout_Oh_Conv_out  := DriversV2.Layouts_DL_OH_In.Viol_Convictions_Raw;
 
-	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Convictions'	,OH_As_Convictions		,Bld_OH_As_Convictions		);
-	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Suspension'	,OH_As_Suspension			,Bld_OH_As_Suspension			);
-	 VersionControl.macBuildNewLogicalFile( logical_name+'As_DR_Info'			,OH_As_DR_Info				,Bld_OH_As_DR_Info				);
-	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Accident'		,OH_As_Accident				,Bld_OH_As_Accident				);
-	 VersionControl.macBuildNewLogicalFile( logical_name+'As_Insurance'		,OH_As_FRA_Insurance	,Bld_OH_As_FRA_Insurance	);
+	Layout_Oh_Conv_out trfOHConv(ds_Convictions l) := transform
+		self.Conviction_Type_Code			:=l.blob[1..2];
+		self.Offense_Violation_Date		:=l.blob[3..10];
+		self.Plate_Number							:=l.blob[11..18];
+		self.Conviction_Date					:=l.blob[19..26];
+		self.Court_Code								:=l.blob[27..32];
+		self.Ohio_Offense_Code				:=l.blob[33..34];
+		self.Sentence_Code						:=l.blob[35];
+		self.Court_Assessed_Points		:=l.blob[36..37];
+		self.Had_Hazardous_Materials	:=l.blob[38];
+		self.Batch_Number							:=l.blob[39..44];
+		self.Conviction_Plea					:=l.blob[45];
+		self.Court_Case_Number				:=l.blob[46..61];
+		self.ACD_Offense_Code					:=l.blob[62..64];
+		self.Posted_Speed							:=l.blob[65..66];
+		self.Actual_Speed							:=l.blob[67..69];
+		self.Blood_Alcohol_Content		:=l.blob[70..74];
+		self.Is_Commercial_Vehicle		:=l.blob[75];
+		self.Reference_Locator_Number	:=l.blob[76..93];
+		self.Offense_Reduced_From_Code:=l.blob[94..96];
+		self.Create_Date							:=l.blob[97..104];
+		self.S1_Case_Number						:=l.blob[105..114];
+		self.P2_Case_Number						:=l.blob[115..124];
+		self.P3_Case_Number						:=l.blob[125..134];
+		self.DL_Case_Number						:=l.blob[135..144];
+		self.Habitual_Case_Number			:=l.blob[145..154];
+		self.Jurisdiction_Code			  :=l.blob[155..156];
+		self.SOA_ConvWithOffense_Code	:=l.blob[157..164];
+		self.Court_Type_Code					:=l.blob[165..168];
+		self.SP_Case_Number						:=l.blob[169..178];
+		self.Out_of_State_Lic_Nbr			:=l.blob[179..203];
+		self.State_of_Origin					:=l.blob[204..205];
+		self.Suspension_Class					:=l.blob[206];
+		self.Is_CourtOrdRemed_Driving :=l.blob[207];
+		self.Is_CDL_Conviction        :=l.blob[208];
+		self.Did_Show_Proof_of_Insu   :=l.blob[209];
+		self.Parent_Guardian_RestCode :=l.blob[210];
+		self.Parent_Guardian_RestDate :=l.blob[211..218];
+		self.Related_Record_Type_Code :=l.blob[219..220];
+		self.Is_Bus                   :=l.blob[221];
+		self.Has_Fatalities           :=l.blob[222];
+		self                          :=l;
+		self                          :=[];
+	end;
+
+	export file_Oh_Conviction := project(ds_Convictions, trfOHConv(left));
+
+	Layout_Conviction_Common  := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Convictions;
+
+	Layout_Conviction_Common trfOHToConvictions(file_Oh_Conviction l) := transform
+		self.dt_first_seen        := l.process_date;
+		self.dt_last_seen         := l.process_date;
+		self.src_state            := 'OH';
+		self.dlcp_key             := trim(l.Key_Number, left, right);
+		self.type_cd              := DriversV2.functions.TrimUpper(l.Record_Type_Code);
+		self.type_desc            := DriversV2.Tables_CP_OH.record_type_code(DriversV2.functions.TrimUpper(self.type_cd));
+		self.violation_date       := DriversV2.functions.ValidateDate(l.Offense_Violation_Date);
+		self.plate_nbr            := DriversV2.functions.TrimUpper(l.plate_number);
+		self.conviction_date      := DriversV2.functions.ValidateDate(l.conviction_date);
+		self.court_county         := DriversV2.functions.TrimUpper(l.Court_Code);
+		self.court_name_cd        := DriversV2.functions.TrimUpper(l.Court_Code);
+		self.court_name_desc      := DriversV2.Tables_CP_OH.court_code(self.court_name_cd);
+		self.court_type_cd        := DriversV2.functions.TrimUpper(l.Court_Type_Code);
+		self.court_type_desc      := DriversV2.Tables_CP_OH.court_type_code(DriversV2.functions.TrimUpper(self.court_type_cd));
+		self.st_offense_conv_cd   := DriversV2.functions.TrimUpper(l.Conviction_Type_Code);
+		self.st_offense_conv_desc := DriversV2.Tables_CP_OH.offense_conv_code(DriversV2.functions.TrimUpper(self.st_offense_conv_cd));
+		self.sentence             := DriversV2.functions.TrimUpper(l.Sentence_Code);
+		self.sentence_desc        := DriversV2.Tables_CP_OH.sentence_code(DriversV2.functions.TrimUpper(self.sentence));
+		self.points               := DriversV2.functions.TrimUpper(l.Court_Assessed_Points);
+		self.hazardous_cd         := DriversV2.functions.TrimUpper(l.Had_Hazardous_Materials);
+		self.hazardous_desc       := DriversV2.Tables_CP_OH.hazardous_mat_flag(DriversV2.functions.TrimUpper(self.hazardous_cd));
+		self.plea_cd              := DriversV2.functions.TrimUpper(l.conviction_plea);
+		self.plea_desc            := DriversV2.Tables_CP_OH.conviction_plea_flag(DriversV2.functions.TrimUpper(self.plea_cd));
+		self.court_case_nbr       := DriversV2.functions.TrimUpper(l.court_case_number);
+		self.acd_offense_cd       := DriversV2.functions.TrimUpper(l.ACD_Offense_Code);
+		self.acd_offense_desc     := DriversV2.Tables_CP_OH.acd_offense_codes(DriversV2.functions.TrimUpper(self.acd_offense_cd));
+		self.reduced_cd           := DriversV2.functions.TrimUpper(l.offense_reduced_from_code);
+		self.reduced_desc         := '';
+		self.create_date          := DriversV2.functions.ValidateDate(l.create_date);
+		self.bmv_case_nbr_1       := DriversV2.functions.TrimUpper(l.s1_case_number);
+		self.bmv_case_nbr_2       := DriversV2.functions.TrimUpper(l.p2_case_number);
+		self.bmv_case_nbr_3       := DriversV2.functions.TrimUpper(l.p3_case_number);
+		self.habitual_case_nbr    := DriversV2.functions.TrimUpper(l.habitual_case_number);
+		self.soa_conviction       := DriversV2.functions.TrimUpper(l.SOA_ConvWithOffense_Code);
+		self.bmv_sp_case_nbr      := DriversV2.functions.TrimUpper(l.sp_case_number);
+		self.out_of_state_dl_nbr  := DriversV2.functions.TrimUpper(l.Out_of_State_Lic_Nbr);
+		self.state_of_origin      := DriversV2.functions.TrimUpper(l.state_of_origin);
+		self                      := l;
+		self                      := [];	  
+	end;
+
+	export OH_As_Convictions:= project(file_Oh_Conviction, trfOHToConvictions(left));
+
+
+	//**************** SUSPENSIONS Mapping **********************************************************************************
+	
+	ds_Suspention      := in_OH_Viol(trim(Record_Type_Code,left,right) = 'SU');
+	Layout_Oh_Susp_out := DriversV2.Layouts_DL_OH_In.Viol_Suspensions_Raw;
+
+	Layout_Oh_Susp_out trfOHSusp(ds_Suspention l) := transform
+	 self.Suspension_Type_Code                    := l.blob[1..2];	
+	 self.Offense_Violation_Date                  := l.blob[3..10];	
+	 self.Clear_Date                              := l.blob[11..18];	
+	 self.Proof_Filing_Shown_Date                 := l.blob[19..26];	
+	 self.Action_Date                             := l.blob[27..34];	
+	 self.Start_Date                              := l.blob[35..42];	
+	 self.End_Date                                := l.blob[43..50];	
+	 self.BMV_Case_Number                         := l.blob[51..60];	
+	 self.Court_Code                              := l.blob[61..66];	
+	 self.Ohio_Offense_Code                       := l.blob[67..69];	
+	 self.Is_Commercial_Vehicle                   := l.blob[70];	
+	 self.Had_Hazardous_Material                  := l.blob[71];	
+	 self.Jurisdiction_Code                       := l.blob[72..73];	
+	 self.Fee_Paid_Date                           := l.blob[74..81];	
+	 self.Plate_Number                            := l.blob[82..89];	
+	 self.CDL_Disqualification_Reason_Code        := l.blob[90..92];	
+	 self.CDL_Out_of_State_Disqualification_Type  := l.blob[93..95];	
+	 self.Disqualification_Extent_Flag            := l.blob[96];	
+	 self.Disqualification_Reason_Reference       := l.blob[97..104];	
+	 self.Reference_Locator_Number                := l.blob[105..122];	
+	 self.School_District_Number                  := l.blob[123..128];	
+	 self.Clearance_Reason                        := l.blob[129];	
+	 self.Cleared_for_Restricted_Driving_Date     := l.blob[130..137];	
+	 self.Withdrawal_Reason_Code                  := l.blob[138..140];	
+	 self.Remedial_Driving_Course_Date            := l.blob[141..148];	
+	 self.License_Exam_Date                       := l.blob[149..156];	
+	 self.ACD_Offense_Code                        := l.blob[157..159];	
+	 self.Withdrawal_Status_Code                  := l.blob[160];	
+	 self.Modified_Driving_Date                   := l.blob[161..168];	
+	 self.Settlement_Agreement_Date               := l.blob[169..176];	
+	 self.Restriction_Code                        := l.blob[177..177];	
+	 self.Conviction_Date                         := l.blob[178..186];	
+	 self.Appeal_Filed_Date                       := l.blob[187..194];	
+	 self.Appeal_Denied_Date                      := l.blob[195..202];	
+	 self.Appeal_Granted_Date                     := l.blob[203..210];	
+	 self.Conviction_Plea_Flag                    := l.blob[211];	
+	 self.Is_Revocation                           := l.blob[212];	
+	 self.County_Number                           := l.blob[213..214];	
+	 self.Create_Date                             := l.blob[215..222];	
+	 self.License_Received_Date                   := l.blob[223..230];	
+	 self.Plate_Received_Date                     := l.blob[231..238];	
+	 self.FRA_Start_Date                          := l.blob[239..246];	
+	 self.FRA_End_Date                            := l.blob[247..254];	
+	 self.Accident_Date                           := l.blob[255..262];	
+	 self.Primary_Related_BMV_Case                := l.blob[263..272];	
+	 self.Narrative_Literal_Code                  := l.blob[273];	
+	 self.Is_Fee_Required                         := l.blob[274];	
+	 self.Is_Vehicle_Owner                        := l.blob[275];	
+	 self.SOA_ConvWithOffense_Code                := l.blob[276..283];	
+	 self.Modified_Driving_End_Date               := l.blob[284..291];	
+	 self.Is_Appeal_Stay                          := l.blob[292];	
+	 self.Withdrawal_Type_Detail_Code             := l.blob[293..295];	
+	 self.BMV_Related_DL_Case                     := l.blob[296..305];	
+	 self.Additional_Related_BMV_Case             := l.blob[306..315];	
+	 self.Fine_Paid_Date                          := l.blob[316..323];	
+	 self.Mail_by_Date                            := l.blob[324..331];	
+	 self.CSEA_Number                             := l.blob[332..335];	
+	 self.CSEA_Case_Number                        := l.blob[336..345];	
+	 self.CSEA_Order_Number                       := l.blob[346..362];	
+	 self.CSEA_Agency_Participant_Number          := l.blob[363..374];	
+	 self.Appeal_or_Hearing_Deadline_Date         := l.blob[375..382];	
+	 self.Remedial_Driving_Course_G_Number        := l.blob[383..388];	
+	 self.Court_Appearance_Effective_Date         := l.blob[389..396];	
+	 self.Suspension_Class_Code                   := l.blob[397];	
+	 self                                         := l;
+	 self                                         := [];
+	end;
+
+	export file_Oh_Suspension := project(ds_Suspention, trfOHSusp(left));
+	Layout_Suspension_Common  := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Suspensions;
+
+	Layout_Suspension_Common trfOHToSuspension(file_Oh_Suspension l) := transform
+		  self.dt_first_seen               := l.process_date;
+   		self.dt_last_seen                := l.process_date;
+   		self.src_state                   := 'OH';	  
+   		self.dlcp_key               		 := trim(l.Key_Number, left, right);
+   		self.type_cd                		 := DriversV2.functions.TrimUpper(l.Record_Type_Code);
+   		self.type_desc              		 := DriversV2.Tables_CP_OH.record_type_code(DriversV2.functions.TrimUpper(self.type_cd));
+   		self.violation_date         		 := DriversV2.functions.ValidateDate(l.Offense_Violation_Date);
+   		self.filed_date             		 := DriversV2.functions.ValidateDate(l.Proof_Filing_Shown_Date);  
+   		self.clear_date             		 := DriversV2.functions.ValidateDate(l.Clear_Date);
+   		self.action_date            		 := DriversV2.functions.ValidateDate(l.Action_Date);
+   		self.start_date             		 := DriversV2.functions.ValidateDate(l.Start_Date);
+   		self.end_date               		 := DriversV2.functions.ValidateDate(l.end_Date);	  
+   		self.bmv_case_nbr_1         		 := DriversV2.functions.TrimUpper(l.BMV_Case_Number);
+   		self.court_name_cd          		 := DriversV2.functions.TrimUpper(l.Court_Code);
+   		self.court_name_desc        		 := DriversV2.Tables_CP_OH.COURT_CODE(self.court_name_cd);	
+			self.court_county           		 := DriversV2.functions.TrimUpper(l.Court_Code);
+			self.court_type             		 := DriversV2.functions.TrimUpper(l.Court_Code);
+   		self.st_offense_conv_cd     		 := DriversV2.functions.TrimUpper(l.Ohio_Offense_Code);
+   		self.st_offense_conv_desc   		 := DriversV2.Tables_CP_OH.offense_conv_code(DriversV2.functions.TrimUpper(self.st_offense_conv_cd));
+   		self.vehicle_no_cd          		 := DriversV2.functions.TrimUpper(l.Is_Commercial_Vehicle);
+   		self.vehicle_no_desc        		 := DriversV2.Tables_CP_OH.vehicle_ind_code(DriversV2.functions.TrimUpper(self.vehicle_no_cd));	  
+   		self.hazardous_cd           		 := DriversV2.functions.TrimUpper(l.Had_Hazardous_Material);
+   		self.hazardous_desc         		 := DriversV2.Tables_CP_OH.hazardous_mat_flag(DriversV2.functions.TrimUpper(self.hazardous_cd));
+   		self.jurisdiction           		 := DriversV2.functions.TrimUpper(l.Jurisdiction_Code);
+   		self.fee_pd_date            		 := DriversV2.functions.ValidateDate(l.Fee_Paid_Date);
+   		self.plate_nbr              		 := DriversV2.functions.TrimUpper(l.Plate_Number);
+   		self.cdl_disq_reason_cd    			 := DriversV2.functions.TrimUpper(l.CDL_Disqualification_Reason_Code);
+   		self.cdl_disq_reason_desc   		 := DriversV2.Tables_CP_OH.cdi_disq_reason_code(DriversV2.functions.TrimUpper(self.cdl_disq_reason_cd));
+   		self.cdl_ofs_disqual_reason_cd   := DriversV2.functions.TrimUpper(l.CDL_Out_of_State_Disqualification_Type);
+   		self.cdl_ofs_disqual_reason_desc := DriversV2.Tables_CP_OH.cdi_oos_disq_type(DriversV2.functions.TrimUpper(self.cdl_ofs_disqual_reason_cd));
+   		self.disq_ext_cd            		 := DriversV2.functions.TrimUpper(l.Disqualification_Extent_Flag);						
+   		self.disq_reason_ref        		 := DriversV2.functions.ValidateDate(l.Disqualification_Reason_Reference);				
+   		self.sd_nbr                 		 := DriversV2.functions.TrimUpper(l.School_District_Number);
+   		self.wd_clear_reason_cd     		 := DriversV2.functions.TrimUpper(l.Withdrawal_Type_Detail_Code);
+   		self.wd_clear_reason_desc   		 := DriversV2.Tables_CP_OH.wd_cle_reason_code(DriversV2.functions.TrimUpper(self.wd_clear_reason_cd));						
+   		self.cleared_date           		 := DriversV2.functions.ValidateDate(l.Cleared_for_Restricted_Driving_Date);
+   		self.Conviction_Date             := DriversV2.functions.ValidateDate(l.Conviction_Date);
+   		self.wd_reason_cd          			 := DriversV2.functions.TrimUpper(l.Withdrawal_Reason_Code);			
+   		self.wd_reason_desc         		 := DriversV2.Tables_CP_OH.wd_reason_code(DriversV2.functions.TrimUpper(self.wd_reason_cd));
+   		self.remedial_drv_crs_dt    		 := DriversV2.functions.TrimUpper(l.Remedial_Driving_Course_Date);						
+   		self.appeal_file_date       		 := DriversV2.functions.ValidateDate(l.Appeal_Filed_Date);
+   		self.appeal_deny_date       		 := DriversV2.functions.ValidateDate(l.Appeal_Denied_Date);
+   		self.appeal_granted_date    		 := DriversV2.functions.ValidateDate(l.Appeal_Granted_Date);
+   		self.plea_cd                		 := DriversV2.functions.TrimUpper(l.Conviction_Plea_Flag);
+   		self.plea_desc              		 := DriversV2.Tables_CP_OH.conviction_plea_flag(DriversV2.functions.TrimUpper(self.plea_cd));
+   		self.county_cd              		 := DriversV2.functions.TrimUpper(l.County_Number);
+   		self.create_date            		 := DriversV2.functions.ValidateDate(l.Create_Date);
+   		self.license_rec_date       		 := DriversV2.functions.ValidateDate(l.License_Received_Date);
+   		self.plate_rec_date         		 := DriversV2.functions.ValidateDate(l.Plate_Received_Date);
+   		self.fra_sup_start_date     		 := DriversV2.functions.ValidateDate(l.FRA_Start_Date);
+   		self.fra_sup_end_date       		 := DriversV2.functions.ValidateDate(l.FRA_end_Date);
+   		self.accident_date          		 := DriversV2.functions.ValidateDate(l.Accident_Date);
+   		self.related_bmv_case_nbr   		 := DriversV2.functions.TrimUpper(l.Primary_Related_BMV_Case);
+   		self.narrative_cd           		 := DriversV2.functions.TrimUpper(l.Narrative_Literal_Code);
+   		self.narrative_desc         		 := DriversV2.Tables_CP_OH.narrative_code(DriversV2.functions.TrimUpper(self.narrative_cd));
+   		self.fee_required           		 := DriversV2.functions.TrimUpper(l.Is_Fee_Required);
+   		self.vehicle_owner_ind      		 := DriversV2.functions.TrimUpper(l.Is_Vehicle_Owner);
+   		self.soa_conviction         		 := DriversV2.functions.TrimUpper(l.SOA_ConvWithOffense_Code);
+   		self.modified_drv_end_dt    		 := DriversV2.functions.ValidateDate(l.Modified_Driving_end_Date);
+   		self.appeal_sup_stay        		 := DriversV2.functions.TrimUpper(l.Is_Appeal_Stay); 
+   		self.wd_type_detail         		 := DriversV2.functions.TrimUpper(l.Withdrawal_Type_Detail_Code);
+   		self.bmv_dl_case_nbr        		 := DriversV2.functions.TrimUpper(l.BMV_Related_DL_Case);
+   		self.related_bmv_case_nbr_2 		 := DriversV2.functions.TrimUpper(l.Additional_Related_BMV_Case);
+   		self.fine_paid_date         		 := DriversV2.functions.ValidateDate(l.Fine_Paid_Date);
+   		self.csea                   		 := DriversV2.functions.TrimUpper(l.CSEA_Number);
+   		self.csea_case_nbr          		 := DriversV2.functions.TrimUpper(l.CSEA_Case_Number);
+   		self.csea_order_nbr         		 := DriversV2.functions.TrimUpper(l.CSEA_Order_Number);
+   		self.csea_part_nbr          		 := DriversV2.functions.TrimUpper(l.CSEA_Agency_Participant_Number);
+   		self                             := l;
+   		self                        		 := [];	  
+	end;
+
+	export OH_As_Suspension := project(file_Oh_Suspension, trfOHToSuspension(left));
+
+	//**************** DRIVER RECORD INFORMATION Mapping ********************************************************************
+
+	ds_cs_in					 :=in_OH_Viol(Record_Type_Code='CS');
+	ds_cosigners_info  :=project(ds_cs_in, 
+															 TRANSFORM(DriversV2.Layouts_DL_OH_In.Viol_cosigners_info_Raw,
+																				 self.RECORD_TYPE_ACTION_DATE           := left.blob[1..8];
+																				 self.DRIVERS_COSIGNERS_RELATIONSHIP    := left.blob[9];	
+																				 self.DRIVERS_COSIGNERS_NAME            := left.blob[10..44];	
+																				 self.COSIGNERS_DRIVERS_LICENSE_NBR     := left.blob[45..52];	
+																				 self.DATABASE_RECORD_CREATE_DATE       := left.blob[53..60];
+																				 self                                   := left;
+																				  ));	
+											
+	ds_cosigners_info_proj := project(ds_cosigners_info,transform(DriversV2.Layouts_DL_OH_In.Temp_Combined_RecLayout4_DrInfo,self:= left;self:=[]));
+
+	ds_wb_in					 :=in_OH_Viol(Record_Type_Code='WB');
+	ds_Warrant_Blocks  :=project(ds_wb_in, 
+															 TRANSFORM(DriversV2.Layouts_DL_OH_In.Viol_Warrant_Blocks_Raw,
+																				 self.Create_Date                  := left.blob[1..8];
+																				 self.BMV_Case_Number    					 := left.blob[9..20];	
+																				 self.Court_Code            			 := left.blob[21..24];	
+																				 self.Clear_Date     							 := left.blob[25..32];	
+																				 self.Warrant_Block_Effective_Date := left.blob[33..40];
+																				 self.Is_Fee_Required              := left.blob[41];	
+																				 self.Fee_Paid_Date                := left.blob[42..49];	
+																				 self.Release_Date	     					 := left.blob[50..57];	
+																				 self.Is_Bankruptcy       				 := left.blob[58];
+																				 self                              := left;
+															 )); 
+	ds_Warrant_Blocks_proj := project(ds_Warrant_Blocks,transform(DriversV2.Layouts_DL_OH_In.Temp_Combined_RecLayout4_DrInfo,self:= left;self:=[]));
+
+	ds_rm_in						:=in_OH_Viol(Record_Type_Code='RM');
+	ds_Remedial_Course  :=project(ds_rm_in, 
+																TRANSFORM(DriversV2.Layouts_DL_OH_In.Viol_Remedial_Course_Raw,
+																					self.RecCreationDate             := left.blob[0..8];
+																					self.RemedialReqCompletionDate   := left.blob[9..16];	
+																					self.requirementsDeniedDate      := left.blob[17..24];	
+																					self.drivingSchoolGNum     			 := left.blob[25..30];	
+																					self.remedialCourtOrderedInd     := left.blob[31];
+																					self                             := left;
+																				 ));
+	ds_Remedial_Course_proj := project(ds_Remedial_Course,transform(DriversV2.Layouts_DL_OH_In.Temp_Combined_RecLayout4_DrInfo,self:= left;self:=[]));
+
+	ds_is_in				 :=in_OH_Viol(Record_Type_Code='IS');
+	ds_OOS_Issuance  :=project(ds_is_in, 
+														 TRANSFORM(DriversV2.Layouts_DL_OH_In.Viol_OOS_Issuance_Raw,
+																			 self.OOState_RecCreationDate:= left.blob[0..8];
+																			 self.OutOfStateIssueDate 	 := left.blob[9..16];	
+																			 self.NewSPCOfRecord      	 := left.blob[17..18];	
+																			 self.OutOfStateDLN     	   := left.blob[19..43];	
+																			 self                        := left;
+																			 ));	
+	ds_OOS_Issuance_proj  := project(ds_OOS_Issuance,transform(DriversV2.Layouts_DL_OH_In.Temp_Combined_RecLayout4_DrInfo,self:= left;self:=[]));
+
+	ds_Combined4_DrInfo		:= ds_cosigners_info_proj + ds_Warrant_Blocks_proj + ds_Remedial_Course_proj + ds_OOS_Issuance_proj ;
+
+	Layout_DR_Info_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Driver_Record_Info;
+
+	Layout_DR_Info_Common trfOHToDR_Info(DriversV2.Layouts_DL_OH_In.Temp_Combined_RecLayout4_DrInfo l) := transform
+		self.dt_first_seen           := l.process_date;
+		self.dt_last_seen            := l.process_date;
+		self.src_state               := 'OH';
+		self.dlcp_key                := trim(l.key_number, left, right);
+		self.type_cd                 := DriversV2.functions.TrimUpper(l.record_type_code);
+		self.type_desc               := DriversV2.Tables_CP_OH.record_type_code(self.type_cd);
+		self.action_date             := DriversV2.functions.ValidateDate(l.record_type_action_date);
+		self.bmv_case_nbr_1          := DriversV2.functions.TrimUpper(l.bmv_case_number);
+		self.clear_date              := DriversV2.functions.ValidateDate(l.clear_date);	  
+		self.cosigners_dl_nbr        := DriversV2.functions.TrimUpper(l.cosigners_drivers_license_nbr);      
+		self.cosigners_name          := DriversV2.functions.TrimUpper(l.drivers_cosigners_name);	  
+		self.cosigners_relationship  := DriversV2.functions.TrimUpper(l.drivers_cosigners_relationship);
+		self.create_date             := DriversV2.functions.ValidateDate(l.create_date);
+		self.out_of_state_dl_nbr     := DriversV2.functions.TrimUpper(l.OutOfStateDLN);
+		self.remedial_require_comp   := DriversV2.functions.ValidateDate(l.RemedialReqCompletionDate);            
+		self.remedial_require_denied := DriversV2.functions.ValidateDate(l.requirementsDeniedDate);
+		self.warrant_eff_date        := DriversV2.functions.ValidateDate(l.warrant_block_effective_date);
+		self                         := l;
+		self                         := [];
+	end;
+
+	Oh_DRInfo := project(ds_Combined4_DrInfo, trfOHToDR_Info(left));
+
+	ds_cn_in        :=in_OH_Viol(Record_Type_Code='LC');
+	ds_Cancellation :=project(ds_cn_in, 
+														TRANSFORM(DriversV2.Layouts_DL_OH_In.Viol_Cancellation_Raw,
+																			 self.cancelRecordType := left.blob[1..2];
+																			 self.dateEntered      := left.blob[3..10];	
+																			 self.effectiveDate    := left.blob[11..18];	
+																			 self.BMVcaseNum     	 := left.blob[19..26];	
+																			 self.courtCaseNum     := left.blob[27..34];
+																			 self.courtCode        := left.blob[35..42];
+																			 self.newStateCode1    := left.blob[43..52];
+																			 self.newStateCode2    := left.blob[53..62];
+																			 self.newStateIssueDate:= left.blob[63..70];
+																			 self                  := left;
+																		 ));
+																		 
+	Layout_DR_Info_Common trfOH_LCTODR_Info(ds_Cancellation l) := transform
+	
+		self.dt_first_seen           := l.process_date;
+		self.dt_last_seen            := l.process_date;
+		self.src_state               := 'OH';	  
+		self.dlcp_key                := trim(l.key_number, left, right);
+		self.type_cd                 := DriversV2.functions.TrimUpper(l.record_type_code);
+		self.type_desc               := DriversV2.Tables_CP_OH.record_type_code(self.type_cd);
+		self.action_date             := DriversV2.functions.ValidateDate(l.dateEntered );
+		self.bmv_case_nbr_1          := DriversV2.functions.TrimUpper(l.BMVcaseNum);
+		self.court_case_nbr          := DriversV2.functions.TrimUpper(l.courtCaseNum);
+		self                         := l;
+		self                         := [];
+	end;
+
+	Oh_DRInfo1  				 := project(ds_Cancellation, trfOH_LCTODR_Info(left));
+	Oh_DR_Info  				 := Oh_DRInfo + Oh_DRInfo1;
+	export OH_As_DR_Info := Oh_DR_Info; 
+
+	//**************** ACCIDENT Mapping *************************************************************************************
+	ds_Accidents        	 := in_OH_Viol(trim(Record_Type_Code,left,right)= 'A1');
+	Layout_Oh_Accident_out := DriversV2.Layouts_DL_OH_In.Viol_Accidents_Raw;
+
+	Layout_Oh_Accident_out trfOHRawToAccident(ds_Accidents l) := transform
+		self.County_Number                  := l.blob[1..2];
+		self.Jurisdiction_Code              := l.blob[3..4];	
+		self.Accident_Severity_Indicator    := l.blob[5];	
+		self.Accident_Date                  := l.blob[6..13];	
+		self.Is_Commercial_Vehicle          := l.blob[14];	
+		self.Has_Hazardous_Materials        := l.blob[15];
+		self.Reference_Locator_Number       := l.blob[16..33];	
+		self.Create_Date                    := l.blob[34..41];	
+		self.Accident_to_Line_of_Duty_Date  := l.blob[42..49];
+		self.Patrol_Crash_ID                := l.blob[50..59];	
+		self.NCIC_Code                      := l.blob[60..64];	
+		self                                := l;
+	end;
+
+	file_Oh_Accidents 		 := project(ds_Accidents, trfOHRawToAccident(left));
+	Layout_Accident_Common := DriversV2.Layouts_DL_Conv_Points_Common.Layout_Accident;
+
+	Layout_Accident_Common trfOHToAccident(file_Oh_Accidents l) := transform
+		self.dt_first_seen      := l.process_date;
+		self.dt_last_seen       := l.process_date;
+		self.src_state          := 'OH';	  
+		self.dlcp_key           := trim(l.key_number, left, right);
+		self.type_cd            := DriversV2.functions.TrimUpper(l.record_type_code);
+		self.type_desc          := DriversV2.Tables_CP_OH.record_type_code(DriversV2.functions.TrimUpper(self.type_cd));
+		self.county             := DriversV2.functions.TrimUpper(l.county_number);      
+		self.jurisdiction       := DriversV2.functions.TrimUpper(l.jurisdiction_code);
+		self.severity_cd        := DriversV2.functions.TrimUpper(l.Accident_Severity_Indicator);	  
+		self.severity_desc      := DriversV2.Tables_CP_OH.accident_severity_code(DriversV2.functions.TrimUpper(self.severity_cd));
+		self.accident_date      := DriversV2.functions.ValidateDate(l.accident_date);
+		self.vehicle_no         := DriversV2.functions.TrimUpper(l.Is_Commercial_Vehicle);
+		self.hazardous_cd       := DriversV2.functions.TrimUpper(l.Has_Hazardous_Materials);
+		self.hazardous_desc     := DriversV2.Tables_CP_OH.hazardous_mat_flag(DriversV2.functions.TrimUpper(self.hazardous_cd));            
+		self.create_date        := DriversV2.functions.ValidateDate(l.create_date);	
+	  self                    := l;		
+		self                    :=[];
+	end;
+
+	export OH_As_Accident := project(file_Oh_Accidents, trfOHToAccident(left));
+
+	//**************** FRA Insurance Mapping ********************************************************************************   
+	ds_FRA_Insurance      			:= in_OH_Viol(trim(Record_Type_Code,left,right) = 'FR');      
+	Layout_Oh_FRA_Insurance_out := DriversV2.Layouts_DL_OH_In.Viol_FRA_Insurance_Raw;
+
+	Layout_Oh_FRA_Insurance_out trfOHRawToFRA(ds_FRA_Insurance l) := transform
+		self.Proof_Filing_Start_Date           := l.blob[1..8];
+		self.Proof_Filing_end_Date             := l.blob[9..16];	
+		self.Insurance_Policy                  := l.blob[17..32];	
+		self.Proof_Filing_Cancellation_Date    := l.blob[33..40];	
+		self.Proof_Filing_Late_Start_Date      := l.blob[41..48];	
+		self.Proof_Filing_Cancelled_Posted_Date:= l.blob[49..56];
+		self.Proof_Filing_Posted_Date          := l.blob[57..64];
+		self                                   := l;
+	end;
+
+	file_Oh_FRA_Insurance := project(ds_FRA_Insurance, trfOHRawToFRA(left));
+	Layout_FRA_Common 		:= DriversV2.Layouts_DL_Conv_Points_Common.Layout_FRA_Insurance;
+
+	Layout_FRA_Common trfOHToFRA(file_Oh_FRA_Insurance l) := transform
+		self.dt_first_seen         := l.process_date;
+		self.dt_last_seen          := l.process_date;
+		self.src_state             := 'OH';	
+		self.dlcp_key              := trim(l.key_number, left, right);      
+		self.cancel_posted_date    := DriversV2.functions.ValidateDate(l.Proof_Filing_Cancelled_Posted_Date);
+		self.filed_date            := DriversV2.functions.ValidateDate(l.proof_filing_posted_date);
+		self.ins_cancel_dt         := DriversV2.functions.ValidateDate(l.Proof_Filing_Cancellation_Date);	  
+		self.ins_policy_nbr        := DriversV2.functions.TrimUpper(l.Insurance_Policy);           
+		self.latest_proof_start_dt := DriversV2.functions.ValidateDate(l.Proof_Filing_Late_Start_Date);
+		self.proof_start_date      := DriversV2.functions.ValidateDate(l.Proof_Filing_Start_Date);
+		self.proof_end_date        := DriversV2.functions.ValidateDate(l.Proof_Filing_end_Date);
+		self                       := l;
+		self                       := [];	
+	end;
+
+	Oh_FRA_Insurance 					 := project(file_Oh_FRA_Insurance, trfOHToFRA(left));
+	export OH_As_FRA_Insurance := Oh_FRA_Insurance;
+	
+	shared logical_name 			 := DriversV2.Constants.Cluster+'in::dl2::'+pversion+'::OH::';	
+	
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Convictions'	,OH_As_Convictions		,Bld_OH_As_Convictions		);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Suspension'	  ,OH_As_Suspension			,Bld_OH_As_Suspension			);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_DR_Info'			,OH_As_DR_Info				,Bld_OH_As_DR_Info				);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Accident'		  ,OH_As_Accident				,Bld_OH_As_Accident				);
+	VersionControl.macBuildNewLogicalFile( logical_name+'As_Insurance'		,OH_As_FRA_Insurance	,Bld_OH_As_FRA_Insurance	);
 	 
-	 export Build_DL_OH_Convpoints :=	 
-	 sequential (parallel( Bld_OH_As_Convictions
-												,Bld_OH_As_Suspension
-												,Bld_OH_As_DR_Info
-												,Bld_OH_As_Accident
-												,Bld_OH_As_FRA_Insurance
+	export Build_DL_OH_Convpoints :=	 
+	sequential(parallel(Bld_OH_As_Convictions
+											,Bld_OH_As_Suspension
+											,Bld_OH_As_DR_Info
+											,Bld_OH_As_Accident
+											,Bld_OH_As_FRA_Insurance
 											 )
-								,sequential( FileServices.StartSuperFileTransaction()
-														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Convictions',logical_name+'As_Convictions')
-														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Suspension',logical_name+'As_Suspension')
-														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_DR_Info',logical_name+'As_DR_Info')
-														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Accident',logical_name+'As_Accident')
-														,fileservices.addsuperfile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Insurance',logical_name+'As_Insurance')
-														,FileServices.FinishSuperFileTransaction()
-													 )
-							);			 
+						  ,sequential( fileServices.StartSuperFileTransaction()
+													,fileservices.AddSuperFile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Convictions',logical_name+'As_Convictions')
+													,fileservices.AddSuperFile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Suspension',logical_name+'As_Suspension')
+													,fileservices.AddSuperFile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_DR_Info',logical_name+'As_DR_Info')
+													,fileservices.AddSuperFile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Accident',logical_name+'As_Accident')
+													,fileservices.AddSuperFile(DriversV2.Constants.Cluster+'in::dl2::ConvPoints::As_Insurance',logical_name+'As_Insurance')
+													,fileServices.FinishSuperFileTransaction()
+												 )
+						);			 
 
 end;

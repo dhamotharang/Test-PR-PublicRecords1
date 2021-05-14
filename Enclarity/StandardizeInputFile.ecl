@@ -1,4 +1,4 @@
-IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
+﻿IMPORT  ut, mdr, tools,_validate, Address, Ut, lib_stringlib, _Control, business_header, Enclarity,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID;
 
 EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
@@ -93,7 +93,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 		
 	EXPORT Individual	(dataset(Layouts.individual_input) baseFile):=function
 
-		enclarity.layouts.individual_base tMapping(layouts.individual_input L) := TRANSFORM, SKIP((L.group_key = 'group_key')
+		enclarity.layouts.individual_base_temp tMapping(layouts.individual_input L) := TRANSFORM, SKIP((L.group_key = 'group_key')
 																																															OR (L.orig_fullname = '' AND
 																																																	L.first_name    = '' AND
 																																																	L.last_name     = ''))
@@ -121,6 +121,7 @@ EXPORT StandardizeInputFile (string filedate, boolean pUseProd = false):= MODULE
 			SELF.gender									:= TRIM(Stringlib.StringToUpperCase(L.gender), LEFT, RIGHT);
 			SELF.upin										:= TRIM(L.upin, LEFT, RIGHT);
 			SELF.clean_dob							:= IF(L.birth_year <> '',_validate.date.fCorrectedDateString((string)SELF.birth_year + '0000',false), '');
+			SELF.cpa_optout							:= TRIM(L.cpa_optout, LEFT, RIGHT); // temporarily save opt out flag field - will push to dotid to avoid layout change for keys
 			SELF  :=  L;
 			SELF  :=  [];
 		END;

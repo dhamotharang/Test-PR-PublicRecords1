@@ -1,4 +1,4 @@
-import tools;
+﻿import tools;
 EXPORT filenames(
 
    string   pversion              = ''
@@ -24,5 +24,8 @@ module
     + UltidSegs  .dall_filenames
     + Patched    .dall_filenames
     ;
-    
+ 
+	export EntityStatsSuperFilename   := '~thor_data400::base::business_header::entity_report_sf';
+	export EntityStatsLogicalBaseFilename := '~thor_data400::base::business_header::entity_report_' + pVersion + '_';
+
 end;

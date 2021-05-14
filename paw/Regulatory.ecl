@@ -1,4 +1,5 @@
 ﻿EXPORT Regulatory := MODULE
+import Suppress ;
 
 	EXPORT applyEmploymentSup(base_ds) := FUNCTIONMACRO
 		import paw, Suppress;
@@ -22,12 +23,18 @@
 
 		
 	ENDMACRO;
+	
+// linkIDs section is copied from BIPV2.IDlaouts 
+
+l_xlink_ids :=  Suppress.Layout_regulatory.LZ_l_xlink_ids ;
 
 	EXPORT 	base_layout := RECORD
 	
 				string15	contact_id;
 				string15	did; 
-				string15	bdid;       
+
+				string15	bdid; 
+
 				string9   ssn;
 				string3		score;
 				string120 company_name;      
@@ -79,8 +86,10 @@
 				string15  source_count;
 				string3   dead_flag:= '000';
 				string10  company_status:=''; 
+				
+    l_xlink_ids	linkIDs  ;			 
+		
 				string2		eor;	
-
 		end;
 
 
@@ -92,8 +101,6 @@
 		recordof(base_ds) reformated_header(Base_File_In L) := 
 			transform
 				self.contact_id 		:=  hash64 (l.did,
-																				l.bdid,
-																				l.ssn,
 																				l.company_name,
 																				l.company_prim_range,
 																				l.company_predir,
@@ -125,11 +132,11 @@
 																				l.source);
 				self.bdid 					:= (unsigned6)l.bdid;
 				self.did  					:= (unsigned6)l.did;
-				self.old_score			:= L.score;
+				self.old_score			:= L.old_score;
 				self.source_count		:= 1;
 				self.dead_flag 			:= (unsigned6)l.dead_flag;
 				self.company_status := '';
-				self	 							:= L;
+				self	 							       := L;
 				self                := [];
 		end;
 

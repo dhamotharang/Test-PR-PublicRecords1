@@ -1,4 +1,4 @@
-import promotesupers, roxiekeybuild, std;
+﻿import promotesupers, roxiekeybuild, std;
 
 
 STD.File.CreateSuperFile('~prte::in::vehicle::main',,1);
@@ -39,14 +39,8 @@ roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','link
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','main_key');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','mfd_srch');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','party_key');
-roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','party_key::linkids');
-// roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','docref.vehkey');
-// roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','dtldictx');
-// roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','exkeyi');
-// roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','exkeyo');
-// roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','nidx3');
-// roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','xdstat2');
-// roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','xseglist');
+
+
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','reverse_lic_plate');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','source_rec_id');
 roxiekeybuild.mac_create_superkeyfiles_standard('~prte','::key::vehiclev2','title_number');

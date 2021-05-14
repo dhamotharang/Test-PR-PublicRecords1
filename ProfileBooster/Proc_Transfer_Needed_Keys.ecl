@@ -1,6 +1,6 @@
 ﻿// ***********************
 // RUN this script on hthor
-// if the copy doesn't appear to do anything, make sure that file "copyfiles::in::transfer::filelistprod_copyinprogress" doesn't already exist.  
+// if the copy doesn't appear to do anything, make sure that file "copyfiles::in::transfer::filelistprod_copyinprogress" doesn't already exist.
 // if it does delete it, or rename line 77 below to something other than dev
 // ***********************
 
@@ -9,7 +9,7 @@ EXPORT Proc_Transfer_Needed_Keys () := function
 import rampscopy, dops,_Control;
 
 filestocopyds := dataset([
- {'thor_data400::key::aid::rawaid_to_acecahe_qa','','',''}
+	{'thor_data400::key::aid::rawaid_to_acecahe_qa','','',''}
 ,{'thor_data400::key::aircraft_id_qa','','',''}
 ,{'thor_data400::key::aircraft_reg_did_qa','','',''}
 ,{'thor_data400::key::american_student::qa::did2','','',''}
@@ -65,24 +65,26 @@ filestocopyds := dataset([
 ,{'thor_data400::key::vehiclev2::did_qa','','',''}
 ,{'thor_data400::key::vehiclev2::main_key_qa','','',''}
 ,{'thor_data400::key::vehiclev2::party_key_qa','','',''}
+,{'thor_data400::key::vehiclev2::linkids_qa','','',''}
 ,{'thor_data400::key::watercraft_did_qa','','',''}
 ,{'thor_data400::key::watercraft_sid_qa','','',''}
 ,{'thor_data400::key::watchdog_qa','','',''}
-			]
-															,rampscopy.layouts.filestocopy);
+,{'thor::key::new_suppression::qa::opt_out','','',''}
+]
+,rampscopy.layouts.filestocopy);
 
 // change these settings below to be prod settings instead
 // dops.xFerRoxieFiles(filestocopyds
 											// ,'10.241.12.207'
 											// ,'10.241.12.201'
 											// ,'thor400_dev02'
-											// ,'8010' 
+											// ,'8010'
 											// ,'dev' // prod or dr or dev or some environment identity, this value will be used in dops.copyconstants.copyfile
 											// ,'melissa.newport@lexisnexis.com'
 											// ,'pb'
 											// ,true
 											// ,false).begincopy;
-											
+
 PBKEY := dops.xFerRoxieFiles(filestocopyds
 											,'uspr-prod-thor-esp.risk.regn.net'  	// dstthoresp - prod thor ESP
 											,'uspr-prod-thor-dali.risk.regn.net'  	// dstthordali - prod dali
@@ -94,13 +96,13 @@ PBKEY := dops.xFerRoxieFiles(filestocopyds
 											,true
 											,false
 											,
-											,'prod_esp.br.seisint.com'
-											,'prod_dali.br.seisint.com'
+											,'uspr-prod-thor-esp.risk.regn.net'
+											,'uspr-prod-thor-dali.risk.regn.net'
 											,'8010'
 											, srcthorclusters := ['thor400_44','thor400_66']
 											,roxieprodesp := '10.173.109.101'
-											,roxieprodtarget := 'roxie_109' 
-											).begincopy;											
-		
+											,roxieprodtarget := 'roxie_109'
+											).begincopy;
+
 RETURN PBKEY;
-END;											
+END;

@@ -50,6 +50,7 @@ string process_date;
 unsigned8 email_rec_key;
 string cust_name;
 string bug_num;
+string2 source;
 end;
 
 Export Base_Domain_Layout:=RECORD
@@ -61,6 +62,7 @@ Export Base_Domain_Layout:=RECORD
   string8 date_first_verified;
   string8 date_last_verified;
   string50 domain_status;
+	string2 source;
   string10 verifies_account;
   string8 process_date;
   unsigned8 email_rec_key;

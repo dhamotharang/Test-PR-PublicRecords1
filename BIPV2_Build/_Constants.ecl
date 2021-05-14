@@ -10,7 +10,7 @@ export _Constants(
 		,pUseOtherEnvironment	:= pUseOtherEnvironment
 		,pGroupname						:= '36' //use thor400_36 by default for the BIP build
 		,pMaxRecordSize				:= 4096
-		,pIsTesting						:= Tools._Constants.IsDataland
+		,pIsTesting						:= Tools._Constants.IsDataland or Tools._Constants.IsAlpha_dev
     ,pAdd_Eclcc           := true
 	))
 	

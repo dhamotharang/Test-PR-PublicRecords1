@@ -1,4 +1,4 @@
-export Layout_NtlAccidents_Alpharetta := module
+﻿export Layout_NtlAccidents_Alpharetta := module
 
 export payload := 
 record
@@ -275,6 +275,28 @@ string DAMAGE;
 string POLK_VALIDATED_VIN;
 end;
 
+export order_combined := record
+order_vs;
+int_order.SUFFIX;
+int_order.GENDER;
+int_order.PREVIOUS_DL_NBR;
+int_order.PREVIOUS_DL_STATE;
+int_order.FULFILLED_DATE;
+int_order.POLICY_CARRIER_AUTO;
+int_order.POLICY_NBR_AUTO;
+int_order.POLICY_CARRIER_PROPERTY;
+int_order.POLICY_NBR_PROPERTY;
+int_order.PREVIOUS_POLICY_TYPE;
+int_order.MORTGAGE_LOAN_NBR;
+int_order.MORTGAGEE;
+int_order.ORIG_ORDER_ID;
+int_order.INITIAL_ORDER;
+int_order.RULES_STATUS_CD;
+int_order.VERSION;
+int_order.SEARCH_MODE;
+int_order.PROCESS_STATE;
+int_order.PROCESSOR;
+end;
 
 export cmbnd := 
 record
@@ -518,7 +540,101 @@ cmbnd;
 	string60 orig_fname; 
 	string60 orig_lname; 
 	string60 orig_mname; 
-  end;					
-
-
+  end;
+	
+  EXPORT ConsolidationBase := RECORD
+		STRING8 dt_first_seen;
+		STRING8 dt_last_seen;
+		STRING4 report_code;
+		STRING25 report_category;
+		STRING65 report_code_desc;
+		STRING14 vehicle_incident_id;
+		STRING1	vehicle_status;
+		STRING100 accident_location;
+		STRING100 accident_street;
+		STRING100 accident_cross_street;
+		STRING100  jurisdiction;
+		STRING2 jurisdiction_state;
+		STRING11 jurisdiction_nbr;
+		STRING64 IMAGE_HASH;
+		STRING1 AIRBAGS_DEPLOY;
+		STRING12 did;
+		STRING40 accident_nbr;
+		STRING8 accident_date; 
+		STRING5 title;
+		STRING20 fname;
+		STRING20 mname;
+		STRING20 lname;
+		STRING5 name_suffix;
+		STRING12 b_did;
+		STRING25 cname;
+		STRING10 prim_range;
+		STRING2 predir;
+		STRING28 prim_name;
+		STRING4 addr_suffix;
+		STRING2 postdir;
+		STRING10 unit_desig;
+		STRING8 sec_range;
+		STRING25 v_city_name;
+		STRING2 st;
+		STRING5 zip;
+		STRING4 zip4;
+		STRING100 RECORD_type;
+		STRING25 driver_license_nbr;
+		STRING2 dlnbr_st;
+		STRING30 vin;
+		STRING10 tag_nbr;
+		STRING2 tagnbr_st;
+		STRING8 dob;
+		STRING50 vehicle_incident_city;
+		STRING2 vehicle_incident_st;
+		STRING100 carrier_name;
+		STRING5	client_type_id;
+		STRING50 Policy_num;	   
+		STRING8 Policy_Effective_Date;   
+		STRING8 Policy_Expiration_Date;
+		STRING4 Report_Has_Coversheet;
+		STRING1 other_vin_indicator;
+		STRING7 vehicle_unit_number;
+		STRING4 towed;
+		STRING80 impact_location;
+		STRING4 vehicle_year;
+		STRING100 vehicle_make;
+		STRING15 point_of_impact;
+		STRING42 vehicle_seg;
+		STRING1 vehicle_seg_type;
+		STRING4 model_year;
+		STRING2 body_style_code;
+		STRING4 engine_size;
+		STRING1 fuel_code;
+		STRING1 number_of_driving_wheels;
+		STRING1 steering_type;
+		STRING3 vina_series;
+		STRING3 vina_model;
+		STRING3 vina_make;
+		STRING2 vina_body_style;
+		STRING100 make_description;
+		STRING100 model_description;
+		STRING20 series_description;
+		STRING2 car_cylinders;
+		STRING60 next_street;
+		STRING40 addl_report_number;
+		STRING11 agency_id;
+		STRING4 work_type_id; 
+		STRING60 orig_fname; 
+		STRING100 orig_lname;  
+		STRING60 orig_mname; 
+		STRING11 ssn;
+		STRING12 cru_order_id;
+		STRING2 cru_sequence_nbr;
+		STRING8 date_vendor_last_reported; 
+		STRING3 report_type_id;
+		STRING8 creation_date; 
+		STRING70 tif_image_hash; 
+		STRING30 precinct;
+		STRING20 acct_nbr; 
+		STRING5 reason_id;
+		STRING3 Page_Count; 
+		STRING2 state;
+  END;
 end;

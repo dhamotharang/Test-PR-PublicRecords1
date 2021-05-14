@@ -1,4 +1,4 @@
-import Data_services, ut; 
+﻿import Data_services, ut; 
 
 EXPORT	Files	:=
 module
@@ -50,6 +50,7 @@ module
 		export	AddlFaresTax	:=	dataset(ln_propertyV2.filenames.Base.AddlFaresTax	,LN_PropertyV2.Layout_Addl_Fares_Tax									                ,thor);
 		export	AddlLegal			:=	dataset(ln_propertyV2.filenames.Base.AddlLegal		,LN_PropertyV2.Layout_Addl_Legal											                ,thor);
 		export	AddlNames			:=	dataset(ln_propertyV2.filenames.Base.AddlNames		,LN_PropertyV2.Layout_Addl_Names											                ,thor);
+		export	AddlNameInfo	:=	dataset(ln_propertyV2.filenames.Base.AddlNameInfo	,LN_PropertyV2.layout_addl_name_info																	,thor);
 		export	Assessment		:=	dataset(ln_propertyV2.filenames.Base.Assessment		,LN_PropertyV2.Layouts.layout_property_common_model_base_scrubs			  ,thor);
 	  export	DeedMortgage	:=	dataset(ln_propertyV2.filenames.Base.DeedMortgage	,LN_PropertyV2.Layouts.layout_deed_mortgage_common_model_base_scrubs	,thor);
 		export	Search				:=	dataset(ln_propertyV2.filenames.Base.Search				,LN_PropertyV2.Layout_Deed_Mortgage_Property_Search		                ,thor);

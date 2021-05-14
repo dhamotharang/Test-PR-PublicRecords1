@@ -11,7 +11,7 @@ foreclosureIn := property.File_Foreclosure_In;
 
 // NORMALIZE: The result of it will be used for DIDing and for building autokeys as well
 // by name (autokeys also will use normalization by company name) 
-Layout_Foreclosure_Base_Normalized normalizeRecords (foreclosureIn l, unsigned1 nameCounter) := transform
+Property.Layout_Foreclosure_Base_Normalized normalizeRecords (foreclosureIn l, unsigned1 nameCounter) := transform
 	self.name_first := choose(nameCounter,l.name1_first,l.name2_first,l.name3_first,l.name4_first,l.name5_first,l.name6_first,l.name7_first,l.name8_first);
 	self.name_middle := choose(nameCounter,l.name1_middle,l.name2_middle,l.name3_middle,l.name4_middle,l.name5_middle,l.name6_middle,l.name7_middle,l.name8_middle);
 	self.name_last := choose(nameCounter,l.name1_last,l.name2_last,l.name3_last,l.name4_last,l.name5_last,l.name6_last,l.name7_last,l.name8_last);
@@ -38,7 +38,7 @@ ds_name_normalized := normalize (foreclosureIn,8,normalizeRecords(left,counter))
 
 
 // by address
-Layout_Foreclosure_Base_Normalized normalize_Addr_Records(Layout_Foreclosure_Base_Normalized l, unsigned1 c) := transform
+Property.Layout_Foreclosure_Base_Normalized normalize_Addr_Records(Property.Layout_Foreclosure_Base_Normalized l, unsigned1 c) := transform
 		self.site_prim_range :=choose(c,l.site_prim_range,l.situs2_prim_range);
 		self.site_predir :=choose(c,l.site_predir,l.situs2_predir);
 		self.site_prim_name :=choose(c,l.site_prim_name,l.situs2_prim_name);
@@ -58,7 +58,7 @@ ds_normalized := normalize(ds_name_normalized(name_first != '' OR name_last != '
 
 src_rec := record
 header_slimsort.Layout_Source;
-Layout_Foreclosure_Base_Normalized;
+Property.Layout_Foreclosure_Base_Normalized;
 end;
 
 DID_Add.Mac_Set_Source_Code (ds_normalized, src_rec, 'FR', foreclosureBaseNormalized_src)
@@ -71,7 +71,7 @@ did_add.MAC_Match_Flex(foreclosureBaseNormalized_src,matchset,
 											 did,src_rec,
 											 true,did_score,75,foreclosureDID_src,true,src);
 //remove src 
-foreclosureDID := project(foreclosureDID_src, transform(Layout_Foreclosure_Base_Normalized, self := left));
+foreclosureDID := project(foreclosureDID_src, transform(Property.Layout_Foreclosure_Base_Normalized, self := left));
 
 matchset_bdid := ['A'];
 
@@ -87,7 +87,7 @@ Business_Header_SS.MAC_Match_Flex(
 			,foo						                    	// phone				              
 			,foo            			           	  	// fein              
 			,bdid										        			// bdid												
-			,Layout_Foreclosure_Base_Normalized		// output layout 
+			,Property.Layout_Foreclosure_Base_Normalized		// output layout 
 			,true                                	// output layout has bdid score field? 																	
 			,bdid_score                     			// bdid_score                 
 			,foreclosureDID_BDID				          // output dataset
@@ -115,7 +115,7 @@ appendSSNSortDist	:=	SORT(DISTRIBUTE(appendSSN, HASH(foreclosure_id)), RECORD, -
 //Normalize BKL file prior to append
 BKforeclosureIn	:= BKForeclosure.Fn_Map_BK2Foreclosure;
 
-Layout_Foreclosure_Base_Normalized normalizeBK(BKforeclosureIn l, unsigned1 nameCounter) := TRANSFORM
+Property.Layout_Foreclosure_Base_Normalized normalizeBK(BKforeclosureIn l, unsigned1 nameCounter) := TRANSFORM
 	self.name_first := choose(nameCounter,l.name1_first,l.name2_first,l.name3_first,l.name4_first,l.name5_first,l.name6_first,l.name7_first,l.name8_first);
 	self.name_middle := choose(nameCounter,l.name1_middle,l.name2_middle,l.name3_middle,l.name4_middle,l.name5_middle,l.name6_middle,l.name7_middle,l.name8_middle);
 	self.name_last := choose(nameCounter,l.name1_last,l.name2_last,l.name3_last,l.name4_last,l.name5_last,l.name6_last,l.name7_last,l.name8_last);
@@ -126,6 +126,27 @@ Layout_Foreclosure_Base_Normalized normalizeBK(BKforeclosureIn l, unsigned1 name
 	self.ssn	:= choose(nameCounter,l.name1_ssn,l.name2_ssn,l.name3_ssn,l.name4_ssn,l.name5_ssn,l.name6_ssn,l.name7_ssn,l.name8_ssn);
 	self.bdid := choose(nameCounter,(integer)l.name1_bdid,(integer)l.name2_bdid,(integer)l.name3_bdid,(integer)l.name4_bdid,(integer)l.name5_bdid,(integer)l.name6_bdid,(integer)l.name7_bdid,(integer)l.name8_bdid);
 	self.bdid_score := choose(nameCounter,(integer)l.name1_bdid_score,(integer)l.name2_bdid_score,(integer)l.name3_bdid_score,(integer)l.name4_bdid_score,(integer)l.name5_bdid_score,(integer)l.name6_bdid_score,(integer)l.name7_bdid_score,(integer)l.name8_bdid_score);
+	self.DotID		  := choose(nameCounter,l.name1.DotID,l.name2.DotID,l.name3.DotID,l.name4.DotID,l.name5.DotID,l.name6.DotID,l.name7.DotID,l.name8.DotID);
+	self.DotScore		:= choose(nameCounter,l.name1.DotScore,l.name2.DotScore,l.name3.DotScore,l.name4.DotScore,l.name5.DotScore,l.name6.DotScore,l.name7.DotScore,l.name8.DotScore);
+	self.DotWeight	:= choose(nameCounter,l.name1.DotWeight,l.name2.DotWeight,l.name3.DotWeight,l.name4.DotWeight,l.name5.DotWeight,l.name6.DotWeight,l.name7.DotWeight,l.name8.DotWeight);
+	self.EmpID		  := choose(nameCounter,l.name1.EmpID,l.name2.EmpID,l.name3.EmpID,l.name4.EmpID,l.name5.EmpID,l.name6.EmpID,l.name7.EmpID,l.name8.EmpID);
+	self.EmpScore		:= choose(nameCounter,l.name1.EmpScore,l.name2.EmpScore,l.name3.EmpScore,l.name4.EmpScore,l.name5.EmpScore,l.name6.EmpScore,l.name7.EmpScore,l.name8.EmpScore);
+	self.EmpWeight	:= choose(nameCounter,l.name1.EmpWeight,l.name2.EmpWeight,l.name3.EmpWeight,l.name4.EmpWeight,l.name5.EmpWeight,l.name6.EmpWeight,l.name7.EmpWeight,l.name8.EmpWeight);
+	self.POWID		  := choose(nameCounter,l.name1.POWID,l.name2.POWID,l.name3.POWID,l.name4.POWID,l.name5.POWID,l.name6.POWID,l.name7.POWID,l.name8.POWID);
+	self.POWScore		:= choose(nameCounter,l.name1.POWScore,l.name2.POWScore,l.name3.POWScore,l.name4.POWScore,l.name5.POWScore,l.name6.POWScore,l.name7.POWScore,l.name8.POWScore);
+	self.POWWeight	:= choose(nameCounter,l.name1.POWWeight,l.name2.POWWeight,l.name3.POWWeight,l.name4.POWWeight,l.name5.POWWeight,l.name6.POWWeight,l.name7.POWWeight,l.name8.POWWeight);
+	self.ProxID		  := choose(nameCounter,l.name1.ProxID,l.name2.ProxID,l.name3.ProxID,l.name4.ProxID,l.name5.ProxID,l.name6.ProxID,l.name7.ProxID,l.name8.ProxID);
+	self.ProxScore	:= choose(nameCounter,l.name1.ProxScore,l.name2.ProxScore,l.name3.ProxScore,l.name4.ProxScore,l.name5.ProxScore,l.name6.ProxScore,l.name7.ProxScore,l.name8.ProxScore);
+	self.ProxWeight	:= choose(nameCounter,l.name1.ProxWeight,l.name2.ProxWeight,l.name3.ProxWeight,l.name4.ProxWeight,l.name5.ProxWeight,l.name6.ProxWeight,l.name7.ProxWeight,l.name8.ProxWeight);
+	self.SeleID		  := choose(nameCounter,l.name1.SeleID,l.name2.SeleID,l.name3.SeleID,l.name4.SeleID,l.name5.SeleID,l.name6.SeleID,l.name7.SeleID,l.name8.SeleID);
+	self.SeleScore	:= choose(nameCounter,l.name1.SeleScore,l.name2.SeleScore,l.name3.SeleScore,l.name4.SeleScore,l.name5.SeleScore,l.name6.SeleScore,l.name7.SeleScore,l.name8.SeleScore);
+	self.SeleWeight	:= choose(nameCounter,l.name1.SeleWeight,l.name2.SeleWeight,l.name3.SeleWeight,l.name4.SeleWeight,l.name5.SeleWeight,l.name6.SeleWeight,l.name7.SeleWeight,l.name8.SeleWeight);	
+	self.OrgID		  := choose(nameCounter,l.name1.OrgID,l.name2.OrgID,l.name3.OrgID,l.name4.OrgID,l.name5.OrgID,l.name6.OrgID,l.name7.OrgID,l.name8.OrgID);
+	self.OrgScore		:= choose(nameCounter,l.name1.OrgScore,l.name2.OrgScore,l.name3.OrgScore,l.name4.OrgScore,l.name5.OrgScore,l.name6.OrgScore,l.name7.OrgScore,l.name8.OrgScore);
+	self.OrgWeight	:= choose(nameCounter,l.name1.OrgWeight,l.name2.OrgWeight,l.name3.OrgWeight,l.name4.OrgWeight,l.name5.OrgWeight,l.name6.OrgWeight,l.name7.OrgWeight,l.name8.OrgWeight);
+	self.UltID		  := choose(nameCounter,l.name1.UltID,l.name2.UltID,l.name3.UltID,l.name4.UltID,l.name5.UltID,l.name6.UltID,l.name7.UltID,l.name8.UltID);
+	self.UltScore		:= choose(nameCounter,l.name1.UltScore,l.name2.UltScore,l.name3.UltScore,l.name4.UltScore,l.name5.UltScore,l.name6.UltScore,l.name7.UltScore,l.name8.UltScore);
+	self.UltWeight	:= choose(nameCounter,l.name1.UltWeight,l.name2.UltWeight,l.name3.UltWeight,l.name4.UltWeight,l.name5.UltWeight,l.name6.UltWeight,l.name7.UltWeight,l.name8.UltWeight);
 	self.site_prim_range :=l.situs1_prim_range;
 	self.site_predir :=l.situs1_predir;
 	self.site_prim_name :=l.situs1_prim_name;

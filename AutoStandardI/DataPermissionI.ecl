@@ -31,6 +31,8 @@
         // per MBS team: DPM 22, is reserved for HealthLinkDimensions 
         EXPORT use_EquifaxAcctDecisioning := in_mod.DataPermissionMask[23] NOT IN restrictedSet;
 				EXPORT use_AccuityBankData := in_mod.DataPermissionMask[24] NOT IN restrictedSet;
+				EXPORT use_DnB := in_mod.DataPermissionMask[28] NOT IN restrictedSet;
+				EXPORT use_FedExData := in_mod.DataPermissionMask[34] NOT IN restrictedSet;
 				EXPORT STRING permission_mask := in_mod.DataPermissionMask;
 	END;
 END;

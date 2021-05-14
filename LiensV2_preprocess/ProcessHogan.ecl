@@ -18,6 +18,7 @@ RemoveLeadingZeros(string in_str) := FUNCTION
 	out_str := in_str[(unsigned)first_non0_position..];
 	return out_str;
 END;
+sysdate := (string)STD.date.today();                        
 	
 	InvalidName	:= '^(NA |N A|N/A)';
 	//Clean/uppercase fields
@@ -31,9 +32,12 @@ END;
 		self.CASENUMBER		:= REGEXREPLACE('[^A-Z0-9 ]',RemoveLeadingZeros(ut.CleanSpacesAndUpper(L.CASENUMBER)),'');
 		self.BOOK					:= REGEXREPLACE('[^A-Z0-9 ]',RemoveLeadingZeros(ut.CleanSpacesAndUpper(L.BOOK)),'');
 		self.PAGE					:= REGEXREPLACE('[^A-Z0-9 ]',RemoveLeadingZeros(ut.CleanSpacesAndUpper(L.PAGE)),'');
-		vActionDate				:= STD.Date.IsValidDate((INTEGER)L.ACTIONDATE);
+		vActionDate				:= STD.Date.IsValidDate((INTEGER)L.ACTIONDATE,1980,(integer)sysdate[1..4]) and //VC DF-27001 Clean old and future dates 
+                         STD.Date.DaysBetween((INTEGER)L.ACTIONDATE,STD.Date.Today())>=0;
 		self.ACTIONDATE		:= IF(vActionDate,L.ACTIONDATE,'');
-		self.ORIGLIEN			:= IF(trim(L.ORIGLIEN) = '00000000','',TRIM(L.ORIGLIEN,left,right));
+
+ 		vORIGLIEN				  := STD.Date.IsValidDate((INTEGER)L.ORIGLIEN,1980);   //VC DF-27001 - Clean old dates only
+		self.ORIGLIEN			:= IF(vORIGLIEN,TRIM(L.ORIGLIEN,left,right),'');
 		self.AMOUNT				:= RemoveLeadingZeros(L.AMOUNT);
 		self.ASSETS				:= TRIM(L.ASSETS,left,right);
 		self.PLAINTIFF		:= ut.CleanSpacesAndUpper(REGEXREPLACE(InvalidName,L.PLAINTIFF,'',NOCASE));
@@ -48,8 +52,8 @@ END;
 		self.ADDRESS			:= ut.CleanSpacesAndUpper(L.ADDRESS);
 		self.CITY					:= ut.CleanSpacesAndUpper(L.CITY);
 		self.STATE				:= ut.CleanSpacesAndUpper(L.STATE);
-		self.ZIP					:= ut.CleanSpacesAndUpper(L.ZIP);
-		vUploadDate				:= STD.Date.IsValidDate((INTEGER)L.UPLOADDATE);
+    self.ZIP					:= ut.CleanSpacesAndUpper(L.ZIP);
+		vUploadDate				:= STD.Date.IsValidDate((INTEGER)L.UPLOADDATE); 	
 		self.UPLOADDATE		:= IF(VUploadDate,L.UPLOADDATE,'');
 		self.UNLAWDETYN		:= ut.CleanSpacesAndUpper(L.UNLAWDETYN);
 		self.ORIGCASE			:= REGEXREPLACE('[^A-Z0-9 ]',RemoveLeadingZeros(ut.CleanSpacesAndUpper(L.ORIGCASE)),'');
@@ -68,9 +72,10 @@ END;
 		self.RMSID				:= ut.CleanSpacesAndUpper(L.RMSID);
 		self.EMPLOYER_NAME	:= ut.CleanSpacesAndUpper(L.EMPLOYER_NAME);
 		// self.lf						:= L.lf;
-		vDOB	:=	STD.Date.IsValidDate((INTEGER)L.DOB);
-		SELF.DOB	:=	IF(vDOB,L.DOB,'');
-		vCollection_Date	:=	STD.Date.IsValidDate((INTEGER)L.Collection_Date);
+		vDOB	            :=	STD.Date.IsValidDate((INTEGER)L.DOB) and 
+                          STD.Date.DaysBetween((INTEGER)L.DOB,STD.Date.Today())>=0; //VC DF-27001 Clean future dates only
+		SELF.DOB	        :=	IF(vDOB,L.DOB,'');
+		vCollection_Date	:=	STD.Date.IsValidDate((INTEGER)L.Collection_Date,1980,(integer)sysdate[1..4]); //VC DF-27001 clean old and future dates
 		SELF.Collection_Date	:=	IF(vCollection_Date,L.Collection_Date,'');
 		SELF.CaseLinkID		:= ut.CleanSpacesAndUpper(L.CaseLinkID);
 		SELF.Unused	:=	'';

@@ -1,10 +1,11 @@
 ﻿//Compile all keys in this package in one place
 //easy to output this module to see if keys exist/are correct layout/etc
-import BizLinkFull,tools;
+import BizLinkFull,tools,BIPV2_Segmentation,BIPV2_Suppression,BIPV2_Best,BIPV2_Build,BIPV2_Company_Names;
 
 EXPORT AlphaProdKeys_Package(
 
-   string   pversion              = 'qa'
+   string   pversionSuppress      = 'qa'
+  ,string   pversion              = 'qa'
   ,boolean	pUseOtherEnvironment	= false
   ,unsigned pKey                  = 0
   ,string   pRegexFieldFilter     = ''
@@ -15,9 +16,16 @@ module
   shared bizbase        := BizLinkFull.File_BizHead;
   shared specs          := BizLinkFull.specificities(bizbase);
 
-  shared bizknames        := BizLinkFull.keynames           (pversion,puseotherenvironment);
+  shared bizknames        := BizLinkFull.keynames         (pversion,puseotherenvironment);
+  shared segnames         := BIPV2_Segmentation.keynames  (pversion,puseotherenvironment);
 
+  shared seleprox_names   := BIPV2_Suppression.FileNames.key_sele_prox_names  (pversionSuppress);
+  shared bestknames       := BIPV2_Best.Keynames                              (pversion,puseotherenvironment);
+  shared knames           := BIPV2_Build.keynames                             (pversion,puseotherenvironment);
+
+  
   //key definitions
+  export strnbr                         := BIPV2_Company_Names.files.StrNbr_SF_DS;  //file, not key, but it is in the package file
   export Xlinkmeow                      := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.Key            ' ,bizknames.meow                    );  
   export Xlinkrefs_l_cnpname            := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.Key          ' ,bizknames.refs_l_cnpname          );  
   export Xlinkrefs_l_cnpname_slim       := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_CNPNAME.SlimKey      ' ,bizknames.refs_l_cnpname_slim     );  
@@ -44,7 +52,14 @@ module
   export Xlinksup_orgid                 := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.KeyorgidUp     ' ,bizknames.sup_orgid               );  
   export Xlinksup_rcid                  := tools.macf_FilesIndex('BizLinkFull.Process_Biz_Layouts.KeyIDHistory   ' ,bizknames.sup_rcid                );  
   export Xlinkrefs_l_sic                := tools.macf_FilesIndex('BizLinkFull.Key_BizHead_L_SIC.Key              ' ,bizknames.refs_l_sic              );  
-                                                                                                                                                          
+  
+  export seg_linkids                    := tools.macf_FilesIndex('BIPV2_Segmentation.Key_LinkIds().key           ' ,segnames.seg_linkids              );  
+  export seleprox_suppress              := BIPV2_Suppression.modSuppression.kSeleProx(pversionSuppress);  
+  export best_linkids                   := tools.macf_FilesIndex('BIPV2_Best.Key_LinkIds.key                     ' ,bestknames.LinkIds                );
+  export contact_title_linkids          := tools.macf_FilesIndex('BIPV2_Build.key_contact_title_linkids().key    ' ,knames.contact_title_linkids      );
+  export ZipCitySt                      := BIPV2_Build.keys     (pversion,puseotherenvironment).ZipCitySt               ;
+  
+  
                                                                                                                                                           
   export outputpackage :=                                                                                                                                     
   sequential(
@@ -77,6 +92,13 @@ module
     ,if(pKey in [0 ,24] ,sequential(output(24 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_orgid               .logical ,100),named('Xlinksup_orgid'                ))))
     ,if(pKey in [0 ,25] ,sequential(output(25 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinksup_rcid                .logical ,100),named('Xlinksup_rcid'                 ))))
     ,if(pKey in [0 ,26] ,sequential(output(26 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_sic              .logical ,100),named('Xlinkrefs_l_sic'               ))))
+
+    ,if(pKey in [0 ,27] ,sequential(output(27 ,named('KeyNumber'),overwrite) ,output(choosen(seg_linkids                  .logical ,100),named('seg_linkids'                   ))))
+    ,if(pKey in [0 ,28] ,sequential(output(28 ,named('KeyNumber'),overwrite) ,output(choosen(seleprox_suppress                     ,100),named('seleprox_suppress'             ))))
+    ,if(pKey in [0 ,29] ,sequential(output(29 ,named('KeyNumber'),overwrite) ,output(choosen(best_linkids                 .logical ,100),named('best_linkids'                  ))))
+    ,if(pKey in [0 ,30] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(contact_title_linkids        .logical ,100),named('contact_title_linkids'         ))))
+    ,if(pKey in [0 ,31] ,sequential(output(31 ,named('KeyNumber'),overwrite) ,output(choosen(strnbr                                ,100),named('strnbr'                        ))))
+    ,if(pKey in [0 ,32] ,sequential(output(32 ,named('KeyNumber'),overwrite) ,output(choosen(ZipCitySt                    .logical ,100),named('ZipCitySt'                     ))))
   );       
 
 end;

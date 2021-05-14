@@ -1,4 +1,5 @@
-﻿import RoxieKeyBuild,PRTE, _control, PRTE2_Common,strata;
+﻿import RoxieKeyBuild, PRTE, _control, PRTE2_Common,strata, dops, prte2, orbit3;
+
 
 export proc_build_keys(string filedate) := FUNCTION
 
@@ -63,17 +64,24 @@ To_qa	:=	parallel(mv1_qa, mv2_qa, mv3_qa, mv4_qa, mv5_qa, mv6_qa, mv7_qa, mv8_qa
 // -- Build Autokeys
 build_autokeys := Keys.autokeys(filedate);
 
-// -- EMAIL ROXIE KEY COMPLETION NOTIFICATION 
-
 is_running_in_prod := PRTE2_Common.Constants.is_running_in_prod;
 
  DOPS_Comment := OUTPUT('Skipping DOPS process');
- updatedops := PRTE.UpdateVersion('MARIKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','N','N');
- updatedops_fcra := PRTE.UpdateVersion('FCRA_MARIKeys',filedate,_control.MyInfo.EmailAddressNormal,'B','F','N');
+ updatedops := PRTE.UpdateVersion(constants.dops_name,filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='N',l_includeboolean := 'N');
+ updatedops_fcra := PRTE.UpdateVersion(constants.fcra_dops_name,filedate,_control.MyInfo.EmailAddressNormal,l_inloc:='B',l_inenvment:='F',l_includeboolean := 'N');
+ 
+ key_validations :=  parallel(output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_nonfcra,Constants.dops_name, 'N'), named(Constants.dops_name+'Validation')),
+                   output(dops.ValidatePRCTFileLayout(filedate, prte2.Constants.ipaddr_prod, prte2.Constants.ipaddr_roxie_fcra,Constants.fcra_dops_name, 'F'), named(Constants.fcra_dops_name+'Validation')));	
 
-PerformUpdateOrNot := IF(is_running_in_prod,
- parallel(updatedops,updatedops_fcra),
+create_orbit_build := parallel(
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - MariKeys', filedate, 'PN', email_list:= _control.MyInfo.EmailAddressNormal),
+																Orbit3.proc_Orbit3_CreateBuild('PRTE - FCRA_MariKeys', filedate, 'PF', email_list:= _control.MyInfo.EmailAddressNormal));
+
+ 
+ PerformUpdateOrNot := IF(is_running_in_prod,
+ parallel(updatedops,updatedops_fcra,create_orbit_build),
  DOPS_Comment);
+
 
 
 cnt_mari_did_fcra := OUTPUT(strata.macf_pops(prte2_prof_license_mari.Keys.key_did(true),,,,,,FALSE,
@@ -109,12 +117,16 @@ cnt_mari_did_fcra := OUTPUT(strata.macf_pops(prte2_prof_license_mari.Keys.key_di
 																									'tax_type_2','title','type_cd','url','violation_case_nbr','violation_desc','violation_dte']));
 
 cnt_mari_did_fcra;
+
 buildKey	:=	sequential(
 												 build_roxie_keys
 												,Move_keys
 												,to_qa
 												,build_autokeys
-												,PerformUpdateOrNot);
+												,copy_seeds(filedate)
+												,key_validations
+												,PerformUpdateOrNot
+												 );
 												
 
 return	buildKey;

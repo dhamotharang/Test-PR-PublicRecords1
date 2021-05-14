@@ -65,7 +65,8 @@ module
 							sequential(
 								if(pDelete, loutput('_fVersionIntegrityCheck(): Clearing ' + pVersions.Delete + ' superfile + deleting contents'),
 											loutput('_fVersionIntegrityCheck(): Clearing ' + pVersions.Delete + ' superfile without deleting contents')),
-								fileservices.clearsuperfile(pVersions.Delete,pDelete)
+								// fileservices.clearsuperfile(pVersions.Delete,pDelete)
+                STD.File.RemoveOwnedSubFiles(pVersions.Delete,pDelete)  // will only delete subfile if it only exists in the delete superfile.  it is is owned by other supers, it will be ignored.
 							)
 					)
 					,if(pIncludeBuiltDelete = true

@@ -1,4 +1,4 @@
-#workunit('name','FCRA-RiskView attributes');
+﻿#workunit('name','FCRA-RiskView attributes');
 
 
 prii_layout := RECORD
@@ -68,8 +68,7 @@ l := RECORD
 END;
 
 
-//fcraroxieIP := 'http://temp-fcra.sc.seisint.com:9876'; 
-fcraroxieIP := 'http://ofcraroxievip.sc.seisint.com:9876'; 
+fcraroxieIP := 'http://prdrfcrathorvip.hpcc.risk.regn.net:9876'; 
 
 
 l t_f(f le, INTEGER c) := TRANSFORM
@@ -85,7 +84,7 @@ l t_f(f le, INTEGER c) := TRANSFORM
 //  self.scores := dataset([{'Models.RVBankCard_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
 //	self.scores := dataset([{'Models.RVRetail_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
 	self.scores := dataset([{'Models.RVTelecom_Service', fcraroxieIP,params}], models.Layout_Score_Chooser); 
-	self.gateways := dataset([{'neutralroxie', 'http://oroxievip.sc.seisint.com:9876'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://prdrroxiethorvip.hpcc.risk.regn.net:9876'}], risk_indicators.Layout_Gateways_In);
 //	self.gateways := dataset([{'neutralroxie', 'http://roxievip.br.seisint.com:9876'}], risk_indicators.Layout_Gateways_In);
 	SELF := le;
 	self := [];

@@ -1,12 +1,12 @@
-﻿// Machine-readable versions of the spec file and subsets thereof
-IMPORT SALT311;
-EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
- 
+// Machine-readable versions of the spec file and subsets thereof
+IMPORT SALT44;
+EXPORT GenerationMod := MODULE(SALT44.iGenerationMod)
+
   // SALT Version info
-  EXPORT salt_VERSION := 'V3.11.8';
-  EXPORT salt_MODULE := 'SALT311'; // Optional override by HACK:SALTMODULE
-  EXPORT salt_TOOLSMODULE := 'SALTTOOLS30'; // Optional override by HACK:SALTTOOLSMODULE
- 
+  EXPORT salt_VERSION := 'V4.4.4';
+  EXPORT salt_MODULE := 'SALT44'; // Optional override by HACK:SALTMODULE
+  EXPORT salt_TOOLSMODULE := 'SALTTOOLS4'; // Optional override by HACK:SALTTOOLSMODULE
+
   // Core module configuration values
   EXPORT spc_MODULE := 'BizLinkFull';
   EXPORT spc_NAMESCOPE := '';
@@ -35,7 +35,7 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
   EXPORT spc_HAS_PARENTS := TRUE;
   EXPORT spc_HAS_FORCE := TRUE;
   EXPORT spc_HAS_BLOCKLINK := FALSE;
- 
+
   // The entire spec file
   EXPORT spcString :=
     'OPTIONS:-ma -gs2\n'
@@ -125,14 +125,17 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'LINKPATH:L_PHONE:company_phone_7:?:cnp_name(HASBASE):company_phone_3:+:company_phone_3_ex:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:st:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_FEIN:company_fein:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:st:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:\n'
     + 'LINKPATH:L_URL:company_url:?:st:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:\n'
-    + 'LINKPATH:L_CONTACT:fname_preferred:lname:?:mname:cnp_name(HASBASE):zip:st:+:fname:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_name:city:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
+    + '\n'
+    + 'LINKPATH:L_CONTACT_ZIP:fname_preferred:lname:zip:?:mname:cnp_name(HASBASE):st:+:fname:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_name:city:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
+    + 'LINKPATH:L_CONTACT_ST:fname_preferred:lname:st:?:mname:cnp_name(HASBASE):+:fname:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_name:city:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CONTACT_ZIP)\n'
+    + '\n'
     + 'LINKPATH:L_CONTACT_SSN:contact_ssn:+:contact_email:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:st:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_EMAIL:contact_email:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:st:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_SIC:company_sic_code1:zip:?:cnp_name:prim_name:MAXBLOCKSIZE(2000)\n'
     + 'LINKPATH:L_SOURCE:source_record_id:source:?:cnp_name(HASBASE):prim_name:zip:city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_CONTACT_DID:contact_did\n'
     ;
- 
+
   // Structured values
   EXPORT linkpaths := DATASET([
     {'L_CNPNAME_ZIP','cnp_name,zip','prim_name,st(HASBASE)','city,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
@@ -145,13 +148,14 @@ EXPORT GenerationMod := MODULE(SALT311.iGenerationMod)
     ,{'L_PHONE','company_phone_7','cnp_name(HASBASE),company_phone_3','company_phone_3_ex,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,st,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_FEIN','company_fein','','company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,st,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_URL','company_url','st','company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
-    ,{'L_CONTACT','fname_preferred,lname','mname,cnp_name(HASBASE),zip,st','fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
+    ,{'L_CONTACT_ZIP','fname_preferred,lname,zip','mname,cnp_name(HASBASE),st','fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
+    ,{'L_CONTACT_ST','fname_preferred,lname,st','mname,cnp_name(HASBASE)','fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','L_CONTACT_ZIP',''}
     ,{'L_CONTACT_SSN','contact_ssn','','contact_email,company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,st,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_EMAIL','contact_email','','company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,st,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_SIC','company_sic_code1,zip','cnp_name,prim_name','','',''}
     ,{'L_SOURCE','source_record_id,source','cnp_name(HASBASE),prim_name,zip,city,st','company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_CONTACT_DID','contact_did','','','',''}
     ],{STRING linkpath;STRING compulsory;STRING optional;STRING bonus;STRING required;STRING search});
- 
+
 END;
 

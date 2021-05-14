@@ -29,13 +29,18 @@ functionmacro
   cluster44 := tools.fun_Groupname('44');
   cluster36 := tools.fun_Groupname('36');
 
-  email                 := BIPV2_Build.Send_Emails(pversion ,,not tools._constants.isdataland and pShouldUpdateDOPS);
-  UpdateFullKeysDops    := email.BIPV2FullKeys.Roxie    ;
-  UpdateWeeklyKeysDops  := email.BIPV2WeeklyKeys.Roxie  ;
-  CheckDatalandKeys     := email.BIPV2DatalandKeys.Roxie;
-  outputdatalandkeys    := BIPV2_Build.BIPV2FullKeys_Package(pversion,false).outputpackage;
-  outputBIPV2Fullkeys    := BIPV2_Build.BIPV2FullKeys_Package(pversion,false).outputpackage;
-  outputBIPV2Weeklykeys    := BIPV2_Build.BIPV2WeeklyKeys_Package(pversion,false).outputpackage;
+  email                   := BIPV2_Build.Send_Emails(pversion ,,not tools._constants.isdataland and pShouldUpdateDOPS,pBuildName := 'BIPV2 Full Build');
+  UpdateFullKeysDops      := email.BIPV2FullKeys.Roxie    ;
+  UpdateWeeklyKeysDops    := email.BIPV2WeeklyKeys.Roxie  ;
+  CheckDatalandKeys       := email.BIPV2DatalandKeys.Roxie;
+  outputdatalandkeys      := BIPV2_Build.BIPV2FullKeys_Package  (pversion,false).outputpackage;
+  outputBIPV2Fullkeys     := BIPV2_Build.BIPV2FullKeys_Package  (pversion,false).outputpackage;
+  outputBIPV2Weeklykeys   := BIPV2_Build.BIPV2WeeklyKeys_Package(pversion,false).outputpackage;
+  
+  // -- update orbit for BIPV2FullKeys and BIPV2Weekly Keys
+  
+  UpdateFullKeysOrbit      := email.BIPV2FullKeys.updateOrbit ;
+  UpdateWeeklyKeysOrbit    := email.BIPV2WeeklyKeys.updateOrbit;
   
   f_out :=   BIPV2_Files.files_CommonBase.filePrefix  + pversion;
   
@@ -53,6 +58,8 @@ functionmacro
       ,BIPV2_Build.Promote().Built2QA //this includes everything
       ,UpdateFullKeysDops
       ,UpdateWeeklyKeysDops
+      ,UpdateFullKeysOrbit  
+      ,UpdateWeeklyKeysOrbit
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster44).Built2QA )
       ,iff(pShouldDoOtherClusters = true  ,BizLinkFull.Promote(,'bizlinkfull',pCluster := cluster36).Built2QA )
       ,if(pShouldDoDataland ,KickPromote2QADataland)

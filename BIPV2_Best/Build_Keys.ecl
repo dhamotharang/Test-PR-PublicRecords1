@@ -6,11 +6,12 @@ export Build_Keys(
 ) :=
 module
 	shared Base     		  := fn_Prep_Base_for_Key (pversion,pBestBase);
-  shared ds_commonbase  := table(pDs_Clean,{seleid,seleid_status_private},seleid,seleid_status_private,merge);
+  shared ds_commonbase  := table(pDs_Clean,{seleid,seleid_status_private,seleid_status_private_score},seleid,seleid_status_private,seleid_status_private_score,merge);
   shared dkeybuild      := join(Base ,ds_commonbase  ,left.seleid = right.seleid,transform(
      layouts.key
     ,self.isdefunct := if(right.seleid_status_private = 'D'           ,true   ,false)
     ,self.isactive  := if(right.seleid_status_private  in ['I','D']   ,false  ,true )
+    ,self.seleid_status_private_score := RIGHT.seleid_status_private_score
     ,self           := left
   ),hash,keep(1),left outer);//only 1 status per seleid
   

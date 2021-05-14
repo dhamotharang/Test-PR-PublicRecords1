@@ -51,7 +51,7 @@ ENDMACRO;
 export Proc_Build_Deed_Boolean_Keys(string filedate, boolean isFast) := function
 
 	//DF-23330 determine if there is a deed base file
-	delta_rec_exist := exists(LN_PropertyV2_Fast.Files.base.deed_mortg);
+	delta_rec_exist := exists(LN_PropertyV2_Fast.Files.basedelta.deed_mortg);
 	useDummyFile := IF(isFast AND NOT delta_rec_exist, TRUE, FALSE);
 	
 	superKeyPrefix := if (isFast,'property_fast','ln_propertyV2');
@@ -71,7 +71,7 @@ export Proc_Build_Deed_Boolean_Keys(string filedate, boolean isFast) := function
 	
 	kwd  := Text_Search.KeywordingFunc(info);
 	bld := Text_Search.Build_From_Inversion(info, posting, kwd, FALSE, FALSE, TRUE, segList,externalKeys);
-	
+/* DF-28307 - key deprecated
 	inlkeyname := '~thor_data400::key::'+superKeyPrefix+'::deeds::'+filedate+'::doc.fares_id';
 	inskeyname := '~thor_data400::key::'+superKeyPrefix+'::deeds::qa::doc.fares_id';
 	
@@ -81,11 +81,11 @@ export Proc_Build_Deed_Boolean_Keys(string filedate, boolean isFast) := function
 												inlkeyname,
 												build_key	
 												);
-								
+*/
 	retval := sequential(
-									bld,
-									build_key,
-									Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname)
+									bld//,
+									//build_key,
+									//Text_Search.Boolean_Move_To_QA(inskeyname,inlkeyname)
 									);
 	return retval;
 end;

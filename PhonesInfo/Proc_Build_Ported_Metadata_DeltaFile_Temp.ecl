@@ -2,15 +2,17 @@
 //Ported Phones Deltabase Build for Telo///////////////////////
 ///////////////////////////////////////////////////////////////
 
-import std, _control, PromoteSupers, RoxieKeyBuild, ut;
+IMPORT std, _control, PromoteSupers, RoxieKeyBuild, ut;
 
-EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename, string newDay, const varstring eclsourceip, string thor_name):= function
+//DF-28036: Convert 6-Digit Spids to 4-Character Spids
+
+EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename, string newDay, const varstring eclsourceip, string thor_name, string contacts):= function
 
 	//Spray Raw Delta Files and Place Into DailyDelta Superfile
 	sprayDailyDelta 		:= PhonesInfo.Spray_Telo_DailyDelta(version, filename, eclsourceip, thor_name);
 	
 	//Build DeltaBaseFile, Using the Raw Delta Files
-	buildBaseDelta			:= output(PhonesInfo.Map_Ported_Metadata_DeltaFile_Temp(version),,'~thor_data400::base::phones::ported_metadata_deltamain_'+version, csv(heading(1), terminator('\n'), separator('\t')), overwrite, __compressed__);
+	buildBaseDelta			:= output(PhonesInfo.Map_Ported_Metadata_DeltaFile_Temp(version),,'~thor_data400::base::phones::ported_metadata_deltamain_'+version, csv(heading(single), terminator('\n'), separator('\t')), overwrite, __compressed__);
 	
 	//Despray Processed DeltaBase File - BASE DESPRAYED FOR DB TEAM
 	desprayBaseDelta		:= FileServices.DeSpray('~thor_data400::base::phones::ported_metadata_deltamain_'+version,
@@ -67,12 +69,10 @@ EXPORT Proc_Build_Ported_Metadata_DeltaFile_Temp(string version, string filename
 	
 	PromoteSupers.Mac_SK_Move_v2('~thor_data400::key::phones_ported_metadata_delta','Q',mvQAPhonesPortedmetadataDelta,'4');	
 	
-	create_build 			:= PhonesInfo.proc_Orbit3_CreateBuild ('PhonesFinder Deltabase', version);
-	
 	//Run Build & Provide Email on Build Status
-	sendEmail		:= sequential(sprayDailyDelta, buildBaseDelta, desprayBaseDelta, moveComBaseDelta, bkPhonesPortedmetadataDelta, mvBltPhonesPortedmetadataDelta, mvQAPhonesPortedmetadataDelta/*,create_build*/):
-														Success(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'Prod PhonesInfo Ported & Metadata DeltaBase Key Build Succeeded', workunit + ': Build complete.')),
-														Failure(FileServices.SendEmail(_control.MyInfo.EmailAddressNotify + ';judy.tao@lexisnexisrisk.com' + ';gregory.rose@lexisnexisrisk.com' + ';darren.knowles@lexisnexisrisk.com', 'Prod PhonesInfo Ported & Metadata DeltaBaseKey Build Failed', workunit + '\n' + FAILMESSAGE)
+	sendEmail		:= sequential(sprayDailyDelta, buildBaseDelta, desprayBaseDelta, moveComBaseDelta, bkPhonesPortedmetadataDelta, mvBltPhonesPortedmetadataDelta, mvQAPhonesPortedmetadataDelta):
+														Success(FileServices.SendEmail(contacts, 'Prod PhonesInfo Ported & Metadata DeltaBase Key Build Succeeded', workunit + ': Build complete.')),
+														Failure(FileServices.SendEmail(contacts, 'Prod PhonesInfo Ported & Metadata DeltaBaseKey Build Failed', workunit + '\n' + FAILMESSAGE)
 														);
 
 	return sendEmail;

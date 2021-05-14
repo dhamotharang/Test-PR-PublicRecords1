@@ -13,7 +13,7 @@ export Rename_BIPV2WeeklyKeys(
 ) :=
 function
 
-  semail := bipv2_build.Send_Emails(pversion,,not pIsTesting and pShouldUpdateRoxiePage = true,,,,pEmailList,pRoxieEmailList,pBuildName := 'BIPV2 Rename BIPV2WeeklyKeys',pUseVersion := pSuperfileVersion).BIPV2WeeklyKeys;
+  semail := bipv2_build.Send_Emails(pversion,,not pIsTesting and pShouldUpdateRoxiePage = true,pFilesToRename(if(pFilter = '' ,true,regexfind(pFilter,logicalname,nocase))),,,pEmailList,pRoxieEmailList,pBuildName := 'BIPV2 Rename BIPV2FullKeys',pUseVersion := pSuperfileVersion).BIPV2WeeklyKeys;
   
   returnresult := sequential(
      tools.fun_RenameBuildFiles(pversion,pFilesToRename,pIsTesting,pSuperfileVersion,pFilter)

@@ -1,6 +1,6 @@
-import RiskWise;
+﻿import RiskWise;
 
-export SD1O_Soapcall(dataset(layout_SD1O_soapcall) indata, string roxieIP='http://roxiestaging.br.seisint.com:9876', boolean isFCRA=false) := function
+export SD1O_Soapcall(dataset(layout_SD1O_soapcall) indata, string roxieIP='http://certstagingvip.hpcc.risk.regn.net:9876', boolean isFCRA=false) := function
 	
 errx := record
 	string errorcode := '';
