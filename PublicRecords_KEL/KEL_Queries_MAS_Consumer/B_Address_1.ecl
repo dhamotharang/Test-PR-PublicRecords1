@@ -4,8 +4,8 @@ IMPORT B_Address_2,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecord
 IMPORT * FROM KEL16.Null;
 EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_2(__in,__cfg).__ENH_Address_2) __ENH_Address_2 := B_Address_2(__in,__cfg).__ENH_Address_2;
-  SHARED __EE447615 := __ENH_Address_2;
-  EXPORT __ST150365_Layout := RECORD
+  SHARED __EE437646 := __ENH_Address_2;
+  EXPORT __ST150343_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -51,24 +51,24 @@ EXPORT B_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST150365_Layout __ND447385__Project(B_Address_2(__in,__cfg).__ST152349_Layout __PP446644) := TRANSFORM
-    __EE447380 := __PP446644.Bestchild_Advo_;
-    SELF.College_Flag_ := (__T(__EE447380))[1].College_Indicator_;
-    __EE447395 := __PP446644.Bestchild_Advo_;
-    SELF.Do_Not_Deliver_Flag_ := (__T(__EE447395))[1].Do_Not_Deliver_Indicator_;
-    __EE447409 := __PP446644.Bestchild_Advo_;
-    SELF.Drop_Indicator_Flag_ := (__T(__EE447409))[1].Drop_Indicator_;
-    __EE447423 := __PP446644.Bestchild_Advo_;
-    SELF.Only_G_M_Flag_ := (__T(__EE447423))[1].Only_Way_To_Get_Mail_Indicator_;
-    __EE447439 := __PP446644.Bestchild_Advo_;
-    SELF.Seasonal_Delivery_Flag_ := (__T(__EE447439))[1].Seasonal_Delivery_Indicator_;
-    __EE447453 := __PP446644.Bestchild_Advo_;
-    SELF.Style_Flag_ := (__T(__EE447453))[1].Style_Code_;
-    __EE447467 := __PP446644.Bestchild_Advo_;
-    SELF.Throw_Back_Flag_ := (__T(__EE447467))[1].Throw_Back_Indicator_;
-    __EE447481 := __PP446644.Bestchild_Advo_;
-    SELF.Vacant_Flag_ := (__T(__EE447481))[1].Vacancy_Indicator_;
-    SELF := __PP446644;
+  SHARED __ST150343_Layout __ND437416__Project(B_Address_2(__in,__cfg).__ST152238_Layout __PP436675) := TRANSFORM
+    __EE437411 := __PP436675.Bestchild_Advo_;
+    SELF.College_Flag_ := (__T(__EE437411))[1].College_Indicator_;
+    __EE437426 := __PP436675.Bestchild_Advo_;
+    SELF.Do_Not_Deliver_Flag_ := (__T(__EE437426))[1].Do_Not_Deliver_Indicator_;
+    __EE437440 := __PP436675.Bestchild_Advo_;
+    SELF.Drop_Indicator_Flag_ := (__T(__EE437440))[1].Drop_Indicator_;
+    __EE437454 := __PP436675.Bestchild_Advo_;
+    SELF.Only_G_M_Flag_ := (__T(__EE437454))[1].Only_Way_To_Get_Mail_Indicator_;
+    __EE437470 := __PP436675.Bestchild_Advo_;
+    SELF.Seasonal_Delivery_Flag_ := (__T(__EE437470))[1].Seasonal_Delivery_Indicator_;
+    __EE437484 := __PP436675.Bestchild_Advo_;
+    SELF.Style_Flag_ := (__T(__EE437484))[1].Style_Code_;
+    __EE437498 := __PP436675.Bestchild_Advo_;
+    SELF.Throw_Back_Flag_ := (__T(__EE437498))[1].Throw_Back_Indicator_;
+    __EE437512 := __PP436675.Bestchild_Advo_;
+    SELF.Vacant_Flag_ := (__T(__EE437512))[1].Vacancy_Indicator_;
+    SELF := __PP436675;
   END;
-  EXPORT __ENH_Address_1 := PROJECT(__EE447615,__ND447385__Project(LEFT));
+  EXPORT __ENH_Address_1 := PROJECT(__EE437646,__ND437416__Project(LEFT));
 END;

@@ -1,7 +1,7 @@
 //HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Phone_Summary,B_Phone_Summary_1,B_Phone_Summary_2,B_Phone_Summary_3,B_Phone_Summary_4,B_Phone_Summary_5,B_Phone_Summary_6,CFG_Compile,E_Input_P_I_I,E_Phone_Summary FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
+IMPORT B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Phone_Summary,B_Phone_Summary_1,B_Phone_Summary_2,B_Phone_Summary_3,B_Phone_Summary_4,B_Phone_Summary_5,CFG_Compile,E_Input_P_I_I,E_Phone_Summary FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(KEL.typ.str __PPhone, DATASET(RECORDOF(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII)) __PInputPIIDataset, KEL.typ.kdate __PP_InpClnArchDt, DATA57 __PDPM, CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault) := MODULE
   SHARED __cfg_Local := MODULE(CFG_Compile)
@@ -98,20 +98,16 @@ EXPORT Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(KEL.typ.str __PPhone, D
   SHARED B_Input_P_I_I_6_Local := MODULE(B_Input_P_I_I_6(__in,__cfg_Local))
     SHARED TYPEOF(B_Input_P_I_I_7(__in,__cfg_Local).__ENH_Input_P_I_I_7) __ENH_Input_P_I_I_7 := B_Input_P_I_I_7_Local.__ENH_Input_P_I_I_7;
   END;
-  SHARED B_Phone_Summary_6_Local := MODULE(B_Phone_Summary_6(__in,__cfg_Local))
-    SHARED TYPEOF(E_Phone_Summary(__in,__cfg_Local).__Result) __E_Phone_Summary := E_Phone_Summary_Filtered.__Result;
-  END;
   SHARED B_Input_P_I_I_5_Local := MODULE(B_Input_P_I_I_5(__in,__cfg_Local))
     SHARED TYPEOF(B_Input_P_I_I_6(__in,__cfg_Local).__ENH_Input_P_I_I_6) __ENH_Input_P_I_I_6 := B_Input_P_I_I_6_Local.__ENH_Input_P_I_I_6;
   END;
   SHARED B_Phone_Summary_5_Local := MODULE(B_Phone_Summary_5(__in,__cfg_Local))
-    SHARED TYPEOF(B_Phone_Summary_6(__in,__cfg_Local).__ENH_Phone_Summary_6) __ENH_Phone_Summary_6 := B_Phone_Summary_6_Local.__ENH_Phone_Summary_6;
+    SHARED TYPEOF(E_Phone_Summary(__in,__cfg_Local).__Result) __E_Phone_Summary := E_Phone_Summary_Filtered.__Result;
   END;
   SHARED B_Input_P_I_I_4_Local := MODULE(B_Input_P_I_I_4(__in,__cfg_Local))
     SHARED TYPEOF(B_Input_P_I_I_5(__in,__cfg_Local).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5_Local.__ENH_Input_P_I_I_5;
   END;
   SHARED B_Phone_Summary_4_Local := MODULE(B_Phone_Summary_4(__in,__cfg_Local))
-    SHARED TYPEOF(B_Input_P_I_I_5(__in,__cfg_Local).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5_Local.__ENH_Input_P_I_I_5;
     SHARED TYPEOF(B_Phone_Summary_5(__in,__cfg_Local).__ENH_Phone_Summary_5) __ENH_Phone_Summary_5 := B_Phone_Summary_5_Local.__ENH_Phone_Summary_5;
   END;
   SHARED B_Input_P_I_I_3_Local := MODULE(B_Input_P_I_I_3(__in,__cfg_Local))
@@ -121,20 +117,24 @@ EXPORT Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(KEL.typ.str __PPhone, D
     SHARED TYPEOF(B_Input_P_I_I_4(__in,__cfg_Local).__ENH_Input_P_I_I_4) __ENH_Input_P_I_I_4 := B_Input_P_I_I_4_Local.__ENH_Input_P_I_I_4;
     SHARED TYPEOF(B_Phone_Summary_4(__in,__cfg_Local).__ENH_Phone_Summary_4) __ENH_Phone_Summary_4 := B_Phone_Summary_4_Local.__ENH_Phone_Summary_4;
   END;
+  SHARED B_Input_P_I_I_2_Local := MODULE(B_Input_P_I_I_2(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_3(__in,__cfg_Local).__ENH_Input_P_I_I_3) __ENH_Input_P_I_I_3 := B_Input_P_I_I_3_Local.__ENH_Input_P_I_I_3;
+  END;
   SHARED B_Phone_Summary_2_Local := MODULE(B_Phone_Summary_2(__in,__cfg_Local))
     SHARED TYPEOF(B_Input_P_I_I_3(__in,__cfg_Local).__ENH_Input_P_I_I_3) __ENH_Input_P_I_I_3 := B_Input_P_I_I_3_Local.__ENH_Input_P_I_I_3;
     SHARED TYPEOF(B_Phone_Summary_3(__in,__cfg_Local).__ENH_Phone_Summary_3) __ENH_Phone_Summary_3 := B_Phone_Summary_3_Local.__ENH_Phone_Summary_3;
   END;
   SHARED B_Phone_Summary_1_Local := MODULE(B_Phone_Summary_1(__in,__cfg_Local))
+    SHARED TYPEOF(B_Input_P_I_I_2(__in,__cfg_Local).__ENH_Input_P_I_I_2) __ENH_Input_P_I_I_2 := B_Input_P_I_I_2_Local.__ENH_Input_P_I_I_2;
     SHARED TYPEOF(B_Phone_Summary_2(__in,__cfg_Local).__ENH_Phone_Summary_2) __ENH_Phone_Summary_2 := B_Phone_Summary_2_Local.__ENH_Phone_Summary_2;
   END;
   SHARED B_Phone_Summary_Local := MODULE(B_Phone_Summary(__in,__cfg_Local))
     SHARED TYPEOF(B_Phone_Summary_1(__in,__cfg_Local).__ENH_Phone_Summary_1) __ENH_Phone_Summary_1 := B_Phone_Summary_1_Local.__ENH_Phone_Summary_1;
   END;
   SHARED TYPEOF(B_Phone_Summary(__in,__cfg_Local).__ENH_Phone_Summary) __ENH_Phone_Summary := B_Phone_Summary_Local.__ENH_Phone_Summary;
-  SHARED __EE3965480 := __ENH_Phone_Summary;
-  SHARED __EE3965577 := __EE3965480(__T(__OP2(__EE3965480.Phone10_,=,__CN(__PPhone))));
-  SHARED __ST85101_Layout := RECORD
+  SHARED __EE3811207 := __ENH_Phone_Summary;
+  SHARED __EE3811304 := __EE3811207(__T(__OP2(__EE3811207.Phone10_,=,__CN(__PPhone))));
+  SHARED __ST85141_Layout := RECORD
     KEL.typ.nstr P_I___Src_W_Inp_P_D_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_P_D_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_P_D_Last_Dt_List_Ev_;
@@ -151,20 +151,20 @@ EXPORT Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(KEL.typ.str __PPhone, D
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE3965577,__ST85101_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Src_W_Inp_P_D_List_Ev_,P_I___Src_W_Inp_P_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_P_D_Last_Dt_List_Ev_,P_I___Src_W_Inp_L_P_List_Ev_,P_I___Src_W_Inp_L_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_L_P_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_P_List_Ev_,P_I___Src_W_Inp_A_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_P_Last_Dt_List_Ev_},P_I___Src_W_Inp_P_D_List_Ev_,P_I___Src_W_Inp_P_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_P_D_Last_Dt_List_Ev_,P_I___Src_W_Inp_L_P_List_Ev_,P_I___Src_W_Inp_L_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_L_P_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_P_List_Ev_,P_I___Src_W_Inp_A_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_P_Last_Dt_List_Ev_,MERGE),__ST85101_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE3811304,__ST85141_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Src_W_Inp_P_D_List_Ev_,P_I___Src_W_Inp_P_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_P_D_Last_Dt_List_Ev_,P_I___Src_W_Inp_L_P_List_Ev_,P_I___Src_W_Inp_L_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_L_P_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_P_List_Ev_,P_I___Src_W_Inp_A_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_P_Last_Dt_List_Ev_},P_I___Src_W_Inp_P_D_List_Ev_,P_I___Src_W_Inp_P_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_P_D_Last_Dt_List_Ev_,P_I___Src_W_Inp_L_P_List_Ev_,P_I___Src_W_Inp_L_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_L_P_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_P_List_Ev_,P_I___Src_W_Inp_A_P_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_P_Last_Dt_List_Ev_,MERGE),__ST85141_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Phone_Summary_Result := __UNWRAP(E_Phone_Summary_Filtered.__Result);
   EXPORT DBG_E_Input_P_I_I_Intermediate_8 := __UNWRAP(B_Input_P_I_I_8_Local.__ENH_Input_P_I_I_8);
   EXPORT DBG_E_Input_P_I_I_Intermediate_7 := __UNWRAP(B_Input_P_I_I_7_Local.__ENH_Input_P_I_I_7);
   EXPORT DBG_E_Input_P_I_I_Intermediate_6 := __UNWRAP(B_Input_P_I_I_6_Local.__ENH_Input_P_I_I_6);
-  EXPORT DBG_E_Phone_Summary_Intermediate_6 := __UNWRAP(B_Phone_Summary_6_Local.__ENH_Phone_Summary_6);
   EXPORT DBG_E_Input_P_I_I_Intermediate_5 := __UNWRAP(B_Input_P_I_I_5_Local.__ENH_Input_P_I_I_5);
   EXPORT DBG_E_Phone_Summary_Intermediate_5 := __UNWRAP(B_Phone_Summary_5_Local.__ENH_Phone_Summary_5);
   EXPORT DBG_E_Input_P_I_I_Intermediate_4 := __UNWRAP(B_Input_P_I_I_4_Local.__ENH_Input_P_I_I_4);
   EXPORT DBG_E_Phone_Summary_Intermediate_4 := __UNWRAP(B_Phone_Summary_4_Local.__ENH_Phone_Summary_4);
   EXPORT DBG_E_Input_P_I_I_Intermediate_3 := __UNWRAP(B_Input_P_I_I_3_Local.__ENH_Input_P_I_I_3);
   EXPORT DBG_E_Phone_Summary_Intermediate_3 := __UNWRAP(B_Phone_Summary_3_Local.__ENH_Phone_Summary_3);
+  EXPORT DBG_E_Input_P_I_I_Intermediate_2 := __UNWRAP(B_Input_P_I_I_2_Local.__ENH_Input_P_I_I_2);
   EXPORT DBG_E_Phone_Summary_Intermediate_2 := __UNWRAP(B_Phone_Summary_2_Local.__ENH_Phone_Summary_2);
   EXPORT DBG_E_Phone_Summary_Intermediate_1 := __UNWRAP(B_Phone_Summary_1_Local.__ENH_Phone_Summary_1);
   EXPORT DBG_E_Phone_Summary_Annotated := __UNWRAP(B_Phone_Summary_Local.__ENH_Phone_Summary);
@@ -175,13 +175,13 @@ EXPORT Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic(KEL.typ.str __PPhone, D
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_8,NAMED('DBG_E_Input_P_I_I_Intermediate_8_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_7,NAMED('DBG_E_Input_P_I_I_Intermediate_7_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_6,NAMED('DBG_E_Input_P_I_I_Intermediate_6_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
-    OUTPUT(DBG_E_Phone_Summary_Intermediate_6,NAMED('DBG_E_Phone_Summary_Intermediate_6_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_5,NAMED('DBG_E_Input_P_I_I_Intermediate_5_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Phone_Summary_Intermediate_5,NAMED('DBG_E_Phone_Summary_Intermediate_5_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_4,NAMED('DBG_E_Input_P_I_I_Intermediate_4_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Phone_Summary_Intermediate_4,NAMED('DBG_E_Phone_Summary_Intermediate_4_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Input_P_I_I_Intermediate_3,NAMED('DBG_E_Input_P_I_I_Intermediate_3_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Phone_Summary_Intermediate_3,NAMED('DBG_E_Phone_Summary_Intermediate_3_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
+    OUTPUT(DBG_E_Input_P_I_I_Intermediate_2,NAMED('DBG_E_Input_P_I_I_Intermediate_2_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Phone_Summary_Intermediate_2,NAMED('DBG_E_Phone_Summary_Intermediate_2_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Phone_Summary_Intermediate_1,NAMED('DBG_E_Phone_Summary_Intermediate_1_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic')),
     OUTPUT(DBG_E_Phone_Summary_Annotated,NAMED('DBG_E_Phone_Summary_Annotated_Q_Non_F_C_R_A_Phone_Summary_Attributes_V1_Dynamic'))
