@@ -14,7 +14,7 @@ EXPORT procBuildAll(
 	// Full Build
 	EXPORT full_build := SEQUENTIAL(
 		versioncontrol.mUtilities.createsupers(dAll_filenames),
-		//SprayFiles,
+		SprayFiles,
 		BancorpRCDList.procBuildBase(pVersion, isDelta),
 		BancorpRCDList.procBuildKeys(pVersion, isDelta),
 		dops_update,

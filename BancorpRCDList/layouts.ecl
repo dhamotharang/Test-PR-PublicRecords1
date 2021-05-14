@@ -1,6 +1,7 @@
 export layouts:=module
 
     export base:=record
+        String version;
         STRING9 SSN;
     end;
 
