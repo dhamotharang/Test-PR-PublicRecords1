@@ -197,7 +197,7 @@ email_recs_nonfcra_thor := join(distribute(clam_pre_email, hash64(did)),
 						and (unsigned)right.date_first_seen[1..6] < left.historydate,
 						add_email_raw(left, right),
 						left outer,
-						atmost(riskwise.max_atmost), keep(1000), LOCAL);
+						atmost(left.did=right.did, riskwise.max_atmost), keep(1000), LOCAL);
 						
 #IF(onThor)
 	email_recs_non_fcra_unsuppressed := email_recs_nonfcra_thor;
@@ -518,12 +518,18 @@ reverse_email_summary_rolled := rollup(sort(with_reverse_source_stats, seq, -rev
 // can only do the reverse email lookup in NONFCRA shell and versions greater than 41
 reverse_summary := if(~isFCRA and bsversion>=50, reverse_email_summary_rolled, dataset([], emailrec) );
 
-// append the reverse_email data
-all_email_data := group(join(with_identity_email_summary, reverse_summary, left.seq=right.seq,
+
+#if(_control.Environment.onThor_LeadIntegrity)
+	all_email_data := project(clam_pre_email_in, transform(temp, self := left, self := []));  // for initial trending attributes, we don't need this function, so we can skip all of this code and make it run faster
+#else
+	// append the reverse_email data
+	all_email_data := group(join(with_identity_email_summary, reverse_summary, left.seq=right.seq,
 													transform(temp,
 													self.email_summary.reverse_email := right.reverse_email,
 													self.email_summary := left.email_summary,
 													self.seq := left.seq), left outer), seq);
+#end
+
 	
 // output(emailfile, named('emailfile'));
 // output(email_recs_non_fcra, named('email_recs_non_fcra')); 

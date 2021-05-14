@@ -1,4 +1,4 @@
-﻿Import Impulse_Email, ut, thrive, riskwise, mdr, risk_indicators, doxie, Suppress, STD;
+﻿Import Impulse_Email, ut, thrive, riskwise, mdr, risk_indicators, doxie, Suppress, STD, _control;
 
 export Boca_Shell_Impulse(GROUPED DATASET(risk_indicators.layout_bocashell_neutral) ids_wide, integer bsversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
@@ -39,10 +39,22 @@ Layout_Impulse_CCPA addImpulse(ids_wide le, Impulse_Email.Key_Impulse_DID ri) :=
     self.global_sid := ri.global_sid;
 	self := le;
 end;
-wImpulse_unsuppressed := join(ids_wide, Impulse_Email.Key_Impulse_DID, left.did<>0 and (unsigned)STD.str.filterout(right.created[1..7],'-')< left.historydate and	
-																// left.did=right.did, addImpulse(left,right), left outer);
+wImpulse_unsuppressed_roxie := join(ids_wide, Impulse_Email.Key_Impulse_DID, left.did<>0 and (unsigned)STD.str.filterout(right.created[1..7],'-')< left.historydate and	
 																keyed(left.did=right.did), addImpulse(left,right), left outer, atmost(riskwise.max_atmost));
 
+wImpulse_unsuppressed_thor := join(
+		distribute(ids_wide, did), 
+		distribute(pull(Impulse_Email.Key_Impulse_DID), did), 
+			left.did<>0 and (unsigned)STD.str.filterout(right.created[1..7],'-')< left.historydate and	
+			(left.did=right.did), 
+			addImpulse(left,right), left outer, local);
+
+#IF(_control.Environment.onThor)
+	wImpulse_unsuppressed := wImpulse_unsuppressed_thor;
+#ELSE
+	wImpulse_unsuppressed := wImpulse_unsuppressed_roxie;
+#END
+	
 wImpulse_flagged := Suppress.CheckSuppression(wImpulse_unsuppressed, mod_access);
 
 wImpulse := PROJECT(wImpulse_flagged, TRANSFORM(Layout_Impulse, 
@@ -61,6 +73,7 @@ wImpulse := PROJECT(wImpulse_flagged, TRANSFORM(Layout_Impulse,
 	self.annual_income := IF(left.is_suppressed, (INTEGER)Suppress.OptOutMessage('INTEGER'), left.annual_income);
     SELF := LEFT;
 )); 
+
 
 // ADD THRIVE RECORDS FOR VERSION 5.0 AND HIGHER
 key_main := thrive.keys().did.qa;
@@ -96,7 +109,7 @@ Layout_Impulse_CCPA append_thrive(ids_wide le, key_main rt) := transform
     self := le;
 end;
 	
-wThrive_unsuppressed := join (ids_wide, key_main,
+wThrive_unsuppressed_roxie := join (ids_wide, key_main,
 		left.did<>0 and
      keyed (left.did = right.did) and    
 		((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) AND
@@ -105,7 +118,25 @@ wThrive_unsuppressed := join (ids_wide, key_main,
 		append_thrive(left, right),
      atmost(riskwise.max_atmost)
   );
-	
+
+wThrive_unsuppressed_thor := join (
+	distribute(ids_wide, did), 
+	distribute(pull(key_main), did),
+		left.did<>0 and
+    (left.did = right.did) and    
+		((unsigned)RIGHT.dt_first_seen < (unsigned)risk_indicators.iid_constants.full_history_date(left.historydate)) AND
+		right.src = mdr.sourceTools.src_Thrive_PD, 
+		// and ((string)right.persistent_record_id not in main_rids),  // don't need to worry about corrections in nonFCRA
+		append_thrive(left, right),
+     atmost(riskwise.max_atmost), local
+  );	
+
+#IF(_control.Environment.onThor)
+	wThrive_unsuppressed := wThrive_unsuppressed_thor;
+#ELSE
+	wThrive_unsuppressed := wThrive_unsuppressed_roxie;
+#END
+
 	
 wThrive_flagged := Suppress.CheckSuppression(wThrive_unsuppressed, mod_access);
 
@@ -148,11 +179,18 @@ Layout_Impulse rollImpulse(Layout_Impulse le, Layout_Impulse ri) := transform
 	self := le;
 end;
 
-rolled_Impulse :=rollup(sorted_payday, left.seq=right.seq, rollImpulse(left,right));
+#if(_control.Environment.onThor_LeadIntegrity)
+	rolled_impulse := project(ids_wide, transform(Layout_Impulse, self := left, self := []));  // for initial trending attributes, we don't need this function, so we can skip all of this code and make it run faster
+#else
+	rolled_Impulse :=rollup(sorted_payday, left.seq=right.seq, rollImpulse(left,right));
+#end
+
+
                                                   
 // output(wImpulse, named('wImpulse'));
 // output(wThrive, named('wThrive'));
 
 return rolled_Impulse;
+
 
 END;

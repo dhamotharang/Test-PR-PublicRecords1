@@ -1,4 +1,5 @@
-﻿import GlobalWatchLists, iesp, Patriot, ut, OFAC_XG5, Gateway, std, Risk_Indicators;
+﻿import GlobalWatchLists, iesp, Patriot, ut, OFAC_XG5, Gateway, std, Risk_Indicators, _Control;
+onThor := _Control.Environment.OnThor;
 
 export getWatchLists2(GROUPED DATASET(Risk_Indicators.Layout_Output) inl, boolean ofac_only = false, boolean skip_company_search = false,unsigned1 ofac_version=1,
 				boolean include_ofac =FALSE, boolean include_additional_watchlists=FALSE,real global_watchlist_threshold=0.00,integer2 dob_radius = -1, 
@@ -189,9 +190,20 @@ Risk_Indicators.layout_output rejoin(inl le, patOut ri) := transform
 	self := le;
 end;
 
-pj3 := join(inl, patRolled, left.seq = right.seq,
-			rejoin(LEFT,RIGHT), lookup, left outer);
+pj3_roxie := join(inl, patRolled, left.seq = right.seq,
+                  rejoin(LEFT,RIGHT), lookup, left outer);
 
+pj3_thor := join(DISTRIBUTE(inl, HASH64(seq)), 
+                 DISTRIBUTE(patRolled, HASH64(seq)), 
+                 left.seq = right.seq,
+                 rejoin(LEFT,RIGHT), left outer, LOCAL);
+                 
+#IF(onThor)
+  pj3 := GROUP(SORT(pj3_thor, seq), seq);
+#ELSE
+  pj3 := pj3_roxie;
+#END
+      
 //*************OFAC VERSION 4 = XG5 BRIDGER SEARCH LOGIC *****************************
 
 OFAC_XG5.Layout.InputLayout XG5prep(inForm le) := TRANSFORM										

@@ -1,4 +1,4 @@
-﻿import aml, easi, mdr, risk_indicators, riskwise, riskview, STD, ut; 
+﻿import aml, easi, mdr, risk_indicators, riskwise, riskview, STD, ut, _control; 
 
 blankEasi := row( [], EASI.Layout_Easi_Census );
 blankBTST := row( [], Risk_Indicators.Layout_BocaShell_BtSt_Out );
@@ -833,18 +833,14 @@ export	string3	AddrChangeCount03	:= capS((string)addr_change_count03, capZero, c
 export	string3	AddrChangeCount06	:= capS((string)clam.velocity_counters.addrs_per_adl_created_6months, capZero, cap255);
 
 export	string3	AddrChangeCount12 := capS((string)clam.other_address_info.addrs_last12, capZero, cap255);
-export	string3	rv3AddrChangeCount12 := capS((string)clam.FIS.addrs_last12, capZero, cap255); //FIS custom attribute
 
 export	string3	AddrChangeCount24 	:= capS((string)clam.other_address_info.addrs_last24, capZero, cap255);
 
 export	string3	AddrChangeCount60 	:= capS((string)clam.other_address_info.addrs_last_5years, capZero, cap255);
-export	string3	rv3AddrChangeCount60 := capS((string)clam.FIS.addrs_last60, capZero, cap255); //FIS custom attribute
 
 export	string10	EstimatedAnnualIncome	:= capS((string)clam.estimated_income, capZero, capMax) ;
 	
 export	string1	PropertyOwner	:= checkboolean(clam.address_verification.owned.property_total>0);
-
-export string3 rv3AssetPropCurrentCount := capS((string)clam.FIS.owned_property_total, capZero, cap255); //FIS custom attribute
 
 export string3 PropOwnedCount := capS((string)clam.address_verification.owned.property_total, capZero, cap255);
 export string3 PropRealSourceCount := PropOwnedCount; // as of CBD4, use the same logic as PropOwnedCount but a different name
@@ -922,8 +918,6 @@ export	string3	AircraftCount24	:= capS((string)clam.aircraft.aircraft_count24, c
 export	string3	AircraftCount60 := capS((string)clam.aircraft.aircraft_count60, capZero, cap255);
 	
 export	string2	WealthIndex 	:= if(clam.wealth_indicator in ['0', ''], '-1', capS(clam.wealth_indicator, capZero, '6'));
-
-export	string2	rv3AssetIndex 	:= Trim(capS(clam.wealth_indicator, capZero, '6')); //FIS custom attribute
 
 export	string2	BusinessActiveAssociation	:= map(clam.did=0 => '-1', 
 																									(clam.employment.business_ct-clam.employment.dead_business_ct) > 0 => '1', 
@@ -1119,8 +1113,6 @@ shared date_last_derog := if( date_last_derog_1 > agedate, 0, date_last_derog_1 
 // For RiskView attributes Raise the upper cap only if an older bankruptcy is on file
 export	string3	DerogAge	:= if(date_last_derog=0, '-1', 
 	capS((string)round((ut.DaysApart((string)date_last_derog, (string)sysdate)) / 30), capZero, map( not isFCRA => cap960, Bankruptcy_Age > 84 => '120', cap84 )));
-
-export	string3	rv3NonDerogCount	:= capS((string)add1U(clam.fis.num_nonderogs), capZero, cap255);	//FIS custom attribute
 	
 export	string3	NonDerogCount	:= capS((string)clam.source_verification.num_nonderogs, capZero, cap255);		
 export	string3	NonDerogCount01	:= capS((string)clam.source_verification.num_nonderogs30, capZero, cap255);
@@ -2626,7 +2618,6 @@ export string2 InquiryCollections12Month	:= if(not clam.truedid, '-1', checkbool
 
 export string3 SSNSubjectCount := if(not clam.truedid or InputProvidedSSN='0', '-1', capS( (string)clam.velocity_counters.adls_per_ssn_seen_18months, capZero, cap255) );
 export string2 SSNDeceased	:= Risk_Indicators.iid_constants.SSNDeceased_Lookup(clam.truedid, InputProvidedSSN, clam.iid.decsflag);
-export string2 rv3SSNDeceased	:= if(ssnNotInput, '', checkBoolean(clam.iid.decsflag='1')); //FIS custom attribute
 
 export string8 SSNDateLowIssued := if(not clam.truedid 
                                         or InputProvidedSSN='0' 
@@ -2657,9 +2648,7 @@ export string2 AddrOnFileHighRisk := map(not clam.truedid => '-1',
 export	string3	AddrInputTimeOldest	:= if(not clam.truedid or noaddrInput or InputAddrDateFirstSeen_v5=0, '-1', 
 																				capS((string)Risk_Indicators.iid_constants.monthsApart_YYYYMMDD_legacy((string)InputAddrDateFirstSeen_v5  + '01',	(string)header_sysDate_version5, true), capOfOne, cap960) );
 
-export	string3	rv3AddrInputTimeOldest	:= if(IAdateFirstSeen=0, '', 
-                                                  capS((string)round((ut.DaysApart((string)checkHdrBldDate(IAdateFirstSeen,clam.header_summary.header_build_date) ,(string)sysdateV3)) / 30), 
-                                                  capOfOne, cap960)); //FIS custom attribute
+
 																				
 export	string3	AddrInputTimeNewest	:= if(not clam.truedid or noaddrInput or InputAddrDateLastSeen_v5=0, '-1', 
 																				capS((string)Risk_Indicators.iid_constants.monthsApart_YYYYMMDD_legacy((string)checkDate6(InputAddrDateLastSeen_v5) + '31',	(string)header_sysDate_version5, true), capOfOne, cap960) );
@@ -2887,11 +2876,6 @@ export string1 ConfirmationSubjectFound :=
   if(riskview.constants.noscore(clam.iid.nas_summary,clam.iid.nap_summary, clam.address_verification.input_address_information.naprop, clam.truedid), 
   '0',  // subject not found
   '1');  // subject found
-
-//FIS custom attribute, uses old logic for truedid
-export string1 rv3ConfirmationSubjectFound := IF(riskview.constants.noscore(clam.iid.nas_summary,clam.iid.nap_summary, clam.address_verification.input_address_information.naprop, clam.FIS.truedid),
-                                                 '1',
-                                                 '0'); 
 
 
 export	string7	AssetPropCurrentTaxTotal	:= if(not clam.truedid or clam.address_verification.owned.property_total < 1, '-1', 
@@ -4353,4 +4337,23 @@ export string2 cpn_trigger := map((integer)co_tgr_FLA_bureau_no_SSN = 1         
 // WAITING ON SAS CODE FOR 203 ATTRIBUTES
 export string3 ver_ssn_sources_first_seen := '';
 export string3 adls_per_ssn_and_first_seen_date := '';
+
+// put the FIS attributes all together so we can comment them out if running LeadIntegrity mode on thor where we slimmed the layout and don't have FIS fields
+#IF(_CONTROL.Environment.onThor_LeadIntegrity=false)
+	export string2 rv3SSNDeceased	:= if(ssnNotInput, '', checkBoolean(clam.iid.decsflag='1')); //FIS custom attribute
+	export	string2	rv3AssetIndex 	:= Trim(capS(clam.wealth_indicator, capZero, '6')); //FIS custom attribute
+	export	string3	rv3AddrInputTimeOldest	:= if(IAdateFirstSeen=0, '', 
+																										capS((string)round((ut.DaysApart((string)checkHdrBldDate(IAdateFirstSeen,clam.header_summary.header_build_date) ,(string)sysdateV3)) / 30), 
+																										capOfOne, cap960)); //FIS custom attribute
+	export	string3	rv3AddrChangeCount12 := capS((string)clam.FIS.addrs_last12, capZero, cap255); //FIS custom attribute
+	export	string3	rv3AddrChangeCount60 := capS((string)clam.FIS.addrs_last60, capZero, cap255); //FIS custom attribute
+	export string3 rv3AssetPropCurrentCount := capS((string)clam.FIS.owned_property_total, capZero, cap255); //FIS custom attribute
+	export	string3	rv3NonDerogCount	:= capS((string)add1U(clam.fis.num_nonderogs), capZero, cap255);	//FIS custom attribute
+	//FIS custom attribute, uses old logic for truedid
+	export string1 rv3ConfirmationSubjectFound := IF(riskview.constants.noscore(clam.iid.nas_summary,clam.iid.nap_summary, clam.address_verification.input_address_information.naprop, clam.FIS.truedid),
+																									 '1',
+																									 '0'); 
+																								 
+#END
+
 END;

@@ -1,4 +1,4 @@
-import doxie_files, doxie,ut,sanctn_mari,Data_Services,Prof_License_Mari;	
+import doxie_files, doxie,ut,sanctn_mari,Data_Services;	
 
 f_sanctn_incidentcode :=	SANCTN_Mari.files_SANCTN_common.incident_codes(trim(FIELD_NAME) = 'LICENSECODE' AND CLN_LICENSE_NUMBER<>'');
 

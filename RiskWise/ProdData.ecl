@@ -606,7 +606,7 @@ deltaBase_did_results := Inquiry_Deltabase.Search_DID(did_ds,
 	email_data_nonfcra := choosen(email_data.key_did(keyed(did=searchdid)), max_recs);
 	if(searchdid!=0 and (include_all_files=true or include_email_data=true), output(email_data_nonfcra, named('email_data_nonfcra')) );
 
-	mari_key := Prof_License_Mari.key_did(isFCRA);
+	mari_key := dx_prof_license_mari.key_did(Data_Services.data_env.GetEnvFCRA(isFCRA));
 	mari_main  := join(indata, mari_key,
 											left.did<>0 and keyed(left.did=right.s_did),
 											transform(recordof(mari_key), self := right),

@@ -42,31 +42,31 @@ EXPORT Incrementals := MODULE
       layout_in_rec.dt_last_field; 
       rec_delete_flag;
     END;
-    LOCAL layout_out_rec := layout_in_rec OR rec_delete_flag;
+    LOCAL layout_join_rec := layout_in_rec OR rec_delete_flag;
+    LOCAL layout_out_rec := #IF(flag_deletes) layout_join_rec #ELSE layout_in_rec #END;
     LOCAL in_recs := #IF(use_distributed) DISTRIBUTE(inf, rid_field) #ELSE inf #END;
 
     // If a delta RID key is specified, must check for updates first.
     #IF(#TEXT(k_delta_rid) <> '')
 
     // fetch delta rids for all records in incoming dataset first, keeping only the most recent per RID.
-    LOCAL unique_rids := DEDUP(
-      SORT(PROJECT(in_recs, TRANSFORM({UNSIGNED8 rid_field;}, SELF := LEFT)), rid_field#IF(use_distributed),LOCAL#END),
-      rid_field#IF(use_distributed),LOCAL#END);
-    LOCAL delta_rids_j := JOIN(unique_rids, k_delta_rid,
+    LOCAL delta_rids_a := PROJECT(UNGROUP(in_recs((UNSIGNED)rid_field != 0)), TRANSFORM({UNSIGNED8 rid_field;}, SELF := LEFT));
+    LOCAL delta_rids_b := DEDUP(SORT(delta_rids_a, rid_field#IF(use_distributed),LOCAL#END), rid_field#IF(use_distributed),LOCAL#END);
+    LOCAL delta_rids_c := JOIN(delta_rids_b, k_delta_rid,
       KEYED(LEFT.rid_field=RIGHT.rid_field),
       TRANSFORM(RIGHT),
       ATMOST(100)#IF(use_distributed),LOCAL#END); // up to 100 delta records for the same RID.
-    LOCAL delta_rids := DEDUP(
-      SORT(delta_rids_j, rid_field, -dt_first_field, -dt_last_field#IF(use_distributed),LOCAL#END)
+    LOCAL unique_rids := DEDUP(
+      SORT(delta_rids_c, rid_field, -dt_first_field, -dt_last_field#IF(use_distributed),LOCAL#END)
       ,rid_field#IF(use_distributed),LOCAL#END);
 
     #ELSE
     
     // dedup all rids in incoming dataset first, keeping only the most recent per RID.
-    LOCAL delta_rids_all := PROJECT(in_recs((UNSIGNED)rid_field != 0), layout_rids);
-    LOCAL delta_rids_sort := SORT(delta_rids_all, rid_field, -dt_first_field, -dt_last_field, 
+    LOCAL delta_rids_a := PROJECT(UNGROUP(in_recs((UNSIGNED)rid_field != 0)), layout_rids);
+    LOCAL delta_rids_b := SORT(delta_rids_a, rid_field, -dt_first_field, -dt_last_field, 
       RECORD #IF(use_distributed), LOCAL#END);
-    LOCAL delta_rids := DEDUP(delta_rids_sort, rid_field#IF(use_distributed), LOCAL#END);
+    LOCAL unique_rids := DEDUP(delta_rids_b, rid_field#IF(use_distributed), LOCAL#END);
     
     #END
 
@@ -75,9 +75,9 @@ EXPORT Incrementals := MODULE
     // Note that, if in_recs is the result set of a left outer join, dropping deletes
     // may produce incorrect results. Flag delete option must be used to account for
     // those cases.
-    LOCAL recs_out := JOIN(in_recs, delta_rids,
+    LOCAL recs_out := JOIN(in_recs, unique_rids,
       LEFT.rid_field = RIGHT.rid_field,
-      TRANSFORM(layout_out_rec,
+      TRANSFORM(layout_join_rec,
         // Drop record from result set if:
         // (1) record is older than most recent delta (stale)
         // (2) record has been deleted (and record is not a flag delete)
@@ -91,17 +91,16 @@ EXPORT Incrementals := MODULE
         SELF.is_delta_delete := is_flag_delete;
         SELF := LEFT;
       ), 
-      LEFT OUTER, GROUPED, KEEP(1), LIMIT(0)
-      #IF(use_distributed),LOCAL#END
+      #IF(use_distributed)
+      LEFT OUTER, KEEP(1), LIMIT(0), LOCAL
+      #ELSE
+      LEFT OUTER, GROUPED, KEEP(1), LIMIT(0) // <-- GROUPED here avoids 'branches of the condition have different grouping' error if input dataset happens to be grouped.
+      #END
     );
 
     // bypass the rollup completely if all records have no rid_field
-    LOCAL gotDelta := EXISTS(in_recs((UNSIGNED)rid_field <> 0));
-    #IF(flag_deletes)
-    RETURN IF(gotDelta, recs_out, PROJECT(inf, layout_out_rec));
-    #ELSE
-    RETURN IF(gotDelta, PROJECT(recs_out, layout_in_rec), inf);
-    #END
+    LOCAL gotDelta := EXISTS(in_recs((UNSIGNED)rid_field <> 0));  
+    RETURN IF(gotDelta, PROJECT(recs_out, layout_out_rec), PROJECT(inf, layout_out_rec));
 
   ENDMACRO;
 

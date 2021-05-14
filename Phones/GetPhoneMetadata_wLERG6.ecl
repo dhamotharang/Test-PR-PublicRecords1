@@ -1,4 +1,4 @@
-IMPORT Phones, STD, UT, dx_PhonesInfo;
+﻿IMPORT Phones, STD, UT, dx_PhonesInfo;
 
 EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
   Phones.IParam.BatchParams in_mod) := FUNCTION

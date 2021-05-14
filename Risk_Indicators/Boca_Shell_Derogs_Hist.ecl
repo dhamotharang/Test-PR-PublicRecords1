@@ -1,6 +1,8 @@
-﻿import doxie_files, ut, liensv2, riskwise, dx_property, bankruptcyv3, risk_indicators, MDR, doxie, Suppress;
+﻿import doxie_files, ut, liensv2, riskwise, dx_property, bankruptcyv3, risk_indicators, MDR, doxie, Suppress, _control;
 
 export Boca_Shell_Derogs_Hist (GROUPED DATASET(risk_indicators.layouts.layout_derogs_input) ids, integer bsversion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
+
+onThor := _control.Environment.OnThor;
 															 
 bans_did := BankruptcyV3.key_bankruptcyV3_did();
 bans_search := BankruptcyV3.key_bankruptcyv3_search_full_bip();
@@ -44,7 +46,23 @@ layout_extended add_bankrupt_keys(risk_indicators.layouts.layout_derogs_input le
 	SELF := le;
 	SELF := [];
 END;
-bankrupt_added := JOIN(ids, bans_did ,LEFT.did=RIGHT.did, add_bankrupt_keys(LEFT,RIGHT), LEFT OUTER, atmost(riskwise.max_atmost), KEEP(100));
+
+bankrupt_added_roxie := JOIN(ids, bans_did,
+                             LEFT.did=RIGHT.did, 
+                             add_bankrupt_keys(LEFT,RIGHT), 
+                             LEFT OUTER, atmost(riskwise.max_atmost), KEEP(100));
+                             
+bankrupt_added_thor := JOIN(DISTRIBUTE(ids, HASH64(did)), 
+                            DISTRIBUTE(PULL(bans_did), HASH64(did)),
+                            LEFT.did=RIGHT.did, 
+                            add_bankrupt_keys(LEFT,RIGHT), 
+                            LEFT OUTER, atmost(riskwise.max_atmost), KEEP(100), LOCAL);
+                            
+#IF(onThor)
+	bankrupt_added := bankrupt_added_thor;
+#ELSE
+	bankrupt_added := bankrupt_added_roxie;
+#END
 
 layout_extended get_bankrupt_search (layout_extended le, bans_search ri) := TRANSFORM
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
@@ -79,16 +97,32 @@ layout_extended get_bankrupt_search (layout_extended le, bans_search ri) := TRAN
 	
 	SELF := le;
 END;
-
-bankrupt_full := JOIN (bankrupt_added, bans_search,
-                       LEFT.bk_tmsid<>'' AND
-                       keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
-											 right.name_type='D' and
-											 (unsigned)right.did=left.did and
-                       (unsigned)(RIGHT.date_filed[1..6]) < left.historydate,
-											 get_bankrupt_search(LEFT,RIGHT),
-											 LEFT OUTER, KEEP(100),
-				ATMOST(Riskwise.max_atmost));
+		
+bankrupt_full_roxie := JOIN (bankrupt_added, bans_search,
+                             LEFT.bk_tmsid<>'' AND
+                             keyed(LEFT.bk_tmsid = RIGHT.tmsid) AND
+                             right.name_type='D' and
+                             (unsigned)right.did=left.did and
+                             (unsigned)(RIGHT.date_filed[1..6]) < left.historydate,
+                             get_bankrupt_search(LEFT,RIGHT),
+                             LEFT OUTER, KEEP(100),
+                             ATMOST(Riskwise.max_atmost));
+                             
+bankrupt_full_thor := JOIN (DISTRIBUTE(bankrupt_added, HASH64(bk_tmsid)),
+                            DISTRIBUTE(PULL(bans_search)(name_type='D'), HASH64(tmsid)),
+                            LEFT.bk_tmsid<>'' AND
+                            LEFT.bk_tmsid = RIGHT.tmsid AND
+                            (unsigned)right.did=left.did and
+                            (unsigned)(RIGHT.date_filed[1..6]) < left.historydate,
+                            get_bankrupt_search(LEFT,RIGHT),
+                            LEFT OUTER, KEEP(100),
+                            LOCAL);
+                            
+#IF(onThor)
+	bankrupt_full := SORT(distribute(bankrupt_full_thor, seq), seq, local);
+#ELSE
+	bankrupt_full := bankrupt_full_roxie;
+#END				
 
 layout_extended roll_bankrupt(layout_extended le, layout_extended ri) := TRANSFORM
 	sameBankruptcy := le.case_num=ri.case_num AND le.court_code=ri.court_code;
@@ -131,11 +165,33 @@ layout_extended roll_bankrupt(layout_extended le, layout_extended ri) := TRANSFO
 	SELF := le;
 END;
 
-bankrupt_rolled_tmp := ROLLUP(SORT(bankrupt_full,seq,did,court_code,case_num,-BJL.date_last_seen), LEFT.did=RIGHT.did, roll_bankrupt(LEFT,RIGHT));
+
+#IF(onThor)
+	bankrupt_sort_thor := SORT(bankrupt_full,seq,did,court_code,case_num,-BJL.date_last_seen, LOCAL);
+	bankrupt_rolled_tmp := ROLLUP(bankrupt_sort_thor, left.seq=right.seq and LEFT.did=RIGHT.did, roll_bankrupt(LEFT,RIGHT), local);
+#ELSE
+	bankrupt_rolled_tmp := ROLLUP(SORT(bankrupt_full,seq,did,court_code,case_num,-BJL.date_last_seen), LEFT.did=RIGHT.did, roll_bankrupt(LEFT,RIGHT));
+#END
+
 //have to sort by desc disp_date so can keep track of the most recent disp
-disp_dates := if(bankrupt_full.bk_disp_date = 0, bankrupt_full.date_last_seen, bankrupt_full.bk_disp_date);
-bankrupt_disp := DEDUP(SORT(bankrupt_full, seq, did,-bk_disp_date,  -BJL.date_last_seen), seq, did);
-bankrupt_rolled_disp := JOIN(bankrupt_rolled_tmp, bankrupt_disp,
+#IF(onThor)
+	bankrupt_disp := DEDUP(SORT(bankrupt_full, seq, did,-bk_disp_date,  -BJL.date_last_seen, LOCAL), seq, did, LOCAL);
+	bankrupt_rolled_disp := JOIN(bankrupt_rolled_tmp, bankrupt_disp,
+	LEFT.seq = RIGHT.seq and LEFT.did = RIGHT.did,
+	TRANSFORM(layout_extended, 
+		SELF.BJL.date_last_seen := RIGHT.BJL.date_last_seen;
+		SELF.BJL.filing_type := RIGHT.BJL.filing_type;
+		SELF.BJL.disposition := RIGHT.BJL.disposition;
+		SELF.case_num := RIGHT.case_num;
+		SELF.court_code := RIGHT.court_code;
+		SELF.BJL.bk_chapter := RIGHT.BJL.bk_chapter;
+		SELF := LEFT),
+	LEFT OUTER, LOCAL);	
+	
+#ELSE
+	bankrupt_disp := DEDUP(SORT(bankrupt_full, seq, did,-bk_disp_date,  -BJL.date_last_seen), seq, did);
+	
+	bankrupt_rolled_disp := JOIN(bankrupt_rolled_tmp, bankrupt_disp,
 	LEFT.seq = RIGHT.seq and LEFT.did = RIGHT.did,
 	TRANSFORM(layout_extended, 
 		SELF.BJL.date_last_seen := RIGHT.BJL.date_last_seen;
@@ -146,6 +202,9 @@ bankrupt_rolled_disp := JOIN(bankrupt_rolled_tmp, bankrupt_disp,
 		SELF.BJL.bk_chapter := RIGHT.BJL.bk_chapter;
 		SELF := LEFT),
 	LEFT OUTER);
+#END
+
+	
 bankrupt_rolled := if(bsVersion < 50, group(bankrupt_rolled_tmp, seq), group(bankrupt_rolled_disp, seq));
 
 layout_extended add_liens(layout_extended le, kld ri) := TRANSFORM
@@ -154,8 +213,18 @@ layout_extended add_liens(layout_extended le, kld ri) := TRANSFORM
 	SELF := le;
 END;
 
-liens_added := JOIN(bankrupt_rolled, kld, keyed(LEFT.did=RIGHT.did), add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100),
-					ATMOST(keyed(left.did=right.did), Riskwise.max_atmost));
+#IF(onThor)                          
+	liens_added := JOIN(DISTRIBUTE(bankrupt_rolled, HASH64(did)),
+													 DISTRIBUTE(PULL(kld), HASH64(did)), 
+													 LEFT.did=RIGHT.did, 
+													 add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100),
+													 ATMOST(left.did=right.did, Riskwise.max_atmost), LOCAL);
+#ELSE                         
+	liens_added := JOIN(bankrupt_rolled, kld, 
+														keyed(LEFT.did=RIGHT.did), 
+														add_liens(LEFT,RIGHT), LEFT OUTER, KEEP(100),
+														ATMOST(Riskwise.max_atmost));
+#END
 
 
 {layout_extended, unsigned4 global_sid} get_liens_nonFCRA(layout_extended le, klr_nonFCRA ri) := TRANSFORM
@@ -227,14 +296,30 @@ liens_added := JOIN(bankrupt_rolled, kld, keyed(LEFT.did=RIGHT.did), add_liens(L
 	SELF := le;
 END;
 
-liens_full_unsuppressed := JOIN (liens_added, klr_nonFCRA, 
-                    LEFT.rmsid<>'' AND
-                    keyed(left.tmsid=right.tmsid) and keyed(LEFT.rmsid=RIGHT.rmsid) AND 
-										right.name_type='D' and 
-										(unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate,
-                    get_liens_nonFCRA(LEFT,RIGHT),
-										LEFT OUTER, KEEP(100),
-				ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
+
+liens_full_unsuppressed_roxie := JOIN (liens_added, klr_nonFCRA, 
+                                       LEFT.rmsid<>'' AND
+                                       keyed(left.tmsid=right.tmsid) and keyed(LEFT.rmsid=RIGHT.rmsid) AND 
+                                       right.name_type='D' and 
+                                       (unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate,
+                                       get_liens_nonFCRA(LEFT,RIGHT),
+                                       LEFT OUTER, KEEP(100),
+                                       ATMOST(keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid), Riskwise.max_atmost));
+
+liens_full_unsuppressed_thor := JOIN (DISTRIBUTE(liens_added(rmsid <> ''), HASH64(tmsid, rmsid)),
+                                      DISTRIBUTE(PULL(klr_nonFCRA)(name_type='D'), HASH64(tmsid, rmsid)),
+                                      // LEFT.rmsid <> '' AND
+                                      left.tmsid=right.tmsid and LEFT.rmsid=RIGHT.rmsid AND 
+                                      (unsigned3)(RIGHT.date_first_seen[1..6]) < left.historydate,
+                                      get_liens_nonFCRA(LEFT,RIGHT),
+                                      LEFT OUTER, KEEP(100),
+                                      LOCAL);
+                                      
+#IF(onThor)
+	liens_full_unsuppressed := liens_full_unsuppressed_thor;
+#ELSE
+	liens_full_unsuppressed := liens_full_unsuppressed_roxie;
+#END
 
 liens_full_flagged := Suppress.CheckSuppression(liens_full_unsuppressed, mod_access);
 
@@ -450,12 +535,26 @@ liens_full := PROJECT(liens_full_flagged, TRANSFORM(layout_extended,
 	SELF := le;
 end;
 
-liens_main_unsuppressed := JOIN(liens_full, liensV2.key_liens_main_ID,
-		left.rmsid<>'' and left.tmsid<>'' and 
-		keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid) and
-		(bsversion < 50 or trim(stringlib.stringtouppercase(right.filing_type_desc)) not in risk_indicators.iid_constants.set_Invalid_Liens_50), // ignore certain lien types completely if running shell version 5.0 or higher
-		get_evictions(LEFT,RIGHT), left outer, 
-		ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
+liens_main_unsuppressed_roxie := JOIN(liens_full, liensV2.key_liens_main_ID,
+                                      left.rmsid<>'' and left.tmsid<>'' and 
+                                      keyed(left.tmsid=right.tmsid) and keyed(left.rmsid=right.rmsid) and
+                                      (bsversion < 50 or trim(stringlib.stringtouppercase(right.filing_type_desc)) not in risk_indicators.iid_constants.set_Invalid_Liens_50), // ignore certain lien types completely if running shell version 5.0 or higher
+                                      get_evictions(LEFT,RIGHT), left outer, 
+                                      ATMOST(keyed(LEFT.tmsid=RIGHT.tmsid) and keyed(left.rmsid=right.rmsid), riskwise.max_atmost));
+                                      
+liens_main_unsuppressed_thor := JOIN(DISTRIBUTE(liens_full, HASH64(tmsid, rmsid)), 
+                                      DISTRIBUTE(PULL(liensV2.key_liens_main_ID), HASH64(tmsid, rmsid)),
+                                      left.rmsid<>'' and left.tmsid<>'' and 
+                                      left.tmsid=right.tmsid and left.rmsid=right.rmsid and
+                                      (bsversion < 50 or trim(stringlib.stringtouppercase(right.filing_type_desc)) not in risk_indicators.iid_constants.set_Invalid_Liens_50), // ignore certain lien types completely if running shell version 5.0 or higher
+                                      get_evictions(LEFT,RIGHT), left outer, 
+                                      ATMOST(riskwise.max_atmost), LOCAL);
+                                      
+#IF(onThor)
+	liens_main_unsuppressed := liens_main_unsuppressed_thor;
+#ELSE
+	liens_main_unsuppressed := liens_main_unsuppressed_roxie;
+#END
 	                   
 liens_main_flagged := Suppress.CheckSuppression(liens_main_unsuppressed, mod_access);
 
@@ -723,8 +822,16 @@ layout_extended roll_liens(layout_extended le, layout_extended ri) := TRANSFORM
 	SELF := ri;
 END;
 
-liens_sorted := SORT(liens_main,did,tmsid,rmsid,-bjl.last_liens_unreleased_date,-bjl.last_eviction_date);
-liens_rolled := ROLLUP(liens_sorted,LEFT.did=RIGHT.did,roll_liens(LEFT,RIGHT)); 
+
+#IF(onThor)
+	liens_sorted := SORT(DISTRIBUTE(liens_main, HASH64(seq)),seq, did,tmsid,rmsid,-bjl.last_liens_unreleased_date,-bjl.last_eviction_date, LOCAL);
+	liens_rolled := ROLLUP(liens_sorted,left.seq=right.seq and LEFT.did=RIGHT.did,roll_liens(LEFT,RIGHT), local); 
+#ELSE
+	liens_sorted := SORT(liens_main,did,tmsid,rmsid,-bjl.last_liens_unreleased_date,-bjl.last_eviction_date);
+	liens_rolled := ROLLUP(liens_sorted,LEFT.did=RIGHT.did,roll_liens(LEFT,RIGHT)); 
+#END
+
+
 
 layout_extended add_doc_NonFCRA(layout_extended le, koff_NonFCRA ri) := TRANSFORM
 	myGetDate := risk_indicators.iid_constants.myGetDate(le.historydate);
@@ -759,11 +866,24 @@ layout_extended add_doc_NonFCRA(layout_extended le, koff_NonFCRA ri) := TRANSFOR
 	SELF := le;
 END;
 
-doc_added := JOIN (liens_rolled, koff_nonFCRA, 
-                   (LEFT.did != 0) AND keyed(LEFT.did=RIGHT.sdid) AND
-									 (unsigned3)(RIGHT.earliest_offense_date[1..6]) < left.historydate, 
-                   add_doc_nonFCRA(LEFT,RIGHT),
-									 LEFT OUTER, KEEP(500), ATMOST (keyed(LEFT.did=RIGHT.sdid), riskwise.max_atmost));
+doc_added_roxie := JOIN (liens_rolled, koff_nonFCRA, 
+                         (LEFT.did != 0) AND keyed(LEFT.did=RIGHT.sdid) AND
+                         (unsigned3)(RIGHT.earliest_offense_date[1..6]) < left.historydate, 
+                         add_doc_nonFCRA(LEFT,RIGHT),
+                         LEFT OUTER, KEEP(500), ATMOST (keyed(LEFT.did=RIGHT.sdid), riskwise.max_atmost));
+                   
+doc_added_thor := JOIN (DISTRIBUTE(liens_rolled, HASH64(did)),
+                        DISTRIBUTE(PULL(koff_nonFCRA), HASH64(sdid)), 
+                        LEFT.did != 0 AND LEFT.did=RIGHT.sdid AND
+                        (unsigned3)(RIGHT.earliest_offense_date[1..6]) < left.historydate, 
+                        add_doc_nonFCRA(LEFT,RIGHT),
+                        LEFT OUTER, KEEP(500), LOCAL);
+                        
+#IF(onThor)
+	doc_added := doc_added_thor;
+#ELSE
+	doc_added := doc_added_roxie;
+#END
 									 
 layout_extended roll_crim_counts(doc_added le, doc_added ri) :=
 TRANSFORM
@@ -781,8 +901,14 @@ TRANSFORM
 	SELF := ri;
 END;
 
-crim_sorted := SORT(doc_added, did,crim_case_num,-bjl.felony_count, -bjl.last_felony_date, -bjl.criminal_count, -bjl.last_criminal_date);
-crim_counts_rolled := ROLLUP(crim_sorted, LEFT.did=RIGHT.did, roll_crim_counts(LEFT,RIGHT));
+#IF(onThor)
+	crim_sorted := SORT(distribute(doc_added, seq), seq,did,crim_case_num,-bjl.felony_count, -bjl.last_felony_date, -bjl.criminal_count, -bjl.last_criminal_date, local);
+	crim_counts_rolled := ROLLUP(crim_sorted, left.seq=right.seq and LEFT.did=RIGHT.did, roll_crim_counts(LEFT,RIGHT), local);
+#ELSE
+	crim_sorted := SORT(doc_added, did,crim_case_num,-bjl.felony_count, -bjl.last_felony_date, -bjl.criminal_count, -bjl.last_criminal_date);
+	crim_counts_rolled := ROLLUP(crim_sorted, LEFT.did=RIGHT.did, roll_crim_counts(LEFT,RIGHT));
+#END
+
 
 layout_extended roll_arrest_counts(doc_added le, doc_added ri) :=
 TRANSFORM
@@ -798,49 +924,85 @@ TRANSFORM
 	SELF := ri;
 END;
 
-arrests_sorted := SORT(doc_added ,did,crim_case_num,-bjl.arrests_count, -bjl.date_last_arrest);
-arrest_counts_rolled := ROLLUP(arrests_sorted, LEFT.did=RIGHT.did, roll_arrest_counts(LEFT,RIGHT));
 
-// joining arrests and crim together causing us to lose the grouping
-crim_rolled := group(sort( 
-				join(crim_counts_rolled, arrest_counts_rolled, 
+#IF(onThor)
+	arrests_sorted := SORT(distribute(doc_added, seq) ,did,crim_case_num,-bjl.arrests_count, -bjl.date_last_arrest, local);
+	arrest_counts_rolled := ROLLUP(arrests_sorted, left.seq=right.seq and LEFT.did=RIGHT.did, roll_arrest_counts(LEFT,RIGHT), local);
+#ELSE
+	arrests_sorted := SORT(doc_added ,did,crim_case_num,-bjl.arrests_count, -bjl.date_last_arrest);
+	arrest_counts_rolled := ROLLUP(arrests_sorted, LEFT.did=RIGHT.did, roll_arrest_counts(LEFT,RIGHT));
+#END
+
+layout_extended merge_crim_and_arrest_counts(layout_extended le, layout_extended rt) := transform
+	self.bjl.criminal_count := le.bjl.criminal_count;
+	self.bjl.criminal_count30 := le.bjl.criminal_count30;
+	self.bjl.criminal_count90 := le.bjl.criminal_count90;
+	self.bjl.criminal_count180 := le.bjl.criminal_count180;
+	self.bjl.criminal_count12 := le.bjl.criminal_count12;
+	self.bjl.criminal_count24 := le.bjl.criminal_count24;
+	self.bjl.criminal_count36 := le.bjl.criminal_count36;
+	self.bjl.criminal_count60 := le.bjl.criminal_count60;
+	self.bjl.last_criminal_date := le.bjl.last_criminal_date;
+	self.bjl.last_felony_date := le.bjl.last_felony_date;
+	self.bjl.felony_count := le.bjl.felony_count;
+	self := rt;
+end;
+
+#IF(onThor)
+	crim_rolled := join(crim_counts_rolled, arrest_counts_rolled, 
 					left.seq=right.seq and left.did=right.did,
-					transform(layout_extended,
-						self.bjl.criminal_count := left.bjl.criminal_count;
-						self.bjl.criminal_count30 := left.bjl.criminal_count30;
-						self.bjl.criminal_count90 := left.bjl.criminal_count90;
-						self.bjl.criminal_count180 := left.bjl.criminal_count180;
-						self.bjl.criminal_count12 := left.bjl.criminal_count12;
-						self.bjl.criminal_count24 := left.bjl.criminal_count24;
-						self.bjl.criminal_count36 := left.bjl.criminal_count36;
-						self.bjl.criminal_count60 := left.bjl.criminal_count60;
-						self.bjl.last_criminal_date := left.bjl.last_criminal_date;
-						self.bjl.last_felony_date := left.bjl.last_felony_date;
-						self.bjl.felony_count := left.bjl.felony_count;
-						SELF := right;)),
-						seq), seq); 
+					merge_crim_and_arrest_counts(left, right), local); 
+#ELSE
+	crim_rolled := join(crim_counts_rolled, arrest_counts_rolled, 
+					left.seq=right.seq and left.did=right.did,
+					merge_crim_and_arrest_counts(left, right)); 
+#END
 
 
-
-wFID := join(crim_rolled, kford, 
+wFID_roxie := join(crim_rolled, kford, 
 						left.did!=0 and keyed(left.did=right.did), 
 						transform(layout_extended, self.fid := right.fid, self.BJL.foreclosure_flag := right.did!=0, self := left), 
 						left outer, atmost(keyed(left.did=right.did), riskwise.max_atmost), keep(50));
 
+wFID_thor := join(distribute(crim_rolled, did), distribute(pull(kford), did), 
+						left.did!=0 and left.did=right.did, 
+						transform(layout_extended, self.fid := right.fid, self.BJL.foreclosure_flag := right.did!=0, self := left), 
+						left outer, atmost(riskwise.max_atmost), keep(50));
 
-all_foreclosures := join(wFID, kforf,
-						left.fid!='' and 
-						keyed(left.fid=right.fid) and
-						right.source=MDR.sourceTools.src_Foreclosures and
-						(unsigned3)(right.recording_date[1..6]) < left.historydate,
-						transform(layout_extended, 
-								self.BJL.last_foreclosure_date := right.recording_date,
-								self.BJL.foreclosure_flag := right.fid!='',
-								self := left),
-						left outer, atmost(keyed(left.fid=right.fid), riskwise.max_atmost), keep(50));
+#IF(onThor)
+	wFID := wFID_thor;
+#ELSE
+	wFID := wFID_roxie;
+#END
 
-wForeclosures := dedup(sort(all_foreclosures, seq, did, -BJL.last_foreclosure_date), seq, did);
-
+layout_extended all_foreclosures_transform(wFID le, kforf ri) := TRANSFORM
+  self.BJL.last_foreclosure_date := ri.recording_date;
+  self.BJL.foreclosure_flag := ri.fid!='';
+  self := le;
+END;						
+all_foreclosures_roxie := join(wFID, kforf,
+                              left.fid!='' and 
+                              keyed(left.fid=right.fid) and
+                              right.source=MDR.sourceTools.src_Foreclosures and
+                              (unsigned3)(right.recording_date[1..6]) < left.historydate,
+                              all_foreclosures_transform(left, right),
+                              left outer, atmost(keyed(left.fid=right.fid), riskwise.max_atmost), keep(50));
+                              
+all_foreclosures_thor := join(DISTRIBUTE(wFID, HASH64(fid)), 
+                              DISTRIBUTE(PULL(kforf)(source=MDR.sourceTools.src_Foreclosures), HASH64(fid)),
+                              left.fid!='' AND left.fid=right.fid and
+                              (unsigned3)(right.recording_date[1..6]) < left.historydate,
+                              all_foreclosures_transform(left, right),
+                              left outer, keep(50), LOCAL);
+                              
+#IF(onThor)
+	all_foreclosures := all_foreclosures_thor;
+	wForeclosures1 := dedup(sort(distribute(all_foreclosures, seq), seq, did, -BJL.last_foreclosure_date, local), seq, did, local);
+	wForeclosures := group(wForeclosures1, seq);
+#ELSE
+	all_foreclosures := all_foreclosures_roxie;
+	wForeclosures := group(dedup(sort(all_foreclosures, seq, did, -BJL.last_foreclosure_date), seq, did), seq);
+#END
 
 // output(liens_added, named('liens_added'),overwrite);
 // output(liens_full, named('liens_full'),overwrite);

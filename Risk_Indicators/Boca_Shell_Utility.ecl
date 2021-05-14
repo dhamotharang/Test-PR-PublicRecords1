@@ -1,7 +1,8 @@
 ﻿/*2014-12-03T01:08:27Z (David Schlangen)
 changes for bug 156869 and 165691
 */
-Import Utilfile, Riskwise, ut, risk_indicators;
+Import Utilfile, Riskwise, ut, risk_indicators, _Control;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Utility(GROUPED dataset(risk_indicators.layout_bocashell_neutral) bs_neutral, unsigned1 glb, boolean isFCRA = false, integer bsversion=40) := FUNCTION
 
@@ -50,13 +51,40 @@ Layout_Utility_Plus getUtilADL(bs_neutral le, Utilfile.Key_DID ri) := transform
 	self := [];
 end;
 
-wUtilADL := join(bs_neutral, Utilfile.Key_DID, 
-															(isFCRA or ut.PermissionTools.glb.ok( glb)) and
-															left.did<>0 and
-															keyed(left.did=right.s_did) and 
-															(unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
-															getUtilADL(left,right), left outer,
-															ATMOST(keyed (left.did=right.s_did), riskwise.max_atmost), KEEP(200));
+wUtilADL_roxie := join(bs_neutral, Utilfile.Key_DID, 
+                      (isFCRA or ut.PermissionTools.glb.ok( glb)) and
+                      left.did<>0 and
+                      keyed(left.did=right.s_did) and 
+                      (unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
+                      getUtilADL(left,right), left outer,
+                      ATMOST(keyed (left.did=right.s_did), riskwise.max_atmost), KEEP(200));
+                              
+// wUtilADL_thor := join(DISTRIBUTE(bs_neutral, HASH64(did)),
+                      // DISTRIBUTE(PULL(Utilfile.Key_DID), HASH64(s_did)),
+                      // left.did<>0 and
+                      // (isFCRA or ut.PermissionTools.glb.ok( glb)) and
+                      // left.did=right.s_did and 
+                      // (unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
+                      // getUtilADL(left,right), left outer,
+                      // ATMOST(left.did=right.s_did, riskwise.max_atmost), KEEP(200), LOCAL);
+                      
+wUtilADL_thor := join(DISTRIBUTE(bs_neutral(did <> 0), HASH64(did)),
+                      DISTRIBUTE(PULL(Utilfile.Key_DID), HASH64(s_did)),
+                      // left.did<>0 and
+                      (isFCRA or ut.PermissionTools.glb.ok( glb)) and
+                      left.did=right.s_did and 
+                      (unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
+                      getUtilADL(left,right), left outer,
+                      ATMOST(left.did=right.s_did, riskwise.max_atmost), KEEP(200), LOCAL)
+                      //is this correct?
+                      +
+                      PROJECT(bs_neutral(did = 0), TRANSFORM(Layout_Utility_Plus, SELF := LEFT, SELF := []));
+                      
+#IF(onThor)
+	wUtilADL_correct := wUtilADL_thor;
+#ELSE
+	wUtilADL_correct := wUtilADL_roxie;
+#END
 										
 // get utility info per Addr 1
 Layout_Utility_Plus getUtilAddr(bs_neutral le, utilfile.Key_Address ri) := transform
@@ -75,20 +103,49 @@ Layout_Utility_Plus getUtilAddr(bs_neutral le, utilfile.Key_Address ri) := trans
 	self := le;
 	self := [];
 end;
-wUtilAddr1 := JOIN(bs_neutral, UtilFile.Key_Address,
-															  (isFCRA or ut.PermissionTools.glb.ok( glb)) and
-																left.shell_input.z5!='' and left.shell_input.prim_name != '' and
-																keyed (left.shell_input.prim_name=right.prim_name) and keyed(left.shell_input.st=right.st) and 
-																keyed(left.shell_input.z5=right.zip) and keyed(left.shell_input.prim_range=right.prim_range) and keyed(left.shell_input.sec_range=right.sec_range) and		
-																// check date
-																((unsigned)RIGHT.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
-																// addr type = 'S' means that this is the service address
-																RIGHT.addr_type='S',
-																 getUtilAddr(left,right), left outer, 
-																 ATMOST(
-																	keyed (left.shell_input.prim_name=right.prim_name) and keyed(left.shell_input.st=right.st) and 
-																	keyed(left.shell_input.z5=right.zip) and keyed(left.shell_input.prim_range=right.prim_range) and 
-																	keyed(left.shell_input.sec_range=right.sec_range), 100));
+
+wUtilAddr1_roxie := JOIN(bs_neutral, UtilFile.Key_Address,
+                        (isFCRA or ut.PermissionTools.glb.ok( glb)) and
+                        left.shell_input.z5!='' and left.shell_input.prim_name != '' and
+                        keyed (left.shell_input.prim_name=right.prim_name) and keyed(left.shell_input.st=right.st) and 
+                        keyed(left.shell_input.z5=right.zip) and keyed(left.shell_input.prim_range=right.prim_range) and keyed(left.shell_input.sec_range=right.sec_range) and		
+                        // check date
+                        ((unsigned)RIGHT.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
+                        // addr type = 'S' means that this is the service address
+                        RIGHT.addr_type='S',
+                         getUtilAddr(left,right), left outer, 
+                         ATMOST(
+                          keyed (left.shell_input.prim_name=right.prim_name) and keyed(left.shell_input.st=right.st) and 
+                          keyed(left.shell_input.z5=right.zip) and keyed(left.shell_input.prim_range=right.prim_range) and 
+                          keyed(left.shell_input.sec_range=right.sec_range), 100));
+                          
+wUtilAddr1_thor := JOIN(DISTRIBUTE(bs_neutral(shell_input.z5 != '' AND shell_input.prim_name != ''), HASH64(shell_input.prim_name, shell_input.st, shell_input.z5, shell_input.prim_range, shell_input.sec_range)), 
+                        DISTRIBUTE(PULL(UtilFile.Key_Address), HASH64(prim_name, st, zip, prim_range, sec_range)),
+                        // left.shell_input.z5!='' and left.shell_input.prim_name != '' and
+                        (isFCRA or ut.PermissionTools.glb.ok( glb)) and
+                        left.shell_input.prim_name=right.prim_name and 
+                        left.shell_input.st=right.st and 
+                        left.shell_input.z5=right.zip and 
+                        left.shell_input.prim_range=right.prim_range and 
+                        left.shell_input.sec_range=right.sec_range and		
+                        // check date
+                        ((unsigned)RIGHT.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
+                        // addr type = 'S' means that this is the service address
+                        RIGHT.addr_type='S',
+                         getUtilAddr(left,right), left outer, 
+                         ATMOST(
+                          left.shell_input.prim_name=right.prim_name and left.shell_input.st=right.st and 
+                          left.shell_input.z5=right.zip and left.shell_input.prim_range=right.prim_range and 
+                          left.shell_input.sec_range=right.sec_range, 100), LOCAL)
+                        //is this correct?
+                        +
+                        PROJECT(bs_neutral(shell_input.z5 = '' OR shell_input.prim_name = ''), TRANSFORM(Layout_Utility_Plus, SELF := LEFT, SELF := []));
+                          
+#IF(onThor)
+	wUtilAddr1_correct := wUtilAddr1_thor;
+#ELSE
+	wUtilAddr1_correct := wUtilAddr1_roxie;
+#END
 																	
 									
 // get utility info per Addr 2
@@ -119,21 +176,55 @@ Layout_Utility_Plus getUtilAddr2(bs_neutral le, utilfile.Key_Address ri) := tran
 	self := le;
 	self := [];
 end;
-wUtilAddr2 := JOIN(bs_neutral, UtilFile.Key_Address,
-																(isFCRA or ut.PermissionTools.glb.ok( glb)) and
-																left.address_verification.address_history_1.zip5!='' and left.address_verification.address_history_1.prim_name != '' and
-																keyed (left.address_verification.address_history_1.prim_name=right.prim_name) and keyed(left.address_verification.address_history_1.st=right.st) and 
-																keyed(left.address_verification.address_history_1.zip5=right.zip) and keyed(left.address_verification.address_history_1.prim_range=right.prim_range) and 
-																keyed(left.address_verification.address_history_1.sec_range=right.sec_range) and		
-																// check date
-																((unsigned)RIGHT.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
-																// addr type = 'S' means that this is the service address
-																RIGHT.addr_type='S',
-																 getUtilAddr2(left,right), left outer, 
-																 ATMOST(
-																	keyed (left.address_verification.address_history_1.prim_name=right.prim_name) and keyed(left.address_verification.address_history_1.st=right.st) and 
-																	keyed(left.address_verification.address_history_1.zip5=right.zip) and keyed(left.address_verification.address_history_1.prim_range=right.prim_range) and 
-																	keyed(left.address_verification.address_history_1.sec_range=right.sec_range), 100));
+
+wUtilAddr2_roxie := JOIN(bs_neutral, UtilFile.Key_Address,
+                        (isFCRA or ut.PermissionTools.glb.ok( glb)) and
+                        left.address_verification.address_history_1.zip5!='' and left.address_verification.address_history_1.prim_name != '' and
+                        keyed (left.address_verification.address_history_1.prim_name=right.prim_name) and keyed(left.address_verification.address_history_1.st=right.st) and 
+                        keyed(left.address_verification.address_history_1.zip5=right.zip) and keyed(left.address_verification.address_history_1.prim_range=right.prim_range) and 
+                        keyed(left.address_verification.address_history_1.sec_range=right.sec_range) and		
+                        // check date
+                        ((unsigned)RIGHT.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
+                        // addr type = 'S' means that this is the service address
+                        RIGHT.addr_type='S',
+                         getUtilAddr2(left,right), left outer, 
+                         ATMOST(
+                          keyed (left.address_verification.address_history_1.prim_name=right.prim_name) and keyed(left.address_verification.address_history_1.st=right.st) and 
+                          keyed(left.address_verification.address_history_1.zip5=right.zip) and keyed(left.address_verification.address_history_1.prim_range=right.prim_range) and 
+                          keyed(left.address_verification.address_history_1.sec_range=right.sec_range), 100));
+                          
+wUtilAddr2_thor := JOIN(DISTRIBUTE(bs_neutral(address_verification.address_history_1.zip5 <> '' AND address_verification.address_history_1.prim_name <> ''),
+                          HASH64(address_verification.address_history_1.prim_name, 
+                                 address_verification.address_history_1.st,
+                                 address_verification.address_history_1.zip5,
+                                 address_verification.address_history_1.prim_range,
+                                 address_verification.address_history_1.sec_range)),
+                        DISTRIBUTE(PULL(UtilFile.Key_Address), 
+                          HASH64(prim_name, st, zip, prim_range, sec_range)),
+                        // LEFT.address_verification.address_history_1.zip5 <> '' AND LEFT.address_verification.address_history_1.prim_name <> '' AND
+                        (isFCRA or ut.PermissionTools.glb.ok( glb)) and
+                        left.address_verification.address_history_1.prim_name=right.prim_name and left.address_verification.address_history_1.st=right.st and 
+                        left.address_verification.address_history_1.zip5=right.zip and left.address_verification.address_history_1.prim_range=right.prim_range and 
+                        left.address_verification.address_history_1.sec_range=right.sec_range and		
+                        // check date
+                        ((unsigned)RIGHT.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate)) AND
+                        // addr type = 'S' means that this is the service address
+                        RIGHT.addr_type='S',
+                         getUtilAddr2(left,right), left outer, 
+                         ATMOST(
+                          left.address_verification.address_history_1.prim_name=right.prim_name and left.address_verification.address_history_1.st=right.st and 
+                          left.address_verification.address_history_1.zip5=right.zip and left.address_verification.address_history_1.prim_range=right.prim_range and 
+                          left.address_verification.address_history_1.sec_range=right.sec_range, 100), LOCAL)
+                        //is this correct?
+                        +
+                        PROJECT(bs_neutral(address_verification.address_history_1.zip5 = '' OR address_verification.address_history_1.prim_name = ''),
+                                TRANSFORM(Layout_Utility_Plus, SELF := LEFT, SELF := []));
+                          
+#IF(onThor)
+	wUtilAddr2_correct := wUtilAddr2_thor;
+#ELSE
+	wUtilAddr2_correct := wUtilAddr2_roxie;
+#END
 																	
 																	
 Layout_Utility_Plus rollUtil(Layout_Utility_Plus le, Layout_Utility_Plus ri) := transform
@@ -161,16 +252,51 @@ Layout_Utility_Plus rollUtil(Layout_Utility_Plus le, Layout_Utility_Plus ri) := 
 end;
 
 
-sUtilADL := sort(wUtilADL, seq, utility.utili_adl_dt_first_seen, utility.utili_adl_type, utility.utili_adl_nap);
-sUtilAddr1 := sort(wUtilAddr1, Utility.utili_addr1_dt_first_seen, utility.utili_addr1_type, utility.utili_addr1_nap);
-sUtilAddr2 := sort(wUtilAddr2, Utility.utili_addr2_dt_first_seen, utility.utili_addr2_type, utility.utili_addr2_nap);
+sUtilADL_roxie := sort(wUtilADL_correct, seq, utility.utili_adl_dt_first_seen, utility.utili_adl_type, utility.utili_adl_nap);
+// sUtilADL_thor := sort(wUtilADL_correct, seq, utility.utili_adl_dt_first_seen, utility.utili_adl_type, utility.utili_adl_nap);
+sUtilADL_thor := sort(DISTRIBUTE(wUtilADL_correct, HASH64(seq)), seq, utility.utili_adl_dt_first_seen, utility.utili_adl_type, utility.utili_adl_nap, LOCAL);
 
-rollAdlUtil := rollup(GROUP(sUtilADL, seq), left.seq=right.seq, rollUtil(left,right));	
-rollAddr1Util := rollup(GROUP(sUtilAddr1, seq), left.seq=right.seq, rollUtil(left,right));	
-rollAddr2Util := rollup(GROUP(sUtilAddr2, seq), left.seq=right.seq, rollUtil(left,right));	
+sUtilAddr1_roxie := sort(wUtilAddr1_correct, Utility.utili_addr1_dt_first_seen, utility.utili_addr1_type, utility.utili_addr1_nap);
+// sUtilAddr1_thor := sort(wUtilAddr1_correct, Utility.utili_addr1_dt_first_seen, utility.utili_addr1_type, utility.utili_addr1_nap);
+sUtilAddr1_thor := sort(DISTRIBUTE(wUtilAddr1_correct, HASH64(seq)), seq, Utility.utili_addr1_dt_first_seen, utility.utili_addr1_type, utility.utili_addr1_nap, LOCAL);
+
+sUtilAddr2_roxie := sort(wUtilAddr2_correct, Utility.utili_addr2_dt_first_seen, utility.utili_addr2_type, utility.utili_addr2_nap);
+// sUtilAddr2_thor := sort(wUtilAddr2_correct, Utility.utili_addr2_dt_first_seen, utility.utili_addr2_type, utility.utili_addr2_nap);
+sUtilAddr2_thor := sort(DISTRIBUTE(wUtilAddr2_correct, HASH64(seq)), seq, Utility.utili_addr2_dt_first_seen, utility.utili_addr2_type, utility.utili_addr2_nap, LOCAL);
+
+#IF(onThor)
+	sUtilADL    := sUtilADL_thor;
+  sUtilAddr1  := sUtilAddr1_thor;
+  sUtilAddr2  := sUtilAddr2_thor;
+#ELSE
+	sUtilADL    := sUtilADL_roxie;
+  sUtilAddr1  := sUtilAddr1_roxie;
+  sUtilAddr2  := sUtilAddr2_roxie;
+#END
+
+rollAdlUtil_roxie := rollup(GROUP(sUtilADL, seq), left.seq=right.seq, rollUtil(left,right));
+rollAdlUtil_thor := rollup(GROUP(DISTRIBUTE(sUtilADL, HASH64(seq)), seq, LOCAL), left.seq=right.seq, rollUtil(left,right));
+	
+rollAddr1Util_roxie := rollup(GROUP(sUtilAddr1, seq), left.seq=right.seq, rollUtil(left,right));
+// rollAddr1Util_thor := rollup(GROUP(sUtilAddr1, seq), left.seq=right.seq, rollUtil(left,right));
+rollAddr1Util_thor := rollup(GROUP(DISTRIBUTE(sUtilAddr1, HASH64(seq)), seq, LOCAL), left.seq=right.seq, rollUtil(left,right));
+	
+rollAddr2Util_roxie := rollup(GROUP(sUtilAddr2, seq), left.seq=right.seq, rollUtil(left,right));
+// rollAddr2Util_thor := rollup(GROUP(sUtilAddr2, seq), left.seq=right.seq, rollUtil(left,right));
+rollAddr2Util_thor := rollup(GROUP(DISTRIBUTE(sUtilAddr2, HASH64(seq)), seq, LOCAL), left.seq=right.seq, rollUtil(left,right));	
+
+#IF(onThor)
+  rollAdlUtil   := rollAdlUtil_thor;
+  rollAddr1Util := rollAddr1Util_thor;
+  rollAddr2Util := rollAddr2Util_thor;
+#ELSE
+	rollAdlUtil   := rollAdlUtil_roxie;
+  rollAddr1Util := rollAddr1Util_roxie;
+  rollAddr2Util := rollAddr2Util_roxie;
+#END
 
 // join all 3 sets of results back to bs_neutral here
-wUtilityADL := join(bs_neutral, rollAdlUtil, left.seq=right.seq, 
+wUtilityADL_roxie := join(bs_neutral, rollAdlUtil, left.seq=right.seq, 
 transform(risk_indicators.layout_bocashell_neutral,
 	self.Utility.utili_adl_type := right.Utility.utili_adl_type; 
 	self.Utility.utili_adl_dt_first_seen := right.Utility.utili_adl_dt_first_seen; 
@@ -181,7 +307,7 @@ transform(risk_indicators.layout_bocashell_neutral,
 	self := left;
 	), left outer, lookup);
 
-wUtilityAddr1 := join(wUtilityADL, rollAddr1Util, left.seq=right.seq, 
+wUtilityAddr1_roxie := join(wUtilityADL_roxie, rollAddr1Util, left.seq=right.seq, 
 transform(risk_indicators.layout_bocashell_neutral,
 	self.Utility.utili_addr1_type := right.Utility.utili_addr1_type; 
 	self.Utility.utili_addr1_dt_first_seen := right.Utility.utili_addr1_dt_first_seen;
@@ -190,7 +316,7 @@ transform(risk_indicators.layout_bocashell_neutral,
 	self := left;
 	), left outer, lookup);
 
-wUtilityAddr2 := join(wUtilityAddr1, rollAddr2Util, left.seq=right.seq, 
+wUtilityAddr2_roxie := join(wUtilityAddr1_roxie, rollAddr2Util, left.seq=right.seq, 
 transform(risk_indicators.layout_bocashell_neutral,
 	self.Utility.utili_addr2_type := right.Utility.utili_addr2_type; 
 	self.Utility.utili_addr2_dt_first_seen := right.Utility.utili_addr2_dt_first_seen;
@@ -198,13 +324,72 @@ transform(risk_indicators.layout_bocashell_neutral,
 	// self.utili_addr2_src := right.utili_addr2_src;
 	self := left;
 	), left outer, lookup);
-	
+  
+wUtilityADL_thor := join(DISTRIBUTE(bs_neutral, HASH64(seq)), DISTRIBUTE(rollAdlUtil, HASH64(seq)), 
+                          left.seq=right.seq, 
+                          transform(risk_indicators.layout_bocashell_neutral,
+                            self.Utility.utili_adl_type := right.Utility.utili_adl_type; 
+                            self.Utility.utili_adl_dt_first_seen := right.Utility.utili_adl_dt_first_seen; 
+                            self.Utility.utili_adl_count := right.Utility.utili_adl_count; 
+                            self.Utility.utili_adl_earliest_dt_first_seen := right.Utility.utili_adl_earliest_dt_first_seen; 
+                            self.Utility.utili_adl_nap := right.Utility.utili_adl_nap; 
+                            // self.utili_adl_src := right.utili_adl_src; 
+                            self := left;
+                            ), left outer, LOCAL);
+
+wUtilityAddr1_thor := join(DISTRIBUTE(wUtilityADL_thor, HASH64(seq)), DISTRIBUTE(rollAddr1Util, HASH64(seq)), 
+                            left.seq=right.seq, 
+                            transform(risk_indicators.layout_bocashell_neutral,
+                              self.Utility.utili_addr1_type := right.Utility.utili_addr1_type; 
+                              self.Utility.utili_addr1_dt_first_seen := right.Utility.utili_addr1_dt_first_seen;
+                              self.Utility.utili_addr1_nap := right.Utility.utili_addr1_nap;
+                              // self.utili_addr1_src := right.utili_addr1_src;
+                              self := left;
+                              ), left outer, LOCAL);
+
+wUtilityAddr2_thor := join(DISTRIBUTE(wUtilityAddr1_thor, HASH64(seq)), DISTRIBUTE(rollAddr2Util, HASH64(seq)), 
+                            left.seq=right.seq, 
+                            transform(risk_indicators.layout_bocashell_neutral,
+                              self.Utility.utili_addr2_type := right.Utility.utili_addr2_type; 
+                              self.Utility.utili_addr2_dt_first_seen := right.Utility.utili_addr2_dt_first_seen;
+                              self.Utility.utili_addr2_nap := right.Utility.utili_addr2_nap;
+                              // self.utili_addr2_src := right.utili_addr2_src;
+                              self := left;
+                              ), left outer, LOCAL);
+                              
+#IF(onThor)
+  wUtilityAddr2 := wUtilityAddr2_thor;
+#ELSE
+  wUtilityAddr2 := wUtilityAddr2_roxie;
+#END
+
 wUtility := group(sort(wUtilityAddr2,seq),seq);
 
 // output(wUtilADL, named('wUtilADL'));
 // output(wutil, named('wutil'));
 // output(sutil, named('sutil'));
 // output(rollUtilout, named('rollUtilout'));
+
+// OUTPUT(wUtilADL_correct, NAMED('wUtilADL_correct'));
+// OUTPUT(wUtilAddr1_correct, NAMED('wUtilAddr1_correct'));
+// OUTPUT(wUtilAddr2_correct, NAMED('wUtilAddr2_correct'));
+
+// OUTPUT(sUtilADL, NAMED('sUtilADL'));
+// OUTPUT(sUtilAddr1, NAMED('sUtilAddr1'));
+// OUTPUT(sUtilAddr2, NAMED('sUtilAddr2'));
+// OUTPUT(rollAdlUtil, NAMED('rollAdlUtil'));
+// OUTPUT(rollAddr1Util, NAMED('rollAddr1Util'));
+// OUTPUT(rollAddr2Util, NAMED('rollAddr2Util'));
+
+/*
+	sUtilADL    := sUtilADL_thor;
+  sUtilAddr1  := sUtilAddr1_thor;
+  sUtilAddr2  := sUtilAddr2_thor;
+
+	rollAdlUtil   := rollAdlUtil_roxie;
+  rollAddr1Util := rollAddr1Util_roxie;
+  rollAddr2Util := rollAddr2Util_roxie;
+*/
 
 return wUtility;
 

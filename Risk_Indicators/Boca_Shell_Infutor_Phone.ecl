@@ -83,6 +83,11 @@ combo_thor := group(sort(distribute(combined, hash64(seq)), seq, local), seq, lo
 	combo := combo_roxie;
 #END
 
+
+#IF(_control.environment.onThor_LeadIntegrity)
+	infutor_final := bs; // for initial trending attributes, we don't need this function, so we can skip all of this code and make it run faster
+
+#ELSE
 risk_indicators.layout_bocashell_neutral rollInfutor(risk_indicators.layout_bocashell_neutral le, risk_indicators.layout_bocashell_neutral ri) := transform
 	self.infutor_phone.infutor_date_first_seen := MIN(le.infutor_phone.infutor_date_first_seen, ri.infutor_phone.infutor_date_first_seen);
 	self.infutor_phone.infutor_date_last_seen := MAX(le.infutor_phone.infutor_date_last_seen, ri.infutor_phone.infutor_date_last_seen);
@@ -107,6 +112,8 @@ infutor_final :=  PROJECT (rolledInfutor, TRANSFORM (risk_indicators.layout_boca
 									self.infutor_phone.infutor_date_first_seen := if(napLT9 and BSVersion >=50 ,0, left.infutor_phone.infutor_date_first_seen);
 									self.infutor_phone.infutor_date_last_seen := if(napLT9 and BSVersion >=50 ,0, left.infutor_phone.infutor_date_last_seen);
 									SELF := LEFT));
+#END
+									
 return infutor_final;
 //return rolledInfutor;
 
