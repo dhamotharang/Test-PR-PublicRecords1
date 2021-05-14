@@ -4,8 +4,8 @@ IMPORT B_Criminal_Offense_6,CFG_Compile,E_Criminal_Offense,FN_Compile FROM Publi
 IMPORT * FROM KEL16.Null;
 EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Criminal_Offense_6(__in,__cfg).__ENH_Criminal_Offense_6) __ENH_Criminal_Offense_6 := B_Criminal_Offense_6(__in,__cfg).__ENH_Criminal_Offense_6;
-  SHARED __EE1098803 := __ENH_Criminal_Offense_6;
-  EXPORT __ST169717_Layout := RECORD
+  SHARED __EE1098758 := __ENH_Criminal_Offense_6;
+  EXPORT __ST169672_Layout := RECORD
     KEL.typ.nstr Case_Number_;
     KEL.typ.nkdate Case_Date_;
     KEL.typ.nstr Case_Type_Description_;
@@ -28,7 +28,7 @@ EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST169670_Layout := RECORD
+  EXPORT __ST169625_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Offender_Key_;
     KEL.typ.nstr Offense_Type_;
@@ -74,7 +74,7 @@ EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(__ST169717_Layout) Offense_Charges_;
+    KEL.typ.ndataset(__ST169672_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Fcra_Data_Layout) Fcra_Data_;
@@ -87,16 +87,16 @@ EXPORT B_Criminal_Offense_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST169670_Layout __ND1099218__Project(B_Criminal_Offense_6(__in,__cfg).__ST171532_Layout __PP1098804) := TRANSFORM
-    __EE1098964 := __PP1098804.Offense_Charges_;
-    __ST169717_Layout __ND1099201__Project(B_Criminal_Offense_6(__in,__cfg).__ST171579_Layout __PP1098965) := TRANSFORM
-      __CC13192 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('doc_build_version'))),__CN(__cfg.CurrentDate));
-      SELF.Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP1098965.Criminal_Date_),__ECAST(KEL.typ.nkdate,__CC13192));
-      SELF.Is_Criminal_Count_F_C_R_A_ := __AND(__AND(__AND(__NOT(__PP1098965.Dismissed_Charges_),__OP2(__PP1098965.Offense_Score_,IN,__CN(['M','F']))),__OP2(__PP1098965.Conviction_Flag_,IN,__CN(['Y','D']))),__OP2(__PP1098965.Traffic_Flag_,=,__CN('N')));
-      SELF := __PP1098965;
+  SHARED __ST169625_Layout __ND1099173__Project(B_Criminal_Offense_6(__in,__cfg).__ST171487_Layout __PP1098759) := TRANSFORM
+    __EE1098919 := __PP1098759.Offense_Charges_;
+    __ST169672_Layout __ND1099156__Project(B_Criminal_Offense_6(__in,__cfg).__ST171534_Layout __PP1098920) := TRANSFORM
+      __CC13147 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('doc_build_version'))),__CN(__cfg.CurrentDate));
+      SELF.Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP1098920.Criminal_Date_),__ECAST(KEL.typ.nkdate,__CC13147));
+      SELF.Is_Criminal_Count_F_C_R_A_ := __AND(__AND(__AND(__NOT(__PP1098920.Dismissed_Charges_),__OP2(__PP1098920.Offense_Score_,IN,__CN(['M','F']))),__OP2(__PP1098920.Conviction_Flag_,IN,__CN(['Y','D']))),__OP2(__PP1098920.Traffic_Flag_,=,__CN('N')));
+      SELF := __PP1098920;
     END;
-    SELF.Offense_Charges_ := __PROJECT(__EE1098964,__ND1099201__Project(LEFT));
-    SELF := __PP1098804;
+    SELF.Offense_Charges_ := __PROJECT(__EE1098919,__ND1099156__Project(LEFT));
+    SELF := __PP1098759;
   END;
-  EXPORT __ENH_Criminal_Offense_5 := PROJECT(__EE1098803,__ND1099218__Project(LEFT));
+  EXPORT __ENH_Criminal_Offense_5 := PROJECT(__EE1098758,__ND1099173__Project(LEFT));
 END;

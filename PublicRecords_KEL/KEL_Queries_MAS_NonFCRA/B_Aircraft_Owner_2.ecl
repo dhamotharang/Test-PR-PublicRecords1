@@ -4,8 +4,8 @@ IMPORT B_Aircraft_Owner_3,CFG_Compile,E_Aircraft,E_Aircraft_Owner,E_Person FROM 
 IMPORT * FROM KEL16.Null;
 EXPORT B_Aircraft_Owner_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Aircraft_Owner_3(__in,__cfg).__ENH_Aircraft_Owner_3) __ENH_Aircraft_Owner_3 := B_Aircraft_Owner_3(__in,__cfg).__ENH_Aircraft_Owner_3;
-  SHARED __EE1909321 := __ENH_Aircraft_Owner_3;
-  EXPORT __ST163779_Layout := RECORD
+  SHARED __EE1909282 := __ENH_Aircraft_Owner_3;
+  EXPORT __ST163734_Layout := RECORD
     KEL.typ.ntyp(E_Aircraft().Typ) Plane_;
     KEL.typ.ntyp(E_Person().Typ) Owner_;
     KEL.typ.nint Registrant_Type_;
@@ -20,10 +20,10 @@ EXPORT B_Aircraft_Owner_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST163779_Layout __ND1909377__Project(B_Aircraft_Owner_3(__in,__cfg).__ST169051_Layout __PP1909322) := TRANSFORM
-    __CC13949 := '-99997';
-    SELF.Aircraft_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP1909322.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP1909322.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13949)));
-    SELF := __PP1909322;
+  SHARED __ST163734_Layout __ND1909338__Project(B_Aircraft_Owner_3(__in,__cfg).__ST169006_Layout __PP1909283) := TRANSFORM
+    __CC13904 := '-99997';
+    SELF.Aircraft_Min_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP1909283.Date_First_Seen_Capped_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP1909283.Date_First_Seen_Capped_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC13904)));
+    SELF := __PP1909283;
   END;
-  EXPORT __ENH_Aircraft_Owner_2 := PROJECT(__EE1909321,__ND1909377__Project(LEFT));
+  EXPORT __ENH_Aircraft_Owner_2 := PROJECT(__EE1909282,__ND1909338__Project(LEFT));
 END;

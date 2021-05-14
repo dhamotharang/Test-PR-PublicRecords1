@@ -4,8 +4,8 @@ IMPORT B_Tradeline_5,CFG_Compile,E_Tradeline FROM PublicRecords_KEL.KEL_Queries_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Tradeline_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Tradeline_5(__in,__cfg).__ENH_Tradeline_5) __ENH_Tradeline_5 := B_Tradeline_5(__in,__cfg).__ENH_Tradeline_5;
-  SHARED __EE2124547 := __ENH_Tradeline_5;
-  EXPORT __ST208427_Layout := RECORD
+  SHARED __EE2124502 := __ENH_Tradeline_5;
+  EXPORT __ST208382_Layout := RECORD
     KEL.typ.nkdate A_R_Date_;
     KEL.typ.nint Total_A_R_;
     KEL.typ.nint Current_A_R_;
@@ -45,13 +45,13 @@ EXPORT B_Tradeline_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST208420_Layout := RECORD
+  EXPORT __ST208375_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
     KEL.typ.nstr Account_Key_;
-    KEL.typ.ndataset(__ST208427_Layout) Records_;
+    KEL.typ.ndataset(__ST208382_Layout) Records_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
     KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.nkdate Current_Date_First_Of_Month_;
@@ -74,21 +74,21 @@ EXPORT B_Tradeline_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST208420_Layout __ND2124482__Project(B_Tradeline_5(__in,__cfg).__ST212645_Layout __PP2123803) := TRANSFORM
-    __EE2124550 := __PP2123803.Records_;
-    __ST208427_Layout __ND2124418__Project(B_Tradeline_5(__in,__cfg).__ST212652_Layout __PP2123846) := TRANSFORM
-      SELF.A_R_Date_Group_ := __FN3(KEL.Routines.DateFromParts,__FN1(KEL.Routines.Year,__PP2123846.A_R_Date_),__FN1(KEL.Routines.Month,__PP2123846.A_R_Date_),__CN(0));
-      __EE2124405 := __PP2123803.Records_;
-      __BS2124406 := __T(__EE2124405);
-      __EE2124411 := __BS2124406(__T(__T(__EE2124405).Is1_Y_Record_));
-      SELF.Is_Most_Recent_Active_Record1_Y_ := __AND(__PP2123803.Is_Active1_Y_,__OP2(__PP2123846.A_R_Date_,=,KEL.Aggregates.MaxN(__EE2124411,__EE2124411.A_R_Date_)));
-      SELF.Total_A_R_L_N_ := __OP2(__OP2(__OP2(__OP2(__PP2123846.Current_A_R_L_N_,+,__PP2123846.Aging1_To30_L_N_),+,__PP2123846.Aging31_To60_L_N_),+,__PP2123846.Aging61_To90_L_N_),+,__PP2123846.Aging91_Plus_L_N_);
-      SELF := __PP2123846;
+  SHARED __ST208375_Layout __ND2124437__Project(B_Tradeline_5(__in,__cfg).__ST212600_Layout __PP2123758) := TRANSFORM
+    __EE2124505 := __PP2123758.Records_;
+    __ST208382_Layout __ND2124373__Project(B_Tradeline_5(__in,__cfg).__ST212607_Layout __PP2123801) := TRANSFORM
+      SELF.A_R_Date_Group_ := __FN3(KEL.Routines.DateFromParts,__FN1(KEL.Routines.Year,__PP2123801.A_R_Date_),__FN1(KEL.Routines.Month,__PP2123801.A_R_Date_),__CN(0));
+      __EE2124360 := __PP2123758.Records_;
+      __BS2124361 := __T(__EE2124360);
+      __EE2124366 := __BS2124361(__T(__T(__EE2124360).Is1_Y_Record_));
+      SELF.Is_Most_Recent_Active_Record1_Y_ := __AND(__PP2123758.Is_Active1_Y_,__OP2(__PP2123801.A_R_Date_,=,KEL.Aggregates.MaxN(__EE2124366,__EE2124366.A_R_Date_)));
+      SELF.Total_A_R_L_N_ := __OP2(__OP2(__OP2(__OP2(__PP2123801.Current_A_R_L_N_,+,__PP2123801.Aging1_To30_L_N_),+,__PP2123801.Aging31_To60_L_N_),+,__PP2123801.Aging61_To90_L_N_),+,__PP2123801.Aging91_Plus_L_N_);
+      SELF := __PP2123801;
     END;
-    SELF.Records_ := __PROJECT(__EE2124550,__ND2124418__Project(LEFT));
-    __CC48771 := 90;
-    SELF.Is_Active_ := __OP2(__PP2123803.Newest_Record_Age_In_Days_,<=,__CN(__CC48771));
-    SELF := __PP2123803;
+    SELF.Records_ := __PROJECT(__EE2124505,__ND2124373__Project(LEFT));
+    __CC48726 := 90;
+    SELF.Is_Active_ := __OP2(__PP2123758.Newest_Record_Age_In_Days_,<=,__CN(__CC48726));
+    SELF := __PP2123758;
   END;
-  EXPORT __ENH_Tradeline_4 := PROJECT(__EE2124547,__ND2124482__Project(LEFT));
+  EXPORT __ENH_Tradeline_4 := PROJECT(__EE2124502,__ND2124437__Project(LEFT));
 END;

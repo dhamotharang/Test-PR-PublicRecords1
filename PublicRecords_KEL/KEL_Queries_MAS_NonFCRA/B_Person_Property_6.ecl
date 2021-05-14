@@ -7,11 +7,11 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
   SHARED VIRTUAL TYPEOF(E_Person_Property_Event(__in,__cfg).__Result) __E_Person_Property_Event := E_Person_Property_Event(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(E_Property(__in,__cfg).__Result) __E_Property := E_Property(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7) __ENH_Property_Event_7 := B_Property_Event_7(__in,__cfg).__ENH_Property_Event_7;
-  SHARED __EE1601872 := __ENH_Person_Property_7;
-  SHARED __EE1601876 := __E_Property;
-  SHARED __EE1601874 := __EE1601872;
-  SHARED __EE1602032 := __EE1601874(__NN(__EE1601874.Subject_));
-  SHARED __ST1605301_Layout := RECORD
+  SHARED __EE1601833 := __ENH_Person_Property_7;
+  SHARED __EE1601837 := __E_Property;
+  SHARED __EE1601835 := __EE1601833;
+  SHARED __EE1601993 := __EE1601835(__NN(__EE1601835.Subject_));
+  SHARED __ST1605262_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -21,14 +21,14 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE1605305 := PROJECT(TABLE(PROJECT(__EE1602032,__ST1605301_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Subject_,Prop_},Subject_,Prop_,MERGE),__ST1605301_Layout);
-  SHARED __EE1601878 := __ENH_Property_Event_7;
-  SHARED __EE1601880 := __E_Person_Property_Event;
-  SHARED __EE1603913 := __EE1601880(__NN(__EE1601880.Event_) AND __NN(__EE1601880.Subject_));
-  SHARED __EE1603924 := __EE1603913.Party_Details_;
-  __JC1603933(E_Person_Property_Event(__in,__cfg).Party_Details_Layout __EE1603924) := __T(__OR(__EE1603924.Party_Is_Buyer_Or_Owner_,__EE1603924.Party_Is_Seller_));
-  SHARED __EE1603934 := __EE1603913(EXISTS(__CHILDJOINFILTER(__EE1603924,__JC1603933)));
-  SHARED __ST1605011_Layout := RECORD
+  SHARED __EE1605266 := PROJECT(TABLE(PROJECT(__EE1601993,__ST1605262_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Subject_,Prop_},Subject_,Prop_,MERGE),__ST1605262_Layout);
+  SHARED __EE1601839 := __ENH_Property_Event_7;
+  SHARED __EE1601841 := __E_Person_Property_Event;
+  SHARED __EE1603874 := __EE1601841(__NN(__EE1601841.Event_) AND __NN(__EE1601841.Subject_));
+  SHARED __EE1603885 := __EE1603874.Party_Details_;
+  __JC1603894(E_Person_Property_Event(__in,__cfg).Party_Details_Layout __EE1603885) := __T(__OR(__EE1603885.Party_Is_Buyer_Or_Owner_,__EE1603885.Party_Is_Seller_));
+  SHARED __EE1603895 := __EE1603874(EXISTS(__CHILDJOINFILTER(__EE1603885,__JC1603894)));
+  SHARED __ST1604972_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Property_Event().Typ) Event_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -37,8 +37,8 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE1605015 := PROJECT(TABLE(PROJECT(__EE1603934,__ST1605011_Layout),{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Subject_,Event_},Subject_,Event_,MERGE),__ST1605011_Layout);
-  SHARED __ST1605100_Layout := RECORD
+  SHARED __EE1604976 := PROJECT(TABLE(PROJECT(__EE1603895,__ST1604972_Layout),{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Subject_,Event_},Subject_,Event_,MERGE),__ST1604972_Layout);
+  SHARED __ST1605061_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -112,13 +112,13 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1605026(B_Property_Event_7(__in,__cfg).__ST181509_Layout __EE1601878, __ST1605011_Layout __EE1605015) := __EEQP(__EE1601878.UID,__EE1605015.Event_);
-  __ST1605100_Layout __JT1605026(B_Property_Event_7(__in,__cfg).__ST181509_Layout __l, __ST1605011_Layout __r) := TRANSFORM
+  __JC1604987(B_Property_Event_7(__in,__cfg).__ST181464_Layout __EE1601839, __ST1604972_Layout __EE1604976) := __EEQP(__EE1601839.UID,__EE1604976.Event_);
+  __ST1605061_Layout __JT1604987(B_Property_Event_7(__in,__cfg).__ST181464_Layout __l, __ST1604972_Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1605098 := JOIN(__EE1605015,__EE1601878,__JC1605026(RIGHT,LEFT),__JT1605026(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST1605441_Layout := RECORD
+  SHARED __EE1605059 := JOIN(__EE1604976,__EE1601839,__JC1604987(RIGHT,LEFT),__JT1604987(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST1605402_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range__1_;
@@ -191,21 +191,21 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST1605441_Layout __ND1605308__Project(__ST1605100_Layout __PP1605307) := TRANSFORM
-    SELF.Primary_Range__1_ := __PP1605307.Primary_Range_;
-    SELF.Predirectional__1_ := __PP1605307.Predirectional_;
-    SELF.Primary_Name__1_ := __PP1605307.Primary_Name_;
-    SELF.Suffix__1_ := __PP1605307.Suffix_;
-    SELF.Postdirectional__1_ := __PP1605307.Postdirectional_;
-    SELF.Z_I_P5__1_ := __PP1605307.Z_I_P5_;
-    SELF.Secondary_Range__1_ := __PP1605307.Secondary_Range_;
-    SELF.Prop__1_ := __PP1605307.Prop_;
-    SELF.Data_Sources__1_ := __PP1605307.Data_Sources_;
-    SELF.Subject__1_ := __PP1605307.Subject_;
-    SELF := __PP1605307;
+  SHARED __ST1605402_Layout __ND1605269__Project(__ST1605061_Layout __PP1605268) := TRANSFORM
+    SELF.Primary_Range__1_ := __PP1605268.Primary_Range_;
+    SELF.Predirectional__1_ := __PP1605268.Predirectional_;
+    SELF.Primary_Name__1_ := __PP1605268.Primary_Name_;
+    SELF.Suffix__1_ := __PP1605268.Suffix_;
+    SELF.Postdirectional__1_ := __PP1605268.Postdirectional_;
+    SELF.Z_I_P5__1_ := __PP1605268.Z_I_P5_;
+    SELF.Secondary_Range__1_ := __PP1605268.Secondary_Range_;
+    SELF.Prop__1_ := __PP1605268.Prop_;
+    SELF.Data_Sources__1_ := __PP1605268.Data_Sources_;
+    SELF.Subject__1_ := __PP1605268.Subject_;
+    SELF := __PP1605268;
   END;
-  SHARED __EE1605512 := PROJECT(__EE1605098,__ND1605308__Project(LEFT));
-  SHARED __ST1605595_Layout := RECORD
+  SHARED __EE1605473 := PROJECT(__EE1605059,__ND1605269__Project(LEFT));
+  SHARED __ST1605556_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nuid UID;
@@ -281,8 +281,8 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1605519(__ST1605301_Layout __EE1605305, __ST1605441_Layout __EE1605512) := __NNEQ(__EE1605512.Subject__1_,__EE1605305.Subject_) AND __T(__OP2(__EE1605512.Subject__1_,=,__EE1605305.Subject_));
-  __ST1605595_Layout __JT1605519(__ST1605301_Layout __l, __ST1605441_Layout __r) := TRANSFORM
+  __JC1605480(__ST1605262_Layout __EE1605266, __ST1605402_Layout __EE1605473) := __NNEQ(__EE1605473.Subject__1_,__EE1605266.Subject_) AND __T(__OP2(__EE1605473.Subject__1_,=,__EE1605266.Subject_));
+  __ST1605556_Layout __JT1605480(__ST1605262_Layout __l, __ST1605402_Layout __r) := TRANSFORM
     SELF.Archive___Date_ := __r.Archive___Date_;
     SELF.Date_First_Seen_ := __r.Date_First_Seen_;
     SELF.Date_Last_Seen_ := __r.Date_Last_Seen_;
@@ -291,9 +291,9 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1605593 := JOIN(__EE1605305,__EE1605512,__JC1605519(LEFT,RIGHT),__JT1605519(LEFT,RIGHT),INNER,HASH);
-  SHARED __EE1605677 := __EE1605593(__NN(__EE1605593.Prop__1_) AND __NN(__EE1605593.Prop_));
-  SHARED __ST259328_Layout := RECORD
+  SHARED __EE1605554 := JOIN(__EE1605266,__EE1605473,__JC1605480(LEFT,RIGHT),__JT1605480(LEFT,RIGHT),INNER,HASH);
+  SHARED __EE1605638 := __EE1605554(__NN(__EE1605554.Prop__1_) AND __NN(__EE1605554.Prop_));
+  SHARED __ST259289_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -380,8 +380,8 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1605687(E_Property(__in,__cfg).Layout __EE1601876, __ST1605595_Layout __EE1605677) := __EEQP(__EE1605677.Prop_,__EE1601876.UID) AND __EEQP(__EE1601876.UID,__EE1605677.Prop__1_);
-  __ST259328_Layout __JT1605687(E_Property(__in,__cfg).Layout __l, __ST1605595_Layout __r) := TRANSFORM
+  __JC1605648(E_Property(__in,__cfg).Layout __EE1601837, __ST1605556_Layout __EE1605638) := __EEQP(__EE1605638.Prop_,__EE1601837.UID) AND __EEQP(__EE1601837.UID,__EE1605638.Prop__1_);
+  __ST259289_Layout __JT1605648(E_Property(__in,__cfg).Layout __l, __ST1605556_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.Archive___Date_ := __r.Archive___Date_;
     SELF.Date_First_Seen_ := __r.Date_First_Seen_;
@@ -391,8 +391,8 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1605794 := JOIN(__EE1605677,__EE1601876,__JC1605687(RIGHT,LEFT),__JT1605687(RIGHT,LEFT),INNER,HASH);
-  SHARED __ST257908_Layout := RECORD
+  SHARED __EE1605755 := JOIN(__EE1605638,__EE1601837,__JC1605648(RIGHT,LEFT),__JT1605648(RIGHT,LEFT),INNER,HASH);
+  SHARED __ST257869_Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nuid UID;
@@ -468,8 +468,8 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE1606263 := PROJECT(__EE1605794,__ST257908_Layout);
-  SHARED __ST258130_Layout := RECORD
+  SHARED __EE1606224 := PROJECT(__EE1605755,__ST257869_Layout);
+  SHARED __ST258091_Layout := RECORD
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nkdate Dt_Last_Seen_;
@@ -479,8 +479,8 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE1606373 := PROJECT(__EE1606263,__ST258130_Layout);
-  SHARED __ST258149_Layout := RECORD
+  SHARED __EE1606334 := PROJECT(__EE1606224,__ST258091_Layout);
+  SHARED __ST258110_Layout := RECORD
     KEL.typ.nkdate M_A_X___Dt_Last_Seen_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
@@ -490,8 +490,8 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE1606393 := PROJECT(__CLEANANDDO(__EE1606373,TABLE(__EE1606373,{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),KEL.Aggregates.MaxNG(__EE1606373.Dt_Last_Seen_) M_A_X___Dt_Last_Seen_,Prop_,Subject_},Prop_,Subject_,MERGE)),__ST258149_Layout);
-  SHARED __ST260003_Layout := RECORD
+  SHARED __EE1606354 := PROJECT(__CLEANANDDO(__EE1606334,TABLE(__EE1606334,{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),KEL.Aggregates.MaxNG(__EE1606334.Dt_Last_Seen_) M_A_X___Dt_Last_Seen_,Prop_,Subject_},Prop_,Subject_,MERGE)),__ST258110_Layout);
+  SHARED __ST259964_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nstr Primary_Range_;
@@ -505,7 +505,7 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Reported_Dates_Layout) Reported_Dates_;
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.bool Property_Is_Sold_ := FALSE;
-    KEL.typ.ndataset(B_Person_Property_7(__in,__cfg).__ST96768_Layout) Property_Sale_Info_;
+    KEL.typ.ndataset(B_Person_Property_7(__in,__cfg).__ST96723_Layout) Property_Sale_Info_;
     KEL.typ.nkdate M_A_X___Dt_Last_Seen_;
     KEL.typ.ntyp(E_Property().Typ) Prop__1_;
     KEL.typ.ntyp(E_Person().Typ) Subject__1_;
@@ -516,15 +516,15 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1606403(B_Person_Property_7(__in,__cfg).__ST181410_Layout __EE1601872, __ST258149_Layout __EE1606393) := __EEQP(__EE1601872.Subject_,__EE1606393.Subject_) AND __EEQP(__EE1601872.Prop_,__EE1606393.Prop_);
-  __ST260003_Layout __JT1606403(B_Person_Property_7(__in,__cfg).__ST181410_Layout __l, __ST258149_Layout __r) := TRANSFORM
+  __JC1606364(B_Person_Property_7(__in,__cfg).__ST181365_Layout __EE1601833, __ST258110_Layout __EE1606354) := __EEQP(__EE1601833.Subject_,__EE1606354.Subject_) AND __EEQP(__EE1601833.Prop_,__EE1606354.Prop_);
+  __ST259964_Layout __JT1606364(B_Person_Property_7(__in,__cfg).__ST181365_Layout __l, __ST258110_Layout __r) := TRANSFORM
     SELF.Prop__1_ := __r.Prop_;
     SELF.Subject__1_ := __r.Subject_;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1606442 := JOIN(__EE1606393,__EE1601872,__JC1606403(RIGHT,LEFT),__JT1606403(RIGHT,LEFT),RIGHT OUTER,HASH);
-  EXPORT __ST183957_Layout := RECORD
+  SHARED __EE1606403 := JOIN(__EE1606354,__EE1601833,__JC1606364(RIGHT,LEFT),__JT1606364(RIGHT,LEFT),RIGHT OUTER,HASH);
+  EXPORT __ST183912_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nstr Primary_Range_;
@@ -537,10 +537,10 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Reported_Dates_Layout) Reported_Dates_;
     KEL.typ.ndataset(E_Person_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    B_Person_Property_7(__in,__cfg).__ST96768_Layout Best_Property_Sale_Info_;
+    B_Person_Property_7(__in,__cfg).__ST96723_Layout Best_Property_Sale_Info_;
     KEL.typ.bool Property_Is_Sold_ := FALSE;
     KEL.typ.nkdate Property_Max_Date_Last_Seen_Uncapped_;
-    KEL.typ.ndataset(B_Person_Property_7(__in,__cfg).__ST96768_Layout) Property_Sale_Info_;
+    KEL.typ.ndataset(B_Person_Property_7(__in,__cfg).__ST96723_Layout) Property_Sale_Info_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -548,14 +548,14 @@ EXPORT B_Person_Property_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault,
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST183957_Layout __ND1606485__Project(__ST260003_Layout __PP1606443) := TRANSFORM
-    __EE1606552 := __PP1606443.Property_Sale_Info_;
-    __BS1606556 := __T(__EE1606552);
-    __EE1606567 := __BN(TOPN(__BS1606556(__NN(__T(__EE1606552).Dt_First_Seen_) AND __NN(__T(__EE1606552).Sale_Price_)),1, -__T(__T(__EE1606552).Dt_First_Seen_), -__T(__T(__EE1606552).Sale_Price_),__T(L_N_Fares_I_D_),__T(Previous_Sale_Price_),__T(Previous_Recording_Date_)),__NL(__EE1606552));
-    __EE1606569 := __EE1606567;
-    SELF.Best_Property_Sale_Info_ := IF(__PP1606443.Property_Is_Sold_,(__T(__EE1606569))[1],ROW([],B_Person_Property_7(__in,__cfg).__ST96768_Layout));
-    SELF.Property_Max_Date_Last_Seen_Uncapped_ := __PP1606443.M_A_X___Dt_Last_Seen_;
-    SELF := __PP1606443;
+  SHARED __ST183912_Layout __ND1606446__Project(__ST259964_Layout __PP1606404) := TRANSFORM
+    __EE1606513 := __PP1606404.Property_Sale_Info_;
+    __BS1606517 := __T(__EE1606513);
+    __EE1606528 := __BN(TOPN(__BS1606517(__NN(__T(__EE1606513).Dt_First_Seen_) AND __NN(__T(__EE1606513).Sale_Price_)),1, -__T(__T(__EE1606513).Dt_First_Seen_), -__T(__T(__EE1606513).Sale_Price_),__T(L_N_Fares_I_D_),__T(Previous_Sale_Price_),__T(Previous_Recording_Date_)),__NL(__EE1606513));
+    __EE1606530 := __EE1606528;
+    SELF.Best_Property_Sale_Info_ := IF(__PP1606404.Property_Is_Sold_,(__T(__EE1606530))[1],ROW([],B_Person_Property_7(__in,__cfg).__ST96723_Layout));
+    SELF.Property_Max_Date_Last_Seen_Uncapped_ := __PP1606404.M_A_X___Dt_Last_Seen_;
+    SELF := __PP1606404;
   END;
-  EXPORT __ENH_Person_Property_6 := PROJECT(__EE1606442,__ND1606485__Project(LEFT));
+  EXPORT __ENH_Person_Property_6 := PROJECT(__EE1606403,__ND1606446__Project(LEFT));
 END;

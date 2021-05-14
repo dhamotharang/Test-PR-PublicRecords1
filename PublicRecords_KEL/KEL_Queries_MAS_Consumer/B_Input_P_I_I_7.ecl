@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_8,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_8(__in,__cfg).__ENH_Input_P_I_I_8) __ENH_Input_P_I_I_8 := B_Input_P_I_I_8(__in,__cfg).__ENH_Input_P_I_I_8;
-  SHARED __EE289354 := __ENH_Input_P_I_I_8;
-  EXPORT __ST157345_Layout := RECORD
+  SHARED __EE289309 := __ENH_Input_P_I_I_8;
+  EXPORT __ST157300_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -147,10 +147,10 @@ EXPORT B_Input_P_I_I_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST157345_Layout __ND289359__Project(B_Input_P_I_I_8(__in,__cfg).__ST157713_Layout __PP289355) := TRANSFORM
-    SELF.Addr_Not_Populated_ := FN_Compile(__cfg).FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP289355.P___Inp_Addr_));
-    SELF.City_State_Zip_Not_Populated_ := FN_Compile(__cfg).FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP289355.P___Inp_Addr_City_),__ECAST(KEL.typ.nstr,__PP289355.P___Inp_Addr_State_),__ECAST(KEL.typ.nstr,__PP289355.P___Inp_Addr_Zip_));
-    SELF := __PP289355;
+  SHARED __ST157300_Layout __ND289314__Project(B_Input_P_I_I_8(__in,__cfg).__ST157668_Layout __PP289310) := TRANSFORM
+    SELF.Addr_Not_Populated_ := FN_Compile(__cfg).FN_Is_Not_Enough_To_Clean(__ECAST(KEL.typ.nstr,__PP289310.P___Inp_Addr_));
+    SELF.City_State_Zip_Not_Populated_ := FN_Compile(__cfg).FN_City_State_Zip_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP289310.P___Inp_Addr_City_),__ECAST(KEL.typ.nstr,__PP289310.P___Inp_Addr_State_),__ECAST(KEL.typ.nstr,__PP289310.P___Inp_Addr_Zip_));
+    SELF := __PP289310;
   END;
-  EXPORT __ENH_Input_P_I_I_7 := PROJECT(__EE289354,__ND289359__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_7 := PROJECT(__EE289309,__ND289314__Project(LEFT));
 END;
