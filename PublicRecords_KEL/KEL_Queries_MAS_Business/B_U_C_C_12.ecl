@@ -4,8 +4,8 @@ IMPORT B_U_C_C_13,CFG_Compile,E_U_C_C,FN_Compile FROM PublicRecords_KEL.KEL_Quer
 IMPORT * FROM KEL16.Null;
 EXPORT B_U_C_C_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_U_C_C_13(__in,__cfg).__ENH_U_C_C_13) __ENH_U_C_C_13 := B_U_C_C_13(__in,__cfg).__ENH_U_C_C_13;
-  SHARED __EE1871901 := __ENH_U_C_C_13;
-  EXPORT __ST221947_Layout := RECORD
+  SHARED __EE1870242 := __ENH_U_C_C_13;
+  EXPORT __ST221687_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Filing_Jurisdiction_;
     KEL.typ.nstr Filing_Number_;
@@ -34,10 +34,10 @@ EXPORT B_U_C_C_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST221943_Layout := RECORD
+  EXPORT __ST221683_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
-    KEL.typ.ndataset(__ST221947_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST221687_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Collateral_Layout) Collateral_;
     KEL.typ.ndataset(E_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -47,17 +47,17 @@ EXPORT B_U_C_C_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Comp
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST221943_Layout __ND1871906__Project(B_U_C_C_13(__in,__cfg).__ST222008_Layout __PP1871902) := TRANSFORM
-    __EE1871922 := __PP1871902.Sub_Filing_;
-    __ST221947_Layout __ND1871927__Project(B_U_C_C_13(__in,__cfg).__ST222012_Layout __PP1871923) := TRANSFORM
+  SHARED __ST221683_Layout __ND1870247__Project(B_U_C_C_13(__in,__cfg).__ST221748_Layout __PP1870243) := TRANSFORM
+    __EE1870263 := __PP1870243.Sub_Filing_;
+    __ST221687_Layout __ND1870268__Project(B_U_C_C_13(__in,__cfg).__ST221752_Layout __PP1870264) := TRANSFORM
       __CC13384 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('ucc_build_version'))),__CN(__cfg.CurrentDate));
-      SELF.Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP1871923.Max_Filing_Date_),__ECAST(KEL.typ.nkdate,__CC13384));
-      SELF.Filing_Type_Filtered_ := FN_Compile(__cfg).FN__map_Filing_Type(__ECAST(KEL.typ.nstr,__PP1871923.Filing_Type_));
-      SELF.Status_Type_Filtered_ := FN_Compile(__cfg).FN__map_Status_Type(__ECAST(KEL.typ.nstr,__PP1871923.Status_Type_));
-      SELF := __PP1871923;
+      SELF.Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP1870264.Max_Filing_Date_),__ECAST(KEL.typ.nkdate,__CC13384));
+      SELF.Filing_Type_Filtered_ := FN_Compile(__cfg).FN__map_Filing_Type(__ECAST(KEL.typ.nstr,__PP1870264.Filing_Type_));
+      SELF.Status_Type_Filtered_ := FN_Compile(__cfg).FN__map_Status_Type(__ECAST(KEL.typ.nstr,__PP1870264.Status_Type_));
+      SELF := __PP1870264;
     END;
-    SELF.Sub_Filing_ := __PROJECT(__EE1871922,__ND1871927__Project(LEFT));
-    SELF := __PP1871902;
+    SELF.Sub_Filing_ := __PROJECT(__EE1870263,__ND1870268__Project(LEFT));
+    SELF := __PP1870243;
   END;
-  EXPORT __ENH_U_C_C_12 := PROJECT(__EE1871901,__ND1871906__Project(LEFT));
+  EXPORT __ENH_U_C_C_12 := PROJECT(__EE1870242,__ND1870247__Project(LEFT));
 END;
