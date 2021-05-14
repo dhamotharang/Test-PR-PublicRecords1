@@ -1,4 +1,5 @@
-﻿import riskwise, ut, faa, risk_indicators;
+﻿import riskwise, ut, faa, risk_indicators, _Control;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Aircraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only) := FUNCTION
 
@@ -11,12 +12,24 @@ RiskWise.Layouts.Layout_Aircraft_ids addAircraft_IDs(ids_only le, key_did ri) :=
                 self := le;
 end;       
 
-aircraftIDs := join(ids_only, key_did,
-									left.did!=0 and keyed(left.did=right.did),
-									 addAircraft_IDs(left,right), left outer, atmost(keyed(left.did=right.did),riskwise.max_atmost));
+aircraftIDs_roxie := join(ids_only, key_did,
+                          left.did!=0 and keyed(left.did=right.did),
+                          addAircraft_IDs(left,right), left outer, atmost(keyed(left.did=right.did),riskwise.max_atmost));
+                   
+aircraftIDs_thor := join(DISTRIBUTE(ids_only, HASH64(did)),
+                         DISTRIBUTE(PULL(key_did), HASH64(did)),
+                         left.did!=0 and
+                         left.did=right.did,
+                         addAircraft_IDs(left,right), left outer, atmost(left.did=right.did,riskwise.max_atmost), LOCAL);
+                   
+#IF(onThor)
+	aircraftIDs_correct := aircraftIDs_thor;
+#ELSE
+	aircraftIDs_correct := aircraftIDs_roxie;
+#END
 
 key_ids := faa.key_aircraft_id();
-RiskWise.Layouts.Layout_Aircraft_plus addAircraft(aircraftIDs le, key_ids ri) := transform
+RiskWise.Layouts.Layout_Aircraft_plus addAircraft(aircraftIDs_correct le, key_ids ri) := transform
                 myGetDate := if(le.historydate=999999, aircraft_build_date, risk_indicators.iid_constants.full_history_date(le.historydate));
                 self.date_first_seen := if(ri.date_first_seen='', '999999', ri.date_first_seen);
                 self.aircraft_count := if(trim(ri.n_number)!='', 1, 0);
@@ -31,10 +44,23 @@ RiskWise.Layouts.Layout_Aircraft_plus addAircraft(aircraftIDs le, key_ids ri) :=
 								self := le;
 end;
                                                                                                                                                                                 
-aircraftRecs := join(aircraftIDs, key_ids,
-							left.aircraft_ID!=0 and keyed(left.aircraft_id=right.aircraft_id) and
-							(unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
-							addAircraft(left,right), left outer, atmost(riskwise.max_atmost));
+aircraftRecs_roxie := join(aircraftIDs_correct, key_ids,
+                           left.aircraft_ID!=0 and keyed(left.aircraft_id=right.aircraft_id) and
+                           (unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
+                           addAircraft(left,right), left outer, atmost(riskwise.max_atmost));
+                           
+aircraftRecs_thor := join(DISTRIBUTE(aircraftIDs_correct, HASH64(aircraft_ID)),
+                          DISTRIBUTE(PULL(key_ids), HASH64(aircraft_ID)),
+                          left.aircraft_ID!=0 and
+                          left.aircraft_id=right.aircraft_id and
+                          (unsigned)right.date_first_seen < (unsigned)risk_indicators.iid_constants.myGetDate(left.historydate),
+                          addAircraft(left,right), left outer, atmost(left.aircraft_id=right.aircraft_id,riskwise.max_atmost), LOCAL);
+                          
+#IF(onThor)
+	aircraftRecs_correct := aircraftRecs_thor;
+#ELSE
+	aircraftRecs_correct := aircraftRecs_roxie;
+#END
                                                 
 Riskwise.Layouts.Layout_Aircraft_Plus roll_aircraft(Riskwise.Layouts.Layout_Aircraft_Plus le, Riskwise.Layouts.Layout_Aircraft_Plus ri) := transform
                 self.aircraft_count := le.aircraft_count+IF(le.n_number=ri.n_number,0,ri.aircraft_count);  // don't increment if the key is a duplicate
@@ -48,7 +74,7 @@ Riskwise.Layouts.Layout_Aircraft_Plus roll_aircraft(Riskwise.Layouts.Layout_Airc
                 self := ri;
 end;
 
-grp_sorted := group(sort(aircraftRecs, seq, did, n_number,-date_first_seen), seq);
+grp_sorted := group(sort(aircraftRecs_correct, seq, did, n_number,-date_first_seen), seq);
 
 rolled_aircraft := rollup(grp_sorted, left.seq=right.seq and left.did=right.did, roll_aircraft(left,right));
 

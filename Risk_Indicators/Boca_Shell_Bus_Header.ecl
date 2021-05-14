@@ -1,7 +1,7 @@
 ﻿/*2014-12-03T01:11:33Z (David Schlangen)
 change for bug 165691
 */
-import ut, business_risk, did_add, Risk_Indicators, doxie;
+import ut, business_risk, did_add, Risk_Indicators, doxie, _control;
 
 export Boca_Shell_Bus_Header(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam_pre_bus_header, doxie.IDataAccess mod_access, integer bsversion) := FUNCTION
 
@@ -156,7 +156,7 @@ temp_rec add_business_header(Risk_Indicators.Layout_Boca_Shell  le, bha rt) := t
 		self := le;
 end;
 
-with_business_header := join(clam_pre_bus_header, bha,
+with_business_header_roxie := join(clam_pre_bus_header, bha,
 						left.shell_input.prim_name!='' and left.shell_input.z5!='' and
 						keyed((unsigned)left.shell_input.z5=right.zip) and
 						keyed(left.shell_input.prim_name=right.prim_name) and
@@ -167,9 +167,29 @@ with_business_header := join(clam_pre_bus_header, bha,
 			 add_business_header(left, right), atmost(10000),
 						keep(1000),
 			 left outer);
+			 
+with_business_header_thor := join(
+distribute(clam_pre_bus_header, hash64(shell_input.z5, shell_input.prim_name, shell_input.prim_range, shell_input.sec_range)), 
+distribute(pull(bha), hash64(zip, prim_name, prim_range, sec_range)),
+						left.shell_input.prim_name!='' and left.shell_input.z5!='' and
+						((unsigned)left.shell_input.z5=right.zip) and
+						(left.shell_input.prim_name=right.prim_name) and
+						(right.prim_range=left.shell_input.prim_range) and
+						(right.sec_range=left.shell_input.sec_range) and
+						(unsigned)(((STRING)right.dt_first_seen)[1..6]) < left.historydate and 
+						doxie.compliance.isBusHeaderSourceAllowed(right.source, mod_access.DataPermissionMask, mod_access.DataRestrictionMask),
+			 add_business_header(left, right), 
+						keep(1000),
+			 left outer, local);
+			 
+#IF(_control.Environment.onThor) 
+	with_business_header := with_business_header_thor;
+#ELSE
+	with_business_header := with_business_header_roxie;
+#END;
 		
  
-t := table(with_business_header, {seq, 
+t_roxie := table(with_business_header, {seq, 
 													 bus_hdr_source_category_code,
 														records_per_source := count(group),
 														bus_name_match_level := max(group, bus_name_match),
@@ -178,8 +198,25 @@ t := table(with_business_header, {seq,
 														first_seen_at_source := min(group, if(dt_first_seen=0, 99999999, dt_first_seen)),
 														last_seen_at_source := max(group, dt_last_seen),
 													}, seq, bus_hdr_source_category_code, few);
-// output(choosen(t, eyeball), named('stats'));
+t_thor := table(with_business_header, {seq, 
+													 bus_hdr_source_category_code,
+														records_per_source := count(group),
+														bus_name_match_level := max(group, bus_name_match),
+														bus_ssn_match_level := max(group, ssnmatch),
+														bus_phone_match_level := max(group, phonematch),
+														first_seen_at_source := min(group, if(dt_first_seen=0, 99999999, dt_first_seen)),
+														last_seen_at_source := max(group, dt_last_seen),
+													}, seq, bus_hdr_source_category_code, merge);  // difference in the thor workunit, since the with_business_header dataset is distributed
 
+#IF(_control.Environment.onThor) 
+	t := t_thor;
+	sorted_t := sort(distribute(t, seq), seq, first_seen_at_source,bus_hdr_source_category_code, local);
+#ELSE
+	t := t_roxie;
+	sorted_t := sort(t, seq, first_seen_at_source,bus_hdr_source_category_code);
+#END;
+
+// output(choosen(t, eyeball), named('stats'));
 
 temp_rec2 := record
 	unsigned seq;
@@ -192,7 +229,7 @@ temp_rec2 := record
 	integer bus_phone_match := 0;
 end;
 
-with_bus_fields := project(sort(t, seq, first_seen_at_source,bus_hdr_source_category_code), 
+with_bus_fields := project(sorted_t, 
 transform(temp_rec2,
 	self.seq := left.seq;
 	nomatch := left.bus_hdr_source_category_code='';
@@ -225,10 +262,16 @@ rolled := rollup(grped, true, roll_bus(left, right));
 // output(choosen(rolled, eyeball), named('rolled'));
 
 
-with_bus_header_summary := group(join(clam_pre_bus_header, rolled, left.seq=right.seq,
+#if(_control.Environment.onThor_LeadIntegrity)
+	with_bus_header_summary := clam_pre_bus_header;  // for initial trending attributes, we don't need this function, so we can skip all of this code and make it run faster
+#else
+	with_bus_header_summary := group(join(clam_pre_bus_header, rolled, left.seq=right.seq,
 									transform(risk_indicators.Layout_Boca_Shell, 
 														self.business_header_address_summary := right,
 														self := left), left outer, keep(1)), seq);
+#end
+
+
 														
 return with_bus_header_summary;
 												

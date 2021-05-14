@@ -1,4 +1,4 @@
-﻿IMPORT AutoKeyI, AutoStandardI, BIPV2, census_data, doxie, iesp, Prof_License_Mari, STD, Suppress, ut;
+﻿IMPORT AutoKeyI, AutoStandardI, BIPV2, census_data, doxie, dx_prof_license_mari, iesp, STD, Suppress, ut;
 
 // ==============================================================================================================
 // MARI MIDEX "LICENSE" DATA (Prof_License_Mari) related functions
@@ -16,17 +16,17 @@ EXPORT Raw_ProfessionalLicenses :=
        
             tempmod_License :=
               MODULE(PROJECT(AutoStandardI.GlobalModule(),AutoKeyI.AutoKeyStandardFetchArgumentInterface,OPT))
-                EXPORT STRING autokey_keyname_root := Prof_License_Mari.constants.AK_QA_KEYNAME;
-                EXPORT STRING typestr := Prof_License_Mari.constants.TYPE_STR;
-                EXPORT SET OF STRING1 get_skip_set := Prof_License_Mari.constants.SET_SKIP;
-                EXPORT BOOLEAN useAllLookups := Prof_License_Mari.constants.USE_ALL_LOOKUPS;
+                EXPORT STRING autokey_keyname_root := dx_prof_license_mari.constants.ak_keyname;
+                EXPORT STRING typestr := dx_prof_license_mari.constants.TYPE_STR;
+                EXPORT SET OF STRING1 get_skip_set := dx_prof_license_mari.constants.SET_SKIP;
+                EXPORT BOOLEAN useAllLookups := dx_prof_license_mari.constants.USE_ALL_LOOKUPS;
               END;
 
             ds_MidexProfLic_AutokeyData := AutoKeyI.AutoKeyStandardFetch(tempmod_License).ids;
             // ds_MidexProfLic_AutokeyData_Sorted := DEDUP( SORT( ds_MidexProfLic_AutokeyData, fakeid), fakeid);
             ds_MidexProfLic_Autokey_mariRids :=
               JOIN( ds_MidexProfLic_AutokeyData,
-                    Prof_License_Mari.key_autokey_payload,
+                    dx_prof_license_mari.key_autokey_payload,
                     KEYED(LEFT.id = RIGHT.fakeid),
                     TRANSFORM( MIDEX_Services.Layouts.rec_profLicMari_payloadKeyField,
                                SELF.mari_rid := RIGHT.mari_rid;
@@ -40,21 +40,21 @@ EXPORT Raw_ProfessionalLicenses :=
         
         EXPORT fn_get_ProfLicMari_BdidData ( UNSIGNED6 in_bdid ):=
           FUNCTION
-            ds_ProfLicMari_bdid_recs := CHOOSEN(Prof_License_Mari.key_bdid( KEYED( BDID = in_bdid ) AND in_bdid != 0),ut.limits.default);
+            ds_ProfLicMari_bdid_recs := CHOOSEN(dx_prof_license_mari.key_bdid( KEYED( BDID = in_bdid ) AND in_bdid != 0),ut.limits.default);
             MIDEX_Services.Macros.MAC_GetProfLic_MidexLayout_mariRid(ds_ProfLicMari_bdid_recs, ds_outDataSet );
             RETURN ds_outDataSet;
           END; // fn_get_ProfLicMari_BdidData
             
         EXPORT fn_get_ProfLicMari_LinkIdData ( DATASET(BIPV2.IDlayouts.l_xlink_ids) in_linkid, doxie.IDataAccess mod_access, STRING1 FetchLevel ):=
           FUNCTION
-            ds_ProfLicMari_linkid_recs := CHOOSEN(Prof_License_Mari.key_Linkids.kFetch(in_linkid, mod_access, FetchLevel),ut.limits.default);
+            ds_ProfLicMari_linkid_recs := CHOOSEN(dx_prof_license_mari.key_Linkids.kFetch(in_linkid, mod_access, FetchLevel),ut.limits.default);
             MIDEX_Services.Macros.MAC_GetProfLic_MidexLayout_mariRid(ds_ProfLicMari_linkid_recs, ds_outDataSet );
             RETURN ds_outDataSet;
           END; // fn_get_ProfLicMari_LinkIdData
           
         EXPORT fn_get_ProfLicMari_DidData ( UNSIGNED6 in_did ):=
           FUNCTION
-            ds_ProfLicMari_did_recs := CHOOSEN(Prof_License_Mari.key_did()( KEYED( S_DID = in_did ) AND in_did != 0),ut.limits.default);
+            ds_ProfLicMari_did_recs := CHOOSEN(dx_prof_license_mari.key_did()( KEYED( S_DID = in_did ) AND in_did != 0),ut.limits.default);
             MIDEX_Services.Macros.MAC_GetProfLic_MidexLayout_mariRid(ds_ProfLicMari_did_recs, ds_outDataSet );
             
             RETURN ds_outDataSet;
@@ -63,8 +63,12 @@ EXPORT Raw_ProfessionalLicenses :=
           
         EXPORT fn_get_ProfLicMari_licNbrData ( STRING30 in_lic_num, STRING30 in_lic_state = '' ):=
           FUNCTION
-            ds_ProfLicMari_License_recs := CHOOSEN(Prof_License_Mari.key_license_nbr( KEYED( cln_license_nbr = in_lic_num AND
-                                                                                            (in_lic_state = '' OR license_state = in_lic_state )) AND in_lic_num != ''),ut.limits.default);
+            ds_ProfLicMari_License_recs := CHOOSEN(
+              dx_prof_license_mari.key_license_number(
+                KEYED(cln_license_nbr = in_lic_num AND
+                      (in_lic_state = '' OR license_state = in_lic_state ))
+                AND in_lic_num != ''),
+              ut.limits.default);
             MIDEX_Services.Macros.MAC_GetProfLic_MidexLayout_mariRid(ds_ProfLicMari_License_recs, ds_outDataSet );
             
             RETURN ds_outDataSet;
@@ -75,7 +79,7 @@ EXPORT Raw_ProfessionalLicenses :=
           FUNCTION
             // this key was built for three types using the same in_ssn_taxid field. The tax id, ssn and ssn4
             // the id types are: E = tax id, S = ssn, s4 = ssn4
-            ds_ProfLicMari_ssn_tin_recs := CHOOSEN(Prof_License_Mari.key_ssn_taxid( KEYED( ssn_taxid = in_taxid AND tax_type = in_tax_type ) AND in_taxid != ''),ut.limits.default);
+            ds_ProfLicMari_ssn_tin_recs := CHOOSEN(dx_prof_license_mari.key_ssn_taxid( KEYED( ssn_taxid = in_taxid AND tax_type = in_tax_type ) AND in_taxid != ''),ut.limits.default);
             MIDEX_Services.Macros.MAC_GetProfLic_MidexLayout_mariRid(ds_ProfLicMari_ssn_tin_recs, ds_outDataSet );
             
             RETURN ds_outDataSet;
@@ -83,7 +87,7 @@ EXPORT Raw_ProfessionalLicenses :=
         
         EXPORT fn_get_ProfLicMari_nmlsIDData ( STRING40 in_nmls_id ):=
           FUNCTION
-            ds_ProfLicMari_nmlsID_recs := CHOOSEN(Prof_License_Mari.key_nmls_id( KEYED( nmls_id = (INTEGER) in_nmls_id)),ut.limits.default);
+            ds_ProfLicMari_nmlsID_recs := CHOOSEN(dx_prof_license_mari.key_nmls_id( KEYED( nmls_id = (INTEGER) in_nmls_id)),ut.limits.default);
             MIDEX_Services.Macros.MAC_GetProfLic_MidexLayout_mariRid(ds_ProfLicMari_nmlsID_recs, ds_outDataSet );
             
             RETURN ds_outDataSet;
@@ -106,7 +110,7 @@ EXPORT Raw_ProfessionalLicenses :=
                                     UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None,
                                     STRING1 searchType ) := FUNCTION
                     
-                    prof_recsRaw := JOIN(in_ids,Prof_License_Mari.key_mari_payload,
+                    prof_recsRaw := JOIN(in_ids,dx_prof_license_mari.key_mari_payload,
                                         KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
                                         // Bug# 182946 - Filter out records which have been superceded
                                         RIGHT.result_cd_1 NOT IN [Midex_Services.Constants.RECORD_STATUS.SupercededMariRidUpdatingSource,
@@ -190,7 +194,7 @@ EXPORT Raw_ProfessionalLicenses :=
                                     doxie.IDataAccess mod_access,
                                     UNSIGNED1 alertVersion = Midex_Services.Constants.AlertVersion.None) := FUNCTION
                     
-                    prof_recsAll := JOIN(in_ids,Prof_License_Mari.key_mari_payload,
+                    prof_recsAll := JOIN(in_ids,dx_prof_license_mari.key_mari_payload,
                                           KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
                                           // Bug# 182946 - Filter out records which have been superceded
                                           RIGHT.result_cd_1 NOT IN [Midex_Services.Constants.RECORD_STATUS.SupercededMariRidUpdatingSource,

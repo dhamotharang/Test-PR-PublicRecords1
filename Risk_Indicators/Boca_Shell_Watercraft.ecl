@@ -1,4 +1,4 @@
-﻿import watercraft, riskwise, ut, risk_indicators, doxie, Suppress;
+﻿import watercraft, riskwise, ut, risk_indicators, doxie, Suppress, _control;
 
 export Boca_Shell_Watercraft(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsVersion, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
@@ -39,10 +39,25 @@ Layout_Watercraft_Plus_CCPA watercraft_nonFCRA(ids_only le, key_did ri) := trans
 								self := le;
                 self := [];
 end;
-watercraft_recs := join(ids_only, key_did,
+
+watercraft_recs_roxie := join(ids_only, key_did,
 									left.did!=0 and keyed(right.l_did = left.did) and
 									(unsigned3)(right.sequence_key[1..6]) < left.historydate,
 									watercraft_nonFCRA(left,right), left outer, atmost(right.l_did=left.did, riskwise.max_atmost));
+
+watercraft_recs_thor := join(
+	distribute(ids_only, did), 
+	distribute(pull(key_did), l_did),
+	left.did!=0 and (right.l_did = left.did) and
+	(unsigned3)(right.sequence_key[1..6]) < left.historydate,
+	watercraft_nonFCRA(left,right), left outer, 
+	local);
+
+#IF(_control.Environment.onThor)
+	watercraft_recs := watercraft_recs_thor;
+#ELSE
+	watercraft_recs := watercraft_recs_roxie;
+#END
 
 Layout_Watercraft_Plus_CCPA watercraft_nonFCRA_CCPA(watercraft_recs le, key_wid ri) := transform
                 self.earliest_date := le.earliest_date;
@@ -65,15 +80,30 @@ Layout_Watercraft_Plus_CCPA watercraft_nonFCRA_CCPA(watercraft_recs le, key_wid 
                 self := [];
 end;
 
-watercraft_rec_join :=  join(watercraft_recs, key_wid,
+watercraft_rec_join_roxie :=  join(watercraft_recs, key_wid,
 												 keyed(right.watercraft_key = left.watercraft_key and
-                                                             right.state_origin = left.state_origin and
-                                                             right.sequence_key = left.sequence_key),
+                         right.state_origin = left.state_origin and
+                         right.sequence_key = left.sequence_key),
 												 watercraft_nonFCRA_CCPA(left,right), 
                                                  left outer,
 												 atmost(right.watercraft_key = left.watercraft_key 
                                                  and right.state_origin = left.state_origin 
                                                  and right.sequence_key = left.sequence_key, riskwise.max_atmost));
+watercraft_rec_join_thor :=  join(
+	distribute(watercraft_recs, hash64(watercraft_key)), 
+	distribute(pull(key_wid), hash64(watercraft_key)),
+												 (right.watercraft_key = left.watercraft_key and
+                         right.state_origin = left.state_origin and
+                         right.sequence_key = left.sequence_key),
+												 watercraft_nonFCRA_CCPA(left,right), 
+                                                 left outer,
+												 atmost(riskwise.max_atmost), local);
+																								 
+#IF(_control.Environment.onThor)
+	watercraft_rec_join := watercraft_rec_join_thor;
+#ELSE
+	watercraft_rec_join := watercraft_rec_join_roxie;
+#END
 
 Layout_Watercraft_Plus_CCPA roll_watercraft(Layout_Watercraft_Plus_CCPA le, Layout_Watercraft_Plus_CCPA ri) := transform
                 self.watercraft_count := le.watercraft_count+IF(le.watercraft_key=ri.watercraft_key,0,ri.watercraft_count);  // don't increment if the key is a duplicate

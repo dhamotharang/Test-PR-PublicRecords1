@@ -1,4 +1,4 @@
-﻿﻿import _Control, riskwise, did_add, ut, risk_indicators, NID, gateway,phones, iesp,STD, Doxie;
+﻿import _Control, riskwise, did_add, ut, risk_indicators, NID, gateway,phones, iesp,STD, Doxie;
 onThor := _Control.Environment.OnThor;
 
 export iid_getPhoneInfo(grouped dataset(risk_indicators.Layout_Output) with_address_info, dataset(Gateway.Layouts.Config) gateways,
@@ -465,9 +465,14 @@ rolled_meta_phone:= rollup(sorted_meta_phone,left.seq=right.seq,phoneroll(left,r
   END;
   
  biggestrec_rolled_join:=join(biggestrec_rolled_temp, rolled_meta_phone, left.seq=right.seq, add_metadata_phone(left,right),left outer);
- biggestrec_rolled:= group(biggestrec_rolled_join,seq);
+ //biggestrec_rolled:= group(biggestrec_rolled_join,seq);
 
-   //phone_metadata has been added. 
+   //phone_metadata has been added.
+#IF(onThor)
+  biggestrec_rolled := group(biggestrec_rolled_temp,seq); // for leadintegrity/bocashell on thor, we don't need the phones metadata
+#ELSE
+  biggestrec_rolled := group(biggestrec_rolled_join,seq);
+#END
 
 risk_indicators.layout_output wphvertrans(risk_indicators.layout_output l, dirs_by_phone r) := transform
 	skip_hw_dist := length(trim(l.wphone10))<>10 OR l.hphonelat='' OR r.geo_lat='';

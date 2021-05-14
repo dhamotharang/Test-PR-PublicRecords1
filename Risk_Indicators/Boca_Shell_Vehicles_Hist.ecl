@@ -1,4 +1,5 @@
-﻿import doxie_files,drivers, VehicleV2, riskwise, doxie;
+﻿import doxie_files,drivers, VehicleV2, riskwise, doxie, _control;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Vehicles_Hist (GROUPED DATASET(Layout_Boca_Shell_ids) ids1,
                                  unsigned1 dppa, boolean dppa_ok,
@@ -45,9 +46,24 @@ vtemp add_Vehicle_num(ids le, kvd ri) := TRANSFORM
 END;
 
 f := if(includeRel and bsVersion>1, ids, ids(~isrelat));
-vehicles_idd := JOIN(f, kvd, left.did!=0 and keyed(LEFT.did=RIGHT.append_did),add_Vehicle_num(LEFT,RIGHT),atmost(5000),KEEP(100));
 
-vtemp2 add_party(vehicles_idd le, VehicleV2.Key_Vehicle_Party_Key R) := transform
+vehicles_idd_roxie := JOIN(f, kvd, 
+                           left.did!=0 and 
+                           keyed(LEFT.did=RIGHT.append_did),
+                           add_Vehicle_num(LEFT,RIGHT),atmost(5000),KEEP(100));
+
+vehicles_idd_thor := JOIN(DISTRIBUTE(f(did <> 0), HASH64(did)), 
+                          DISTRIBUTE(PULL(kvd), HASH64(append_did)), 
+                          LEFT.did = RIGHT.append_did,
+                          add_Vehicle_num(LEFT,RIGHT),atmost(5000),KEEP(100), LOCAL);
+
+#IF(onThor)
+	vehicles_idd_correct := vehicles_idd_thor;
+#ELSE
+	vehicles_idd_correct := vehicles_idd_roxie;
+#END
+
+vtemp2 add_party(vehicles_idd_correct le, VehicleV2.Key_Vehicle_Party_Key R) := transform
 	SELF.current_count := (INTEGER) (r.Sequence_Key<>'' AND r.history='');
 	SELF.historical_count := (INTEGER) (r.Sequence_Key<>'' AND r.history='H');	
 	SELF.Rel_current_count := if(r.Sequence_Key<>'' AND r.history='', (INTEGER) (r.Sequence_Key<>'' AND r.history=''), 0);
@@ -57,15 +73,30 @@ vtemp2 add_party(vehicles_idd le, VehicleV2.Key_Vehicle_Party_Key R) := transfor
 	self := [];
 end;
 
-vehicles_party := JOIN(vehicles_idd, VehicleV2.Key_Vehicle_Party_Key,
-						keyed(LEFT.vehicle_key=RIGHT.vehicle_key) AND 
-						keyed(left.iteration_key=right.iteration_key) and
-						keyed(left.sequence_key=right.sequence_key) AND
-						RIGHT.date_first_seen < left.historydate,
-						add_party(LEFT,RIGHT), atmost(riskwise.max_atmost));
+vehicles_party_roxie := JOIN(vehicles_idd_correct, VehicleV2.Key_Vehicle_Party_Key,
+                            keyed(LEFT.vehicle_key=RIGHT.vehicle_key) AND 
+                            keyed(left.iteration_key=right.iteration_key) and
+                            keyed(left.sequence_key=right.sequence_key) AND
+                            RIGHT.date_first_seen < left.historydate,
+                            add_party(LEFT,RIGHT), atmost(riskwise.max_atmost));
+            
+vehicles_party_thor := JOIN(DISTRIBUTE(vehicles_idd_correct, HASH64(vehicle_key, iteration_key, sequence_key)),
+                            DISTRIBUTE(PULL(VehicleV2.Key_Vehicle_Party_Key), HASH64(vehicle_key, iteration_key, sequence_key)),
+                            LEFT.vehicle_key=RIGHT.vehicle_key AND 
+                            LEFT.iteration_key=right.iteration_key and
+                            LEFT.sequence_key=right.sequence_key AND
+                            RIGHT.date_first_seen < LEFT.historydate,
+                            add_party(LEFT,RIGHT), 
+                            atmost(LEFT.vehicle_key=RIGHT.vehicle_key, riskwise.max_atmost), LOCAL);
+                            
+#IF(onThor)
+	vehicles_party_correct := vehicles_party_thor;
+#ELSE
+	vehicles_party_correct := vehicles_party_roxie;
+#END
 						
 
-vehrecAddl add_Vehicles_main(vehicles_party le, VehicleV2.Key_Vehicle_Main_Key ri) := TRANSFORM
+vehrecAddl add_Vehicles_main(vehicles_party_correct le, VehicleV2.Key_Vehicle_Main_Key ri) := TRANSFORM
 	//Include relatives here since for batch transactions with two relatives in the same batch, we may dedup the non-relative record
 	//We will filter relatives out of historical_count in vehicles_appended_to_did
 	self.historical_count := le.current_count + le.historical_count;  // if it's current, also ding the historical counter.
@@ -88,19 +119,55 @@ vehrecAddl add_Vehicles_main(vehicles_party le, VehicleV2.Key_Vehicle_Main_Key r
 	SELF := [];//vehicle2 and vehicle 3 state and source code
 END;
 
-vehicles_main := JOIN(vehicles_party, VehicleV2.Key_Vehicle_Main_Key,
-						keyed(LEFT.vehicle_key=RIGHT.vehicle_key) AND 
-						keyed(left.iteration_key=right.iteration_key) and right.orig_vin<>'',
-						add_Vehicles_main(LEFT,RIGHT), atmost(riskwise.max_atmost));
+vehicles_main_roxie := JOIN(vehicles_party_roxie, VehicleV2.Key_Vehicle_Main_Key,
+                            keyed(LEFT.vehicle_key=RIGHT.vehicle_key) AND 
+                            keyed(left.iteration_key=right.iteration_key) and right.orig_vin<>'',
+                            add_Vehicles_main(LEFT,RIGHT), atmost(riskwise.max_atmost));
+            
+vehicles_main_thor := JOIN(DISTRIBUTE(vehicles_party_thor, HASH64(vehicle_key, iteration_key)), 
+                           DISTRIBUTE(PULL(VehicleV2.Key_Vehicle_Main_Key), HASH64(vehicle_key, iteration_key)),
+                           LEFT.vehicle_key=RIGHT.vehicle_key AND 
+                           LEFT.iteration_key=RIGHT.iteration_key and RIGHT.orig_vin<>'',
+                           add_Vehicles_main(LEFT,RIGHT), atmost(LEFT.vehicle_key=RIGHT.vehicle_key, riskwise.max_atmost), LOCAL);
+                           
+#IF(onThor)
+	vehicles_main_correct := vehicles_main_thor;
+#ELSE
+	vehicles_main_correct := vehicles_main_roxie;
+#END
 
 
+//TODO: do we need to change this for THOR?
+//DISTRIBUTE by all sorting criteria (did, vehicle1.vin, -current_count_indiv, -historical_count_indiv, -relative_owned_count)?
+//and run LOCAL?
 vehicles_added := group(
-						dedup( 
-							// keep 1 record per VIN per person, and keep the record which has the highest current count
-							sort(vehicles_main,  did, vehicle1.vin, -current_count_indiv, -historical_count_indiv, -relative_owned_count),
-						did, vehicle1.vin), did);
+                              dedup( 
+                              // keep 1 record per VIN per person, and keep the record which has the highest current count
+                              sort(vehicles_main_correct,  did, vehicle1.vin, -current_count_indiv, -historical_count_indiv, -relative_owned_count),
+                              did, vehicle1.vin), did);
+                              
+                              // DIST by DID, set LOCAL, sort LOCAL
+                                
+// vehicles_added_Roxie := group(
+                              // dedup( 
+                              // keep 1 record per VIN per person, and keep the record which has the highest current count
+                              // sort(vehicles_main_correct,  did, vehicle1.vin, -current_count_indiv, -historical_count_indiv, -relative_owned_count),
+                              // did, vehicle1.vin), did);
+                
+// vehicles_added_thor := group(
+                              // dedup( 
+                              // keep 1 record per VIN per person, and keep the record which has the highest current count
+                              // sort(vehicles_main_correct,  did, vehicle1.vin, -current_count_indiv, -historical_count_indiv, -relative_owned_count),
+                              // did, vehicle1.vin), did);
 
-//vehicles_added := PROJECT(vehicles_added11, transform(vehrec, SELF :=LEFT, SELF := []));
+                              
+// #IF(onThor)
+	// vehicles_added_correct := vehicles_added_thor;
+// #ELSE
+	// vehicles_added_correct := vehicles_added_roxie;
+// #END
+
+// vehicles_added := PROJECT(vehicles_added, transform(vehrec, SELF :=LEFT, SELF := []));
 
 vehrecAddl roll_vehicles(vehrecAddl le, vehrecAddl ri) := TRANSFORM
 	SELF.current_count := le.current_count+
@@ -149,7 +216,14 @@ vehicles_appended_to_did := join(ids1, vehicles_per_did_rolled,
 		self := left,
 		self := right));
 
-vehicles_rolled := group(sort(vehicles_appended_to_did, seq, isRelat, did), seq);
+vehicles_rolled_roxie := group(sort(vehicles_appended_to_did, seq, isRelat, did), seq);
+vehicles_rolled_thor := group(sort(DISTRIBUTE(vehicles_appended_to_did, HASH64(seq)), seq, isRelat, did, LOCAL), seq, LOCAL);
+
+#IF(onThor)
+	vehicles_rolled := vehicles_rolled_thor;
+#ELSE
+	vehicles_rolled := vehicles_rolled_roxie;
+#END
 
 vehrecAddl roll_again(vehrecAddl le, vehrecAddl ri) := TRANSFORM
 	self.relative_owned_count := le.relative_owned_count + ri.relative_owned_count;
@@ -173,3 +247,5 @@ veh_hist_final := project(veh_hist, transform(vehrec,
 RETURN ungroup(veh_hist_final);
 
 END;
+
+//run roxie version first, THOR second

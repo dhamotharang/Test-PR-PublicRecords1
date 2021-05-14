@@ -1,6 +1,6 @@
 IMPORT $, iesp, gateway, STD, Risk_Indicators, ut;
 IMPORT AlloyMedia_student_list, American_student_list, doxie, dx_Email, dx_header, dx_gong, infutor, infutorcid, Impulse_Email;
-IMPORT DayBatchPCNSR, header_quick, PhonesFeedback, phonesplus, phonesplus_v2, ProfileBooster, Prof_License_Mari, prof_licensev2, POE, POEsFromEmails;
+IMPORT DayBatchPCNSR, header_quick, PhonesFeedback, phonesplus, phonesplus_v2, ProfileBooster, dx_prof_license_mari, prof_licensev2, POE, POEsFromEmails;
 IMPORT one_click_data, saleschannel, spoke, targus, thrive, vehiclev2, zoom;
 
 EXPORT TestMod := MODULE
@@ -85,7 +85,7 @@ EXPORT TestMod := MODULE
     infutor_raw_recs := mac_get_payload(lexid, infutor.Key_Header_Infutor_Knowx, s_did);
     infutor_cid_raw_recs := mac_get_payload(lexid, InfutorCID.Key_Infutor_DID, did);
     infutor_narc_raw_recs := mac_get_payload(lexid, ProfileBooster.Key_Infutor_DID, did);
-    proflic_mari_raw_recs := mac_get_payload(lexid, Prof_License_Mari.key_did(), s_did);
+    proflic_mari_raw_recs := mac_get_payload(lexid, dx_prof_license_mari.key_did(), s_did);
     oneclick_raw_recs := mac_get_payload(lexid, one_click_data.keys().did.qa, did);
     paw_raw_recs := $.Raw.GetPawRecs(dids);
     pcnrs_raw_recs := mac_get_payload(lexid, DayBatchPCNSR.Key_PCNSR_DID, did);

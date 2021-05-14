@@ -285,18 +285,44 @@ export getIncarceration(dataset(doxie.layout_references) dids) := function
 		// recordof(doxie_files.Key_Punishment) punishment;  // for debugging only
 	end;
 
-	offender_keys := JOIN(dids, doxie_files.Key_Offenders(), 
-											left.did<>0 and 
-											KEYED(LEFT.did = RIGHT.sdid),
-										TRANSFORM(incarc_temp, SELF.offender_key := RIGHT.offender_key, SELF := LEFT, self := []), atmost(riskwise.max_atmost), keep(500));
+	offender_keys_roxie := JOIN(dids, doxie_files.Key_Offenders(), 
+                              left.did<>0 and 
+                              KEYED(LEFT.did = RIGHT.sdid),
+                            TRANSFORM(incarc_temp, SELF.offender_key := RIGHT.offender_key, SELF := LEFT, self := []), atmost(riskwise.max_atmost), keep(500));
 
+	offender_keys_thor := JOIN(DISTRIBUTE(dids(did<>0), HASH64(did)), 
+                             DISTRIBUTE(doxie_files.Key_Offenders(), HASH64(sdid)), 
+                             // left.did<>0 and 
+                             LEFT.did = RIGHT.sdid,
+                             TRANSFORM(incarc_temp, SELF.offender_key := RIGHT.offender_key, SELF := LEFT, self := []), atmost(riskwise.max_atmost), keep(500), LOCAL);
+
+
+  #IF(onThor)
+		offender_keys := offender_keys_thor;
+	#ELSE
+		offender_keys := offender_keys_roxie;
+	#END
+  
 	// Find out possible incarcerations
 	did_ofndrKeys := DEDUP(SORT(offender_keys, did, offender_key),did, offender_key);
 	// output(did_ofndrKeys, named('did_ofndrKeys'));
 		
-	with_punishment := JOIN(did_ofndrKeys, doxie_files.Key_Punishment(), 
-										KEYED(LEFT.offender_key = RIGHT.ok), 
-										atmost(riskwise.max_atmost), keep(500), left outer);
+	with_punishment_roxie := JOIN(did_ofndrKeys, doxie_files.Key_Punishment(), 
+                                KEYED(LEFT.offender_key = RIGHT.ok), 
+                                atmost(riskwise.max_atmost), keep(500), left outer);
+                    
+  with_punishment_thor := JOIN(DISTRIBUTE(did_ofndrKeys, HASH64(offender_key)), 
+                               DISTRIBUTE(doxie_files.Key_Punishment(), HASH64(ok)), 
+                               LEFT.offender_key = RIGHT.ok, 
+                               atmost(riskwise.max_atmost), keep(500), left outer, LOCAL);
+                               
+  #IF(onThor)
+		with_punishment := with_punishment_thor;
+	#ELSE
+		with_punishment := with_punishment_roxie;
+	#END
+                    
+                    
 	// OUTPUT(with_punishment, NAMED('Results'));
 
 	CriminalRecords_Services.MAC_Incarceration_Filter(with_punishment, with_punishment_flagged)

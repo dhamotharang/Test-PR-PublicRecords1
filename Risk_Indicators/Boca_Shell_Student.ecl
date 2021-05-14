@@ -1,5 +1,5 @@
-﻿
-import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators, doxie, Suppress, ut;
+﻿import american_student_list, Riskwise, AlloyMedia_student_list, MDR, risk_indicators, doxie, Suppress, ut, _Control;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, integer bsversion, boolean isMarketing, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 		
@@ -30,16 +30,30 @@ export Boca_Shell_Student(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids)
 		self.skip_opt_out := le.skip_opt_out;
 	end;
 	
-	student_file_unsuppressed := join(ids_only, american_student_list.key_DID, 
-		left.did!=0 
-		and if(bsversion >= 4, true, if(right.source = MDR.sourceTools.src_OKC_Student_List, false, true)) 
-		and (~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing) or isMarketing=false)
-		and keyed(left.did=right.l_did)
-		and (unsigned3)(right.date_first_seen[1..6]) < left.historydate,
-		student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100)
-	);
+	student_file_unsuppressed_roxie := join(ids_only, american_student_list.key_DID, 
+                                          left.did!=0 
+                                          and if(bsversion >= 4, true, if(right.source = MDR.sourceTools.src_OKC_Student_List, false, true)) 
+                                          and (~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing) or isMarketing=false)
+                                          and keyed(left.did=right.l_did)
+                                          and (unsigned3)(right.date_first_seen[1..6]) < left.historydate,
+                                          student(left,right), left outer, atmost(keyed(left.did=right.l_did), 100));
+  
+  student_file_unsuppressed_thor := join(DISTRIBUTE(ids_only, HASH64(did)), 
+                                         DISTRIBUTE(PULL(american_student_list.key_DID), HASH64(l_did)),
+                                         left.did!=0
+                                         and if(bsversion >= 4, true, if(right.source = MDR.sourceTools.src_OKC_Student_List, false, true)) 
+                                         and (~(right.source=mdr.sourceTools.src_OKC_Student_List and right.collegeid in Risk_Indicators.iid_constants.Set_Restricted_Colleges_For_Marketing) or isMarketing=false)
+                                         and left.did=right.l_did
+                                         and (unsigned3)(right.date_first_seen[1..6]) < left.historydate,
+                                         student(left,right), left outer, atmost(left.did=right.l_did, 100), LOCAL);
+  
+#IF(onThor)
+	student_file_unsuppressed_correct := student_file_unsuppressed_thor;
+#ELSE
+	student_file_unsuppressed_correct := student_file_unsuppressed_roxie;
+#END
 	
-student_file_flagged := Suppress.CheckSuppression(student_file_unsuppressed, mod_access);
+student_file_flagged := Suppress.CheckSuppression(student_file_unsuppressed_correct, mod_access);
 
 student_file := PROJECT(student_file_flagged, TRANSFORM(Layout_AS_Plus, 
 		self.student.date_last_seen := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.date_last_seen);
@@ -163,13 +177,26 @@ student_file := PROJECT(student_file_flagged, TRANSFORM(Layout_AS_Plus,
 		self := [];
 	end;
 
-	alloy_file_unsuppressed := join(ids_only, AlloyMedia_student_list.Key_DID, 
-			left.did!=0
-			and keyed(left.did=right.did)
-			and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
-			alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
+	alloy_file_unsuppressed_roxie := join(ids_only, AlloyMedia_student_list.Key_DID, 
+                                        left.did!=0
+                                        and keyed(left.did=right.did)
+                                        and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
+                                        alloy_main(left, right), atmost(keyed(left.did=right.did), 100));
+  
+  alloy_file_unsuppressed_thor := join(DISTRIBUTE(ids_only, HASH64(did)), 
+                                       DISTRIBUTE(PULL(AlloyMedia_student_list.Key_DID), HASH64(did)),
+                                       left.did!=0
+                                       and left.did=right.did
+                                       and right.date_vendor_first_reported < risk_indicators.iid_constants.myGetDate(left.historydate),
+                                       alloy_main(left, right), atmost(left.did=right.did, 100), LOCAL);
+                                       
+#IF(onThor)
+	alloy_file_unsuppressed_correct := alloy_file_unsuppressed_thor;
+#ELSE
+	alloy_file_unsuppressed_correct := alloy_file_unsuppressed_roxie;
+#END
 
-	alloy_file_flagged := Suppress.CheckSuppression(alloy_file_unsuppressed, mod_access);
+	alloy_file_flagged := Suppress.CheckSuppression(alloy_file_unsuppressed_correct, mod_access);
 
 	alloy_file := PROJECT(alloy_file_flagged, TRANSFORM(Layout_AS_Plus, 
 		self.student.college_major := IF(left.is_suppressed, Suppress.OptOutMessage('STRING'), left.student.college_major);

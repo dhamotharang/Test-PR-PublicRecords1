@@ -1,10 +1,9 @@
-﻿IMPORT AutoStandardI, census_data, iesp,liensv2_services, LN_PropertyV2_Services,
-       Midex_Services, Prof_License_Mari, SANCTN, SANCTN_Mari, STD, Suppress, ut;
+IMPORT AutoStandardI, census_data, dx_common, dx_prof_license_mari, iesp, liensv2_services, LN_PropertyV2_Services,
+       Midex_Services, SANCTN, SANCTN_Mari, STD, Suppress, ut;
 
-       
 EXPORT Functions :=
   MODULE
-  
+
     EXPORT getPenalty(MIDEX_Services.Iparam.searchrecords in_mod) :=
       FUNCTION
         // Because Midex is a derogitory database, the penalty needs to be a little
@@ -18,7 +17,7 @@ EXPORT Functions :=
         // and must be less than 15 to be output.
         // NOTE: Any piece (or all three pieces) of a persons name is considered 1 search field
         // The same is true for the address
-        
+
         nameSearchedCalc :=
           AutoStandardI.InterfaceTranslator.fname_value.val(in_mod) != '' OR
           AutoStandardI.InterfaceTranslator.mname_value.val(in_mod) != '' OR
@@ -48,7 +47,7 @@ EXPORT Functions :=
         ssnSearched := IF(in_mod.ssn != '',1,0);
         ssnLast4Searched := IF(in_mod.ssn_last4 != '',1,0);
         tinSearched := IF(in_mod.tin != '',1,0);
-        
+
         NumPenalizedInputFields := addrSearched + compNameSearched + didSearched + licSeached + MidexRptNbrSearched +
                                    nameSearched + nmlsIdSearched + ssnSearched + ssnLast4Searched + tinSearched;
 
@@ -71,13 +70,13 @@ EXPORT Functions :=
         SELF.all_hash := IF(le.all_hash != 0,le.all_hash,ri.all_hash);
         SELF.isInputHash := le.all_hash != 0;
       END;
-      
+
       dResultsChanged_AllHash := JOIN(dInHashes,
                                       dSearchResultsHashes,
                                       LEFT.all_hash = RIGHT.all_hash,
                                       tCheckResultsChanged(LEFT,RIGHT),
                                       FULL ONLY);
-      
+
       // Account for case when the hash logic had changed
       // need to compare the hash value sent by ESP with the hash value calculated before the logic change so that alerts would not be triggered
       dResultsChanged_PrevAllHash := JOIN(dInHashes,
@@ -85,14 +84,14 @@ EXPORT Functions :=
                                           LEFT.all_hash = RIGHT.prev_all_hash,
                                           tCheckResultsChanged(LEFT,RIGHT),
                                           FULL ONLY);
-      
+
       dResultsChanged := IF(pAlertVersion = Midex_Services.Constants.AlertVersion.Current,
                             dResultsChanged_AllHash,
                             dResultsChanged_PrevAllHash);
-      
+
       // Debug
       // t_MIDEXLicenseReportResponse(dResultsChanged,NAMED('dResultsChanged'));
-      
+
       RETURN pAlertVersion != Midex_Services.Constants.AlertVersion.None AND EXISTS(dResultsChanged);
     END;
 
@@ -128,7 +127,7 @@ EXPORT Functions :=
             SELF.DateFirstSeen := iesp.ECL2ESP.toDate ( (UNSIGNED6)DateFirstSeen );
             SELF.DateLastSeen := iesp.ECL2ESP.toDate ( (UNSIGNED6)DateLastSeen );
           END;
-        
+
         RETURN ROW (xfm_searchServiceAddr ());
       END;
 
@@ -145,7 +144,7 @@ EXPORT Functions :=
             SELF.ExpireDate := iesp.ECL2ESP.toDate((UNSIGNED4)licenseExpireDate); //Expiration Date
             SELF.IsCurrent := licenseIsCurrent;
           END;
-        
+
         RETURN ROW (xfm_LicenseInfo ());
       END;
 
@@ -154,7 +153,7 @@ EXPORT Functions :=
         dataPermissionTempMod := MODULE( AutoStandardI.DataPermissionI.params )
                                    EXPORT dataPermissionMask := in_dataPermissionMask;
                                  END;
-        
+
         set_nonPubAccess := MAP(  AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_MidexFreddieMac AND
                                   AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_MidexNonPublic => [MIDEX_Services.Constants.DATASOURCE_CODE_NONPUB, MIDEX_Services.Constants.DATASOURCE_CODE_FREDDIE],
                                   AutoStandardI.DataPermissionI.val(dataPermissionTempMod).use_MidexFreddieMac => [MIDEX_Services.Constants.DATASOURCE_CODE_FREDDIE],
@@ -163,8 +162,8 @@ EXPORT Functions :=
                                 );
         RETURN set_nonPubAccess;
       END;
-      
-           
+
+
     EXPORT fn_dobMask ( STRING8 dob, UNSIGNED1 dobMask) :=
       FUNCTION
         dob_in_tDateFormat := iesp.ECL2ESP.toDatestring8(dob);
@@ -172,33 +171,33 @@ EXPORT Functions :=
                       dob_in_tDateFormat,
                       iesp.ECL2ESP.ApplyDateMask(dob_in_tDateFormat, dobMask)
                     );
-       
+
         RETURN masked;
       END;
 
    EXPORT fn_pubSanctSsnMask ( STRING11 SSNUMBER, STRING9 ssn_appended, STRING ssnMask ) :=
-  
+
      FUNCTION
        ssnRaw := IF( ssn_appended != '',
                       ssn_appended,
                       STD.STR.FilterOut( SSNUMBER, '-')
                     );
        ssnMasked := Suppress.ssn_Mask( ssnRaw, ssnMask);
-      
+
        ssn := IF( (UNSIGNED) ssnMasked = 0,
                   '',
                   ssnMasked
                 );
       RETURN ssn;
      END;
-     
-   
-   
+
+
+
    // Format License Search result into iesp layout.
    EXPORT iesp.midexlicensesearch.t_MIDEXLicenseSearchResponse Format_licenseSearch_iesp(DATASET(MIDEX_Services.Layouts.license_srch_layout) recs,
                                                                                          DATASET(MIDEX_Services.Layouts.hash_layout) Alerthashes,
                                                                                          Midex_Services.Iparam.searchrecords inMod) := FUNCTION
-                      
+
       records := PROJECT(recs,TRANSFORM(iesp.midexlicensesearch.t_MIDEXLicenseSearchRecord,
 
         SELF.Licensee.First := LEFT.licensee_FirstName,
@@ -225,7 +224,7 @@ EXPORT Functions :=
         SELF.License.IssueState := LEFT.lic_state,
         SELF.License.IsCurrent := LEFT.isCurrent,
         SELF.licensee := []));
-      
+
       iesp.midexlicensesearch.t_MIDEXLicenseSearchAlertResult xfm_alert(INTEGER numRecsRequested, INTEGER starting_record) :=
         TRANSFORM
           SELF.Hashes := PROJECT(CHOOSEN(Alerthashes,numRecsRequested, starting_record),
@@ -234,23 +233,23 @@ EXPORT Functions :=
           SELF.AlertVersion := IF(inMod.EnableAlert,Midex_Services.Constants.AlertVersion.Current,Midex_Services.Constants.AlertVersion.None);
           SELF.ResultChanged := IsResultsChanged(inMod.searchHashes,CHOOSEN(Alerthashes,numRecsRequested,starting_record),inMod.alertVersion);
         END;
-        
+
       iesp.midexlicensesearch.t_MIDEXLicenseSearchResponse format() :=
         TRANSFORM
           INTEGER return_count := 10 : STORED('ReturnCount'); // records per page
           INTEGER starting_record := 1 : STORED('StartingRecord'); // which record page starts with
           INTEGER numRecsRequested := ut.Min2( return_count, iesp.Constants.MIDEX.MAX_COUNT_SEARCH_RESPONSE_RECORDS );
-      
+
           SELF._Header := iesp.ECL2ESP.GetHeaderRow();
           SELF.RecordCount := COUNT(recs);
           SELF.Records := CHOOSEN(records, numRecsRequested, starting_record);
           SELF.AlertResult := IF(inMod.EnableAlert,ROW(xfm_alert(numRecsRequested, starting_record)));
       END;
-      
+
       results := DATASET([format()]);
       RETURN results;
     END;
-    
+
     SHARED iesp.midex_share.t_MIDEXLicenseInfoEx Format_licenseRec_iesp(MIDEX_Services.Layouts.LicenseInfo_Layout L) := TRANSFORM
       SELF._TYPE := L.lic_type;
       SELF.Number := L.lic_number;
@@ -277,14 +276,14 @@ EXPORT Functions :=
                                                 L.st, L.zip5, '', L.county);
       SELF := [];
     END;
-    
+
     SHARED iesp.midexlicensereport.t_MIDEXRepresent Format_RepresentRec_iesp(Layouts.Represent_Registration_Layout L) := TRANSFORM
       SELF.CompanyName := L.company_name;
       SELF.NmlsID := IF(L.comp_nmls_id != 0,(STRING) L.comp_nmls_id,'');
       SELF.StartDate := iesp.ECL2ESP.toDate((INTEGER4) L.start_date);
       SELF.EndDate := iesp.ECL2ESP.toDate((INTEGER4) L.end_date);
     END;
-    
+
     SHARED iesp.midexlicensereport.t_MIDEXRegistration Format_RegistraionRec_iesp(Layouts.Represent_Registration_Layout L) := TRANSFORM
       SELF.LicenseNumber := L.lic_number;
       SELF.NmlsID := IF(L.comp_nmls_id != 0,(STRING) L.comp_nmls_id,'');
@@ -293,16 +292,16 @@ EXPORT Functions :=
       SELF.StatusDate := iesp.ECL2ESP.toDate((INTEGER4) L.status_date);
       SELF.RenewedThrough := L.renewed_thru;
     END;
-      
+
     SHARED iesp.midexlicensereport.t_MIDEXRegulator Format_RegulatorRec_iesp(Layouts.Regulator_Layout L) := TRANSFORM
       SELF.Regulator := L.regulator_name;
       SELF.RegistrationName := L.registration_name;
       SELF.Authorized := IF(STD.STR.Contains(L.authorized,'YES',TRUE),'Y',
                                       IF(STD.STR.Contains(L.authorized,'NO',TRUE),'N','U'));
-                                      
+
       SELF.Registrations := PROJECT(CHOOSEN(L.Registrations,iesp.Constants.MIDEX.MAX_COUNT_REGISTRATIONS),Format_RegistraionRec_iesp(LEFT));
     END;
-    
+
     SHARED iesp.midexlicensereport.t_MIDEXAction Format_actionRec_iesp(Layouts.Action_Layout L) := TRANSFORM
       SELF.Regulator := L.regulator_name;
       SELF.AuthorityName := L.authority_name;
@@ -312,7 +311,7 @@ EXPORT Functions :=
       SELF.AssociatedDoc := L.assoc_doc;
       SELF.ActionDetail := L.action_detail;
     END;
-    
+
     SHARED iesp.midexlicensereport.t_MIDEXLicenseReportRecord Format_licenseReport_iesp(MIDEX_Services.Layouts.LicenseReport_Layout L) := TRANSFORM
       SELF.DataSource := L.data_source;
       SELF.DataSourceDate := iesp.ECL2ESP.toDate ((INTEGER4) L.last_upd_date);
@@ -344,7 +343,7 @@ EXPORT Functions :=
       SELF.LicenseeReportNo := L.report_number;
       SELF := [];
     END;
-    
+
     EXPORT Layouts.LicenseReport_Layout fn_rollHashes (DATASET(Layouts.LicenseReport_Layout) l) :=
       FUNCTION
         hashesRolled :=
@@ -363,7 +362,7 @@ EXPORT Functions :=
                             SELF := LEFT));
         RETURN hashesRolled;
       END;
-      
+
     EXPORT iesp.midexlicensereport.t_MIDEXLicenseReportResponse Format_licenseReport_iespResponse(DATASET(Layouts.LicenseReport_Layout) l) :=
     FUNCTION
       results := PROJECT(l,TRANSFORM(iesp.midexlicensereport.t_MIDEXLicenseReportResponse,
@@ -419,11 +418,11 @@ EXPORT Functions :=
     EXPORT iesp.midexrecordsearch.t_MIDEXRecordSearchResponse Format_midexSearch_iesp(DATASET(iesp.midexrecordsearch.t_MIDEXRecordSearchRecord) recs,
                                                                                       DATASET(Midex_Services.Layouts.hash_layout) Alerthashes,
                                                                                       MIDEX_Services.Iparam.searchrecords inMod) := FUNCTION
-      
+
       INTEGER return_count := 10 : STORED('ReturnCount'); // records per page
       INTEGER starting_record := 1 : STORED('StartingRecord'); // which record page starts with
       INTEGER numRecsRequested := ut.Min2( return_count, iesp.Constants.MIDEX.MAX_COUNT_SEARCH_RESPONSE_RECORDS );
-      
+
       iesp.midexrecordsearch.t_MIDEXRecordSearchAlertResult xfm_alert() := TRANSFORM
           SELF.Hashes := PROJECT(CHOOSEN(Alerthashes,numRecsRequested, starting_record),
                                        TRANSFORM(iesp.midex_share.t_AlertHash,
@@ -431,14 +430,14 @@ EXPORT Functions :=
           SELF.AlertVersion := IF(inMod.EnableAlert,Midex_Services.Constants.AlertVersion.Current,Midex_Services.Constants.AlertVersion.None);
           SELF.ResultChanged := IsResultsChanged(inMod.searchHashes,CHOOSEN(Alerthashes,numRecsRequested, starting_record),inMod.alertVersion);
       END;
-      
+
       iesp.midexrecordsearch.t_MIDEXRecordSearchResponse format() := TRANSFORM
           SELF._Header := iesp.ECL2ESP.GetHeaderRow();
           SELF.RecordCount := COUNT(recs);
           SELF.Records := CHOOSEN(recs,numRecsRequested, starting_record);
           SELF.AlertResult := ROW(xfm_alert());
       END;
-      
+
       results := DATASET([format()]);
 
       RETURN results;
@@ -462,13 +461,13 @@ EXPORT Functions :=
                           );
           RETURN stringValue;
         END;
-   
+
 
     EXPORT fn_formatMidexCompReport_iespResponse( DATASET(iesp.midexcompreport.t_MIDEXCompReportRecord) ds_inMidexCompResults,
                                                   MIDEX_Services.Layouts.Monitor_layout ds_hashVals,
                                                   INTEGER pAlertVersion) :=
       FUNCTION
-      
+
         results :=
           PROJECT( ds_inMidexCompResults,
                    TRANSFORM( iesp.midexcompreport.t_MIDEXCompReportResponse,
@@ -510,7 +509,7 @@ EXPORT Functions :=
                               SELF.AlertResult.Changes := ds_hashVals, // all remaining fields from recName
                               SELF.AlertResult := [],
                             ));
-        
+
         RETURN results;
       END;
 
@@ -520,7 +519,7 @@ EXPORT Functions :=
         // the Midex XML users. Per Krishna T. we are masking the smartlinx sections here in the
         // midex code and a new project will be created to mask the DOB in each of the smarlinx
         // sections at some point in the future.
-                          
+
         bestInfoDobMask :=
           ROW( TRANSFORM( iesp.smartlinxreport.t_SLRBestInfo,
                           SELF.DOB := iesp.ECL2ESP.ApplyDateMask(ds_Person_in.BestInfo.DOB, dobMaskUnsigned ),
@@ -539,16 +538,16 @@ EXPORT Functions :=
                           SELF.PhonesV2 := ds_Person_in.BestInfo.PhonesV2;
                           SELF.PhonesV3 := []
                         ));
-                        
-                        
+
+
         maskDob_EmailAddresses :=
           PROJECT( ds_Person_in.EmailAddresses,
                    TRANSFORM( iesp.emailsearch.t_EmailSearchRecord,
                               SELF.DOB := iesp.ECL2ESP.ApplyDateMask(LEFT.DOB, dobMaskUnsigned ),
                               SELF := LEFT;
                             ));
-                            
-                        
+
+
         iesp.share.t_Date xfm_maskDob ( iesp.share.t_Date DOB ):=
           TRANSFORM
             maskedDOB := iesp.ECL2ESP.ApplyDateMask ( DOB, dobMaskUnsigned );
@@ -556,50 +555,50 @@ EXPORT Functions :=
             SELF.Month := maskedDOB.Month;
             SELF.Day := maskedDOB.Day;
           END;
-        
+
         maskDob_AkaEntities :=
           PROJECT( ds_Person_in.AKAEntities,
                    TRANSFORM( iesp.smartlinxreport.t_SLREntities,
                               SELF.DOBs := PROJECT( LEFT.DOBs, xfm_maskDob( LEFT )),
                               SELF := LEFT,
                              ));
-                              
+
         maskDob_ImposterEntities :=
           PROJECT( ds_Person_in.ImposterEntities,
                    TRANSFORM( iesp.smartlinxreport.t_SLREntities,
                               SELF.DOBs := PROJECT(LEFT.DOBs, xfm_maskDOB( LEFT )),
                               SELF := LEFT,
                              ));
-        
+
         //--------------------------------------------------------------------------------------
         // start imposters child dataset
-        
+
         iesp.bps_share.t_BpsReportDriverLicense xfm_maskDob_ImposterDL ( iesp.bps_share.t_BpsReportDriverLicense ImposterDL ) :=
           TRANSFORM
             SELF.DOB := iesp.ECL2ESP.ApplyDateMask ( ImposterDL.DOB, dobMaskUnsigned );
             SELF := ImposterDL;
           END;
-        
+
         iesp.driverlicense2.t_DLEmbeddedReport2Record xfm_maskDob_ImposterDL2 ( iesp.driverlicense2.t_DLEmbeddedReport2Record ImposterDL2 ):=
           TRANSFORM
             SELF.DOB := iesp.ECL2ESP.ApplyDateMask ( ImposterDL2.DOB, dobMaskUnsigned );
             SELF.DOB2 := iesp.ECL2ESP.ApplyDateStringMask( ImposterDL2.DOB2, dobMaskUnsigned , TRUE );
             SELF := ImposterDL2;
           END;
-        
+
         // imposters-> Criminal Histories -- begin --------------------------------------
         iesp.matrix.t_MatrixCrimReportAppend xfm_maskDob_ImposterCrimHist_Appends( iesp.matrix.t_MatrixCrimReportAppend imposterCrimHisAppend ) :=
           TRANSFORM
             SELF.DOBs := PROJECT( imposterCrimHisAppend.DOBs, xfm_maskDob( LEFT )),
             SELF := imposterCrimHisAppend,
           END;
-        
+
         iesp.matrix.t_MatrixCrimReportIdentity xfm_maskDob_ImposterCrimHist_Identity( iesp.matrix.t_MatrixCrimReportIdentity imposterCrimHisIdentity ) :=
           TRANSFORM
             SELF.DOB := iesp.ECL2ESP.ApplyDateMask ( imposterCrimHisIdentity.DOB, dobMaskUnsigned );
             SELF := imposterCrimHisIdentity,
           END;
-        
+
         iesp.matrix.t_MatrixCrimReportRecord xfm_maskDob_ImposterCrimHist ( iesp.matrix.t_MatrixCrimReportRecord imposterCrimHis ):=
           TRANSFORM
             SELF.Appends := PROJECT( imposterCrimHis.Appends, xfm_maskDob_ImposterCrimHist_Appends( LEFT ));
@@ -616,40 +615,40 @@ EXPORT Functions :=
             SELF.CriminalHistories := PROJECT( imposterIdentityAka.CriminalHistories, xfm_maskDob_ImposterCrimHist( LEFT ));
             SELF := imposterIdentityAka;
           END;
-                             
+
 
         maskDob_Imposters :=
           PROJECT( ds_Person_in.Imposters,
                    TRANSFORM( iesp.bps_share.t_BpsReportImposter,
                               SELF.AKAs := PROJECT( LEFT.AKAs, xfm_maskDob_ImposterAka( LEFT )),
                             ));
-  
+
         // End imposters child dataset
         //--------------------------------------------------------------------------------------
-                
+
         // Report Addresses
         iesp.bpsreport.t_BpsReportIdentitySlim xfm_maskDob_ReportAddressResident ( iesp.bpsreport.t_BpsReportIdentitySlim reportAddressResident ) :=
           TRANSFORM
             SELF.DOB := iesp.ECL2ESP.ApplyDateMask ( reportAddressResident.DOB, dobMaskUnsigned );
             SELF := reportAddressResident;
           END;
-        
+
         iesp.smartlinxreport.t_SLRAddress xfm_maskDob_ReportAddresses( iesp.smartlinxreport.t_SLRAddress reportAddress ) :=
           TRANSFORM
             SELF.Residents := PROJECT( reportAddress.Residents, xfm_maskDob_ReportAddressResident( LEFT ));
             SELF := reportAddress;
           END;
-          
+
         maskDob_ReportAddresses :=
           PROJECT( ds_Person_in.ReportAddresses,
                    TRANSFORM( iesp.smartlinxreport.t_SLRAddresses,
                               SELF.CurrentAddresses := PROJECT( LEFT.CurrentAddresses, xfm_maskDob_ReportAddresses( LEFT )),
                               SELF.PriorAddresses := PROJECT( LEFT.PriorAddresses, xfm_maskDob_ReportAddresses( LEFT )),
                             ));
-                            
+
         // End ReportAddresses dataset
         //--------------------------------------------------------------------------------------
-                
+
         // Associates
         iesp.bpsreport.t_BpsReportIdentitySlim xfm_maskDob_Relative_AssociateAKAs( iesp.bpsreport.t_BpsReportIdentitySlim AssociateAKA ) :=
           TRANSFORM
@@ -670,7 +669,7 @@ EXPORT Functions :=
                               SELF.Addresses := PROJECT( LEFT.Addresses, xfm_maskDob_Relative_AssociateAddresses(LEFT)),
                               SELF := LEFT,
                             ));
-        
+
         maskDob_Relatives :=
           PROJECT( ds_Person_in.relatives,
                    TRANSFORM( iesp.smartlinxreport.t_SLRRelative,
@@ -678,10 +677,10 @@ EXPORT Functions :=
                               SELF.Addresses := PROJECT( LEFT.Addresses, xfm_maskDob_Relative_AssociateAddresses(LEFT)),
                               SELF := LEFT,
                             ));
-                            
+
         // End Associates dataset
         //--------------------------------------------------------------------------------------
-        
+
         iesp.criminal.t_CrimReportParoleEx xfm_maskDob_CrimParoleSentencesEx ( iesp.criminal.t_CrimReportParoleEx CrimParoleEx ) :=
           TRANSFORM
             SELF.DOB := iesp.ECL2ESP.ApplyDateMask ( CrimParoleEx.DOB, dobMaskUnsigned ),
@@ -698,7 +697,7 @@ EXPORT Functions :=
 
         // End Criminals dataset
         //--------------------------------------------------------------------------------------
-        
+
         maskDob_SexOffenses :=
           PROJECT( ds_Person_in.SexualOffenses,
                    TRANSFORM( iesp.sexualoffender.t_SexOffReportRecord,
@@ -732,7 +731,7 @@ EXPORT Functions :=
             SELF.CorporateAffiliations := IF(options.IncludeCorporateAffiliations, ds_Person_in.CorporateAffiliations);
             SELF.OtherAssociatedBusinesses := IF(options.IncludePersonBusinessAssociates, ds_Person_in.OtherAssociatedBusinesses);
           END;
-                             
+
        RETURN ROW(xfm_setSmartLinxPersonFormat ());
     END;
 
@@ -843,25 +842,29 @@ EXPORT Functions :=
                TRANSFORM(MIDEX_Services.Layouts.rec_NMLSIds,
                          SELF.NMLSId := (UNSIGNED6)RIGHT.nmls_id),
                LIMIT(MIDEX_Services.Constants.JOIN_LIMIT, SKIP));
-        
-        ds_pubSanNMLS :=
+
+        ds_pubSanNMLS_pre :=
           JOIN(in_mod.MidexReportNumbers, SANCTN.key_nmls_midex,
-               KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr) AND
-               (UNSIGNED)RIGHT.nmls_id != 0 AND
-               IF(in_mod.searchType = MIDEX_Services.Constants.COMP_SEARCH,
-                  RIGHT.license_type = MIDEX_Services.Constants.NMLS_COMP OR
-                  RIGHT.license_type = MIDEX_Services.Constants.NMLS_BR OR
-                  RIGHT.license_type = MIDEX_Services.Constants.NMLS,
-                  IF(in_mod.searchType = MIDEX_Services.Constants.INDIV_SEARCH,
-                     RIGHT.license_type = MIDEX_Services.Constants.NMLS_INDIV OR
-                     RIGHT.license_type = MIDEX_Services.Constants.NMLS,
-                  FALSE)),
-               TRANSFORM(MIDEX_Services.Layouts.rec_NMLSIds,
-                         SELF.NMLSId := (UNSIGNED6)RIGHT.nmls_id),
-               LIMIT(MIDEX_Services.Constants.JOIN_LIMIT, SKIP));
-               
+            KEYED(LEFT.midex_rpt_nbr = RIGHT.midex_rpt_nbr) AND
+            (UNSIGNED)RIGHT.nmls_id != 0 AND
+            IF(in_mod.searchType = MIDEX_Services.Constants.COMP_SEARCH,
+              RIGHT.license_type = MIDEX_Services.Constants.NMLS_COMP OR
+              RIGHT.license_type = MIDEX_Services.Constants.NMLS_BR OR
+              RIGHT.license_type = MIDEX_Services.Constants.NMLS,
+              IF(in_mod.searchType = MIDEX_Services.Constants.INDIV_SEARCH,
+                RIGHT.license_type = MIDEX_Services.Constants.NMLS_INDIV OR
+                RIGHT.license_type = MIDEX_Services.Constants.NMLS,
+              FALSE)),
+              TRANSFORM(MIDEX_Services.Layouts.rec_NMLSIds OR dx_common.layout_metadata,
+                dx_common.Incrementals.mac_CopyMetadata(SELF, RIGHT),
+                SELF.NMLSId := (UNSIGNED6)RIGHT.nmls_id),
+              LIMIT(MIDEX_Services.Constants.JOIN_LIMIT, SKIP));
+
+        ds_pubSanNMLS_pre_rolled := dx_common.Incrementals.mac_Rollupv2(ds_pubSanNMLS_pre);
+        ds_pubSanNMLS := PROJECT(ds_pubSanNMLS_pre_rolled, MIDEX_Services.Layouts.rec_NMLSIds);
+
         ds_profLicNMLS :=
-          JOIN(in_mod.MariRidNumbers, Prof_License_Mari.key_mari_payload,
+          JOIN(in_mod.MariRidNumbers, dx_prof_license_mari.key_mari_payload,
                KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
                RIGHT.nmls_id != 0 AND
                RIGHT.result_cd_1 = Midex_Services.Constants.RECORD_STATUS.LatestRecordUpdatingSource AND
@@ -874,12 +877,12 @@ EXPORT Functions :=
                TRANSFORM(MIDEX_Services.Layouts.rec_NMLSIds,
                          SELF.NMLSId := RIGHT.nmls_id),
                LIMIT(MIDEX_Services.Constants.JOIN_LIMIT, SKIP));
-        
+
         ds_all_nmlsIds :=
           DEDUP(SORT(ds_nonpubSanNMLS + ds_pubSanNMLS + ds_profLicNMLS, NMLSId), NMLSId);
-        
+
         ds_MariRids_all :=
-          JOIN(ds_all_nmlsIds, Prof_License_Mari.key_nmls_id,
+          JOIN(ds_all_nmlsIds, dx_prof_license_mari.key_nmls_id,
                KEYED((UNSIGNED)LEFT.NMLSId = RIGHT.nmls_id),
                TRANSFORM(MIDEX_Services.Layouts.rec_NMLSWithDBAsAndMariRid,
                          SELF.NMLSId := RIGHT.NMLS_Id,
@@ -889,7 +892,7 @@ EXPORT Functions :=
 
         RETURN ds_MariRids_all;
       END;
-      
+
      EXPORT set_nmlsLicenseType (STRING in_search_type) := FUNCTION
          nmls_type := MAP(in_search_type = 'I' => Constants.NMLS_INDIV,
                           in_search_type = 'C' => Constants.NMLS_COMP,
@@ -903,16 +906,16 @@ EXPORT Functions :=
             in_recs_deduped := DEDUP( SORT( in_recs(nmls_id != 0), nmls_id ), nmls_id );
 
             // get nmls records
-            nmls_recs_raw := JOIN(in_recs_deduped,Prof_License_Mari.key_nmls_id,
+						nmls_recs_raw := JOIN(in_recs_deduped,dx_prof_license_mari.key_nmls_id,
                                   KEYED(LEFT.nmls_id = RIGHT.nmls_id) AND
                                   // Bug 192775 - Memory exceeded error
                                   RIGHT.result_cd_1 = Midex_Services.Constants.RECORD_STATUS.LatestRecordUpdatingSource,
                                   TRANSFORM(RIGHT),
                                   LIMIT(MIDEX_Services.Constants.JOIN_LIMIT,SKIP));
-            
+
             // Bug 192775 - Memory exceeded error
             nmls_recs := DEDUP( SORT( nmls_recs_raw, nmls_id ), nmls_id );
-            
+
             //Nmls Ids sometimes have more than the one lic# attached to a mari rid.
             //Additional licenses are pulled and then appended to the mari rid license record.
             nmls_lic_recs := PROJECT(nmls_recs,
@@ -928,9 +931,9 @@ EXPORT Functions :=
                 SELF.business_type := LEFT.business_type,
                 SELF.charter := IF(LEFT.charter != '0',LEFT.charter,''),
                 SELF := []));
-                                        
+
             nmls_lic_recs_dedup := DEDUP(nmls_lic_recs,ALL);
-            
+
             loc_recsRaw := PROJECT(nmls_recs,
               TRANSFORM(MIDEX_Services.Layouts.Location_Layout,
                 // If the affil_type is for a company (CO or BR) set location from affil value
@@ -954,12 +957,12 @@ EXPORT Functions :=
                 SELF.fips_county := LEFT.bus_county,
                 SELF.company_name := LEFT.name_company,
                 SELF := []));
-            
+
             census_data.MAC_Fips2County_Keyed(loc_recsRaw,st,fips_county,county,loc_recs);
-            
+
             loc_recs_dedup := DEDUP(loc_recs,ALL);
 
-            rep_reg_recs := JOIN(nmls_recs,Prof_License_Mari.key_indv_detail,
+            rep_reg_recs := JOIN(nmls_recs,dx_Prof_License_Mari.key_individual_detail,
               KEYED(LEFT.nmls_id = RIGHT.individual_nmls_id),
               TRANSFORM(MIDEX_Services.Layouts.Represent_Registration_Layout,
                 SELF.nmls_id := LEFT.nmls_id,
@@ -993,26 +996,26 @@ EXPORT Functions :=
                 SELF.registration_name := LEFT.std_license_desc,
                 SELF.authorized := LEFT.is_authorized_license,
                 SELF := []));
-            
+
             // Keep unique registrations by nmlsid,regulator, authorized, status_date, org_issue_date and status.
             reg_sorted := DEDUP(SORT(rep_reg_recs+bus_reg_recs,nmls_id,regulator_name,authorized,-status_date,-org_issue_date,reg_status)
                                 ,nmls_id,regulator_name,authorized,status_date,org_issue_date,reg_status);
-            
+
             reg_group := GROUP(reg_sorted,nmls_id,regulator_name,authorized);
             bus_reg_recs_dedup := DEDUP(bus_reg_recs,ALL);
-            
+
             MIDEX_Services.Layouts.Regulator_Layout Roll_Regs(
-              MIDEX_Services.Layouts.Represent_Registration_Layout l, 
-              DATASET(MIDEX_Services.Layouts.Represent_Registration_Layout) allRows) := 
+              MIDEX_Services.Layouts.Represent_Registration_Layout l,
+              DATASET(MIDEX_Services.Layouts.Represent_Registration_Layout) allRows) :=
             TRANSFORM
               SELF.Registrations := allRows;
               SELF := l;
               SELF := [];
             END;
-            
+
             reg_recs := ROLLUP(reg_group,GROUP,Roll_Regs(LEFT,ROWS(LEFT)));
             
-            discAction_recs := JOIN(nmls_recs,Prof_License_Mari.key_disciplinary,
+            discAction_recs := JOIN(nmls_recs,dx_Prof_License_Mari.key_disciplinary_actions,
               KEYED(LEFT.nmls_id = RIGHT.individual_nmls_id),
               TRANSFORM(MIDEX_Services.Layouts.Action_Layout,
                 SELF.nmls_id := LEFT.nmls_id,
@@ -1027,7 +1030,7 @@ EXPORT Functions :=
           LIMIT(iesp.Constants.MIDEX.MAX_COUNT_DISC_ACTIONS,SKIP));
             discAction_recs_dedup := DEDUP(discAction_recs,ALL);
             
-            regAction_recs := JOIN(nmls_recs,Prof_License_Mari.key_regulatory,
+            regAction_recs := JOIN(nmls_recs,dx_Prof_License_Mari.key_regulatory_actions,
               KEYED(LEFT.nmls_id = RIGHT.nmls_id),
               TRANSFORM(MIDEX_Services.Layouts.Action_Layout,
                 SELF.nmls_id := LEFT.nmls_id,
@@ -1041,7 +1044,7 @@ EXPORT Functions :=
                 SELF := []),
               LIMIT(iesp.Constants.MIDEX.MAX_COUNT_DISC_ACTIONS,SKIP));
             regAction_recs_dedup := DEDUP(regAction_recs,ALL);
-            
+
             //Begin attaching nmls info
             MIDEX_Services.Layouts.LicenseReport_Layout Denorm_Lic(MIDEX_Services.Layouts.LicenseReport_Layout l, DATASET(MIDEX_Services.Layouts.LicenseInfo_Layout) allRows) := TRANSFORM
               // Dedup but exculde nmls_id since the mari_rid license record won't have an nmlsid
@@ -1051,7 +1054,7 @@ EXPORT Functions :=
             END;
             nmls_lic := DENORMALIZE(in_recs,nmls_lic_recs_dedup,LEFT.nmls_id = RIGHT.nmls_id,
                           GROUP,Denorm_Lic(LEFT,ROWS(RIGHT)));
-                                      
+
             // Attach location recs
             MIDEX_Services.Layouts.LicenseReport_Layout Denorm_Loc(MIDEX_Services.Layouts.LicenseReport_Layout l, DATASET(MIDEX_Services.Layouts.Location_Layout) allRows) := TRANSFORM
               SELF.Locations := CHOOSEN(allRows,iesp.Constants.MIDEX.MAX_COUNT_OFFICE_LOCATIONS);
@@ -1059,7 +1062,7 @@ EXPORT Functions :=
             END;
             nmls_loc := DENORMALIZE(nmls_lic,loc_recs_dedup,LEFT.nmls_id = RIGHT.nmls_id,
                                     GROUP,Denorm_Loc(LEFT,ROWS(RIGHT)));
-            
+
             // Attach represent recs
             MIDEX_Services.Layouts.LicenseReport_Layout Denorm_Rep(MIDEX_Services.Layouts.LicenseReport_Layout l, DATASET(MIDEX_Services.Layouts.Represent_Registration_Layout) allRows) := TRANSFORM
               SELF.Represents := CHOOSEN(allRows, iesp.Constants.MIDEX.MAX_COUNT_REPRESENT);
@@ -1067,7 +1070,7 @@ EXPORT Functions :=
             END;
             nmls_loc_rep := DENORMALIZE(nmls_loc,rep_recs,LEFT.nmls_id = RIGHT.nmls_id,
                                         GROUP,Denorm_Rep(LEFT,ROWS(RIGHT)));
-            
+
             // Attach regulator recs
             MIDEX_Services.Layouts.LicenseReport_Layout Denorm_Reg(MIDEX_Services.Layouts.LicenseReport_Layout l, DATASET(MIDEX_Services.Layouts.Regulator_Layout) allRows) := TRANSFORM
               SELF.Regulators := CHOOSEN(allRows,iesp.Constants.MIDEX.MAX_COUNT_REGULATORS);
@@ -1075,7 +1078,7 @@ EXPORT Functions :=
             END;
             nmls_loc_rep_reg := DENORMALIZE(nmls_loc_rep,reg_recs,LEFT.nmls_id = RIGHT.nmls_id,
                                             GROUP,Denorm_Reg(LEFT,ROWS(RIGHT)));
-            
+
             // Attach disc action recs
             MIDEX_Services.Layouts.LicenseReport_Layout Denorm_DisAction(MIDEX_Services.Layouts.LicenseReport_Layout l, DATASET(MIDEX_Services.Layouts.Action_Layout) allRows) := TRANSFORM
               SELF.Disc_Actions := CHOOSEN(allRows,iesp.Constants.MIDEX.MAX_COUNT_DISC_ACTIONS);
@@ -1083,7 +1086,7 @@ EXPORT Functions :=
             END;
             nmls_loc_rep_reg_dis := DENORMALIZE(nmls_loc_rep_reg,discAction_recs_dedup,LEFT.nmls_id = RIGHT.nmls_id,
                                       GROUP,Denorm_DisAction(LEFT,ROWS(RIGHT)));
-            
+
             // Attach reg action recs
             MIDEX_Services.Layouts.LicenseReport_Layout Denorm_RegAction(MIDEX_Services.Layouts.LicenseReport_Layout l, DATASET(MIDEX_Services.Layouts.Action_Layout) allRows) := TRANSFORM
                 SELF.Reg_Actions := CHOOSEN(allRows,iesp.Constants.MIDEX.MAX_COUNT_REG_ACTIONS);
@@ -1112,9 +1115,9 @@ EXPORT Functions :=
                                                                     LEFT.address.orig_address2, ''),
                          ));
       RETURN ds_out_tMatchedParty;
-    
+
     END;
-    
+
     EXPORT fn_setBusinessIds ( UNSIGNED6 dotId_in,  UNSIGNED6 empId_in,
                                                     UNSIGNED6 powId_in, UNSIGNED6 proxId_in,
                                                     UNSIGNED6 seleId_in, UNSIGNED6 orgId_in,
@@ -1132,8 +1135,8 @@ EXPORT Functions :=
           END;
         RETURN ROW(xfm_setBusinessIds());
       END;
-      
-      
+
+
     EXPORT fn_setParsedParty ( DATASET(liensv2_services.layout_lien_party_parsed) rec_parsedPartyIn, UNSIGNED maxParsedParties ) :=
       FUNCTION
         ds_parsedParty :=
@@ -1154,7 +1157,7 @@ EXPORT Functions :=
                             ));
       RETURN CHOOSEN(ds_parsedParty,maxParsedParties);
     END;
-    
+
     EXPORT fn_setPhoneTimeZone (DATASET(liensv2_services.layout_lien_party_phone) ds_lienJudgPhonesIn, UNSIGNED maxPhones) :=
       FUNCTION
         ds_out_phones :=
@@ -1165,9 +1168,9 @@ EXPORT Functions :=
                             ));
         RETURN CHOOSEN(ds_out_phones,maxPhones);
       END;
-                        
-     
-    
+
+
+
   EXPORT fn_setLienJudgDebtor ( DATASET(LiensV2_Services.layout_lien_party) ds_lienJudgIn, UNSIGNED maxDebtors ) :=
     FUNCTION
       ds_out_LienJudgDebtor :=
@@ -1195,7 +1198,7 @@ EXPORT Functions :=
                               SELF := [],
                           ));
 
-      
+
       RETURN CHOOSEN(ds_out_LienJudgThirdParty,maxThirdParties);
     END; // ds_out_LienJudgThirdParty
 
@@ -1210,7 +1213,7 @@ EXPORT Functions :=
                              SELF := [],
                           ));
 
-      
+
       RETURN CHOOSEN(ds_out_LienJudgCreditor,maxCreditors);
     END; // fn_setLienJudgCreditors
 
@@ -1225,7 +1228,7 @@ EXPORT Functions :=
                               SELF := [],
                           ));
 
-      
+
       RETURN CHOOSEN(ds_out_LienJudgAttorneys,maxAttorneys);
     END; // fn_setLienJudgAttorneys
 
@@ -1250,7 +1253,7 @@ EXPORT Functions :=
                            ));
         RETURN CHOOSEN(ds_out_LienJudgfilings,maxFilings);
       END; // fn_setLienJudgFilings
-    
+
     EXPORT fn_setContactCompanyTitles ( DATASET( MIDEX_Services.Layouts.company_title_rec)ds_contactCompTitles_In, UNSIGNED maxCompTitles ) :=
       FUNCTION
         ds_out_ContactCompanyTitles :=
@@ -1260,14 +1263,14 @@ EXPORT Functions :=
                             ));
 
         ds_out_contactCompanyTitles_sorted := DEDUP( SORT( ds_out_contactCompanyTitles, value), value);
-        
+
         RETURN CHOOSEN(ds_out_contactCompanyTitles_sorted,maxCompTitles);
       END; // fn_setContacCompanyTitles
-    
+
 
       EXPORT iesp.bankruptcy.t_Bankruptcy2Meeting fn_SetMeetingInfo ( STRING inMeetingDate, STRING inMeetingTime, STRING inAddr ) :=
       FUNCTION
-        
+
          iesp.bankruptcy.t_Bankruptcy2Meeting xfm_SetMeetingInfo () :=
            TRANSFORM
              SELF.Date := iesp.ECL2ESP.toDatestring8(inMeetingDate);
@@ -1276,8 +1279,8 @@ EXPORT Functions :=
            END;
         RETURN ROW(xfm_setMeetingInfo());
       END;
- 
- 
+
+
 
     EXPORT iesp.property.t_PropertyAssessment fn_setPropertyAssessment (LN_PropertyV2_Services.layouts.assess.result.wider rw_dsPropertyAssessments_in) :=
       FUNCTION
@@ -1337,7 +1340,7 @@ EXPORT Functions :=
           END; //xfm_setPropertyAssessment
         RETURN ROW(xfm_setPropertyAssessment ());
       END; //fn_setPropertyAssessment
-      
+
     EXPORT iesp.property.t_PropertyDeed fn_setPropertyDeed ( LN_PropertyV2_Services.layouts.deeds.result.wider2 rw_dsPropertyDeeds_in ) :=
       FUNCTION
         // the assignments that start with [1.. are not datasets, they are defined as variable length string
@@ -1377,7 +1380,7 @@ EXPORT Functions :=
           END;
         RETURN ROW(xfm_setPropertyDeeds());
       END;
-    
+
     EXPORT fn_setPropertyNames (DATASET(LN_PropertyV2_Services.layouts.parties.entity) ds_propertyEntity_in, UNSIGNED maxPropertyEntities ) :=
       FUNCTION
         ds_out_propertyEntities :=
@@ -1400,8 +1403,8 @@ EXPORT Functions :=
                             ));
         RETURN CHOOSEN(ds_out_propertyEntities,maxPropertyEntities);
       END;
-      
-      
+
+
     EXPORT fn_setPropertyOriginalNames2 ( DATASET( LN_PropertyV2_Services.layouts.parties.orig) ds_propertyOrigNames_in, UNSIGNED maxOrigNames ) :=
       FUNCTION
         ds_out_propertyOrigNames2 :=
@@ -1413,8 +1416,8 @@ EXPORT Functions :=
                             ));
         RETURN CHOOSEN(ds_out_propertyOrigNames2,maxOrigNames);
       END; //fn_setPropertyOriginalNames
-      
-      
+
+
     EXPORT fn_setPropertyEntities ( DATASET(LN_PropertyV2_Services.layouts.parties.pparty) ds_propertyPParties_in, UNSIGNED maxPropertyEntities) :=
       FUNCTION
         ds_out_propertyEntities :=
@@ -1437,7 +1440,7 @@ EXPORT Functions :=
                            ));
         RETURN CHOOSEN(ds_out_propertyEntities,maxPropertyEntities);
       END; // fn_setPropertyEntities
-      
+
 
     EXPORT iesp.rollupbizreport.t_BizReportFor xfm_setBusinessBest( iesp.rollupbizreport.t_BizReportFor bestinfo) :=
       TRANSFORM
@@ -1464,10 +1467,10 @@ EXPORT Functions :=
         SELF.PhoneVariations := ds_Business_in.PhoneVariations;
         SELF := ds_Business_in;
       END;
-                             
+
     // --------------------------------------------------------------------------------------------------------------
     // END: SmartLinx Business Functions
     // --------------------------------------------------------------------------------------------------------------
-        
+
 
   END; // end of Functions module
