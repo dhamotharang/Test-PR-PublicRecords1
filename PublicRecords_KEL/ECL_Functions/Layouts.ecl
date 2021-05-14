@@ -329,15 +329,16 @@ EXPORT Layouts := MODULE
 		STRING3 InsPhoneSrc;
 	END;
 	
-	//SHARED LayoutHighRiskAddressInternal := RECORD
-		//STRING PI_InpAddrSICCodeHRList;
-		//STRING PI_InpAddrNAICSCodeHRList;
-		//STRING6 PI_InpAddrIsHRCorrectFacFlag;
-	//END;
-	//EXPORT LayoutHighRiskAddressAttributes := RECORD
-		//INTEGER G_ProcUID;
-		//LayoutHighRiskAddressInternal;
-	//END;
+	SHARED LayoutHighRiskAddressInternal := RECORD
+		STRING PI_InpAddrSICCodeHRList;
+		STRING PI_InpAddrNAICSCodeHRList;
+		STRING6 PI_InpAddrIsHRCorrectFacFlag;
+	END;
+	
+	EXPORT LayoutHighRiskAddressAttributes := RECORD
+		INTEGER G_ProcUID;
+		LayoutHighRiskAddressInternal;
+	END;
 
 	SHARED LayoutInferredAttributesInternal := RECORD
 		STRING10 P_InpClnArchDtF6M;
@@ -421,7 +422,6 @@ EXPORT Layouts := MODULE
 		LayoutSSNSumInternal;
 		LayoutPhoneSumInternal;
 		LayoutAddrSummaryInternal;
-		//LayoutHighRiskAddressInternal;
 	END;
 
 	SHARED LayoutInputBIIBusinessEchoInternal := RECORD
@@ -2119,7 +2119,7 @@ EXPORT Layouts := MODULE
 		LayoutPhoneSumInternal;
 		LayoutAddrSummaryInternal;
 		LayoutInferredAttributesInternal;
-		//LayoutHighRiskAddressInternal;
+		LayoutHighRiskAddressInternal;
 		STRING65 B_InpAcct;
 		INTEGER G_ProcBusUID;
 		LayoutInputBIIInternal - B_InpAcct;

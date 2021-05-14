@@ -152,9 +152,9 @@
 	STRING6 PI_InpAddrIsAptFlag;
 	//STRING6 PI_InpAddrIsPOBoxFlag;
 	//STRING6 PI_InpAddrIsMilitaryFlag;
-	//STRING PI_InpAddrSICCodeHRList;
-	//STRING PI_InpAddrNAICSCodeHRList;
-	//STRING6 PI_InpAddrIsHRCorrectFacFlag;	
+	STRING PI_InpAddrSICCodeHRList;
+	STRING PI_InpAddrNAICSCodeHRList;
+	STRING6 PI_InpAddrIsHRCorrectFacFlag;	
 	INTEGER PI_InpDOBAge;
 	STRING6 PI_InpSSNIsDeceasedFlag;
 	STRING10 PI_InpSSNDeceasedDt;
