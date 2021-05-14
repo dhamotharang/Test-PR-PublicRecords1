@@ -157,7 +157,7 @@ EXPORT proc_build_vehicle_all(
 		Spray_Infutor_VIN_Files,
 		Spray_Infutor_Motorcycle_Files,
 		VINA_Info,
-		/* 
+		/*
 		Scrub_Experian_Files,
 		Scrub_Infutor_Motorcycle_Files,
 		Scrub_Infutor_VIN_Files,
@@ -179,8 +179,8 @@ EXPORT proc_build_vehicle_all(
 		proc_delete_persist_files,
 		getretval,
 		update_dops_non_fcra,
-		update_idops_non_fcra,
-		create_orbit_build_instance
+		create_orbit_build_instance,
+		update_idops_non_fcra
 	);
 
 ENDMACRO;
