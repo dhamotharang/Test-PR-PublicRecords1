@@ -35,9 +35,11 @@ EXPORT DATASET(Header_Crosswalk.Layouts.summary) fn_summary(
       // Available pairs
       {#TEXT(did1), #TEXT(did2), 'Available Pairs', COUNT(ds_input)},
       {#TEXT(did1), #TEXT(did2), 'Unique Pairs', COUNT(ds_unique_pairs)},
+      {#TEXT(did1), #TEXT(did2), 'DID counterpart', COUNT(ds_node_1)},
+      {#TEXT(did2), #TEXT(did1), 'DID counterpart', COUNT(ds_node_2)},
       
       // did1 edge distribution
-      {#TEXT(did1), #TEXT(did2), 'Single Pair', COUNT(ds_node_1(edges = 1))},
+      {#TEXT(did1), #TEXT(did2), '1 Pair', COUNT(ds_node_1(edges = 1))},
       {#TEXT(did1), #TEXT(did2), '[2,5] Pairs', COUNT(ds_node_1(edges BETWEEN 2 AND 5))},
       {#TEXT(did1), #TEXT(did2), '[6,20] Pairs', COUNT(ds_node_1(edges BETWEEN 6 AND 20))},
       {#TEXT(did1), #TEXT(did2), '[21,50] Pairs', COUNT(ds_node_1(edges BETWEEN 21 AND 50))},
@@ -47,7 +49,7 @@ EXPORT DATASET(Header_Crosswalk.Layouts.summary) fn_summary(
       {#TEXT(did1), #TEXT(did2), '1001+ Pairs', COUNT(ds_node_1(edges > 1000))},
 
       // did2 edge distribution
-      {#TEXT(did2), #TEXT(did1), 'Single Pair', COUNT(ds_node_2(edges = 1))},
+      {#TEXT(did2), #TEXT(did1), '1 Pair', COUNT(ds_node_2(edges = 1))},
       {#TEXT(did2), #TEXT(did1), '[2,5] Pairs', COUNT(ds_node_2(edges BETWEEN 2 AND 5))},
       {#TEXT(did2), #TEXT(did1), '[6,20] Pairs', COUNT(ds_node_2(edges BETWEEN 6 AND 20))},
       {#TEXT(did2), #TEXT(did1), '[21,50] Pairs', COUNT(ds_node_2(edges BETWEEN 21 AND 50))},
