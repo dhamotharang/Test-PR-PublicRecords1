@@ -75,8 +75,10 @@ dummy_project := project(main_dataset,change_dummy_ver(left));
 	ds_full_party := dataset('~thor_data400::base::liens::party::Hogan_full_temp', liensv2.Layout_liens_party_SSN_for_hogan_BIPV2_with_LinkFlags, thor);
 	ds_fix2				:= LiensV2._Functions.fn_HoganPopDtFirstSeen(ds_full_party, ds_main);
 /*************************************************************DF-24044******************************************************************/
-/****************************************************************Main*******************************************************************/             
-dHoganMainwithNewIds := LiensV2.Fn_Propagate_TMSIDRMSID_Main(ds_main);							
+/****************************************************************Main*******************************************************************/
+            
+dHoganMainwithNewIds := LiensV2.Fn_Propagate_TMSIDRMSID_Main(ds_main);		
+					
 
 LiensV2.Layout_liens_main_module_for_hogan.layout_liens_main tAdobt_newTMSID (dHoganMainwithNewIds l) := Transform
 self.tmsid := Map(l.BestEarliestTMSID <> '' => l.BestEarliestTMSID,
@@ -86,7 +88,19 @@ self.rmsid := Map(l.newrmsid <> '' => l.newrmsid,
 self:= l;
 end;
 
-dNewHoganMainBasewithNewIds := Project(dHoganMainwithNewIds,tAdobt_newTMSID(left));
+TMSIDPatch := Project(dHoganMainwithNewIds,tAdobt_newTMSID(left));
+//DF-29287 Remove dups
+Patch_sort := sort(TMSIDPatch,tmsid, rmsid, record_code, date_vendor_removed,  filing_jurisdiction, filing_state, orig_filing_number, orig_filing_type,  
+                orig_filing_date, orig_filing_time ,  case_number, filing_number, filing_type_desc,  filing_date ,  filing_time,  vendor_entry_date, judge, case_title,  
+							  filing_book, filing_page, release_date, amount, eviction, satisifaction_type, judg_satisfied_date, judg_vacated_date, tax_code, irs_serial_number, effective_date, 
+							  lapse_date, accident_date, sherrif_indc, expiration_date, agencyID, agency_state, agency_county, legal_lot, legal_block, legal_borough, certificate_number, 
+								orig_filing_time, -process_date,local);
+
+dNewHoganMainBasewithNewIds := dedup(Patch_sort,tmsid, rmsid, record_code, date_vendor_removed,  filing_jurisdiction, filing_state, orig_filing_number, orig_filing_type,  
+                orig_filing_date, orig_filing_time ,  case_number, filing_number, filing_type_desc,  filing_date ,  filing_time,  vendor_entry_date, judge, case_title,  
+							  filing_book, filing_page, release_date, amount, eviction, satisifaction_type, judg_satisfied_date, judg_vacated_date, tax_code, irs_serial_number, effective_date, 
+							  lapse_date, accident_date, sherrif_indc, expiration_date, agencyID, agency_state, agency_county, legal_lot, legal_block, legal_borough, certificate_number,local);
+
 
 /************************************************************Mapping File**************************************************************/ 
 //Generate Mapping file for distribution
@@ -129,6 +143,12 @@ end;
 dNewHoganPartyFullBasewithNewIds := Project(dHoganPartyfullwithnewids,tAdobt_newTMSID3(left));
 
 /**********************************************************************************************************/
+
+// Set_tmsid:=['HG0003519452339NYRICC1                            ','HG0004078143642NYRICC1                            ','HG000435541625NYRICC1                             ','HG0004397045031NYRICC1                            ','HG0007359331988KYKENC1                            '];
+
+// output(ds_main(tmsid in Set_tmsid),named('o21')); 
+// output(dHoganMainwithNewIds(tmsid in Set_tmsid),named('o22')); 
+// output(dNewHoganMainBasewithNewIds(tmsid in Set_tmsid),named('o23')); 
 PromoteSupers.MAC_SF_BuildProcess(dNewHoganMainBasewithNewIds,
                        '~thor_data400::base::Liens::Main::Hogan',bld_hogan_main, 2,,true);
 PromoteSupers.MAC_SF_BuildProcess(dMappingFile_tosenddeduped,
