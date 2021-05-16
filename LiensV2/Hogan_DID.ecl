@@ -197,7 +197,7 @@ file_party_fein_adds :=  file_party_fein(ADDDELFLAG != 'D');
 
 // FILTER DELETE RECORDS
 
-file_party_fein_delete := DEDUP(SORT(file_party_fein(ADDDELFLAG = 'D'),orig_rmsid),orig_rmsid);
+file_party_fein_delete := DEDUP(SORT(file_party_fein(ADDDELFLAG in ['C','D']),orig_rmsid),orig_rmsid); //DF-29287 delete update prev record
 
 // FULL FILE 
 /*cng change delete pull from the file with orig_rmids not deduped*/

@@ -67,16 +67,14 @@ file_deletes := fnMainDeletes(LiensV2.file_Hogan_main, LiensV2.file_Hogan_party_
 
 Full_hogan_Main_nondist := dataset('~thor_data400::base::liens::main::hogan',liensv2.layout_liens_main_module_for_hogan.layout_liens_main,thor);
 
-// REMOVE DELETES FROM MAIN BASE FILE
-
+// REMOVE DELETES FROM MAIN BASE FILE  //DF-29287 removed Local as it doesn't work well with lookup
 Full_hogan_remove_Delete	:=	JOIN(
-																	DISTRIBUTE(Full_hogan_Main_nondist,HASH(orig_rmsid)), 
-																	DISTRIBUTE(file_deletes(orig_rmsid_main_del <> ''),HASH(orig_rmsid_main_del)),
+																	Full_hogan_Main_nondist, 
+																	file_deletes(orig_rmsid_main_del <> ''),
 																	LEFT.orig_rmsid	=	RIGHT.orig_rmsid_main_del AND
 																	left.tmsid = right.tmsid,
 																	TRANSFORM(LEFT),
 																	LEFT ONLY,
-																	LOCAL,
 																	LOOKUP
 																	);
 
@@ -86,14 +84,15 @@ liensv2.Layout_liens_main_module_for_hogan.layout_liens_main  treformat(rec_temp
 self := L; 
 end ; 
 
-file_update := distribute(project(file_adds, treformat(left)),hash(tmsid));
+file_update := project(file_adds, treformat(left));
 
-Full_hogan_Main := distribute(Full_hogan_remove_Delete,hash(tmsid));
+Full_hogan_Main := Full_hogan_remove_Delete;
 
 
 // Add Full File and Daily file (distributed)
 
-daily_plus_full := Full_hogan_Main +  file_update;
+daily_plus_full := distribute(Full_hogan_Main + file_update,hash(tmsid)); //DF-29287
+
 
 // Sort and rollup full file (local)
 
@@ -129,7 +128,9 @@ deduprecords := dedup(full_sort2,tmsid, rmsid, record_code, date_vendor_removed,
                 orig_filing_date, orig_filing_time ,  case_number, filing_number, filing_type_desc,  filing_date ,  filing_time,  vendor_entry_date, judge, case_title,  
 							  filing_book, filing_page, release_date, amount, eviction, satisifaction_type, judg_satisfied_date, judg_vacated_date, tax_code, irs_serial_number, effective_date, 
 							  lapse_date, accident_date, sherrif_indc, expiration_date, agencyID, agency_state, agency_county, legal_lot, legal_block, legal_borough, certificate_number,local);
-
+// cSet_tmsid:=['HG0003519452339NYRICC1                            ','HG0004078143642NYRICC1                            ','HG000435541625NYRICC1                             ','HG0004397045031NYRICC1                            ','HG0007359331988KYKENC1                            '];
+// output(Full_hogan_Main(tmsid in Set_tmsid),named('oa'));
+// output(file_update(tmsid in Set_tmsid),named('ob'));// output(deduprecords(tmsid in Set_tmsid),named('O1'));
 RETURN deduprecords;
 
 END;
