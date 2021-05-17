@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Bankruptcy FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Bankruptcy_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Bankruptcy(__in,__cfg).__Result) __E_Bankruptcy := E_Bankruptcy(__in,__cfg).__Result;
-  SHARED __EE280739 := __E_Bankruptcy;
-  EXPORT __ST218340_Layout := RECORD
+  SHARED __EE279990 := __E_Bankruptcy;
+  EXPORT __ST217591_Layout := RECORD
     KEL.typ.nstr Source_Description_;
     KEL.typ.nstr Original_Chapter_;
     KEL.typ.nstr Filing_Type_;
@@ -32,13 +32,13 @@ EXPORT B_Bankruptcy_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST218333_Layout := RECORD
+  EXPORT __ST217584_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Court_Code_;
     KEL.typ.nstr Case_Number_;
     KEL.typ.nstr Original_Case_Number_;
-    KEL.typ.ndataset(__ST218340_Layout) Records_;
+    KEL.typ.ndataset(__ST217591_Layout) Records_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Case_Details_Layout) Case_Details_;
     KEL.typ.ndataset(E_Bankruptcy(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -48,14 +48,14 @@ EXPORT B_Bankruptcy_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST218333_Layout __ND1883556__Project(E_Bankruptcy(__in,__cfg).Layout __PP280533) := TRANSFORM
-    __EE280576 := __PP280533.Records_;
-    __ST218340_Layout __ND1883535__Project(E_Bankruptcy(__in,__cfg).Records_Layout __PP280889) := TRANSFORM
-      SELF.Child_Sort_List_ := MAP(__T(__NT(__PP280889.Disposition_))=>1,__T(__OP2(__PP280889.Disposition_,=,__CN('Dismissed')))=>2,__T(__OP2(__PP280889.Disposition_,=,__CN('Discharged')))=>3,__T(__OP2(__PP280889.Disposition_,=,__CN('Discharge NA')))=>4,__T(__OP2(__PP280889.Disposition_,=,__CN('Discharge Granted')))=>5,__T(__OP2(__PP280889.Disposition_,=,__CN('Closed')))=>6,7);
-      SELF := __PP280889;
+  SHARED __ST217584_Layout __ND1882744__Project(E_Bankruptcy(__in,__cfg).Layout __PP279784) := TRANSFORM
+    __EE279827 := __PP279784.Records_;
+    __ST217591_Layout __ND1882723__Project(E_Bankruptcy(__in,__cfg).Records_Layout __PP280140) := TRANSFORM
+      SELF.Child_Sort_List_ := MAP(__T(__NT(__PP280140.Disposition_))=>1,__T(__OP2(__PP280140.Disposition_,=,__CN('Dismissed')))=>2,__T(__OP2(__PP280140.Disposition_,=,__CN('Discharged')))=>3,__T(__OP2(__PP280140.Disposition_,=,__CN('Discharge NA')))=>4,__T(__OP2(__PP280140.Disposition_,=,__CN('Discharge Granted')))=>5,__T(__OP2(__PP280140.Disposition_,=,__CN('Closed')))=>6,7);
+      SELF := __PP280140;
     END;
-    SELF.Records_ := __PROJECT(__EE280576,__ND1883535__Project(LEFT));
-    SELF := __PP280533;
+    SELF.Records_ := __PROJECT(__EE279827,__ND1882723__Project(LEFT));
+    SELF := __PP279784;
   END;
-  EXPORT __ENH_Bankruptcy_8 := PROJECT(__EE280739,__ND1883556__Project(LEFT));
+  EXPORT __ENH_Bankruptcy_8 := PROJECT(__EE279990,__ND1882744__Project(LEFT));
 END;

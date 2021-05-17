@@ -408,8 +408,6 @@ IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Tod_Flag__SingleValue_Inv
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Model_Class_Code__SingleValue_Invalid,NAMED('E_Vehicle_Model_Class_Code__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Model_Class__SingleValue_Invalid,NAMED('E_Vehicle_Model_Class__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Min_Door_Count__SingleValue_Invalid,NAMED('E_Vehicle_Min_Door_Count__SingleValue_Invalid')));
-IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Latest_Vehicle_Flag__SingleValue_Invalid,NAMED('E_Vehicle_Latest_Vehicle_Flag__SingleValue_Invalid')));
-IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Latest_Vehicle_Iteration_Flag__SingleValue_Invalid,NAMED('E_Vehicle_Latest_Vehicle_Iteration_Flag__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Standard_Lienholder_Name__SingleValue_Invalid,NAMED('E_Vehicle_Standard_Lienholder_Name__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Source_First_Date__SingleValue_Invalid,NAMED('E_Vehicle_Source_First_Date__SingleValue_Invalid')));
 IF(RunAll OR RunInvalidSingleValues,OUTPUT(E_Vehicle().Source_Last_Date__SingleValue_Invalid,NAMED('E_Vehicle_Source_Last_Date__SingleValue_Invalid')));
