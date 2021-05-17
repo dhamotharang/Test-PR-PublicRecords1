@@ -1,9 +1,9 @@
-IMPORT _control,RoxieKeyBuild, Emdeon;
+﻿IMPORT _control,RoxieKeyBuild, Emdeon;
 
 EXPORT Email_Notification_Lists := MODULE
 
    EXPORT developer := 'deryck.murray@lexisnexisrisk.com;jason.allerdings@lexinexisrisk.com;';
-   EXPORT tester := _Control.MyInfo.EmailAddressNotify;
+   EXPORT tester := 'jason.allerdings@lexinexisrisk.com;';
 	 //quality_assurance := 'qualityassurance@seisint.com;';
 	 EXPORT quality_assurance := 'deryck.murray@lexisnexisrisk.com;jason.allerdings@lexisnexisrisk.com;';
    EXPORT all_hands := developer + tester + ';' + quality_assurance;

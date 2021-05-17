@@ -1,8 +1,8 @@
-IMPORT _control,RoxieKeyBuild, hxmx;
+﻿IMPORT _control,RoxieKeyBuild, hxmx;
 
 EXPORT Email_Notification_Lists := MODULE
    EXPORT developer := 'deryck.murray@lexisnexisrisk.com;jason.allerdings@lexisnexisrisk.com;';
-   EXPORT tester := _Control.MyInfo.EmailAddressNotify;
+   EXPORT tester := 'jason.allerdings@lexisnexisrisk.com';
 	 //quality_assurance := 'qualityassurance@seisint.com;';
 	 EXPORT quality_assurance := 'deryck.murray@lexisnexisrisk.com; jason.allerdings@lexisnexisrisk.com;';
    EXPORT all_hands := developer + tester + ';' + quality_assurance;
