@@ -573,6 +573,8 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 
   HHIDLexids := PROJECT(HHIDs_ADLs_Good_Lexids, TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
 
+	HHIDLexids_noInput := HHIDLexids(P_LexID NOT IN InputLexids);
+
   Input_HHIDLexids := DEDUP(SORT((Input_FDC + HHIDLexids)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 	Input_FDC_RelativesLexids_HHIDLexids_LexIDs := DEDUP(SORT((RelativesLexids + Input_HHIDLexids )(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
@@ -2421,6 +2423,8 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					LEFT.ZIP5 = RIGHT.zip AND 
 					LEFT.PrimaryRange = RIGHT.prim_range AND 
 					LEFT.SecondaryRange = RIGHT.sec_range) and
+					left.Predirectional=right.predir and
+					left.Postdirectional=right.postdir and
 					 ArchiveDate((string)right.dt_first_seen )<= LEFT.P_InpClnArchDt[1..8] and
 				IF(Options.isMarketing,(right.src IN PublicRecords_KEL.ECL_Functions.Constants.ALLOWED_MARKETING_SOURCES OR PublicRecords_KEL.ECL_Functions.Common_Functions.IsMarketingAllowedKey(right.src, right.st)), TRUE) and
 				IF(Options.isFCRA ,(right.src IN SET(PublicRecords_KEL.ECL_Functions.Constants.Allowed_Consumer_Header_SRC(Options.isFCRA), Src)),right.src IN SET(PublicRecords_KEL.ECL_Functions.Constants.Allowed_Consumer_Header_SRC, Src) ) and
@@ -4998,6 +5002,8 @@ Key_AccLogs_FCRA_Address :=
 				LEFT.PrimaryName = right.prim_name AND
 				LEFT.PrimaryRange = right.prim_range and
 				left.SecondaryRange = right.Sec_range) AND
+				left.Predirectional=right.person_q.predir and
+				left.AddrSuffix=right.person_q.addr_suffix and
 				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] and
 							//lets dump the inquiries we don't care about
 							((trim(std.str.ToUpperCase(RIGHT.search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.FCRA_Functions)	AND 
@@ -5219,6 +5225,8 @@ Key_AccLogs_FCRA_SSN :=
 				LEFT.PrimaryName = right.prim_name AND
 				LEFT.PrimaryRange = right.prim_range and
 				left.SecondaryRange = right.Sec_range) AND
+				left.Predirectional=right.person_q.predir and//boca shell does it
+				left.AddrSuffix=right.person_q.addr_suffix and
 				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] and
 							//lets dump the inquiries we don't care about
 							(trim(std.str.ToUpperCase(RIGHT.search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.nonFCRA_Functions)	AND 
@@ -5254,6 +5262,8 @@ Key_AccLogs_FCRA_SSN :=
 				LEFT.PrimaryName = right.prim_name AND
 				LEFT.PrimaryRange = right.prim_range and
 				left.SecondaryRange = right.Sec_range) AND
+				left.Predirectional=right.person_q.predir and//boca shell does it
+				left.AddrSuffix=right.person_q.addr_suffix and
 				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] and
 							//lets dump the inquiries we don't care about
 							(trim(std.str.ToUpperCase(RIGHT.search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.nonFCRA_Functions)	AND 
@@ -5291,9 +5301,9 @@ Key_AccLogs_FCRA_SSN :=
 					SELF := LEFT,
 					SELF := []));	
 
-//Inquiries nonFCRA DID	
+//Inquiries nonFCRA input consumer DID only	
 	Key_AccLogs_Inquiry_Table_DID_unsuppressed := 
-			JOIN(Input_HHIDLexids, Inquiry_AccLogs.Key_Inquiry_DID, 
+			JOIN(Input_FDC, Inquiry_AccLogs.Key_Inquiry_DID, 
 				Common.DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_DID = TRUE AND
 				options.Data_Restriction_Mask[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue and
 				LEFT.P_LexID > 0 AND
@@ -5319,10 +5329,46 @@ Key_AccLogs_FCRA_SSN :=
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
+				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_3000));
+
+//households only
+	Key_AccLogs_Inquiry_Table_DID_unsuppressed_HouseHolds_Only := 
+			JOIN(HHIDLexids_noInput, Inquiry_AccLogs.Key_Inquiry_DID, 
+				Common.DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_DID = TRUE AND
+				options.Data_Restriction_Mask[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue and
+				LEFT.P_LexID > 0 AND
+				KEYED(LEFT.P_LexID = RIGHT.s_did) AND
+				ArchiveDate((string)right.Search_Info.DateTime[1..8]) <= LEFT.P_InpClnArchDt[1..8] and
+							//lets dump the inquiries we don't care about
+							(trim(std.str.ToUpperCase(RIGHT.search_info.function_description)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.nonFCRA_Functions)	AND 
+							(trim(RIGHT.bus_intel.use) = PublicRecords_KEL.ECL_Functions.AccLogs_Constants.Check_Bus_Intel_Uses) AND 
+							(trim(RIGHT.search_info.product_code) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.valid_product_codes) and
+						(
+								trim(STD.str.ToUpperCase(right.bus_intel.vertical)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.collections_vertical_set or
+								trim(STD.str.ToUpperCase(right.bus_intel.industry)) IN PublicRecords_KEL.ECL_Functions.AccLogs_Constants.collection_industry or
+								STD.str.Find(trim(STD.str.ToUpperCase(right.bus_intel.sub_market)),'FIRST PARTY', 1) > 0
+						),
+				TRANSFORM(Layouts_FDC.Layout_Inquiry_AccLogs__Inquiry_Table_DID,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Src := MDR.sourceTools.src_InquiryAcclogs,
+					SELF.DateOfInquiry := RIGHT.Search_Info.DateTime[1..8] + RIGHT.Search_Info.DateTime[10..] + '0';
+					SELF.IsUpdateRecord := FALSE, //to help with debugging and data questions
+					SELF.IsDeltaBaseRecord := False,
+					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date := ArchiveDate((string)SELF.DateOfInquiry);
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)RIGHT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
+					SELF := RIGHT, 
+					SELF := LEFT,
+					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
-		Key_AccLogs_Inquiry_Table_Update_DID_unsuppressed := 
-			JOIN(Input_HHIDLexids, Inquiry_AccLogs.Key_Inquiry_DID_Update, 
+
+		Key_AccLogs_Inquiry_Table_Update_DID_unsuppressed := //boca shell only passes Households into full key not update key
+			JOIN(Input_FDC, Inquiry_AccLogs.Key_Inquiry_DID_Update, 
 				Common.DoFDCJoin_Inquiry_AccLogs__Inquiry_Table_DID = TRUE AND
 				options.Data_Restriction_Mask[risk_indicators.iid_constants.posInquiriesRestriction]<>risk_indicators.iid_constants.sTrue and
 				LEFT.P_LexID > 0 AND
@@ -5350,7 +5396,7 @@ Key_AccLogs_FCRA_SSN :=
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
-	Gather_DID_Inquiries := Key_AccLogs_Inquiry_Table_DID_unsuppressed+Key_AccLogs_Inquiry_Table_Update_DID_unsuppressed+deltaBase_did_unsuppressed;
+	Gather_DID_Inquiries := Key_AccLogs_Inquiry_Table_DID_unsuppressed+Key_AccLogs_Inquiry_Table_Update_DID_unsuppressed+Key_AccLogs_Inquiry_Table_DID_unsuppressed_HouseHolds_Only+deltaBase_did_unsuppressed;
 	
 	DID_Inquiries_Suppress := Suppress.MAC_SuppressSource(Gather_DID_Inquiries, mod_access, did_field := person_q.appended_adl, gsid_field := ccpa.global_sid, data_env := Environment);
 

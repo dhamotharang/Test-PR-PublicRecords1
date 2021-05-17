@@ -13,6 +13,11 @@ EXPORT valid_product_codes := ['1', '2', '7']; // 1 = ACCURINT, 2 = RISKWISE
 
 EXPORT Check_Bus_Intel_Uses := '';
 
+//household only							
+EXPORT collection_industry := ['COLLECTIONS','COLLECTION','COLLECTION LAW FIRM','DEBT BUYER','FIRST PARTY','THIRD PARTY']; 
+EXPORT collections_vertical_set := ['COLLECTIONS','RECEIVABLES MANAGEMENT','1PC','3PC'];
+
+
 EXPORT nonFCRA_Functions := [
 '60 DAYS NEWS',
 '90 DAYS NEWS',
