@@ -2,11 +2,11 @@
 
 //Reappend DID and SSN to the historic base and filter records out of period. 
 
-EXPORT Fn_UpdateWeeklyBase (string pVersion = '') := function
+EXPORT Fn_UpdateWeeklyBase (string pVersion = '') := Module
 
-	curr_weekly_base := INQL_FFD.Files(false, true).Base.Built +
-											INQL_FFD.Files(true, true).Base.Built;
-
+	curr_weekly_base             := Inql_ffd.FN_Decrypt_Weekly_Base() +
+																	INQL_FFD.Files(true, true).Base.Built;
+	
 	formatted	:=	project(curr_weekly_base
 												,transform(INQL_FFD.Layouts.Input_Formatted,
 																				
@@ -32,17 +32,42 @@ EXPORT Fn_UpdateWeeklyBase (string pVersion = '') := function
 																		self := [];
 																		)); 
 																		
-	filtered_weekly_base_did_ssn   	:= appended_base
+	weekly_base_filtered_by_period   	:= appended_base
 																				(
 																			((ppc in _Constants.FCRA_PPC) and datetime[1..8] between _Flags(pVersion).dt2yearsago and pVersion) 
 							                    or 	((ppc not in _Constants.FCRA_PPC) and datetime[1..8] between _Flags(pVersion).dt1yearago and pVersion)
 																			);
 	
-	excluded_weekly_base            := filtered_weekly_base_did_ssn (ppc not in _Constants.FCRA_PPC_EXCLUDE);
+	weekly_base_filtered_by_valid_ppc   := weekly_base_filtered_by_period (ppc not in _Constants.FCRA_PPC_EXCLUDE);
 	
-	new_weekly_base  				  				:= dedup(sort(excluded_weekly_base,record),record, except version, filedate);
+	shared weekly_base_with_group_rid   := INQL_FFD.FN_Append_Group_RID(weekly_base_filtered_by_valid_ppc).base_group_rid;
+	
+	shared curr_weekly_base_encrypted 	:= distribute(INQL_FFD.Files(false, true).Base_Encrypted.Built +
+																										INQL_FFD.Files(true, true).Base_Encrypted.Built,
+																										hash(transaction_id));
+																								
+  shared InputDecrypted         			 := project(curr_weekly_base_encrypted,
+	                                                transform(inql_ffd.Layouts.Input_Decrypted,
+																																			self := left;
+																																			self := [];)
+																																			);
+																																			
+  shared weekly_base_cleaned_decrypted := project(INQL_FFD.FN_Clean_Decrypted(weekly_base_with_group_rid, 
+	                                                                            InputDecrypted),
+																						transform(inql_ffd.Layouts.base, self:= left;));
+																						
+	export new_weekly_base  				:= dedup(sort(weekly_base_cleaned_decrypted,record),record, except version, filedate);
+	
+	weekly_base_transactions        := distribute(table(new_weekly_base,{transaction_id,group_rid}),hash(transaction_id));
 
-  
-  return new_weekly_base;
+  update_weekly_base_encrypted  	:= join(curr_weekly_base_encrypted,weekly_base_transactions,
+	                                        left.transaction_id = right.transaction_id,
+	                                        transform(Inql_ffd.Layouts.base_encrypted,
+																					          self.group_rid := right.group_rid,
+																					          self:=left;),local);
+																										
+	export new_weekly_base_encrypted := dedup(sort(update_weekly_base_encrypted,record),
+	                                          record, except version, filedate);
+	
 
 end;

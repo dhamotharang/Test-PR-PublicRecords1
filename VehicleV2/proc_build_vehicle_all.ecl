@@ -1,6 +1,5 @@
-﻿IMPORT STD, Orbit_Report, Orbit3, RoxieKeyBuild, dops, Scrubs_VehicleV2, VehicleV2;
+﻿IMPORT STD, Orbit_Report, Orbit3, RoxieKeyBuild, dops, Scrubs_VehicleV2, VehicleV2, VehicleCodes;
 
-//export proc_build_vehicle_all(pVersion) :=
 EXPORT proc_build_vehicle_all(
 	pSourceIP,
 	pDirectory,
@@ -128,7 +127,20 @@ EXPORT proc_build_vehicle_all(
 		SUCCESS(VehicleV2.Email_notification_lists(pVersion).VehicleV2PersistfilesDeletion),
 		FAILURE(STD.System.Email.SendEmail(Email_Recipients,'persist files failed to delete',failmessage));
 
-	update_dops_non_fcra := dops.updateversion('VehicleV2Keys',pVersion,Email_Recipients,,'N|B');
+	update_dops_non_fcra := dops.updateversion(
+		'VehicleV2Keys',
+		pVersion,
+		Email_Recipients,,
+		'N|B'
+	);
+
+	update_idops_non_fcra := dops.updateversion(
+		'VehicleV2Keys',
+		pVersion,
+		Email_Recipients,
+		l_inenvment := 'N',
+		l_inloc := 'A'
+	);
 
 	Orbit_report.Vehicle_Stats(getretval);
 
@@ -145,7 +157,7 @@ EXPORT proc_build_vehicle_all(
 		Spray_Infutor_VIN_Files,
 		Spray_Infutor_Motorcycle_Files,
 		VINA_Info,
-		/* 
+		/*
 		Scrub_Experian_Files,
 		Scrub_Infutor_Motorcycle_Files,
 		Scrub_Infutor_VIN_Files,
@@ -159,7 +171,6 @@ EXPORT proc_build_vehicle_all(
 		Proc_Build_Base,
 		Proc_Build_Keys1,
 		Proc_build_booleankeys,
-		update_dops_non_fcra,
 		proc_build_stats,
 		new_records_sample_for_qa,
 		new_records_sample_OH_for_qa,
@@ -167,7 +178,9 @@ EXPORT proc_build_vehicle_all(
 		proc_picker_file,
 		proc_delete_persist_files,
 		getretval,
-		create_orbit_build_instance
+		update_dops_non_fcra,
+		create_orbit_build_instance,
+		update_idops_non_fcra
 	);
 
 ENDMACRO;
