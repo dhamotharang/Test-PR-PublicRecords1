@@ -9,7 +9,7 @@ EXPORT layout_Accurint_Property_batch_out :=
 		
 //	***** POTENTIALLY USEFUL DATA *****
 		
-		STRING10  record_type        := '';
+		STRING14  record_type        := '';
 		STRING8   sortby_date        := '';
 		STRING1   current_record     := '';
 
@@ -49,6 +49,11 @@ EXPORT layout_Accurint_Property_batch_out :=
 		STRING8   recording_date     := '';
 		STRING250 legal_description  := '';
 		
+    STRING8   release_effective_date := ''; // contract_date
+    STRING8   mortgage_payoff_date   := ''; // first_td_due_date
+    STRING20  document_number        := '';
+    STRING40  lender_name            := '';
+
 		FFD.Layouts.ConsumerFlags;
 
 		STRING12 owner_1_did;
