@@ -11,6 +11,6 @@ module
 
  export LinkIds           := tools.mod_FilenamesBuild(lkeyTemplate  + 'linkIds'     ,pversion);
 
- export dAll_filenames    := LinkIds.dAll_filenames + Delta_Rid.dAll_filenames;
+ export dAll_filenames    := LinkIds.dAll_filenames;
 
 end;
