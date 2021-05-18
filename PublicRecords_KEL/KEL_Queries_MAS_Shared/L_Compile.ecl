@@ -3,6 +3,18 @@ IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_Shared;
 IMPORT * FROM KEL16.Null;
 EXPORT L_Compile := MODULE
+  SHARED Address_High_Risk_Dynamic_Res0_Internal_Layout := RECORD
+    KEL.typ.nstr P_I___Inp_Addr_S_I_C_Code_H_R_List_;
+    KEL.typ.nstr P_I___Inp_Addr_N_A_I_C_S_Code_H_R_List_;
+    KEL.typ.str P_I___Inp_Addr_Is_H_R_Correct_Fac_Flag_ := '';
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT Address_High_Risk_Dynamic_Res0_Layout := RECORDOF(__UNWRAP(DATASET([],Address_High_Risk_Dynamic_Res0_Internal_Layout)));
   SHARED Mini_Attributes_V1_Roxie_Dynamic_Res0_Internal_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';

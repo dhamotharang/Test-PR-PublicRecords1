@@ -4,8 +4,8 @@ IMPORT B_Sele_Person_6,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sel
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Person_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_6(__in,__cfg).__ENH_Sele_Person_6) __ENH_Sele_Person_6 := B_Sele_Person_6(__in,__cfg).__ENH_Sele_Person_6;
-  SHARED __EE1987478 := __ENH_Sele_Person_6;
-  EXPORT __ST211393_Layout := RECORD
+  SHARED __EE1988235 := __ENH_Sele_Person_6;
+  EXPORT __ST211570_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -23,10 +23,10 @@ EXPORT B_Sele_Person_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST211393_Layout __ND1987601__Project(B_Sele_Person_6(__in,__cfg).__ST214766_Layout __PP1987479) := TRANSFORM
-    __CC65263 := 730;
-    SELF.Two_Years_ := __OP2(__PP1987479.Age_In_Days_,<=,__CN(__CC65263));
-    SELF := __PP1987479;
+  SHARED __ST211570_Layout __ND1988358__Project(B_Sele_Person_6(__in,__cfg).__ST214947_Layout __PP1988236) := TRANSFORM
+    __CC65352 := 730;
+    SELF.Two_Years_ := __OP2(__PP1988236.Age_In_Days_,<=,__CN(__CC65352));
+    SELF := __PP1988236;
   END;
-  EXPORT __ENH_Sele_Person_5 := PROJECT(__EE1987478,__ND1987601__Project(LEFT));
+  EXPORT __ENH_Sele_Person_5 := PROJECT(__EE1988235,__ND1988358__Project(LEFT));
 END;

@@ -4,8 +4,8 @@ IMPORT B_Property_5,CFG_Compile,E_Property,E_Zip_Code,FN_Compile FROM PublicReco
 IMPORT * FROM KEL16.Null;
 EXPORT B_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Property_5(__in,__cfg).__ENH_Property_5) __ENH_Property_5 := B_Property_5(__in,__cfg).__ENH_Property_5;
-  SHARED __EE306172 := __ENH_Property_5;
-  EXPORT __ST155187_Layout := RECORD
+  SHARED __EE306343 := __ENH_Property_5;
+  EXPORT __ST155358_Layout := RECORD
     KEL.typ.nstr A_V_M_Unformatted_A_P_N_;
     KEL.typ.nint A_V_M_Land_Use_Code_;
     KEL.typ.nkdate A_V_M_Recording_Date_;
@@ -28,7 +28,7 @@ EXPORT B_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST155169_Layout := RECORD
+  EXPORT __ST155340_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -38,7 +38,7 @@ EXPORT B_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.nstr Secondary_Range_;
     KEL.typ.ntyp(E_Zip_Code().Typ) Z_I_P5_;
     KEL.typ.ndataset(E_Property(__in,__cfg).Address_Components_Layout) Address_Components_;
-    KEL.typ.ndataset(__ST155187_Layout) Automated_Valuation_Model_;
+    KEL.typ.ndataset(__ST155358_Layout) Automated_Valuation_Model_;
     KEL.typ.ndataset(E_Property(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -47,15 +47,15 @@ EXPORT B_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST155169_Layout __ND306177__Project(B_Property_5(__in,__cfg).__ST155865_Layout __PP306173) := TRANSFORM
-    __EE306216 := __PP306173.Automated_Valuation_Model_;
-    __ST155187_Layout __ND306221__Project(B_Property_5(__in,__cfg).__ST155883_Layout __PP306217) := TRANSFORM
-      __CC13229 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-      SELF.A_V_M_Years_ := FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP306217.A_V_M_Value_Date_),__ECAST(KEL.typ.nkdate,__CC13229));
-      SELF := __PP306217;
+  SHARED __ST155340_Layout __ND306348__Project(B_Property_5(__in,__cfg).__ST156036_Layout __PP306344) := TRANSFORM
+    __EE306387 := __PP306344.Automated_Valuation_Model_;
+    __ST155358_Layout __ND306392__Project(B_Property_5(__in,__cfg).__ST156054_Layout __PP306388) := TRANSFORM
+      __CC13202 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+      SELF.A_V_M_Years_ := FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP306388.A_V_M_Value_Date_),__ECAST(KEL.typ.nkdate,__CC13202));
+      SELF := __PP306388;
     END;
-    SELF.Automated_Valuation_Model_ := __PROJECT(__EE306216,__ND306221__Project(LEFT));
-    SELF := __PP306173;
+    SELF.Automated_Valuation_Model_ := __PROJECT(__EE306387,__ND306392__Project(LEFT));
+    SELF := __PP306344;
   END;
-  EXPORT __ENH_Property_4 := PROJECT(__EE306172,__ND306177__Project(LEFT));
+  EXPORT __ENH_Property_4 := PROJECT(__EE306343,__ND306348__Project(LEFT));
 END;
