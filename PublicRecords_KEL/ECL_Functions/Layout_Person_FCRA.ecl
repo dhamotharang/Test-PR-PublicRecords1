@@ -429,7 +429,10 @@
 	STRING PL_VerNameFirstSrcListEv;
 	STRING PL_VerNameFirstSrcEmrgDtListEv;
 	STRING PL_VerNameFirstSrcLastDtListEv;	
-
+	STRING PL_VerNameLastSrcListEv;
+	STRING PL_VerNameLastSrcEmrgDtListEv;
+	STRING PL_VerNameLastSrcLastDtListEv;
+	INTEGER PL_VerNameLastSrcCntEv;
 	STRING6 PL_AstPropFlagEv;
 	STRING6 PL_AstPropCurrFlag;
 	STRING6 PL_AstPropOwnershipIndx;

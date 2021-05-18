@@ -1487,6 +1487,10 @@ EXPORT Layouts := MODULE
 		STRING PL_VerNameFirstSrcListEv;
 		STRING PL_VerNameFirstSrcEmrgDtListEv;
 		STRING PL_VerNameFirstSrcLastDtListEv;
+		STRING PL_VerNameLastSrcListEv;
+		STRING PL_VerNameLastSrcEmrgDtListEv;
+		STRING PL_VerNameLastSrcLastDtListEv;
+		INTEGER PL_VerNameLastSrcCntEv;
 		//consumer statements
 		string6 PL_AlrtCorrectedFlag;
 		string6 PL_AlrtConsStatementFlag;
