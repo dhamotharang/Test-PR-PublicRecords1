@@ -624,7 +624,10 @@
 	STRING PL_VerNameFirstSrcListEv;
 	STRING PL_VerNameFirstSrcEmrgDtListEv;
 	STRING PL_VerNameFirstSrcLastDtListEv;	
-	
+	STRING PL_VerNameLastSrcListEv;
+	STRING PL_VerNameLastSrcEmrgDtListEv;
+	STRING PL_VerNameLastSrcLastDtListEv;
+	INTEGER PL_VerNameLastSrcCntEv;
 	// Business attributes	
 	STRING65 B_InpAcct;
 	INTEGER	G_ProcBusUID;

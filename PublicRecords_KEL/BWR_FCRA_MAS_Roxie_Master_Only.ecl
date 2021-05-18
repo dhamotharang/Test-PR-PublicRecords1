@@ -35,6 +35,7 @@ Include_Minors := TRUE;
 Retain_Input_Lexid := FALSE;//keep what we have on input
 Append_PII := FALSE;//keep what we have on input
 Overwrite_Redacted_SSN := false;
+Include_Inferred_Performance := FALSE;
 
 Is_Prescreen := false;
 // Is_Prescreen := TRUE;
@@ -142,6 +143,7 @@ soapLayout := RECORD
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
+	BOOLEAN AllowInferredPerformance;
 end;
 
 Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
@@ -182,6 +184,7 @@ soapLayout trans (pp le):= TRANSFORM
 		SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
 		self.RetainInputLexid := Settings.RetainInputLexid;
 		self.appendpii := Settings.BestPIIAppend; //do not append best pii for running
+		SELF.AllowInferredPerformance := Include_Inferred_Performance; //do not append best pii for running
 END;
 
 soap_in := Distribute(PROJECT(pp, trans(LEFT)), RANDOM());

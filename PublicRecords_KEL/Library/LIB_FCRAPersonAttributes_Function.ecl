@@ -20,10 +20,10 @@ EXPORT LIB_FCRAPersonAttributes_Function(DATASET(PublicRecords_KEL.ECL_Functions
 	
 	PersonAttributes := PublicRecords_KEL.FnRoxie_GetPersonAttributesFCRA(MiniAttributeInputRecords, FDCDataset, Options);
 
-	InferredPerformanceAttributes := IF(Options.IncludeInferredPerformance, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributeInputRecords, Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
+	// InferredPerformanceAttributes := IF(Options.IncludeInferredPerformance, PublicRecords_KEL.FnRoxie_GetInferredPerformanceAttributes(MiniAttributeInputRecords, Options, FDCDataset), DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInferredAttributes));
 
 
-	withPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, 
+	FinalPersonAttributes := JOIN(InputPIIAttributes, PersonAttributes, 
 	LEFT.G_ProcUID = RIGHT.G_ProcUID,
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
 			SELF := RIGHT,
@@ -32,14 +32,14 @@ EXPORT LIB_FCRAPersonAttributes_Function(DATASET(PublicRecords_KEL.ECL_Functions
 		LEFT OUTER, KEEP(1), ATMOST(100));		
 
 
-	FinalPersonAttributes := JOIN(withPersonAttributes, InferredPerformanceAttributes, 
-	LEFT.G_ProcUID = RIGHT.G_ProcUID,
-		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
-			SELF.G_ProcUID := LEFT.G_procUID,//If right is empty this ensures that G_ProcUID is not blank
-			SELF := RIGHT,
-			SELF := LEFT,
-			SELF := []),
-		LEFT OUTER, KEEP(1), ATMOST(100));		
+	// FinalPersonAttributes := JOIN(withPersonAttributes, InferredPerformanceAttributes, 
+	// LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		// TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster,
+			// SELF.G_ProcUID := LEFT.G_procUID,//If right is empty this ensures that G_ProcUID is not blank
+			// SELF := RIGHT,
+			// SELF := LEFT,
+			// SELF := []),
+		// LEFT OUTER, KEEP(1), ATMOST(100));		
 		
 	
 

@@ -974,7 +974,12 @@ EXPORT FnRoxie_GetPersonAttributesFCRA( DATASET(PublicRecords_KEL.ECL_Functions.
 			SELF.PL_VerNameFirstSrcLastDtListEv := MAP(
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,
 								ResultsFound => RIGHT.PL_VerNameFirstSrcLastDtListEv, 
-								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);				
+								PublicRecords_KEL.ECL_Functions.Constants.NO_DATA_FOUND);			
+			SELF.PL_VerNameLastSrcCntEv := IF(LexIDNotOnFile, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,(INTEGER)RIGHT.PL_VerNameLastSrcCntEv);								
+			SELF.PL_VerNameLastSrcListEv := IF(LexIDNotOnFile, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,RIGHT.PL_VerNameLastSrcListEv); 
+			SELF.PL_VerNameLastSrcEmrgDtListEv := IF(LexIDNotOnFile,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,RIGHT.PL_VerNameLastSrcEmrgDtListEv); 
+			SELF.PL_VerNameLastSrcLastDtListEv := IF(LexIDNotOnFile , PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA,RIGHT.PL_VerNameLastSrcLastDtListEv);								
+								
 			SELF.PL_VerSSNSrcCntEv := MAP(
 								LexIDNotOnFile => PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT,
 								ResultsFound => (INTEGER)RIGHT.PL_VerSSNSrcCntEv, 
@@ -1316,7 +1321,10 @@ EXPORT FnRoxie_GetPersonAttributesFCRA( DATASET(PublicRecords_KEL.ECL_Functions.
 			SELF.PL_VerNameFirstSrcListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;				
 			SELF.PL_VerNameFirstSrcEmrgDtListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;				
 			SELF.PL_VerNameFirstSrcLastDtListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;	
-			
+			SELF.PL_VerNameLastSrcCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;				
+			SELF.PL_VerNameLastSrcListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;				
+			SELF.PL_VerNameLastSrcEmrgDtListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;				
+			SELF.PL_VerNameLastSrcLastDtListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;			
 			SELF.PL_VerSSNSrcCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA_INT;				
 			SELF.PL_VerSSNSrcListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;				
 			SELF.PL_VerSSNSrcEmrgDtListEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;				
