@@ -3662,11 +3662,11 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 	Key_Vehicle_Party_Records := Suppress.MAC_SuppressSource(Key_Vehicle_Party_Records_unsuppressed, mod_access, did_field := append_did, data_env := Environment);
 
 	Key_Vehicle_Main_Records_unsuppressed :=  
-		JOIN(Key_Vehicle_Party_Records, VehicleV2.Key_Vehicle_Main_Key,
+		JOIN(Vehicle_all, VehicleV2.Key_Vehicle_Main_Key,
 		Common.DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_Main_Party = TRUE AND
 				KEYED(LEFT.vehicle_key = RIGHT.vehicle_key AND 
 					LEFT.iteration_key = RIGHT.iteration_key),
-				TRANSFORM({Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Main_Key, RECORDOF(LEFT)}, // including RECORDOF(LEFT) in this layout so that we can retain the DID for CCPA file suppressions
+				TRANSFORM({Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Main_Key},
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.P_LexID := LEFT.P_LexID,
@@ -3683,8 +3683,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
-	Key_Vehicle_Main_Records := PROJECT(Suppress.MAC_SuppressSource(Key_Vehicle_Main_Records_unsuppressed, mod_access, did_field := append_did, data_env := Environment),
-		TRANSFORM(Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Main_Key, SELF := LEFT)); // Suppressing records, then transforming back to original key layout since we no longer need the append_did field from the vehicle did key.
+	Key_Vehicle_Main_Records := Suppress.MAC_SuppressSource(Key_Vehicle_Main_Records_unsuppressed, mod_access, did_field := p_lexid, data_env := Environment); // Suppressing records, then transforming back to original key layout since we no longer need the append_did field from the vehicle did key.
 	
 	With_Vehicle_Party_Records := DENORMALIZE(With_Vehicle_linkids_Records, Key_Vehicle_Party_Records,
 			LEFT.UIDAppend = RIGHT.UIDAppend, GROUP,

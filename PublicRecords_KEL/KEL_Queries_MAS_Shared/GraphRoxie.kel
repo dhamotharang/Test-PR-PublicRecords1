@@ -16,7 +16,6 @@ IMPORT KnowledgeUniverse.PublicRecords_KEL.MiniAttributes;
 
 
 //high risk will be FCRA eventually
-					/* KS-6125			
 QUERY: AddressHighRiskDynamic(STRING InputStreetNumber, STRING InputStreetName, INTEGER InputZip, STRING InputPredirectional, STRING InputSuffix, STRING InputPostDirectional,
 							DATASET OF PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII InputPIIDataset,
 					DATE P_InpClnArchDt,
@@ -28,7 +27,7 @@ QUERY: AddressHighRiskDynamic(STRING InputStreetNumber, STRING InputStreetName, 
 		ASOF DynamicArchive(P_InpClnArchDt) 
 		USING DPM
 		USE InputPIIDataset(FLAT,
-             InputPII(UID = G_ProcUID, Subject = P_LexID));	*/	 
+             InputPII(UID = G_ProcUID, Subject = P_LexID));
 
  QUERY: MiniAttributesV1RoxieDynamic(SET OF Person LexID_in, 
 					DATE P_InpClnArchDt, 

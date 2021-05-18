@@ -1502,25 +1502,10 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 			DateFirstSeen = FORMAT('YYYYMMDD'),
 			DateLastSeen = FORMAT('YYYYMMDD'),
 			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date), 
+			Archive_Date = FORMAT('YYYYMMDD')), 
 		PERMITS(DPMBitmap)),
 
 	Dataset_VehicleV2__Key_Vehicle_Party_Key(
-		Vehicle(FILTER((STRING20)vehicle_key <> ''),
-			DateLastSeen = FORMAT('YYYYMM01')date_last_seen, // Contains information for ASOF
-			DateFirstSeen = FORMAT('YYYYMMDD')date_first_seen, // Contains information for ASOF
-			VehicleKey = vehicle_key,
-			StateOfOrigin = state_origin,
-			// LatestVehicleFlag = latest_vehicle_flag,
-			// LatestVehicleIterationFlag = latest_vehicle_iteration_flag,
-			//DateVendorFirstReported = date_vendor_first_reported,
-			//DateVendorLastReported = date_vendor_last_reported,
-			SourceFirstDate = src_first_date,
-			SourceLastDate = src_last_date,
-			StandardLienholderName = std_lienholder_name,
-			Source = source_code,
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),
 		PersonVehicle(FILTER((STRING20)vehicle_key <> '' AND (UNSIGNED)append_did != 0),
 			DateFirstSeen = FORMAT('YYYYMMDD')date_first_seen, // Contains information for ASOF
 			DateLastSeen = FORMAT('YYYYMM01')date_last_seen, // Contains information for ASOF
@@ -1605,18 +1590,6 @@ USE PublicRecords_KEL.ECL_Functions.Dataset_FDC(FDC,
 		PERMITS(DPMBitmap)),
 
 	Dataset_VehicleV2__Key_Vehicle_LinkID_Key(
-		Vehicle(FILTER((STRING20)vehicle_key <> ''),
-			DateLastSeen = FORMAT('YYYYMM01')date_last_seen, // Contains information for ASOF
-			DateFirstSeen = FORMAT('YYYYMMDD')date_first_seen, // Contains information for ASOF
-			VehicleKey = vehicle_key,
-			StateOfOrigin = state_origin,
-			// LatestVehicleFlag = latest_vehicle_flag,
-			// LatestVehicleIterationFlag = latest_vehicle_iteration_flag,
-			//DateVendorFirstReported = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')date_vendor_first_reported,
-			//DateVendorLastReported = FORMAT('YYYYMMDD', 'YYYYMM01', 'YYYY0101')date_vendor_last_reported,
-			Source = source_code,
-			HybridArchiveDate = FORMAT('YYYYMMDD'),
-			Archive_Date = FORMAT('YYYYMMDD')archive_date),
 		SeleVehicle(FILTER((STRING20)vehicle_key <> '' AND (UNSIGNED)ultid<>0 AND (UNSIGNED)orgid<>0 AND (UNSIGNED)seleid<>0),
 			UltID = ultid,
 			OrgID = orgid,
