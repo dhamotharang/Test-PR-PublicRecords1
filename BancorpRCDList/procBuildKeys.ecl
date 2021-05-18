@@ -7,7 +7,7 @@ EXPORT procBuildKeys (STRING	pVersion, boolean isDelta):=function
 	
 	RoxieKeybuild.MAC_build_logical(dx_BancorpRCDList.key_SSN(),BancorpRCDList.files.base,dx_BancorpRCDList.names('').i_ssn,name_ssn,BancorpRCDList_SSN);
 	
-	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::BancorpRCDList::@version@::did','D',ma_BancorpRCDList_SSN_to_qa,pVersion,2);
+	RoxieKeyBuild.Mac_SK_Move_v3('~thor_data400::key::BancorpRCDList::@version@::ssn','D',ma_BancorpRCDList_SSN_to_qa,pVersion,2);
 	
 	build_keys := sequential(
         BancorpRCDList_SSN,
