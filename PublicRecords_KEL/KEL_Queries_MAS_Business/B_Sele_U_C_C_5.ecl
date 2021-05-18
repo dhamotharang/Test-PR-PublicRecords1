@@ -4,8 +4,8 @@ IMPORT B_Sele_U_C_C_6,B_Sele_U_C_C_9,CFG_Compile,E_Business_Org,E_Business_Sele,
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_U_C_C_6(__in,__cfg).__ENH_Sele_U_C_C_6) __ENH_Sele_U_C_C_6 := B_Sele_U_C_C_6(__in,__cfg).__ENH_Sele_U_C_C_6;
-  SHARED __EE1987961 := __ENH_Sele_U_C_C_6;
-  EXPORT __ST211627_Layout := RECORD
+  SHARED __EE1988718 := __ENH_Sele_U_C_C_6;
+  EXPORT __ST211804_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Party_Type_;
     KEL.typ.int Party_Sort_List_ := 0;
@@ -16,16 +16,16 @@ EXPORT B_Sele_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST211619_Layout := RECORD
+  EXPORT __ST211796_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.ntyp(E_U_C_C().Typ) Filing_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
-    KEL.typ.ndataset(__ST211627_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST211804_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_Sele_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST219575_Layout) Best_Party_Types_;
+    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST219756_Layout) Best_Party_Types_;
     KEL.typ.nstr Filtered_Party_Type_;
     KEL.typ.bool Is_Creditor_ := FALSE;
     KEL.typ.bool Is_Debtor_ := FALSE;
@@ -37,12 +37,12 @@ EXPORT B_Sele_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST211619_Layout __ND1988079__Project(B_Sele_U_C_C_6(__in,__cfg).__ST214972_Layout __PP1987962) := TRANSFORM
-    __EE1987999 := __PP1987962.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE1987999),__ST211627_Layout),__NL(__EE1987999));
-    SELF.Is_Creditor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP1987962.Filtered_Party_Type_)),IN,__CN(['S','C','A']))),TRUE,FALSE);
-    SELF.Is_Debtor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP1987962.Filtered_Party_Type_)),=,__CN('D'))),TRUE,FALSE);
-    SELF := __PP1987962;
+  SHARED __ST211796_Layout __ND1988836__Project(B_Sele_U_C_C_6(__in,__cfg).__ST215153_Layout __PP1988719) := TRANSFORM
+    __EE1988756 := __PP1988719.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE1988756),__ST211804_Layout),__NL(__EE1988756));
+    SELF.Is_Creditor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP1988719.Filtered_Party_Type_)),IN,__CN(['S','C','A']))),TRUE,FALSE);
+    SELF.Is_Debtor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP1988719.Filtered_Party_Type_)),=,__CN('D'))),TRUE,FALSE);
+    SELF := __PP1988719;
   END;
-  EXPORT __ENH_Sele_U_C_C_5 := PROJECT(__EE1987961,__ND1988079__Project(LEFT));
+  EXPORT __ENH_Sele_U_C_C_5 := PROJECT(__EE1988718,__ND1988836__Project(LEFT));
 END;

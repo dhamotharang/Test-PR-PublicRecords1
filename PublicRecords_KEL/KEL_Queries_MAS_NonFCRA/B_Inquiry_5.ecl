@@ -4,6 +4,6 @@ IMPORT B_Inquiry_6,B_Inquiry_8,CFG_Compile,E_Inquiry FROM PublicRecords_KEL.KEL_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Inquiry_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Inquiry_6(__in,__cfg).__ENH_Inquiry_6) __ENH_Inquiry_6 := B_Inquiry_6(__in,__cfg).__ENH_Inquiry_6;
-  SHARED __EE1609520 := __ENH_Inquiry_6;
-  EXPORT __ENH_Inquiry_5 := __EE1609520;
+  SHARED __EE1617073 := __ENH_Inquiry_6;
+  EXPORT __ENH_Inquiry_5 := __EE1617073;
 END;
