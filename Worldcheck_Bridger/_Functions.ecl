@@ -406,6 +406,8 @@
 				trim(subcatname, left, right) = 'PEP NG-R' 	=> 'PEP Non-Government - Immediate Relative',
 				trim(subcatname, left, right) = 'PEP NG-A' 	=> 'PEP Non-Government - Close Associate',
 				trim(subcatname, left, right) = 'SOE' 		=> 'PEP State Owned Entity',
+				trim(subcatname, left, right) = 'SIE' 		=> 'PEP State Invested Enterprise',
+				trim(subcatname, left, right) = 'IOS' 		=> 'PEP Instrumentality of State',
 				trim(subcatname, left, right) in ['Non-PEP', ''] => 'Non-PEP',
 				'');
 				
@@ -1435,6 +1437,8 @@
 				trim(kword, left, right) = 'ARRNR-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARRNR_MW,
 				trim(kword, left, right) = 'IDMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDMA,
 				trim(kword, left, right) = 'TWMPB-CV' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMPB_CV,
+				trim(kword, left, right) = 'NS-CCMC-EO13959' =>SubGroup_Constants.numKeywordsID.KEYWORD_NS_CCMC_EO13959,
+				trim(kword, left, right) = 'ROONJN' =>SubGroup_Constants.numKeywordsID.KEYWORD_ROONJN,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

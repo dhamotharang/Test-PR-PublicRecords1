@@ -88,8 +88,8 @@ END;
 EXPORT ScoredproxidFetch(TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',UNSIGNED4 param_efr_bitmap = 0,BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetch(param_company_sic_code1,param_zip,param_cnp_name,param_prim_name,param_prim_name_len,param_fallback_value,param_efr_bitmap);
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 15; // Set bitmap for keys used
-    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 15, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 16; // Set bitmap for keys used
+    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 16, 0); // Set bitmap for key failed
 
     SELF.company_sic_code1_match_code := match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,TRUE);
 
@@ -162,7 +162,7 @@ END;
 EXPORT ScoredFetch_Batch(DATASET(InputLayout_Batch) recs,BOOLEAN AsIndex, BOOLEAN In_disableForce = FALSE) := FUNCTION
   Process_Biz_Layouts.LayoutScoredFetch Score_Batch(Key le,recs ri) := TRANSFORM
     SELF.Reference := ri.reference; // Copy reference field
-    SELF.keys_used := 1 << 15; // Set bitmap for keys used
+    SELF.keys_used := 1 << 16; // Set bitmap for keys used
     SELF.keys_failed := 0; // Set bitmap for key failed
 
     SELF.company_sic_code1_match_code := match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,ri.company_sic_code1,TRUE);

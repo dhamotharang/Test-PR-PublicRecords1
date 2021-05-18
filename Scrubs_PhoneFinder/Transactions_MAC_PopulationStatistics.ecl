@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT Transactions_MAC_PopulationStatistics(infile,Ref='',Input_transaction_id = '',Input_transaction_date = '',Input_user_id = '',Input_product_code = '',Input_company_id = '',Input_source_code = '',Input_batch_job_id = '',Input_batch_acctno = '',Input_response_time = '',Input_reference_code = '',Input_phonefinder_type = '',Input_submitted_lexid = '',Input_submitted_phonenumber = '',Input_submitted_firstname = '',Input_submitted_lastname = '',Input_submitted_middlename = '',Input_submitted_streetaddress1 = '',Input_submitted_city = '',Input_submitted_state = '',Input_submitted_zip = '',Input_phonenumber = '',Input_data_source = '',Input_royalty_used = '',Input_carrier = '',Input_risk_indicator = '',Input_phone_type = '',Input_phone_status = '',Input_ported_count = '',Input_last_ported_date = '',Input_otp_count = '',Input_last_otp_date = '',Input_spoof_count = '',Input_last_spoof_date = '',Input_phone_forwarded = '',Input_date_added = '',Input_filename = '',OutFile) := MACRO
+EXPORT Transactions_MAC_PopulationStatistics(infile,Ref='',Input_transaction_id = '',Input_transaction_date = '',Input_user_id = '',Input_product_code = '',Input_company_id = '',Input_source_code = '',Input_batch_job_id = '',Input_batch_acctno = '',Input_response_time = '',Input_reference_code = '',Input_phonefinder_type = '',Input_submitted_lexid = '',Input_submitted_phonenumber = '',Input_submitted_firstname = '',Input_submitted_lastname = '',Input_submitted_middlename = '',Input_submitted_streetaddress1 = '',Input_submitted_city = '',Input_submitted_state = '',Input_submitted_zip = '',Input_phonenumber = '',Input_data_source = '',Input_royalty_used = '',Input_carrier = '',Input_risk_indicator = '',Input_phone_type = '',Input_phone_status = '',Input_ported_count = '',Input_last_ported_date = '',Input_otp_count = '',Input_last_otp_date = '',Input_spoof_count = '',Input_last_spoof_date = '',Input_phone_forwarded = '',Input_date_added = '',Input_identity_count = '',Input_phone_verified = '',Input_verification_type = '',Input_phone_star_rating = '',Input_filename = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_PhoneFinder;
   #uniquename(of)
   %of% := RECORD
@@ -216,6 +216,30 @@ EXPORT Transactions_MAC_PopulationStatistics(infile,Ref='',Input_transaction_id 
       '' 
     #ELSE
         IF( le.Input_date_added = (TYPEOF(le.Input_date_added))'','',':date_added')
+    #END
+ 
++    #IF( #TEXT(Input_identity_count)='' )
+      '' 
+    #ELSE
+        IF( le.Input_identity_count = (TYPEOF(le.Input_identity_count))'','',':identity_count')
+    #END
+ 
++    #IF( #TEXT(Input_phone_verified)='' )
+      '' 
+    #ELSE
+        IF( le.Input_phone_verified = (TYPEOF(le.Input_phone_verified))'','',':phone_verified')
+    #END
+ 
++    #IF( #TEXT(Input_verification_type)='' )
+      '' 
+    #ELSE
+        IF( le.Input_verification_type = (TYPEOF(le.Input_verification_type))'','',':verification_type')
+    #END
+ 
++    #IF( #TEXT(Input_phone_star_rating)='' )
+      '' 
+    #ELSE
+        IF( le.Input_phone_star_rating = (TYPEOF(le.Input_phone_star_rating))'','',':phone_star_rating')
     #END
  
 +    #IF( #TEXT(Input_filename)='' )

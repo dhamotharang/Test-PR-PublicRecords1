@@ -1,20 +1,23 @@
-import _control, ut, Business_Header, Business_Header_SS, did_add,AID, Mdr, Std;
+﻿import _control, ut, Business_Header, Business_Header_SS, did_add,AID, Mdr, Std;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Value Types
 //////////////////////////////////////////////////////////////////////////////////////////////
 File_in 			:= File_5000_Bank_Details_In;
-segment_code 		:= '5000';
+segment_code 	:= '5000';
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Convert the Input File to Base format
 //////////////////////////////////////////////////////////////////////////////////////////////
 Layout_5000_Bank_Details_Base_AID Convert2Base(File_in l) := 
 transform
-	self.date_first_seen	:=	'';
-	self.date_last_seen 	:=	self.date_first_seen;
-	self									:= 	l;
-	self									:=	[];
+	self.date_first_seen					:=	'';
+	self.date_last_seen 					:=	self.date_first_seen;
+	self.process_date_first_seen	:= 	(unsigned4)l.process_date;
+	self.process_date_last_seen		:= 	self.process_date_first_seen;
+	self.record_type							:= 	'C';
+	self													:= 	l;
+	self													:=	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));

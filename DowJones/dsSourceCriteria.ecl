@@ -2036,7 +2036,9 @@ EXPORT dsSourceCriteria := DATASET([
 {'OFAC - Non-SDN CCMC Identifiers List','2023'},
 {'US Department of Defense FY99 NDAA 1237 Report','2024'},
 {'US Executive Order 13959','2025'},
-{'FCA (UK) Unregistered Cryptoasset Businesses List','2026'}
+{'FCA (UK) Unregistered Cryptoasset Businesses List','2026'},
+{'EC (CFSP) 2021/711 Myanmar/Burma List','2027'},
+{'EC 2021/706 Myanmar/Burma List','2028'}
 
 ],r);
 

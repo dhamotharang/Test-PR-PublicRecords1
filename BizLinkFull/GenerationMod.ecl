@@ -128,12 +128,14 @@ EXPORT GenerationMod := MODULE(SALT44.iGenerationMod)
     + '\n'
     + 'LINKPATH:L_CONTACT_ZIP:fname_preferred:lname:zip:?:mname:cnp_name(HASBASE):st:+:fname:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_name:city:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_CONTACT_ST:fname_preferred:lname:st:?:mname:cnp_name(HASBASE):+:fname:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_name:city:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CONTACT_ZIP)\n'
+    + 'LINKPATH:L_CONTACT:fname_preferred:lname:?:mname:cnp_name(HASBASE):zip:st:+:fname:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_name:city:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag:REQUIRED(L_CONTACT_ST)\n'
     + '\n'
     + 'LINKPATH:L_CONTACT_SSN:contact_ssn:+:contact_email:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:st:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_EMAIL:contact_email:+:company_sic_code1:cnp_name:cnp_number:cnp_btype:cnp_lowv:zip:prim_name:city:st:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_SIC:company_sic_code1:zip:?:cnp_name:prim_name:MAXBLOCKSIZE(2000)\n'
     + 'LINKPATH:L_SOURCE:source_record_id:source:?:cnp_name(HASBASE):prim_name:zip:city:st:+:company_sic_code1:cnp_number:cnp_btype:cnp_lowv:prim_range:sec_range:parent_proxid:sele_proxid:org_proxid:ultimate_proxid:sele_flag:org_flag:ult_flag\n'
     + 'LINKPATH:L_CONTACT_DID:contact_did\n'
+    + ' '
     ;
 
   // Structured values
@@ -150,6 +152,7 @@ EXPORT GenerationMod := MODULE(SALT44.iGenerationMod)
     ,{'L_URL','company_url','st','company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_CONTACT_ZIP','fname_preferred,lname,zip','mname,cnp_name(HASBASE),st','fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_CONTACT_ST','fname_preferred,lname,st','mname,cnp_name(HASBASE)','fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','L_CONTACT_ZIP',''}
+    ,{'L_CONTACT','fname_preferred,lname','mname,cnp_name(HASBASE),zip,st','fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','L_CONTACT_ST',''}
     ,{'L_CONTACT_SSN','contact_ssn','','contact_email,company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,st,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_EMAIL','contact_email','','company_sic_code1,cnp_name,cnp_number,cnp_btype,cnp_lowv,zip,prim_name,city,st,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag','',''}
     ,{'L_SIC','company_sic_code1,zip','cnp_name,prim_name','','',''}

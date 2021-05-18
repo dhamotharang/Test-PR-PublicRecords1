@@ -12,6 +12,7 @@
 
 	FinalFlatRec := record
 	  inDs.linkid;
+    inDs.source;
 	  unsigned6 sales;
 		integer permits_name;
 		integer method_name;

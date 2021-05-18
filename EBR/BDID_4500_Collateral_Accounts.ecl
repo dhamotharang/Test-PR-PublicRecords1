@@ -11,10 +11,13 @@ segment_code 		:= '4500';
 //////////////////////////////////////////////////////////////////////////////////////////////
 Layout_4500_Collateral_Accounts_Base Convert2Base(File_in l) := 
 transform
-	self.date_first_seen	:= '';
-	self.date_last_seen 	:= self.date_first_seen;
-	self 				:= 	l;
-	self				:=	[];
+	self.date_first_seen					:= '';
+	self.date_last_seen 					:= self.date_first_seen;
+	self.process_date_first_seen	:= 	(unsigned4)l.process_date;
+	self.process_date_last_seen		:= 	self.process_date_first_seen;
+	self.record_type							:= 	'C';
+	self 													:= 	l;
+	self													:=	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));

@@ -11,10 +11,13 @@ segment_code 		:= '6500';
 //////////////////////////////////////////////////////////////////////////////////////////////
 Layout_6500_Government_Trade_Base Convert2Base(File_in l) := 
 transform
-	self.date_first_seen		:= business_header.validatedate(l.date_reported);
-	self.date_last_seen 		:= self.date_first_seen;
-	self 					:= l;
-	self					:= [];
+	self.date_first_seen					:= 	business_header.validatedate(l.date_reported);
+	self.date_last_seen 					:= 	self.date_first_seen;
+	self.process_date_first_seen	:= 	(unsigned4)l.process_date;
+	self.process_date_last_seen 	:= 	self.process_date_first_seen;
+	self.record_type							:= 	'C';		
+	self 													:= 	l;
+	self													:= 	[];
 end;
 
 File_in2base := project(File_in, Convert2Base(left));

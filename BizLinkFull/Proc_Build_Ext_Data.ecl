@@ -19,6 +19,7 @@ function
   Buildext_data_l_phone         := tools.macf_writeindex('Mod_Ext_Data().KeyL_PHONE       		  ,knames.ext_data_l_phone          .new'	);
   Buildext_data_l_sic           := tools.macf_writeindex('Mod_Ext_Data().KeyL_SIC   						,knames.ext_data_l_sic       			.new'	);
   Buildext_data_l_fein          := tools.macf_writeindex('Mod_Ext_Data().KeyL_FEIN    					,knames.ext_data_l_fein        		.new'	);
+  Buildext_data_l_contact       := tools.macf_writeindex('Mod_Ext_Data().KeyL_CONTACT       		,knames.ext_data_l_contact        .new'	);
   Buildext_data_l_contact_zip   := tools.macf_writeindex('Mod_Ext_Data().KeyL_CONTACT_ZIP 		  ,knames.ext_data_l_contact_zip    .new'	);
   Buildext_data_l_contact_st    := tools.macf_writeindex('Mod_Ext_Data().KeyL_CONTACT_ST 				,knames.ext_data_l_contact_st     .new'	);
   Buildext_data_l_url           := tools.macf_writeindex('Mod_Ext_Data().KeyL_URL      					,knames.ext_data_l_url          	.new'	);
@@ -45,6 +46,7 @@ function
           ,Buildext_data_l_phone
           ,Buildext_data_l_sic
           ,Buildext_data_l_fein
+          ,Buildext_data_l_contact
           ,Buildext_data_l_contact_st
           ,Buildext_data_l_contact_zip
           ,Buildext_data_l_url

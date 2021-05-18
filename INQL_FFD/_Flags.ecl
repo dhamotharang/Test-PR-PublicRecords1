@@ -22,7 +22,10 @@ export _Flags(string pVersion = '', boolean isUpdate = true, boolean isFCRA = tr
 	versionsInWeeklyBase   					:= table(INQL_FFD.Files(false,isFCRA,pVersion).Base.qa,{version,count(group)},version,few,merge)
 																					(version in setVersionsInDailyBase);
 	export isDailyBaseToFlush     	:= count(versionsInDailyBase) = count(versionsInWeeklyBase) and LastFullKeyVersionApproved;
-	                                     	
+	
+	export existDeltaKey            := nothor(fileservices.GetSuperFileSubCount(inql_ffd.keynames(true).lexid.qa)) > 1; 
+
+	
 	export dt1yearago  := ut.date_math(pVersion,-365);
 	
 	export dt2yearsago := ut.date_math(pVersion,-730);

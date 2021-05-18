@@ -59,7 +59,7 @@ EXPORT RawInput_GenerationMod := MODULE(SALT311.iGenerationMod)
     + 'FIELDTYPE:Invalid_SSN:SPACES( ):ALLOW(0123456789):LENGTHS(0,9):WORDS(0,1)\n'
     + 'FIELDTYPE:Invalid_DL:CUSTOM(Scrubs_IDA.Functions.FN_valid_DL > 0)\n'
     + 'FIELDTYPE:Invalid_Phone:LIKE(Invalid_Num):LENGTHS(0,10)\n'
-    + 'FIELDTYPE:Invalid_Clientassigneduniquerecordid:ALLOW(abcdefghijklmnopqrstuvwxyz0123456789)\n'
+    + 'FIELDTYPE:Invalid_Clientassigneduniquerecordid:CUSTOM(Scrubs_IDA.Functions.fn_valid_clientId > 0):ONFAIL(REJECT)\n'
     + 'FIELDTYPE:Invalid_Emailaddress:CUSTOM(Scrubs.Functions.fn_valid_email > 0)\n'
     + 'FIELDTYPE:Invalid_Ipaddress:CUSTOM(Scrubs.Functions.fn_valid_IP > 0)\n'
     + '\n'

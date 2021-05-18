@@ -19,7 +19,7 @@ Mapped0 := SALT44.FromFlat(UniChange0,Process_Biz_Layouts.InputLayout,Mapping0);
 
 
 // Create the mappings and links for data in the main external file
-  CanSearch(Process_Biz_Layouts.InputLayout le) := IF (Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),1 << 1,0) + IF (Key_BizHead_L_CNPNAME_ST.CanSearch(le),1 << 2,0) + IF (Key_BizHead_L_CNPNAME.CanSearch(le),1 << 3,0) + IF (Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),1 << 4,0) + IF (Key_BizHead_L_ADDRESS1.CanSearch(le),1 << 5,0) + IF (Key_BizHead_L_ADDRESS2.CanSearch(le),1 << 6,0) + IF (Key_BizHead_L_ADDRESS3.CanSearch(le),1 << 7,0) + IF (Key_BizHead_L_PHONE.CanSearch(le),1 << 8,0) + IF (Key_BizHead_L_FEIN.CanSearch(le),1 << 9,0) + IF (Key_BizHead_L_URL.CanSearch(le),1 << 10,0) + IF (Key_BizHead_L_CONTACT_ZIP.CanSearch(le),1 << 11,0) + IF (Key_BizHead_L_CONTACT_ST.CanSearch(le),1 << 12,0) + IF (Key_BizHead_L_CONTACT_SSN.CanSearch(le),1 << 13,0) + IF (Key_BizHead_L_EMAIL.CanSearch(le),1 << 14,0) + IF (Key_BizHead_L_SIC.CanSearch(le),1 << 15,0) + IF (Key_BizHead_L_SOURCE.CanSearch(le),1 << 16,0) + IF (Key_BizHead_L_CONTACT_DID.CanSearch(le),1 << 17,0) > 0;
+  CanSearch(Process_Biz_Layouts.InputLayout le) := IF (Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),1 << 1,0) + IF (Key_BizHead_L_CNPNAME_ST.CanSearch(le),1 << 2,0) + IF (Key_BizHead_L_CNPNAME.CanSearch(le),1 << 3,0) + IF (Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),1 << 4,0) + IF (Key_BizHead_L_ADDRESS1.CanSearch(le),1 << 5,0) + IF (Key_BizHead_L_ADDRESS2.CanSearch(le),1 << 6,0) + IF (Key_BizHead_L_ADDRESS3.CanSearch(le),1 << 7,0) + IF (Key_BizHead_L_PHONE.CanSearch(le),1 << 8,0) + IF (Key_BizHead_L_FEIN.CanSearch(le),1 << 9,0) + IF (Key_BizHead_L_URL.CanSearch(le),1 << 10,0) + IF (Key_BizHead_L_CONTACT_ZIP.CanSearch(le),1 << 11,0) + IF (Key_BizHead_L_CONTACT_ST.CanSearch(le),1 << 12,0) + IF (Key_BizHead_L_CONTACT.CanSearch(le),1 << 13,0) + IF (Key_BizHead_L_CONTACT_SSN.CanSearch(le),1 << 14,0) + IF (Key_BizHead_L_EMAIL.CanSearch(le),1 << 15,0) + IF (Key_BizHead_L_SIC.CanSearch(le),1 << 16,0) + IF (Key_BizHead_L_SOURCE.CanSearch(le),1 << 17,0) + IF (Key_BizHead_L_CONTACT_DID.CanSearch(le),1 << 18,0) > 0;
   Process_Biz_Layouts.InputLayout tr(Process_Biz_Layouts.InputLayout le) := TRANSFORM,SKIP(~CanSearch(le))
     SELF := le;
   END;
@@ -4174,6 +4174,409 @@ EXPORT ScoredproxidFetchL_CONTACT_ST(TYPEOF(h.fname_preferred) param_fname_prefe
 
   RETURN result2;
 END;
+// Working with LINKPATH L_CONTACT;
+EXPORT KeyL_CONTACTName := BizLinkFull.Filename_keys.Ext_L_CONTACT; /*HACK07*/
+
+layout := RECORD // project out required fields
+// Compulsory fields
+
+  h.fname_preferred;
+
+
+  h.lname;
+
+
+// Optional fields
+
+  h.zip;
+
+  h.st;
+
+  h.fallback_value; // Populate the fallback field
+  h.ultid; // Parent #3
+  h.orgid; // Parent #2
+  h.seleid; // Parent #1
+
+  h.proxid; // The ID field
+  h.rcid; // For the case where an external linkage did not happen
+
+  h.mname;
+
+
+  h.cnp_name;
+
+// Extra credit fields
+
+  h.fname;
+
+  h.company_sic_code1;
+
+  h.cnp_number;
+
+  h.cnp_btype;
+
+  h.cnp_lowv;
+
+  h.prim_name;
+
+  h.city;
+
+  h.prim_range;
+
+  h.sec_range;
+
+  h.parent_proxid;
+
+  h.sele_proxid;
+
+  h.org_proxid;
+
+  h.ultimate_proxid;
+
+  h.sele_flag;
+
+  h.org_flag;
+
+  h.ult_flag;
+
+  h.powid; // Uncle #1
+
+  h.lname_len;
+
+  h.mname_len;
+
+  h.fname_len;
+
+  h.prim_name_len;
+
+  h.city_len;
+
+  h.prim_range_len;
+
+  h.sec_range_len;
+
+//Scores for various field components
+  h.fname_preferred_weight100 ; // Contains 100x the specificity
+  h.lname_weight100 ; // Contains 100x the specificity
+  h.lname_initial_char_weight100 ; // Contains 100x the specificity
+  h.lname_e2_Weight100;
+
+  h.mname_weight100 ; // Contains 100x the specificity
+  h.mname_initial_char_weight100 ; // Contains 100x the specificity
+  h.mname_e2_Weight100;
+
+  h.cnp_name_weight100 ; // Contains 100x the specificity
+  h.cnp_name_initial_char_weight100 ; // Contains 100x the specificity
+  h.zip_weight100 ; // Contains 100x the specificity
+  h.st_weight100 ; // Contains 100x the specificity
+  h.fname_weight100 ; // Contains 100x the specificity
+  h.fname_initial_char_weight100 ; // Contains 100x the specificity
+  h.fname_e1_Weight100;
+
+  h.company_sic_code1_weight100 ; // Contains 100x the specificity
+  h.cnp_number_weight100 ; // Contains 100x the specificity
+  h.cnp_btype_weight100 ; // Contains 100x the specificity
+  h.cnp_lowv_weight100 ; // Contains 100x the specificity
+  h.prim_name_weight100 ; // Contains 100x the specificity
+  h.prim_name_e1_Weight100;
+
+  h.city_weight100 ; // Contains 100x the specificity
+  INTEGER2 city_p_Weight100 := SALT44.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_p_cnt)/log(2)); // Precompute phonetic specificity
+  INTEGER2 city_e2_Weight100 := SALT44.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2_cnt)/log(2)); // Precompute edit-distance specificity
+  INTEGER2 city_e2p_Weight100 := SALT44.Min0(h.city_weight100 + 100*log(h.city_cnt/h.city_e2p_cnt)/log(2)); // Precompute phonetic & edit_distance specificity
+
+  h.prim_range_weight100 ; // Contains 100x the specificity
+  h.prim_range_e1_Weight100;
+
+  h.sec_range_weight100 ; // Contains 100x the specificity
+  h.sec_range_e1_Weight100;
+
+  h.parent_proxid_weight100 ; // Contains 100x the specificity
+  h.sele_proxid_weight100 ; // Contains 100x the specificity
+  h.org_proxid_weight100 ; // Contains 100x the specificity
+  h.ultimate_proxid_weight100 ; // Contains 100x the specificity
+  h.sele_flag_weight100 ; // Contains 100x the specificity
+  h.org_flag_weight100 ; // Contains 100x the specificity
+  h.ult_flag_weight100 ; // Contains 100x the specificity
+
+END;
+
+DataForKey0 := DEDUP(SORT(TABLE(h((fname_preferred NOT IN SET(s.nulls_fname_preferred,fname_preferred) AND fname_preferred <> (TYPEOF(fname_preferred))''),(lname NOT IN SET(s.nulls_lname,lname) AND lname <> (TYPEOF(lname))''),(cnp_name NOT IN SET(s.nulls_cnp_name,cnp_name) AND cnp_name <> (TYPEOF(cnp_name))'')),layout),fname_preferred,lname,zip,st,proxid,seleid,orgid,ultid,rcid,mname,cnp_name,fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,powid,lname_len,mname_len,fname_len,prim_name_len,city_len,prim_range_len,sec_range_len,fname_preferred_weight100,lname_weight100,lname_initial_char_weight100,lname_e2_Weight100,mname_weight100,mname_initial_char_weight100,mname_e2_Weight100,cnp_name_weight100,cnp_name_initial_char_weight100,zip_weight100,st_weight100,fname_weight100,fname_initial_char_weight100,fname_e1_Weight100,company_sic_code1_weight100,cnp_number_weight100,cnp_btype_weight100,cnp_lowv_weight100,prim_name_weight100,prim_name_e1_Weight100,city_weight100,city_p_Weight100,city_e2_Weight100,city_e2p_Weight100,prim_range_weight100,prim_range_e1_Weight100,sec_range_weight100,sec_range_e1_Weight100,parent_proxid_weight100,sele_proxid_weight100,org_proxid_weight100,ultimate_proxid_weight100,sele_flag_weight100,org_flag_weight100,ult_flag_weight100,-fallback_value,LOCAL),WHOLE RECORD,EXCEPT fallback_value,LOCAL);
+SHARED DataForKeyL_CONTACT := DataForKey0;
+EXPORT KeyL_CONTACT := INDEX(DataForKeyL_CONTACT,{DataForKeyL_CONTACT},{},KeyL_CONTACTName);
+
+KeyRec := RECORDOF(KeyL_CONTACT);
+EXPORT RawFetchL_CONTACT(TYPEOF(h.fname_preferred) param_fname_preferred = (TYPEOF(h.fname_preferred))'',TYPEOF(h.lname) param_lname = (TYPEOF(h.lname))'',TYPEOF(h.lname_len) param_lname_len = (TYPEOF(h.lname_len))'',TYPEOF(h.mname) param_mname = (TYPEOF(h.mname))'',TYPEOF(h.mname_len) param_mname_len = (TYPEOF(h.mname_len))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'') := 
+    STEPPED( LIMIT( KeyL_CONTACT(
+          KEYED((fname_preferred = param_fname_preferred))
+
+      AND KEYED((lname = param_lname))
+
+      AND KEYED((~EXISTS(param_zip) OR zip = (TYPEOF(zip))'') OR (zip IN SET(param_zip,zip)))
+      AND KEYED((param_st = (TYPEOF(st))'' OR st = (TYPEOF(st))'') OR (st = param_st))
+
+      AND ((param_mname = (TYPEOF(mname))'' OR mname = (TYPEOF(mname))'') OR (mname = param_mname) OR ((mname[1..LENGTH(TRIM(param_mname))] = param_mname OR param_mname[1..LENGTH(TRIM(mname))] = mname) OR (Config_BIP.WithinEditN(mname,mname_len,param_mname,param_mname_len,2, 0))))
+      AND ((param_cnp_name = (TYPEOF(cnp_name))'' OR cnp_name = (TYPEOF(cnp_name))'') OR (SALT44.MatchBagOfWords(cnp_name,param_cnp_name,3177747,1) > Config_BIP.cnp_name_Force * 100))
+
+      AND KEYED(fallback_value >= param_fallback_value)
+),Config_BIP.L_CONTACT_MAXBLOCKLIMIT,ONFAIL(TRANSFORM(KeyRec,SELF := ROW([],KeyRec))),KEYED),ultid,orgid,seleid,proxid);
+
+EXPORT ScoredproxidFetchL_CONTACT(TYPEOF(h.fname_preferred) param_fname_preferred = (TYPEOF(h.fname_preferred))'',TYPEOF(h.lname) param_lname = (TYPEOF(h.lname))'',TYPEOF(h.lname_len) param_lname_len = (TYPEOF(h.lname_len))'',TYPEOF(h.mname) param_mname = (TYPEOF(h.mname))'',TYPEOF(h.mname_len) param_mname_len = (TYPEOF(h.mname_len))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.fname) param_fname = (TYPEOF(h.fname))'',TYPEOF(h.fname_len) param_fname_len = (TYPEOF(h.fname_len))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
+  RawData := RawFetchL_CONTACT(param_fname_preferred,param_lname,param_lname_len,param_mname,param_mname_len,param_cnp_name,param_zip,param_st,param_fallback_value);
+  Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
+    SELF.keys_used := 1 << 13+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
+    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 13+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
+
+    SELF.fname_preferred_match_code := match_methods(File_BizHead).match_fname_preferred(le.fname_preferred,param_fname_preferred,TRUE);
+
+    SELF.fname_preferredWeight := (50+MAP (
+         SELF.fname_preferred_match_code = SALT44.MatchCode.ExactMatch =>le.fname_preferred_weight100,
+         -0.562*le.fname_preferred_weight100))/100;
+
+
+    SELF.lname_match_code := match_methods(File_BizHead).match_lname(le.lname,param_lname,le.lname_len,param_lname_len,TRUE);
+
+    SELF.lnameWeight := (50+MAP (
+         SELF.lname_match_code = SALT44.MatchCode.ExactMatch =>le.lname_weight100,
+         -0.651*le.lname_weight100))/100;
+
+
+    SELF.mname_match_code := MAP(
+         le.mname = (TYPEOF(le.mname))'' OR param_mname = (TYPEOF(param_mname))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_mname(le.mname,param_mname,le.mname_len,param_mname_len,FALSE));
+
+    SELF.mnameWeight := (50+MAP (
+         SELF.mname_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.mname_match_code = SALT44.MatchCode.ExactMatch =>le.mname_weight100,
+         SELF.mname_match_code = SALT44.MatchCode.InitialLMatch =>le.mname_weight100,
+         SELF.mname_match_code = SALT44.MatchCode.InitialRMatch=> SALT44.Fn_Interpolate_Initial(le.mname,param_mname,le.mname_weight100,le.mname_initial_char_weight100),
+         SELF.mname_match_code = SALT44.MatchCode.EditDistanceMatch =>le.mname_e2_weight100,
+
+         -0.723*le.mname_weight100))/100;
+
+
+    SELF.cnp_name_match_code := MAP(
+         le.cnp_name = (TYPEOF(le.cnp_name))'' OR param_cnp_name = (TYPEOF(param_cnp_name))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_cnp_name(le.cnp_name,param_cnp_name,FALSE));
+
+    SELF.cnp_nameWeight := (50+MAP (
+         SELF.cnp_name_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.cnp_name_match_code = SALT44.MatchCode.ExactMatch =>le.cnp_name_weight100,
+         SALT44.MatchBagOfWords(le.cnp_name,param_cnp_name,3177747,1)
+
+         ))/100;
+
+
+    SELF.zip_match_code := MAP(
+         le.zip = (TYPEOF(le.zip))'' OR ~EXISTS(param_zip) => SALT44.MatchCode.OneSideNull,
+
+         match_methods(File_BizHead).match_zip_el(le.zip,SET(param_zip,zip),FALSE));
+
+    SELF.zipWeight := (50+MAP (
+         SELF.zip_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.zip_match_code = SALT44.MatchCode.ExactMatch => /*HACK16*/ if(count(param_zip) > 1, (1100 * param_zip(zip=le.zip)[1].weight/100.0), (le.zip_weight100 * param_zip(zip=le.zip)[1].weight/100.0)),
+         -0.995*le.zip_weight100))/100;
+    SELF.zip_cases := DATASET([{le.zip,SELF.zipweight}],Process_Biz_Layouts.layout_zip_cases);
+
+
+    SELF.st_match_code := MAP(
+         le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_st(le.st,param_st,FALSE));
+
+    SELF.stWeight := (50+MAP (
+         SELF.st_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.st_match_code = SALT44.MatchCode.ExactMatch =>le.st_weight100,
+         -1.000*le.st_weight100))/100;
+
+
+    SELF.fname_match_code := MAP(
+         le.fname = (TYPEOF(le.fname))'' OR param_fname = (TYPEOF(param_fname))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_fname(le.fname,param_fname,le.fname_len,param_fname_len,FALSE));
+
+    SELF.fnameWeight := (50+MAP (
+         SELF.fname_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.fname_match_code = SALT44.MatchCode.ExactMatch =>le.fname_weight100,
+         SELF.fname_match_code = SALT44.MatchCode.InitialLMatch =>le.fname_weight100,
+         SELF.fname_match_code = SALT44.MatchCode.InitialRMatch=> SALT44.Fn_Interpolate_Initial(le.fname,param_fname,le.fname_weight100,le.fname_initial_char_weight100),
+         SELF.fname_match_code = SALT44.MatchCode.EditDistanceMatch =>le.fname_e1_weight100,
+
+         -0.578*le.fname_weight100))/100*0.20;
+
+
+    SELF.company_sic_code1_match_code := MAP(
+         le.company_sic_code1 = (TYPEOF(le.company_sic_code1))'' OR param_company_sic_code1 = (TYPEOF(param_company_sic_code1))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,FALSE));
+
+    SELF.company_sic_code1Weight := (50+MAP (
+         SELF.company_sic_code1_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.company_sic_code1_match_code = SALT44.MatchCode.ExactMatch =>le.company_sic_code1_weight100,
+         -0.727*le.company_sic_code1_weight100))/100;
+
+
+    SELF.cnp_number_match_code := MAP(
+         le.cnp_number = (TYPEOF(le.cnp_number))'' OR param_cnp_number = (TYPEOF(param_cnp_number))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_cnp_number(le.cnp_number,param_cnp_number,FALSE));
+
+    SELF.cnp_numberWeight := (50+MAP (
+         SELF.cnp_number_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.cnp_number_match_code = SALT44.MatchCode.ExactMatch =>le.cnp_number_weight100,
+         -0.996*le.cnp_number_weight100))/100;
+
+
+    SELF.cnp_btype_match_code := MAP(
+         le.cnp_btype = (TYPEOF(le.cnp_btype))'' OR param_cnp_btype = (TYPEOF(param_cnp_btype))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_cnp_btype(le.cnp_btype,param_cnp_btype,FALSE));
+
+    SELF.cnp_btypeWeight := (50+MAP (
+         SELF.cnp_btype_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.cnp_btype_match_code = SALT44.MatchCode.ExactMatch =>le.cnp_btype_weight100,
+         -0.958*le.cnp_btype_weight100))/100;
+
+
+    SELF.cnp_lowv_match_code := MAP(
+         le.cnp_lowv = (TYPEOF(le.cnp_lowv))'' OR param_cnp_lowv = (TYPEOF(param_cnp_lowv))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_cnp_lowv(le.cnp_lowv,param_cnp_lowv,FALSE));
+
+    SELF.cnp_lowvWeight := (50+MAP (
+         SELF.cnp_lowv_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.cnp_lowv_match_code = SALT44.MatchCode.ExactMatch =>le.cnp_lowv_weight100,
+         -0.962*le.cnp_lowv_weight100))/100;
+
+
+    SELF.prim_name_match_code := MAP(
+         le.prim_name = (TYPEOF(le.prim_name))'' OR param_prim_name = (TYPEOF(param_prim_name))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_prim_name(le.prim_name,param_prim_name,le.prim_name_len,param_prim_name_len,FALSE));
+
+    SELF.prim_nameWeight := (50+MAP (
+         SELF.prim_name_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.prim_name_match_code = SALT44.MatchCode.ExactMatch =>le.prim_name_weight100,
+         SELF.prim_name_match_code = SALT44.MatchCode.EditDistanceMatch =>le.prim_name_e1_weight100,
+
+         -1.000*le.prim_name_weight100))/100;
+
+
+    SELF.city_match_code := MAP(
+         le.city = (TYPEOF(le.city))'' OR param_city = (TYPEOF(param_city))'' => SALT44.MatchCode.OneSideNull,
+         le.st = (TYPEOF(le.st))'' OR param_st = (TYPEOF(param_st))'' OR le.st <> param_st => SALT44.MatchCode.ContextNoMatch, // Only valid if the context variable is equal
+
+         match_methods(File_BizHead).match_city(le.city,param_city,le.city_len,param_city_len,FALSE));
+
+
+    SELF.cityWeight := (50+MAP (
+         SELF.city_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.city_match_code = SALT44.MatchCode.ContextNoMatch => 0,
+         SELF.city_match_code = SALT44.MatchCode.ExactMatch =>le.city_weight100,
+         SELF.city_match_code = SALT44.MatchCode.EditDistanceMatch =>IF( metaphonelib.DMetaPhone1(le.city)=metaphonelib.DMetaPhone1(param_city),le.city_e2p_weight100,le.city_e2_weight100),
+         SELF.city_match_code = SALT44.MatchCode.PhoneticMatch =>le.city_p_weight100,
+
+         -0.947*le.city_weight100))/100;
+
+
+    SELF.prim_range_match_code := MAP(
+         le.prim_range = (TYPEOF(le.prim_range))'' OR param_prim_range = (TYPEOF(param_prim_range))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_prim_range(le.prim_range,param_prim_range,le.prim_range_len,param_prim_range_len,FALSE));
+
+    SELF.prim_rangeWeight := (50+MAP (
+         SELF.prim_range_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.prim_range_match_code = SALT44.MatchCode.ExactMatch =>le.prim_range_weight100,
+         SELF.prim_range_match_code = SALT44.MatchCode.EditDistanceMatch =>le.prim_range_e1_weight100,
+
+         -1.000*le.prim_range_weight100))/100;
+
+
+    SELF.sec_range_match_code := MAP(
+         le.sec_range = (TYPEOF(le.sec_range))'' OR param_sec_range = (TYPEOF(param_sec_range))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_sec_range(le.sec_range,param_sec_range,le.sec_range_len,param_sec_range_len,FALSE));
+
+    SELF.sec_rangeWeight := (50+MAP (
+         SELF.sec_range_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.sec_range_match_code = SALT44.MatchCode.ExactMatch =>le.sec_range_weight100,
+         SELF.sec_range_match_code = SALT44.MatchCode.EditDistanceMatch =>le.sec_range_e1_weight100,
+
+         -0.888*le.sec_range_weight100))/100;
+
+
+    SELF.parent_proxid_match_code := MAP(
+         le.parent_proxid = (TYPEOF(le.parent_proxid))'' OR param_parent_proxid = (TYPEOF(param_parent_proxid))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_parent_proxid(le.parent_proxid,param_parent_proxid,FALSE));
+
+    SELF.parent_proxidWeight := (50+MAP (
+         SELF.parent_proxid_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.parent_proxid_match_code = SALT44.MatchCode.ExactMatch =>le.parent_proxid_weight100,
+         -1.000*le.parent_proxid_weight100))/100*0.00;
+
+
+    SELF.sele_proxid_match_code := MAP(
+         le.sele_proxid = (TYPEOF(le.sele_proxid))'' OR param_sele_proxid = (TYPEOF(param_sele_proxid))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_sele_proxid(le.sele_proxid,param_sele_proxid,FALSE));
+
+    SELF.sele_proxidWeight := (50+MAP (
+         SELF.sele_proxid_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.sele_proxid_match_code = SALT44.MatchCode.ExactMatch =>le.sele_proxid_weight100,
+         -1.000*le.sele_proxid_weight100))/100*0.00;
+
+
+    SELF.org_proxid_match_code := MAP(
+         le.org_proxid = (TYPEOF(le.org_proxid))'' OR param_org_proxid = (TYPEOF(param_org_proxid))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_org_proxid(le.org_proxid,param_org_proxid,FALSE));
+
+    SELF.org_proxidWeight := (50+MAP (
+         SELF.org_proxid_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.org_proxid_match_code = SALT44.MatchCode.ExactMatch =>le.org_proxid_weight100,
+         -1.000*le.org_proxid_weight100))/100*0.00;
+
+
+    SELF.ultimate_proxid_match_code := MAP(
+         le.ultimate_proxid = (TYPEOF(le.ultimate_proxid))'' OR param_ultimate_proxid = (TYPEOF(param_ultimate_proxid))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_ultimate_proxid(le.ultimate_proxid,param_ultimate_proxid,FALSE));
+
+    SELF.ultimate_proxidWeight := (50+MAP (
+         SELF.ultimate_proxid_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.ultimate_proxid_match_code = SALT44.MatchCode.ExactMatch =>le.ultimate_proxid_weight100,
+         -1.000*le.ultimate_proxid_weight100))/100*0.00;
+
+
+    SELF.sele_flag_match_code := MAP(
+         le.sele_flag = (TYPEOF(le.sele_flag))'' OR param_sele_flag = (TYPEOF(param_sele_flag))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_sele_flag(le.sele_flag,param_sele_flag,FALSE));
+
+    SELF.sele_flagWeight := (50+MAP (
+         SELF.sele_flag_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.sele_flag_match_code = SALT44.MatchCode.ExactMatch =>le.sele_flag_weight100,
+         -1.000*le.sele_flag_weight100))/100*0.00;
+
+
+    SELF.org_flag_match_code := MAP(
+         le.org_flag = (TYPEOF(le.org_flag))'' OR param_org_flag = (TYPEOF(param_org_flag))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_org_flag(le.org_flag,param_org_flag,FALSE));
+
+    SELF.org_flagWeight := (50+MAP (
+         SELF.org_flag_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.org_flag_match_code = SALT44.MatchCode.ExactMatch =>le.org_flag_weight100,
+         -1.000*le.org_flag_weight100))/100*0.00;
+
+
+    SELF.ult_flag_match_code := MAP(
+         le.ult_flag = (TYPEOF(le.ult_flag))'' OR param_ult_flag = (TYPEOF(param_ult_flag))'' => SALT44.MatchCode.OneSideNull,
+         match_methods(File_BizHead).match_ult_flag(le.ult_flag,param_ult_flag,FALSE));
+
+    SELF.ult_flagWeight := (50+MAP (
+         SELF.ult_flag_match_code = SALT44.MatchCode.OneSideNull => 0,
+         SELF.ult_flag_match_code = SALT44.MatchCode.ExactMatch =>le.ult_flag_weight100,
+         -1.000*le.ult_flag_weight100))/100*0.00;
+
+    SELF.Weight := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0 AND le.rcid = 0, 1, MAX(0, SELF.fname_preferredWeight) + MAX(0, SELF.lnameWeight) + MAX(0, SELF.mnameWeight) + MAX(0, SELF.cnp_nameWeight) + MAX(0, SELF.zipWeight) + MAX(0, SELF.stWeight) + MAX(0, SELF.fnameWeight) + MAX(0, SELF.company_sic_code1Weight) + MAX(0, SELF.cnp_numberWeight) + MAX(0, SELF.cnp_btypeWeight) + MAX(0, SELF.cnp_lowvWeight) + MAX(0, SELF.prim_nameWeight) + MAX(0, SELF.cityWeight) + MAX(0, SELF.prim_rangeWeight) + MAX(0, SELF.sec_rangeWeight) + MAX(0, SELF.parent_proxidWeight) + MAX(0, SELF.sele_proxidWeight) + MAX(0, SELF.org_proxidWeight) + MAX(0, SELF.ultimate_proxidWeight) + MAX(0, SELF.sele_flagWeight) + MAX(0, SELF.org_flagWeight) + MAX(0, SELF.ult_flagWeight));
+
+    SELF := le;
+  END;
+  result0 := PROJECT(NOFOLD(RawData),Score(LEFT));
+
+  result1 := PROJECT(result0, Process_Biz_Layouts.update_forcefailed(LEFT,param_disableForce));
+
+  result2 := ROLLUP(result1,LEFT.proxid = RIGHT.proxid  AND ( LEFT.proxid<>0 OR LEFT.rcid = RIGHT.rcid ),Process_Biz_Layouts.combine_scores(LEFT,RIGHT,param_disableForce));
+
+  RETURN result2;
+END;
 // Working with LINKPATH L_CONTACT_SSN;
 EXPORT KeyL_CONTACT_SSNName := BizLinkFull.Filename_keys.Ext_L_CONTACT_SSN; /*HACK07*/
 
@@ -4290,8 +4693,8 @@ EXPORT RawFetchL_CONTACT_SSN(TYPEOF(h.contact_ssn) param_contact_ssn = (TYPEOF(h
 EXPORT ScoredproxidFetchL_CONTACT_SSN(TYPEOF(h.contact_ssn) param_contact_ssn = (TYPEOF(h.contact_ssn))'',TYPEOF(h.contact_email) param_contact_email = (TYPEOF(h.contact_email))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetchL_CONTACT_SSN(param_contact_ssn,param_fallback_value);
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 13+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
-    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 13+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 14+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
+    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 14+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
 
     SELF.contact_ssn_match_code := match_methods(File_BizHead).match_contact_ssn(le.contact_ssn,param_contact_ssn,TRUE);
 
@@ -4631,8 +5034,8 @@ EXPORT RawFetchL_EMAIL(TYPEOF(h.contact_email) param_contact_email = (TYPEOF(h.c
 EXPORT ScoredproxidFetchL_EMAIL(TYPEOF(h.contact_email) param_contact_email = (TYPEOF(h.contact_email))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetchL_EMAIL(param_contact_email,param_fallback_value);
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 14+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
-    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 14+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 15+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
+    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 15+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
 
     SELF.contact_email_match_code := match_methods(File_BizHead).match_contact_email(le.contact_email,param_contact_email,TRUE);
 
@@ -4910,8 +5313,8 @@ EXPORT RawFetchL_SIC(TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPE
 EXPORT ScoredproxidFetchL_SIC(TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetchL_SIC(param_company_sic_code1,param_zip,param_cnp_name,param_prim_name,param_prim_name_len,param_fallback_value);
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 15+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
-    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 15+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 16+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
+    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 16+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
 
     SELF.company_sic_code1_match_code := match_methods(File_BizHead).match_company_sic_code1(le.company_sic_code1,param_company_sic_code1,TRUE);
 
@@ -5094,8 +5497,8 @@ EXPORT RawFetchL_SOURCE(TYPEOF(h.source_record_id) param_source_record_id = (TYP
 EXPORT ScoredproxidFetchL_SOURCE(TYPEOF(h.source_record_id) param_source_record_id = (TYPEOF(h.source_record_id))'',TYPEOF(h.source) param_source = (TYPEOF(h.source))'',TYPEOF(h.cnp_name) param_cnp_name = (TYPEOF(h.cnp_name))'',TYPEOF(h.prim_name) param_prim_name = (TYPEOF(h.prim_name))'',TYPEOF(h.prim_name_len) param_prim_name_len = (TYPEOF(h.prim_name_len))'',DATASET(Process_Biz_Layouts.layout_zip_cases) param_zip,TYPEOF(h.city) param_city = (TYPEOF(h.city))'',TYPEOF(h.city_len) param_city_len = (TYPEOF(h.city_len))'',TYPEOF(h.st) param_st = (TYPEOF(h.st))'',TYPEOF(h.company_sic_code1) param_company_sic_code1 = (TYPEOF(h.company_sic_code1))'',TYPEOF(h.cnp_number) param_cnp_number = (TYPEOF(h.cnp_number))'',TYPEOF(h.cnp_btype) param_cnp_btype = (TYPEOF(h.cnp_btype))'',TYPEOF(h.cnp_lowv) param_cnp_lowv = (TYPEOF(h.cnp_lowv))'',TYPEOF(h.prim_range) param_prim_range = (TYPEOF(h.prim_range))'',TYPEOF(h.prim_range_len) param_prim_range_len = (TYPEOF(h.prim_range_len))'',TYPEOF(h.sec_range) param_sec_range = (TYPEOF(h.sec_range))'',TYPEOF(h.sec_range_len) param_sec_range_len = (TYPEOF(h.sec_range_len))'',TYPEOF(h.parent_proxid) param_parent_proxid = (TYPEOF(h.parent_proxid))'',TYPEOF(h.sele_proxid) param_sele_proxid = (TYPEOF(h.sele_proxid))'',TYPEOF(h.org_proxid) param_org_proxid = (TYPEOF(h.org_proxid))'',TYPEOF(h.ultimate_proxid) param_ultimate_proxid = (TYPEOF(h.ultimate_proxid))'',TYPEOF(h.sele_flag) param_sele_flag = (TYPEOF(h.sele_flag))'',TYPEOF(h.org_flag) param_org_flag = (TYPEOF(h.org_flag))'',TYPEOF(h.ult_flag) param_ult_flag = (TYPEOF(h.ult_flag))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetchL_SOURCE(param_source_record_id,param_source,param_cnp_name,param_prim_name,param_prim_name_len,param_zip,param_city,param_city_len,param_st,param_fallback_value);
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 16+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
-    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 16+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 17+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
+    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 17+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
 
     SELF.source_record_id_match_code := match_methods(File_BizHead).match_source_record_id(le.source_record_id,param_source_record_id,TRUE);
 
@@ -5357,8 +5760,8 @@ EXPORT RawFetchL_CONTACT_DID(TYPEOF(h.contact_did) param_contact_did = (TYPEOF(h
 EXPORT ScoredproxidFetchL_CONTACT_DID(TYPEOF(h.contact_did) param_contact_did = (TYPEOF(h.contact_did))'',TYPEOF(h.fallback_value) param_fallback_value = (TYPEOF(h.fallback_value))'',BOOLEAN param_disableForce = FALSE) := FUNCTION
   RawData := RawFetchL_CONTACT_DID(param_contact_did,param_fallback_value);
   Process_Biz_Layouts.LayoutScoredFetch Score(RawData le) := TRANSFORM
-    SELF.keys_used := 1 << 17+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
-    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 17+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
+    SELF.keys_used := 1 << 18+Config_BIP.KeysBitmapOffset; // Set bitmap for keys used
+    SELF.keys_failed := IF(le.proxid = 0 AND le.seleid = 0 AND le.orgid = 0 AND le.ultid = 0, 1 << 18+Config_BIP.KeysBitmapOffset, 0); // Set bitmap for key failed
 
     SELF.contact_did_match_code := match_methods(File_BizHead).match_contact_did(le.contact_did,param_contact_did,TRUE);
 
@@ -5379,7 +5782,7 @@ EXPORT ScoredproxidFetchL_CONTACT_DID(TYPEOF(h.contact_did) param_contact_did = 
   RETURN result2;
 END;
 
-EXPORT BuildAll := PARALLEL(BUILDINDEX(PayloadByproxid, OVERWRITE),BUILDINDEX(KeyL_CNPNAME_ZIP, OVERWRITE),BUILDINDEX(KeyL_CNPNAME_ST, OVERWRITE),BUILDINDEX(KeyL_CNPNAME, OVERWRITE),BUILDINDEX(KeyL_CNPNAME_FUZZY, OVERWRITE),BUILDINDEX(KeyL_ADDRESS1, OVERWRITE),BUILDINDEX(KeyL_ADDRESS2, OVERWRITE),BUILDINDEX(KeyL_ADDRESS3, OVERWRITE),BUILDINDEX(KeyL_PHONE, OVERWRITE),BUILDINDEX(KeyL_FEIN, OVERWRITE),BUILDINDEX(KeyL_URL, OVERWRITE),BUILDINDEX(KeyL_CONTACT_ZIP, OVERWRITE),BUILDINDEX(KeyL_CONTACT_ST, OVERWRITE),BUILDINDEX(KeyL_CONTACT_SSN, OVERWRITE),BUILDINDEX(KeyL_EMAIL, OVERWRITE),BUILDINDEX(KeyL_SIC, OVERWRITE),BUILDINDEX(KeyL_SOURCE, OVERWRITE),BUILDINDEX(KeyL_CONTACT_DID, OVERWRITE));
+EXPORT BuildAll := PARALLEL(BUILDINDEX(PayloadByproxid, OVERWRITE),BUILDINDEX(KeyL_CNPNAME_ZIP, OVERWRITE),BUILDINDEX(KeyL_CNPNAME_ST, OVERWRITE),BUILDINDEX(KeyL_CNPNAME, OVERWRITE),BUILDINDEX(KeyL_CNPNAME_FUZZY, OVERWRITE),BUILDINDEX(KeyL_ADDRESS1, OVERWRITE),BUILDINDEX(KeyL_ADDRESS2, OVERWRITE),BUILDINDEX(KeyL_ADDRESS3, OVERWRITE),BUILDINDEX(KeyL_PHONE, OVERWRITE),BUILDINDEX(KeyL_FEIN, OVERWRITE),BUILDINDEX(KeyL_URL, OVERWRITE),BUILDINDEX(KeyL_CONTACT_ZIP, OVERWRITE),BUILDINDEX(KeyL_CONTACT_ST, OVERWRITE),BUILDINDEX(KeyL_CONTACT, OVERWRITE),BUILDINDEX(KeyL_CONTACT_SSN, OVERWRITE),BUILDINDEX(KeyL_EMAIL, OVERWRITE),BUILDINDEX(KeyL_SIC, OVERWRITE),BUILDINDEX(KeyL_SOURCE, OVERWRITE),BUILDINDEX(KeyL_CONTACT_DID, OVERWRITE));
 //Having built all the data - we need to be able to fetch it all too!
 EXPORT FetchLayout := RECORD
   UNSIGNED4 UniqueID; // Will store UniqueID of QUERY
@@ -5442,7 +5845,7 @@ UNSIGNED1 mname_len := LENGTH(TRIM(le.mname));
 UNSIGNED1 lname_len := LENGTH(TRIM(le.lname));
 In_disableForce := le.disableForce;
 In_bGetAllScores := le.bGetAllScores;
-SELF.keys_tried := IF (Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),1 << 1,0) + IF (Key_BizHead_L_CNPNAME_ST.CanSearch(le),1 << 2,0) + IF (Key_BizHead_L_CNPNAME.CanSearch(le),1 << 3,0) + IF (Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),1 << 4,0) + IF (Key_BizHead_L_ADDRESS1.CanSearch(le),1 << 5,0) + IF (Key_BizHead_L_ADDRESS2.CanSearch(le),1 << 6,0) + IF (Key_BizHead_L_ADDRESS3.CanSearch(le),1 << 7,0) + IF (Key_BizHead_L_PHONE.CanSearch(le),1 << 8,0) + IF (Key_BizHead_L_FEIN.CanSearch(le),1 << 9,0) + IF (Key_BizHead_L_URL.CanSearch(le),1 << 10,0) + IF (Key_BizHead_L_CONTACT_ZIP.CanSearch(le),1 << 11,0) + IF (Key_BizHead_L_CONTACT_ST.CanSearch(le),1 << 12,0) + IF (Key_BizHead_L_CONTACT_SSN.CanSearch(le),1 << 13,0) + IF (Key_BizHead_L_EMAIL.CanSearch(le),1 << 14,0) + IF (Key_BizHead_L_SIC.CanSearch(le),1 << 15,0) + IF (Key_BizHead_L_SOURCE.CanSearch(le),1 << 16,0) + IF (Key_BizHead_L_CONTACT_DID.CanSearch(le),1 << 17,0) + IF (Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),1 << 1+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CNPNAME_ST.CanSearch(le),1 << 2+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CNPNAME.CanSearch(le),1 << 3+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),1 << 4+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_ADDRESS1.CanSearch(le),1 << 5+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_ADDRESS2.CanSearch(le),1 << 6+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_ADDRESS3.CanSearch(le),1 << 7+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_PHONE.CanSearch(le),1 << 8+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_FEIN.CanSearch(le),1 << 9+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_URL.CanSearch(le),1 << 10+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_ZIP.CanSearch(le),1 << 11+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_ST.CanSearch(le),1 << 12+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_SSN.CanSearch(le),1 << 13+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_EMAIL.CanSearch(le),1 << 14+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_SIC.CanSearch(le),1 << 15+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_SOURCE.CanSearch(le),1 << 16+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_DID.CanSearch(le),1 << 17+Config_BIP.KeysBitmapOffset,0);
+SELF.keys_tried := IF (Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),1 << 1,0) + IF (Key_BizHead_L_CNPNAME_ST.CanSearch(le),1 << 2,0) + IF (Key_BizHead_L_CNPNAME.CanSearch(le),1 << 3,0) + IF (Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),1 << 4,0) + IF (Key_BizHead_L_ADDRESS1.CanSearch(le),1 << 5,0) + IF (Key_BizHead_L_ADDRESS2.CanSearch(le),1 << 6,0) + IF (Key_BizHead_L_ADDRESS3.CanSearch(le),1 << 7,0) + IF (Key_BizHead_L_PHONE.CanSearch(le),1 << 8,0) + IF (Key_BizHead_L_FEIN.CanSearch(le),1 << 9,0) + IF (Key_BizHead_L_URL.CanSearch(le),1 << 10,0) + IF (Key_BizHead_L_CONTACT_ZIP.CanSearch(le),1 << 11,0) + IF (Key_BizHead_L_CONTACT_ST.CanSearch(le),1 << 12,0) + IF (Key_BizHead_L_CONTACT.CanSearch(le),1 << 13,0) + IF (Key_BizHead_L_CONTACT_SSN.CanSearch(le),1 << 14,0) + IF (Key_BizHead_L_EMAIL.CanSearch(le),1 << 15,0) + IF (Key_BizHead_L_SIC.CanSearch(le),1 << 16,0) + IF (Key_BizHead_L_SOURCE.CanSearch(le),1 << 17,0) + IF (Key_BizHead_L_CONTACT_DID.CanSearch(le),1 << 18,0) + IF (Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),1 << 1+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CNPNAME_ST.CanSearch(le),1 << 2+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CNPNAME.CanSearch(le),1 << 3+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CNPNAME_FUZZY.CanSearch(le),1 << 4+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_ADDRESS1.CanSearch(le),1 << 5+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_ADDRESS2.CanSearch(le),1 << 6+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_ADDRESS3.CanSearch(le),1 << 7+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_PHONE.CanSearch(le),1 << 8+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_FEIN.CanSearch(le),1 << 9+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_URL.CanSearch(le),1 << 10+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_ZIP.CanSearch(le),1 << 11+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_ST.CanSearch(le),1 << 12+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT.CanSearch(le),1 << 13+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_SSN.CanSearch(le),1 << 14+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_EMAIL.CanSearch(le),1 << 15+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_SIC.CanSearch(le),1 << 16+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_SOURCE.CanSearch(le),1 << 17+Config_BIP.KeysBitmapOffset,0) + IF (Key_BizHead_L_CONTACT_DID.CanSearch(le),1 << 18+Config_BIP.KeysBitmapOffset,0);
 fetchResults0 := ROLLUP(
   MERGE(
 
@@ -5458,6 +5861,7 @@ SORTED(IF(BizLinkFull.Key_BizHead_L_CNPNAME_ZIP.CanSearch(le),ScoredproxidFetchL
 ,SORTED(IF(BizLinkFull.Key_BizHead_L_URL.CanSearch(le),ScoredproxidFetchL_URL(param_company_url := company_url_spec,param_st := le.st,param_company_sic_code1 := le.company_sic_code1,param_cnp_name := cnp_name_spec,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_zip := le.zip_cases,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
 ,SORTED(IF(BizLinkFull.Key_BizHead_L_CONTACT_ZIP.CanSearch(le),ScoredproxidFetchL_CONTACT_ZIP(param_fname_preferred := le.fname_preferred,param_lname := le.lname,param_lname_len := lname_len,param_zip := le.zip_cases,param_mname := le.mname,param_mname_len := mname_len,param_cnp_name := cnp_name_spec,param_st := le.st,param_fname := le.fname,param_fname_len := fname_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
 ,SORTED(IF((~BizLinkFull.Key_BizHead_L_CONTACT_ZIP.CanSearch(le)),IF(BizLinkFull.Key_BizHead_L_CONTACT_ST.CanSearch(le),ScoredproxidFetchL_CONTACT_ST(param_fname_preferred := le.fname_preferred,param_lname := le.lname,param_lname_len := lname_len,param_st := le.st,param_mname := le.mname,param_mname_len := mname_len,param_cnp_name := cnp_name_spec,param_fname := le.fname,param_fname_len := fname_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce))),ultid,orgid,seleid,proxid,rcid)
+,SORTED(IF((~BizLinkFull.Key_BizHead_L_CONTACT_ST.CanSearch(le) AND ~BizLinkFull.Key_BizHead_L_CONTACT_ZIP.CanSearch(le)),IF(BizLinkFull.Key_BizHead_L_CONTACT.CanSearch(le),ScoredproxidFetchL_CONTACT(param_fname_preferred := le.fname_preferred,param_lname := le.lname,param_lname_len := lname_len,param_mname := le.mname,param_mname_len := mname_len,param_cnp_name := cnp_name_spec,param_zip := le.zip_cases,param_st := le.st,param_fname := le.fname,param_fname_len := fname_len,param_company_sic_code1 := le.company_sic_code1,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce))),ultid,orgid,seleid,proxid,rcid)
 ,SORTED(IF(BizLinkFull.Key_BizHead_L_CONTACT_SSN.CanSearch(le),ScoredproxidFetchL_CONTACT_SSN(param_contact_ssn := le.contact_ssn,param_contact_email := le.contact_email,param_company_sic_code1 := le.company_sic_code1,param_cnp_name := cnp_name_spec,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_zip := le.zip_cases,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_st := le.st,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
 ,SORTED(IF(BizLinkFull.Key_BizHead_L_EMAIL.CanSearch(le),ScoredproxidFetchL_EMAIL(param_contact_email := le.contact_email,param_company_sic_code1 := le.company_sic_code1,param_cnp_name := cnp_name_spec,param_cnp_number := le.cnp_number,param_cnp_btype := le.cnp_btype,param_cnp_lowv := le.cnp_lowv,param_zip := le.zip_cases,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_city := le.city,param_city_len := city_len,param_st := le.st,param_prim_range := le.prim_range,param_prim_range_len := prim_range_len,param_sec_range := le.sec_range,param_sec_range_len := sec_range_len,param_parent_proxid := le.parent_proxid,param_sele_proxid := le.sele_proxid,param_org_proxid := le.org_proxid,param_ultimate_proxid := le.ultimate_proxid,param_sele_flag := le.sele_flag,param_org_flag := le.org_flag,param_ult_flag := le.ult_flag,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)
 ,SORTED(IF(BizLinkFull.Key_BizHead_L_SIC.CanSearch(le),ScoredproxidFetchL_SIC(param_company_sic_code1 := le.company_sic_code1,param_zip := le.zip_cases,param_cnp_name := cnp_name_spec,param_prim_name := le.prim_name,param_prim_name_len := prim_name_len,param_fallback_value := le.fallback_value,param_disableForce := In_disableForce)),ultid,orgid,seleid,proxid,rcid)

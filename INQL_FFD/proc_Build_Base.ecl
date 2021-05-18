@@ -1,7 +1,7 @@
 ﻿//Defines full build process
 import _control, versioncontrol, inql_ffd;
 
-export Build_Base(
+export proc_Build_Base(
 											boolean isUpdate = true
 									, 	boolean isFCRA = true
 									, 	string pVersion = ''				
@@ -9,23 +9,30 @@ export Build_Base(
 
 module
    
-	export build_base		:= Update_Base(isUpdate, isFCRA, pversion);
-
+	export daily_base		:= Inql_FFD.Update_Base(isUpdate, isFCRA, pversion).daily_base; 
+  
 	VersionControl.macBuildNewLogicalFile( 
-																				 Filenames(isUpdate, isFCRA, pversion).base.new	
-																				,build_base
+																				 Inql_FFD.Filenames(isUpdate, isFCRA, pversion).base.new	
+																				,daily_base
 																				,Build_Base_File
 																			 );
-																																
+	
+	export base_encrypted		:= Inql_FFD.Update_Base(isUpdate, isFCRA, pversion).daily_base_encrypted;
+  VersionControl.macBuildNewLogicalFile( 
+																				 Inql_FFD.Filenames(isUpdate, isFCRA, pversion, true).base.new	
+																				,base_encrypted
+																				,Build_Base_File_Encrypted
+																			 );																															
 
 	export full_build :=
 												sequential(
 																	 move_files(isUpdate, isFCRA, pVersion).Current_To_In_Building
 																	,Build_Base_File
-																	,Promote(isUpdate, isFCRA, pversion).buildfiles.New2Built
-																	,Promote(isUpdate, isFCRA, pversion).buildfiles.Built2qa
+																	,Build_Base_File_Encrypted
+																	// ,Promote(isUpdate, isFCRA, pversion).buildfiles.New2Built
+																	// ,Promote(isUpdate, isFCRA, pversion).buildfiles.Built2qa
 																//	,move_files(isUpdate, isFCRA, pVersion).In_Building_to_Built
-																	,fn_Consolidate_Input_Files(isUpdate, isFCRA, pVersion)
+																	// ,fn_Consolidate_Input_Files(isUpdate, isFCRA, pVersion)
 																	);
 
 	export All :=

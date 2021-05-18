@@ -1,24 +1,20 @@
-IMPORT LiensV2;
+﻿IMPORT LiensV2;
 
 EXPORT fnMainDeletes(DATASET(LiensV2.Layout_liens_main_module_for_hogan.layout_liens_main) dMain, DATASET(liensv2.Layout_liens_party_SSN_for_hogan_BIPV2_with_LinkFlags) dParty) := FUNCTION
-		main_tbl := table(distribute(dMain, hash(tmsid)) ,{tmsid, rmsid, orig_rmsid}, tmsid, rmsid, orig_rmsid, local);														
-		party_tbl:= table(distribute(dParty, hash(tmsid)) ,{tmsid, rmsid, orig_rmsid}, tmsid, rmsid, orig_rmsid, local);	
-		fdeletes := DEDUP(SORT(liensV2.mapping_hogan(ADDDELFLAG = 'D'),orig_rmsid),orig_rmsid);
+		main_tbl := table(dMain  ,{tmsid, rmsid, orig_rmsid}, tmsid, rmsid, orig_rmsid,few);		//DF-29287 distribute not needed												
+		party_tbl:= table(dParty ,{tmsid, rmsid, orig_rmsid}, tmsid, rmsid, orig_rmsid,few);	  //DF-29287 distribute not needed
+		fdeletes := table(liensV2.mapping_hogan(ADDDELFLAG IN ['D','C']),{orig_rmsid},orig_rmsid,few); //VC DF-29287 Updates need to be processed as Del+add
 
-		main_del := join(distribute(main_tbl(orig_rmsid <> ''), hash(orig_rmsid)),
-															distribute(fdeletes, hash(orig_rmsid)),
+		main_del := join(main_tbl(orig_rmsid <> ''),fdeletes, //DF-29287 distribute not needed
 															left.orig_rmsid = right.orig_rmsid,
 															transform({recordof(main_tbl), string10 orig_rmsid_main_del}, self.orig_rmsid_main_del := right.orig_rmsid, self := left),
-															local,
 															left outer,
 															lookup);
 
 
-		party_del := join(distribute(party_tbl(orig_rmsid <> ''), hash(orig_rmsid)),
-															distribute(fdeletes, hash(orig_rmsid)),
+		party_del := join(party_tbl(orig_rmsid <> ''),fdeletes,//DF-29287 distribute not needed
 															left.orig_rmsid = right.orig_rmsid,
 															transform({recordof(party_tbl), string10 orig_rmsid_party_del}, self.orig_rmsid_party_del := right.orig_rmsid, self := left),
-															local,
 															left outer,
 															lookup);
 									
