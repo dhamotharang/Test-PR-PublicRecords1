@@ -9,7 +9,7 @@ EXPORT FnRoxie_GetHighRiskAddress (DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	GoodInputOnly := InputData(NOT P_InpClnAddrPrimRng = '' AND NOT P_InpClnAddrPrimName = '' AND NOT P_InpClnAddrZip5 = '');
 	BadInputOnly := InputData(P_InpClnAddrPrimRng = '' OR P_InpClnAddrPrimName = '' OR P_InpClnAddrZip5 = '');																		
 
-	HighRiskAddressAttributesLayout := PublicRecords_KEL.KEL_Queries_MAS_Shared.L_Compile.Address_High_Risk_Res0_Internal_Layout;
+	HighRiskAddressAttributesLayout := PublicRecords_KEL.KEL_Queries_MAS_Shared.L_Compile.Address_High_Risk_Dynamic_Res0_Layout;
 			
 	RawResults := NOCOMBINE(JOIN(GoodInputOnly, FDCDataset,
 		LEFT.G_ProcUID = RIGHT.G_ProcUID,
