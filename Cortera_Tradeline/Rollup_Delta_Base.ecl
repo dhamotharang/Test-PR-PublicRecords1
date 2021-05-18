@@ -8,7 +8,11 @@ export Rollup_Delta_Base(
 function
 
 	//*** The below project transform is to set the none-blank dt_effective_last delta records "status" value to "D".
-	pDataset_proj := project(pDataset, transform(Cortera_Tradeline.Layout_Tradeline_Base, self.status := if(left.status = '' and left.dt_effective_last <> 0, 'D', left.status), self := left));
+	pDataset_proj := project(pDataset, transform(Cortera_Tradeline.Layout_Tradeline_Base, 
+																							 self.status := if(left.status in ['','R'] and left.dt_effective_last <> 0, 'D', left.status),
+																							 self.delta_ind := 0,   //*** Initializing to zero for full build
+																							 self := left)
+													);
 	pDataset_Dist := distribute(pDataset_proj, hash(link_id, account_key));
 	pDataset_sort := sort(pDataset_Dist, record, except 
 												 status
@@ -45,8 +49,7 @@ function
 		SELF.dt_effective_last				:= ut.EarliestDate(l.dt_effective_last	,r.dt_effective_last	);
 		SELF.status										:= if(l.status <> '', l.status, r.status);
 		SELF.deletion_date						:= if(l.deletion_date <> 0, l.deletion_date, r.deletion_date);
-		SELF.delta_ind								:= 0;  //*** Setting to zero for full build
-		self 													:= l;
+		SELF 													:= l;
 	end;
 
 	pDataset_rollup := rollup( pDataset_sort
