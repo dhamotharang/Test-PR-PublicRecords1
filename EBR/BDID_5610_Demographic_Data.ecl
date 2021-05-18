@@ -1,7 +1,8 @@
 ﻿import ut, Business_Header, Business_Header_SS, did_add,lib_stringlib,idl_header;
 
-dFlippedNames 	:= EBR.BDID_5610_Demo_Input_Norm;
-segment_code 		:= '5610';
+dFlippedNames 	:= 	EBR.BDID_5610_Demo_Input_Norm;
+segment_code 		:= 	'5610';
+dBase						:=	EBR.File_5610_Demographic_Data_Base;
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 // -- Clear bdid field on base file
@@ -34,12 +35,17 @@ transform
 	self 									:= l;
 end;
 
-File_Base_blank_bdid := project(dFlippedNames, BlankBDIDBase(left));
+File_Base_blank_bdid := project(dBase, BlankBDIDBase(left));
+
+File_Combined	:=	if(EBR.EBR_Init_Flag(segment_code) = false,
+											dFlippedNames + File_Base_blank_bdid,
+											dFlippedNames
+										 );
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // -- Set Record Type flag
 //////////////////////////////////////////////////////////////////////////////////////////
-File_Combined_Grpd_Sort	:= SORT(File_Base_blank_bdid, FILE_NUMBER, officer_last_name, officer_first_name, -process_date_last_seen, local);
+File_Combined_Grpd_Sort	:= SORT(File_Combined, FILE_NUMBER, officer_last_name, officer_first_name, -process_date_last_seen, local);
 File_Combined_Grpd 			:= GROUP(File_Combined_Grpd_Sort,	FILE_NUMBER, officer_last_name, officer_first_name, local);
 
 EBR.Layout_5610_demographic_data_Base SetRecordType(EBR.Layout_5610_demographic_data_Base l, EBR.Layout_5610_demographic_data_Base r) := 
