@@ -229,7 +229,7 @@ outputwork :=
 											ExcessiveInvalidRecordsFound => ReportExcessiveInvalidRecords,
 											MoveToPass )
 									 ,output('Next File: ' + ip + ' ' + FileDir2)	
-									 //,count(nothor(FileServices.RemoteDirectory(ip, FileDir2,'*.dat',true))(regexfind(LzFilePath,name,nocase)))>0,_Control.fSubmitNewWorkunit(Run_ECL,ThorName)
+									 ,count(nothor(FileServices.RemoteDirectory(ip, FileDir2,'*.dat',true))(regexfind(LzFilePath,name,nocase)))>0,_Control.fSubmitNewWorkunit(Run_ECL,ThorName)
 							)
 					)
 					,Send_Email(st:=UpSt,fn:=fname,ut:=UpType,ce:=Customer_Email).FileErrorAlert
