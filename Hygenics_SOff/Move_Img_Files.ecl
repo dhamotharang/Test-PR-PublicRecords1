@@ -50,7 +50,7 @@ return sequential(
 						Hygenics_Soff.Move_Soff_Image_Files('ut', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('va', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('vt', filedate),
-						Hygehynics_Soff.Move_Soff_Image_Files('wa', filedate),
+						Hygenics_Soff.Move_Soff_Image_Files('wa', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('wi', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('wv', filedate),
 						Hygenics_Soff.Move_Soff_Image_Files('wy', filedate),
