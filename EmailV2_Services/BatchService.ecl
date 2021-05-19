@@ -5,10 +5,9 @@
 // Look at the history of this attribute for the old SOAP info.
 // =====================================================================
 
-
 EXPORT BatchService(useCannedRecs = 'false') := MACRO
 
-IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty, WSInput;
+  IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty, WSInput;
 
   #CONSTANT('SearchLibraryVersion', AutoheaderV2.Constants.LibVersion.SALT);
 
@@ -22,8 +21,9 @@ IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty, WSInput;
 
   isValidSearchType := EmailV2_Services.Constants.SearchType.isValidSearchType(batch_params.SearchType);
   isAllowedValidation := EmailV2_Services.Constants.isAllowedValidation(SearchTier, EmailValidationType);
+  isEmailageRestricted := EmailV2_Services.Constants.isEmailageValidation(EmailValidationType) AND batch_params.isDirectMarketing();
 
-  IF(~isValidSearchType OR (batch_params.CheckEmailDeliverable AND ~isAllowedValidation), FAIL(303, doxie.ErrorCodes(303)));
+  IF(isEmailageRestricted OR ~isValidSearchType OR (batch_params.CheckEmailDeliverable AND ~isAllowedValidation), FAIL(303, doxie.ErrorCodes(303)));
 
   BatchShare.MAC_SequenceInput(ds_xml_in, ds_batch_in);
 
@@ -32,6 +32,7 @@ IMPORT AutoheaderV2, BatchShare, Doxie, EmailV2_Services, Royalty, WSInput;
   BatchShare.MAC_RestoreAcctno(ds_batch_in,batch_recs.Records, ds_output,,false);
   Royalty.MAC_RestoreAcctno(ds_batch_in, batch_recs.Royalties, royalties);
 
-  OUTPUT( ds_output, NAMED('Results'));
-  OUTPUT( royalties, NAMED('RoyaltySet'));
+  OUTPUT(ds_output, NAMED('Results'));
+  OUTPUT(royalties, NAMED('RoyaltySet'));
+
 ENDMACRO;
