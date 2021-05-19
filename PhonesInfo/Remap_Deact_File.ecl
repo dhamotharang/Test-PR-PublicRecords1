@@ -111,7 +111,8 @@
 //////////////////////////////////////////////////////////////
 
 	fixFields_d := distribute(notSA, hash(phone));
-	fixFields_s := sort(fixFields_d, phone, -(integer)changeid, carrier_name, -if(action_code in [PhonesInfo.TransactionCode.Deact, PhonesInfo.TransactionCode.Suspend], 1, 2), local);
+	fixFields_s := sort(fixFields_d, phone, -(integer)timestamp, carrier_name, -if(action_code in [PhonesInfo.TransactionCode.Deact], 1, 
+																																														if(action_code in [PhonesInfo.TransactionCode.Suspend, PhonesInfo.TransactionCode.SwapDelete], 2, 3)), local);
 	fixFields_g := group(fixFields_s, phone);
 	  
 	PhonesInfo.Layout_Deact.Temp2 iter1(fixFields_g l, fixFields_g r) := transform
