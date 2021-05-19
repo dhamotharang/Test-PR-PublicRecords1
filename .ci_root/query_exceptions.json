@@ -2,7 +2,6 @@
 	"nofastsyntax": [
 		"BRM_Marketing_attributes.BRM_Marketing_Attr_Batch_Services", 
 		"business_risk_bip.lib_b2b_attributes", 
-		"Doxie.Comprehensive_Report_Service", 
 		"publicrecords_kel.library.lib_businessattributes", 
 		"PublicRecords_KEL.MAS_Business_nonFCRA_Service", 
 		"PublicRecords_KEL.MAS_FCRA_Service", 
