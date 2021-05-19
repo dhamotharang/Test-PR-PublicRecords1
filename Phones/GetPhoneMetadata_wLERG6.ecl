@@ -1,4 +1,4 @@
-IMPORT Phones, STD, UT, dx_PhonesInfo;
+﻿IMPORT Phones, STD, UT, dx_PhonesInfo;
 
 EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) dBatchPhonesIn,
   Phones.IParam.BatchParams in_mod) := FUNCTION
@@ -108,7 +108,7 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
                   LEFT OUTER, LIMIT(100, SKIP));
   //prioritize PORTED
   dPortedPhonesSorted := SORT(dPortedPhonesFinal, phone, -vendor_last_reported_dt,
-                vendor_first_reported_dt, -dt_last_reported, dt_first_reported, source NOT IN Phones.Constants.Sources.set_ICONECTIV_SRC,
+                vendor_first_reported_dt, -dt_last_reported, dt_first_reported, source <> Phones.Constants.Sources.ICONECTIV_SRC,
                 record);
 
 
@@ -122,7 +122,7 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
     // * Swap Phone Number event_date = swap_start_dt
     // * Suspended Number event_date = deact_start_dt
     // * Reactivated Number event_date = react_start_dt
-    boolean ported_phone := R.source IN Phones.Constants.Sources.set_ICONECTIV_SRC;
+    boolean ported_phone := R.source = Phones.Constants.Sources.ICONECTIV_SRC;
 
 
     //identifies both historic and current disconnect records
@@ -162,7 +162,6 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
                     Phones.Constants.Sources.ATT_LIDB_SRC => R.vendor_last_reported_dt,
                     Phones.Constants.Sources.LERG6 => R.vendor_last_reported_dt,
                     Phones.Constants.Sources.ICONECTIV_SRC => R.port_start_dt, //probably should include port_end_dt
-                    Phones.Constants.Sources.ICONNECTIVE_PORT_VALIDATE_SRC => R.port_start_dt,
                     Phones.Constants.Sources.GONG_DISCONNECT_SRC => MAX(R.deact_start_dt,R.deact_end_dt,R.react_start_dt,R.react_end_dt),
                     0);
     SELF.phone_serv_type := if(ported_phone or VERFICATION, R.serv, ''); // PG are not always shown as landlines even though they came from gong ???
@@ -301,7 +300,7 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
                                 Phones.Constants.PhoneStatus.NotAvailable);
 
       // find the most recent Port/PB/L6 record to fill the carrier information for OT records
-      portRecords := SORT(allRows(source IN Phones.Constants.Sources.set_VERIFICATION OR source IN Phones.Constants.Sources.set_ICONECTIV_SRC),-event_date);
+      portRecords := SORT(allRows(source IN Phones.Constants.Sources.set_VERIFICATION OR source = phones.Constants.Sources.ICONECTIV_SRC ),-event_date);
       SELF.phone := L.phone;
       //Carrier information from this rollup (from most recent port for a phone) is used to populate carrier information for OTP
       //in the final join
@@ -364,5 +363,6 @@ EXPORT GetPhoneMetadata_wLERG6(DATASET(Phones.Layouts.PhoneAttributes.BatchIn) d
                 OUTPUT(dPortedPhonesSorted,NAMED('dPortedPhonesSorted'), EXTEND);
                 OUTPUT(filteredLerg6Phones,NAMED('filteredLerg6Phones'), EXTEND);
   #END
+
 RETURN dPhonesMetadata_w_status;
 END;

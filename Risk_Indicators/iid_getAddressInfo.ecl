@@ -445,7 +445,8 @@ utiliRecsByAddr_thor := if (isFCRA, PhoneRecsByAddr_rolled,
 				   utiliByAddr(left,right),left outer, 
 				   ATMOST(
 					   (left.prim_name=right.prim_name) and (left.st=right.st) and 
-					  (left.z5=right.zip) and keyed(left.prim_range=right.prim_range) and 
+					  // (left.z5=right.zip) and keyed(left.prim_range=right.prim_range) and
+            (left.z5=right.zip) and (left.prim_range=right.prim_range) and
 					  (left.sec_range=right.sec_range), 100), LOCAL),seq),seq));
 						
 #IF(onThor)

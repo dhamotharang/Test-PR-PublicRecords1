@@ -1,5 +1,5 @@
-//Risk_Indicators.iid_check_best
-import header, watchdog, risk_indicators, ut;
+﻿//Risk_Indicators.iid_check_best
+import header, watchdog, risk_indicators, ut, _control;
 
 export iid_check_best(grouped dataset(iid_constants.layout_outx) all_header, 
 											grouped dataset(risk_indicators.Layout_Output) rolled_header,
@@ -62,7 +62,18 @@ risk_indicators.layout_output checkBest (risk_indicators.layout_output le, w ri)
 	SELF := le;
 END;
 
-with_best_addr_original := JOIN(rolled_header, w, LEFT.did=RIGHT.did, checkBest(LEFT,RIGHT), LEFT OUTER, LOOKUP);
+
+#IF(_control.Environment.onThor)
+	with_best_addr1 := JOIN(
+												distribute(rolled_header, did), 
+												distribute(w, did), 
+												LEFT.did=RIGHT.did, checkBest(LEFT,RIGHT), LEFT OUTER, local);
+	with_best_addr_original := group(with_best_addr1, seq, did);
+#ELSE
+	with_best_addr_original := JOIN(rolled_header, w, LEFT.did=RIGHT.did, checkBest(LEFT,RIGHT), LEFT OUTER, LOOKUP);
+#END
+
+
 
 
 risk_indicators.layout_output checkBest_50 (risk_indicators.layout_output le) := TRANSFORM

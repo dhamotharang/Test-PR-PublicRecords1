@@ -1,4 +1,4 @@
-import doxie, fcra, Prof_License_Mari, riskwise;
+import data_services, doxie, fcra, dx_prof_license_mari, riskwise;
 
 EXPORT _Prof_License_Mari_data(	dataset (doxie.layout_references) dids, 
 																dataset (fcra.Layout_override_flag) flag_file
@@ -8,7 +8,7 @@ EXPORT _Prof_License_Mari_data(	dataset (doxie.layout_references) dids,
   main_rids  := SET (flag_file (file_id = FCRA.FILE_ID.MARI), record_id);
 
   // MAIN data
-  key_main := Prof_License_Mari.key_did(true);
+  key_main := dx_prof_license_mari.key_did(data_services.data_env.iFCRA);
   rec_main := recordof (key_main);
   
   raw_data := join (dids, key_main,

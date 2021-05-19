@@ -25,6 +25,7 @@
 */
 EXPORT MAC_FlagSuppressedSource (ds_in, mod_access, did_field = 'did', gsid_field = 'global_sid', use_distributed = FALSE, data_env = data_services.data_env.iNonFCRA) := FUNCTIONMACRO
 
+	IMPORT _Control;
   LOCAL rec_suppressed := RECORD
     BOOLEAN is_suppressed := false;
   END;
@@ -58,7 +59,11 @@ EXPORT MAC_FlagSuppressedSource (ds_in, mod_access, did_field = 'did', gsid_fiel
     ), LEFT OUTER, KEEP(1), LIMIT(0));
   #END
 
+#IF(_CONTROL.Environment.onThor_LeadIntegrity)
+	RETURN PROJECT(ds_in, TRANSFORM(l_out, SELF := LEFT;));
+#ELSE
   RETURN IF (mod_access.lexid_source_optout > 0, suppressed_recs, 
     PROJECT(ds_in, TRANSFORM(l_out, SELF := LEFT;)));
+#END
 
 ENDMACRO;

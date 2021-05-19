@@ -1,4 +1,4 @@
-﻿import data_services,prof_license_mari, ut;
+﻿import data_services,dx_Prof_License_Mari, ut;
 
 EXPORT Key_Override_Proflic_Mari_ffid := module
 
@@ -19,7 +19,7 @@ dailyds_proflic_mari := dataset (daily_prefix + 'proflic_mari', FCRA.Layout_Over
 kf := dedup (sort (ds_proflic_mari(flag_file_id<>''), -flag_file_id), except flag_file_id);
 FCRA.Mac_Replace_Records(kf,dailyds_proflic_mari,persistent_record_id,replaceds);
 // DF-22458 Deprecate specified fields in thor_data400::key::override::fcra::proflic_mari::qa::ffid
-ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, Prof_License_Mari.constants.fields_to_clear);
+ut.MAC_CLEAR_FIELDS(replaceds, replaceds_cleared, dx_Prof_License_Mari.constants.fields_to_clear);
 //CCPA-1047 - use layout defined for this key
 final_ds := PROJECT(replaceds_cleared,$.Layout_Override_Proflic_Mari);
 export proflic_mari := index (final_ds, {flag_file_id}, {final_ds}, keyname_prefix + 'proflic_mari::qa::ffid', OPT);
