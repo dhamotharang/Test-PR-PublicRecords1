@@ -1,4 +1,6 @@
-﻿export MOVE_FILES(boolean fcra = false, boolean pDaily = false, string buildingType='') := module
+﻿IMPORT _Control;
+
+export MOVE_FILES(boolean fcra = false, boolean pDaily = false, string buildingType='', boolean delta=false) := module
 	
 	shared FS 		:= fileservices;
 	
@@ -12,6 +14,55 @@
 	shared In_Bldg_SF := nothor(FS.LogicalFileList('thor_data::in::inql*' + if(fcra, '::fcra*', '::nonfcra*') + '_bldg',false,true))(~regexfind('_sl|_cc|_fdn', name));
 	shared Hist_SF 		:= nothor(FS.LogicalFileList('thor_data::in::inql*' + if(fcra, '::fcra*', '::nonfcra*') + '_hist',false,true))(~regexfind('_sl|_cc|_fdn', name));
 	
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	//Batchr3 Temp Move From 
+    isFCRA := Case(_Control.ThisEnvironment.ThisDaliIp, 
+                   _Control.IPAddress.NewLogTHOR_dali => false,
+				   _Control.IPAddress.FCRALogTHOR_dali => true
+				   ,false); 
+
+    prefix := if(isFCRA,'thor10_231','thor100_21');	
+    sfcra   := if(isFCRA,'fcra','nonfcra');
+	
+    fnMovePreprocess(string source_file) := function 
+	
+			v2_source := map(source_file = 'idm_bls' => 'idm',source_file = 'prodr3'=>'batchr3',source_file);
+			return sequential(
+				                nothor(fileservices.addsuperfile('~thor_data::in::inql::'+sfcra + '::'+ v2_source, 
+																												'~'+prefix+'::in::'+source_file+'_acclogs_preprocess',,true));
+												nothor(fileservices.addsuperfile('~'+prefix+'::in::'+source_file+'_acclogs_processed',
+												                                  '~'+prefix+'::in::'+source_file+'_acclogs_preprocess',,true));
+												nothor(fileservices.clearsuperfile('~'+prefix+'::in::'+source_file+'_acclogs_preprocess'))
+											 );
+    end; 	
+  
+    movepre_nonfcra 						    := parallel(fnMovePreprocess('batchr3'));	
+	
+    movepre_fcra 						        := parallel(fnMovePreprocess('prodr3'));	
+																	
+    EXPORT Batchr3Move 							:= sequential(if(isFCRA,movepre_fcra, movepre_nonfcra));
+																			
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	//New version
+	
+	shared In_SF_New 			:= nothor(FS.LogicalFileList('uspr::inql' + if(fcra, '::fcra', '::nonfcra') + '::in*',false,true))(~regexfind('::built|_built|::building_base|_sl|_cc|_fdn|_hist', name));
+    shared In_Bldg_SF_New       := nothor(FS.LogicalFileList('uspr::inql' + if(fcra, '::fcra', '::nonfcra') + '::in*' + '::building_base',false,true))(~regexfind('_sl|_cc|_fdn', name));
+	
+	export Current_To_In_Bldg_New := sequential(
+					FS.StartSuperFileTransaction(),
+						nothor(apply(In_SF_New, FS.AddSuperFile('~' + name + '::building_base', '~' + name, addcontents := true))),
+						nothor(apply(In_SF_New, FS.ClearSuperFile('~' + name, false))),
+				  FS.FinishSuperFileTransaction()
+						);
+
+	export Bldg_To_Built_New := sequential(
+					FS.StartSuperFileTransaction(),
+				        nothor(apply(In_Bldg_SF_New, FS.AddSuperFile('~' + regexreplace('::building_base', name, '::built'), '~' + name, addcontents := true))),
+						nothor(apply(In_Bldg_SF_New, FS.ClearSuperFile('~' + name, false))),
+				  FS.FinishSuperFileTransaction()
+						);
+    //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 	export Current_To_In_Bldg := sequential(
 					FS.StartSuperFileTransaction(),
 						nothor(apply(In_SF, FS.AddSuperFile('~' + name + '_bldg', '~' + name, addcontents := true))),
@@ -45,10 +96,20 @@
 					// FS.FinishSuperFileTransaction()
 						// );
 						
-	export Base_To_Building := sequential(
-					FS.StartSuperFileTransaction(),
+delta_list			:=	nothor(FS.SuperFileContents(Base_SF))(regexfind('delta',name));
+all_list				:=	nothor(FS.SuperFileContents(Base_SF));
+tobuilding_list := 	if(delta,delta_list,all_list);
+
+export Base_To_Building:=	sequential(FS.StartSuperFileTransaction(),
 						nothor(FS.ClearSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType))),
-						nothor(FS.AddSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType), '~' + Base_SF, addcontents := true)),
+						nothor(apply(tobuilding_list,FS.AddSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType), '~' + name))),
+					FS.FinishSuperFileTransaction()
+						);
+	
+	export Base_To_Building_didville := sequential(
+					FS.StartSuperFileTransaction(),
+						nothor(FS.ClearSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType+'::didville'))),
+						nothor(FS.AddSuperFile('~' + regexreplace('::built', Base_SF, '::building_'+buildingType+'::didville'), '~' + Base_SF, addcontents := true)),
 					FS.FinishSuperFileTransaction()
 						);
 end;
