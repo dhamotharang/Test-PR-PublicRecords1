@@ -191,8 +191,8 @@ layout_old_acct into_fdInput(f le, INTEGER c) := TRANSFORM
                                 historydate_to_use = 0                  => map(
                                                                               le.historydate in ['', '999999']             => '',  // leave timestamp blank, query will populate it with the current date   	
                                                                               regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,
-                                                                              regexfind('^\\d{8}$',        le.historydate) => le.historydate + ' '   + STD.Date.CurrentTime(),
-                                                                              regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 ' + STD.Date.CurrentTime(),		                                                
+                                                                              regexfind('^\\d{8}$',        le.historydate) => le.historydate + ' '   + Intformat(STD.Date.CurrentTime(TRUE), 6, 1),
+                                                                              regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 ' + Intformat(STD.Date.CurrentTime(TRUE), 6, 1),		                                                
                                                                                                                               le.historydate
                                                                               ),
                                                                               '' //defaults to current mode, shouldn't get here

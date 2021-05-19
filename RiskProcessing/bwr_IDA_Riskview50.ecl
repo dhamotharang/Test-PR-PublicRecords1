@@ -164,12 +164,12 @@ soapLayout intoSOAP(inputData le, UNSIGNED4 c) := TRANSFORM
 						SELF := [])]);
 	
   SELF.historyDateTimeStamp := map(
-       OverrideHistoryDate != '0'                   => OverrideHistoryDate,             // Use the override date if it's populated
-       le.historydate in ['', '999999']             => '',                              // leave timestamp blank, query will populate it with the current date   	
-			 regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,                  // if your file already has a timestamp in the correct format
-			 regexfind('^\\d{8}$',        le.historydate) => le.historydate +   ' 00000100',  // if your file has an 8 digit history date populated - just add timestamp
-			 regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 00000100',	// most files still have just year and month, so add day of 01 and a timestamp	                                                
-			                                                 le.historydate
+       OverrideHistoryDate != '0'                   => OverrideHistoryDate,                                                   // Use the override date if it's populated
+       le.historydate in ['', '999999']             => '',                                                                    // leave timestamp blank, query will populate it with the current date   	
+       regexfind('^\\d{8} \\d{8}$', le.historydate) => le.historydate,                                                        // if your file already has a timestamp in the correct format
+       regexfind('^\\d{8}$',        le.historydate) => le.historydate + ' '   + Intformat(STD.Date.CurrentTime(TRUE), 6, 1),  // if your file has an 8 digit history date populated - just add timestamp
+       regexfind('^\\d{6}$',        le.historydate) => le.historydate + '01 ' + Intformat(STD.Date.CurrentTime(TRUE), 6, 1),  // most files still have just year and month, so add day of 01 and a timestamp	                                                
+                                                       le.historydate
 	 );
   
 	// SELF.HistoryDateTimeStamp := '';
