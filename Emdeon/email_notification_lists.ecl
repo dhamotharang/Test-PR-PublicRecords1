@@ -2,10 +2,10 @@
 
 EXPORT Email_Notification_Lists := MODULE
 
-   EXPORT developer := 'deryck.murray@lexisnexisrisk.com;jason.allerdings@lexinexisrisk.com;';
+   EXPORT developer := 'jason.allerdings@lexinexisrisk.com;kevin.reeder@lexisnexisrisk.com';
    //EXPORT tester := '';
 	 //quality_assurance := 'qualityassurance@seisint.com;';
-	 EXPORT quality_assurance := 'deryck.murray@lexisnexisrisk.com;jason.allerdings@lexisnexisrisk.com;';
+	 EXPORT quality_assurance := 'jason.allerdings@lexisnexisrisk.com;';
    EXPORT all_hands := developer + ';' + quality_assurance;
 	 
    EXPORT BuildSuccess :=	IF(Emdeon._Flags().IsTesting, developer, all_hands);
