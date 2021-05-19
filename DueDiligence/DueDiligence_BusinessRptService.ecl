@@ -32,11 +32,24 @@ EXPORT DueDiligence_BusinessRptService := MACRO
     regulatoryCompliance := DueDiligence.CommonQuery.GetCompliance(dppa, glba, drm, dpm, userIn.IndustryClass, lexIdSourceOptout, transactionID, batchUID, globalCompanyID, DDssnMask);
 
     //based on what was requested, call the appropriate attributes
-    ddResults := DueDiligence.CommonQueryXML.mac_v3BusinessXML(wseq, cleanData, regulatoryCompliance, optionsIn.AdditionalInput,
-                                                               requestResponseLayout, DueDiligence.Constants.STRING_TRUE, FALSE);
+    ddResults_temp := DueDiligence.CommonQueryXML.mac_v3BusinessXML(wseq, cleanData, regulatoryCompliance, optionsIn.AdditionalInput,
+                                                                    requestResponseLayout, DueDiligence.Constants.STRING_TRUE, FALSE);
 
 
+    ddResults := PROJECT(ddResults_temp, TRANSFORM(requestResponseLayout,
 
+                                                    inputEcho := LEFT.result.inputEcho;
+                                                    inputBusLexID := TRIM(inputEcho.business.lexID);
+                                                    calcdBusLexID := TRIM(LEFT.result.BusinessID);
+
+                                                    businessLexIDChanged := inputBusLexID <> DueDiligence.Constants.EMPTY AND
+                                                                            calcdBusLexID <> DueDiligence.Constants.EMPTY AND
+                                                                            inputBusLexID <> calcdBusLexID;
+
+                                                    //if a lexID was passed in and we found a valid business and lexID changed
+                                                    SELF.result.lexIDChanged := businessLexIDChanged;
+
+                                                    SELF := LEFT;));
 
 
     IF(debugIndicator, OUTPUT(cleanData, NAMED('cleanData'))); //This is for debug mode

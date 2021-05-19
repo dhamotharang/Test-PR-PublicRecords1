@@ -401,6 +401,7 @@ EXPORT FP_models := MODULE
 
     //call wrappers for Combined IDA models
     model_fibn12010_0 := Models.getLuciModel(FP_mod).FIBN12010_0;
+    model_fiwn12103_0 := Models.getLuciModel(FP_mod).FIWN12103_0;
 
 #if(Models.FraudAdvisor_Constants.VALIDATION_MODE)
 		model_info := model_fp1908_1; 
@@ -471,6 +472,7 @@ EXPORT FP_models := MODULE
                         'fp1907_1'  => model_fp1907_1,
                         'fp1907_2'  => model_fp1907_2,
                         'fibn12010_0'  => model_fibn12010_0,
+                        'fiwn12103_0'  => model_fiwn12103_0,
                                        DATASET([], models.layouts.layout_fp1109) // Return blank dataset if unknown model
                        );
    #END                  

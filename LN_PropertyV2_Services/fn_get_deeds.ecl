@@ -1,4 +1,4 @@
-import Codes, LN_PropertyV2;
+﻿import Codes, LN_PropertyV2;
 
 k_codes			:= keys.codes;
 
@@ -109,10 +109,17 @@ export dataset(l_rolled) fn_get_deeds(
 			'SELLER1_ID_CODE', vsource, L.seller1_id_code);
 		self.seller2_id_desc := GetCode(
 			'SELLER2_ID_CODE', vsource, L.seller2_id_code);
-		
-		self.record_type_desc := GetCode(
-			'RECORD_TYPE', vsource, L.record_type);
-			
+/* The record_type of M and Z have been used for 2 different purposes in the deed file. We need to diffrentiate to find out which M or Z lable we need to use.
+   Only assignments and releases have document_type_code populated while the other deed records with record_type of M and Z deed types do not have document_type_code populated.  
+*/      
+		modified_record_type := 
+     map(
+          trim(vsource) = 'OKCTY' and trim(L.record_type) = 'M' and trim(L.document_type_code) <> '' => 'M-A',
+          trim(vsource) = 'OKCTY' and trim(L.record_type) = 'Z' and trim(L.document_type_code) <> '' => 'Z-A',
+          L.record_type
+         );	
+                               
+		self.record_type_desc := GetCode('RECORD_TYPE', vsource, modified_record_type);   
 		self.property_address_desc := Codes.KeyCodes(consts.assess_codefile,
 			'PROPERTY_ADDRESS_CODE', vsource, L.property_address_code, true);
 		

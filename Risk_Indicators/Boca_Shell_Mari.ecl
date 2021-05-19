@@ -1,12 +1,12 @@
-﻿import _Control, Prof_License_Mari, riskwise, risk_indicators, doxie, Suppress, data_services;
+﻿import _Control, dx_prof_license_mari, riskwise, risk_indicators, doxie, Suppress, data_services;
 onThor := _Control.Environment.OnThor;
 
 EXPORT Boca_Shell_Mari(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
 											boolean isFCRA, boolean isPreScreen, doxie.IDataAccess mod_access = MODULE (doxie.IDataAccess) END) := FUNCTION
 
-data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+data_environment :=  data_services.data_env.GetEnvFCRA(isFCRA);
 	
-key_main := Prof_License_Mari.key_did(isFCRA) ;
+key_main := dx_prof_license_mari.key_did(data_environment) ;
 rec_main := recordof (key_main);
  
 layout_mari_temp := record

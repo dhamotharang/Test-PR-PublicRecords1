@@ -1,11 +1,11 @@
-﻿import prof_licenseV2, riskwise, ut, risk_indicators, Prof_License_Mari, doxie, Suppress, data_services, AML;
+﻿import prof_licenseV2, riskwise, ut, risk_indicators, dx_prof_license_mari, doxie, Suppress, data_services, AML;
 
 export IndProfLic(DATASET(Layouts.AMLExecLayoutV2) ExecIds,
                            doxie.IDataAccess mod_access,
                            boolean isFCRA = false
                            ) := FUNCTION
 
-data_environment :=  IF(isFCRA, data_services.data_env.iFCRA, data_services.data_env.iNonFCRA);
+data_environment :=  data_services.data_env.GetEnvFCRA(isFCRA);
 
 //version 2
 Layout_PL_Plus := RECORD
@@ -65,7 +65,7 @@ license_recs := PROJECT(license_recs_flagged, TRANSFORM(Layout_PL_Plus,
 LicensesSD := dedup(sort(license_recs, seq, did, prolic_key, -date_most_recent), seq, did, prolic_key);
 
 
-key_main := Prof_License_Mari.key_did(isFCRA) ;
+key_main := dx_prof_license_mari.key_did(data_environment) ;
 rec_main := recordof (key_main);
 
 

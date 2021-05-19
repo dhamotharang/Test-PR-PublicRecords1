@@ -1,4 +1,4 @@
-﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, Prof_License_Mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView, AVM_V2;
+﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, dx_prof_license_mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView, AVM_V2;
 IMPORT KEL13 AS KEL;
 
 //please note
@@ -908,7 +908,7 @@ EXPORT GetOverrideMari(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 		INTEGER UIDAppend;
 		INTEGER G_ProcUID;
 		INTEGER P_lexid;
-		recordof(Prof_License_Mari.key_did(true)) - [global_sid,record_sid];
+		recordof(dx_prof_license_mari.layouts.i_did) - [global_sid,record_sid];
     string20 flag_file_id;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.proflic_correct_ffid;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.proflic_correct_RECORD_ID;

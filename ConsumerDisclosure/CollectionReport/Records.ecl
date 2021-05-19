@@ -1,6 +1,6 @@
 IMPORT $, alloymedia_student_list, american_student_list, canadianphones_v2, daybatchpcnsr, doxie, dx_email, dx_header,
-  dx_gong, header_quick, impulse_email, infutor, infutorcid, one_click_data, patriot, paw,
-  phonemart, phonesplus, phonesplus_v2, phonesfeedback, poe, poesfromemails, prof_licensev2, prof_license_mari, profilebooster,
+  dx_gong, dx_prof_license_mari, header_quick, impulse_email, infutor, infutorcid, one_click_data, patriot, paw,
+  phonemart, phonesplus, phonesplus_v2, phonesfeedback, poe, poesfromemails, prof_licensev2, profilebooster,
   saleschannel, spoke, targus, thrive, vehiclev2, zoom;
 
 EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
@@ -30,7 +30,7 @@ EXPORT Records(UNSIGNED6 lexid, $.IParam.IReportParam in_mod) := FUNCTION
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.INFUTOR, infutor.Key_Header_Infutor_Knowx, s_did, dt_last_seen, $.Constants.DateFormat.YYYYMM)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.INFUTOR_CID, InfutorCID.Key_Infutor_DID, did, dt_last_seen)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.INFUTOR_NARC, ProfileBooster.Key_Infutor_DID, did)
-    + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.MARI, Prof_License_Mari.key_did(), s_did, date_last_seen)
+    + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.MARI, dx_prof_license_mari.key_did(), s_did, date_last_seen)
     + $.MAC.GetCollection(dids, in_mod, $.Constants.Collection.ONECLICK_DATA, one_click_data.keys().did.qa, did, dt_last_seen)
     + $.MAC.GetCollectionFromRaw(patriot_recs, in_mod, $.Constants.Collection.PATRIOT, patriot.key_patriot_file, pty_key)
     + $.MAC.GetCollectionFromRaw(paw_recs, in_mod, $.Constants.Collection.PAW, paw.Key_contactID, contact_id, dt_last_seen)

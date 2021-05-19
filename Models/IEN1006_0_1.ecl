@@ -1,4 +1,5 @@
-import risk_indicators, ut, easi, std;
+﻿import risk_indicators, ut, easi, std, _Control;
+onThor := _Control.Environment.OnThor;
 
 export IEN1006_0_1( grouped dataset(risk_indicators.layout_boca_shell) clam, dataset(easi.layout_census) census ) := FUNCTION
 
@@ -1353,13 +1354,19 @@ export IEN1006_0_1( grouped dataset(risk_indicators.layout_boca_shell) clam, dat
 		end;
 
 
-	model := join(clam, census, 
+	model_roxie := join(clam, census, 
 		right.geolink = left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk,
 		doModel(LEFT,RIGHT), left outer, lookup);
 
-	// model := join(distribute(clam, hash32(shell_input.st+shell_input.county+shell_input.geo_blk)), distribute(census,hash32(geolink)), 
-		// right.geolink = left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk,
-		// doModel(LEFT,RIGHT), left outer, keep(1), local);
+	model_thor := join(distribute(clam, hash64(shell_input.st+shell_input.county+shell_input.geo_blk)), distribute(census,hash64(geolink)), 
+		right.geolink = left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk,
+		doModel(LEFT,RIGHT), left outer, keep(1), local);
+    
+  #IF(onThor)
+    model := GROUP(model_thor, seq);
+  #ELSE
+    model := model_roxie;
+  #END
 
 	return model;
 
