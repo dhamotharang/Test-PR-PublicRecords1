@@ -53,6 +53,8 @@
 	
 	EXPORT LayoutIDs_Inputs := RECORD
 		LayoutIDs;
+		STRING LexIDSegment;
+		STRING LexIDSegment2;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides;
 	END;	
 	
@@ -1885,7 +1887,7 @@ SHARED Header__key_ADL_segmentation :=  Header.key_ADL_segmentation;
 		LayoutIDs;
 		RECORDOF(Header__key_ADL_segmentation);
 		dpmtype;
-		STRING2 src;
+		STRING3 src;
 		STRING Archive_Date;
 	END;			
 	

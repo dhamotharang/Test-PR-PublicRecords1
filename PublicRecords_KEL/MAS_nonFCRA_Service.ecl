@@ -124,8 +124,10 @@ STRING100 Default_data_permission_mask := '';
 	#STORED('NetAcuityURL', NetAcuityGW.url);
 	#STORED('IsFCRAValue', FALSE);
 	
+	TargusIsAllowed := DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission] = '1';
 	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
-	#STORED('TargusURL', TargusGW.url);
+	TargusGWURL := IF(TargusIsAllowed, TargusGW.url, '');
+	#STORED('TargusURL', TargusGWURL);
 	
 	InsurancePhoneGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'insurancephoneheader')[1];
 	#STORED('InsurancePhoneURL', InsurancePhoneGW.url);
@@ -209,7 +211,7 @@ STRING100 Default_data_permission_mask := '';
 							SELF := [];)]);
 
 	RoyaltySet := TargusRoyaltyDS + NetAcuityRoyaltyDS;
-					
+
 	OUTPUT(RoyaltySet, NAMED('RoyaltySet'));
 	
   OUTPUT( FinalResults, NAMED('Results') );

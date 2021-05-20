@@ -33,6 +33,7 @@
 	STRING1 P_InpArchDtFlag;
 	INTEGER7 P_LexID;
 	INTEGER3 P_LexIDScore;
+	STRING12 P_LexIDCategory;
 	STRING6 P_InpClnNamePrfx;
 	STRING20 P_InpClnNameFirst;
 	STRING6 P_InpClnNameSffx;

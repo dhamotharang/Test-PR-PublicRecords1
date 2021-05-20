@@ -173,6 +173,8 @@ EXPORT Layouts := MODULE
 		BOOLEAN IsInputRec;
 		LayoutInputPIIEchoInternal;
 		LayoutInputPIICleanInternal;
+		STRING LexIDSegment;
+		STRING LexIDSegment2;
 		STRING10 InputIncomeEcho;
 		STRING10 InputBalanceEcho;
 		STRING10 InputChargeoFFdEcho;
@@ -2145,6 +2147,8 @@ EXPORT Layouts := MODULE
 		INTEGER RepNumber;
 		LayoutInputPIIEchoInternal;
 		LayoutInputPIICleanInternal;
+		STRING LexIDSegment;
+		STRING LexIDSegment2;
 		STRING10 InputIncomeEcho;
 		STRING10 InputBalanceEcho;
 		STRING10 InputChargeoFFdEcho;

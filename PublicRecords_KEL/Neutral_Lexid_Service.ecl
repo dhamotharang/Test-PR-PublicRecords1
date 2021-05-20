@@ -7,7 +7,7 @@
 */
 /*--INFO-- The FCRA-Neutral part that appends the Lexid */ 
 
-IMPORT PublicRecords_KEL;
+IMPORT Header, PublicRecords_KEL;
 
 EXPORT Neutral_Lexid_Service() := MACRO
 	//Score_threshold := 80 : stored('Score_threshold');
@@ -20,6 +20,15 @@ EXPORT Neutral_Lexid_Service() := MACRO
 	
 	LexidAppended := PublicRecords_KEL.ECL_Functions.Fn_AppendLexid_Roxie( indata, Options );
 
-	output(LexidAppended, NAMED('LexidAppended'));
+	getLexIDCategory := JOIN(LexidAppended, Header.key_ADL_segmentation, 
+		LEFT.P_LexID > 0 AND
+		KEYED(LEFT.P_LexID = RIGHT.did),
+		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII,
+			SELF.LexIDSegment := RIGHT.ind1,
+			SELF.LexIDSegment2 := RIGHT.ind2,
+			SELF := LEFT), 
+		LEFT OUTER, ATMOST(100), KEEP(1));
+		
+	output(getLexIDCategory, NAMED('LexidAppended'));
 	
 ENDMACRO;
