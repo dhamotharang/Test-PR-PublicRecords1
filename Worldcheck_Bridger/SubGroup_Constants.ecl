@@ -306,6 +306,8 @@
 		export string PEP_NG_A						:= '18';
 		export string SOE							:= '19';
 		export string NON_PEP						:= '20';
+		export string SIE						:= '21';
+		export string IOS						:= '22';
 	end;
 	
 	export numDeceasedState := module
@@ -1336,6 +1338,7 @@
 		export string KEYWORD_TWMPB_CV							:= '1018';
 		export string KEYWORD_NS_CCMC_EO13959				:= '1019';
 		export string KEYWORD_ROONJN								:= '1020';
+		export string KEYWORD_COBMC									:= '1021';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;
