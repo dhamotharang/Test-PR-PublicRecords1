@@ -46,6 +46,7 @@ EXPORT L_Compile := MODULE
   SHARED F_C_R_A_Person_Attributes_V1_Dynamic_Res0_Internal_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.str P___Lex_I_D_Seen_Flag_ := '';
+    KEL.typ.nstr P___Lex_I_D_Category_;
     KEL.typ.str P___Lex_I_D_Is_Deceased_Flag_ := '';
     KEL.typ.int P_L___Ast_Veh_Air_Cnt_Ev_ := 0;
     KEL.typ.nstr P_L___Ast_Veh_Air_Emrg_Dt_List_Ev_;
