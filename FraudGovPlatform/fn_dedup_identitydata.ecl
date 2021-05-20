@@ -6,6 +6,7 @@
     Drivers_License_State,Drivers_License,Bank_Routing_Number_1,Bank_Account_Number_1,Bank_Routing_Number_2,Bank_Account_Number_2,
     Ethnicity,Race,Household_ID,Customer_Person_ID,Head_of_Household_indicator,Relationship_Indicator,IP_Address,Device_ID,
     Unique_number,MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,geo_lat,geo_long,source,rin_source, source_rec_id); //transaction_id, Customer_Job_ID,Batch_Record_ID
+
     new_rec := record
 		inputs;
 		unsigned4 dt_first_seen;
@@ -41,7 +42,7 @@
         Drivers_License,Bank_Routing_Number_1,Bank_Account_Number_1,Bank_Routing_Number_2,Bank_Account_Number_2,Ethnicity,
         Race,Household_ID,Customer_Person_ID,Head_of_Household_indicator,Relationship_Indicator,IP_Address,Device_ID,Unique_number,
         MAC_Address,Serial_Number,Device_Type,Device_identification_Provider,geo_lat,geo_long, source, rin_source
-    ); //transaction_id ,Customer_Job_ID,  Batch_Record_ID,
+    ); //transaction_id ,Customer_Job_ID,  Batch_Record_ID, Duration, TransactionStatus, Reason
                 
 
     rdp_srt := sort(inputs(rin_source = 9) , Customer_Id, Customer_State, Customer_Agency_Vertical_Type, Customer_Program, Reason_Description,Date_of_Transaction,Rawlinkid,raw_Full_Name,raw_Title,raw_First_name,
