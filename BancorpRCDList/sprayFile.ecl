@@ -18,7 +18,7 @@ FilesToSpray := DATASET([
 		//	
 		{
 			pServerIP, 																//	SourceIP
-			pDirectory,//+pVersionDate+'/',							//	SourceDirectory
+			pDirectory+pVersionDate+'/',							//	SourceDirectory
 			//pFilename,																//	directory_filter
 			pFilename,
 			0, 																				//	record_size
