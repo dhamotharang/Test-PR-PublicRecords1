@@ -1,5 +1,6 @@
-import dops;
+﻿import dops;
 EXPORT GetDeleteFilesFromDB(string l_cluster = '',string l_daliip = '', string l_owner = '', string l_filename = '',boolean getallfiles = true, string excludedeletedfiles = '1'
+					,string noofdays = '10'
 					,string dopsenv = dops.constants.dopsenvironment) := function
 	InputRec := record
 		string cluster{xpath('cluster')} := l_cluster;
@@ -7,6 +8,7 @@ EXPORT GetDeleteFilesFromDB(string l_cluster = '',string l_daliip = '', string l
 		string fileowner{xpath('fileowner')} := l_owner;
 		string filename{xpath('filename')} := l_filename;
 		string getonlynondeletedfiles{xpath('getonlynondeletedfiles')} := excludedeletedfiles;
+		string noofdays{xpath('noofdays')} := noofdays;
 	end;
 	
 	outrec := record
