@@ -1,10 +1,10 @@
-﻿IMPORT std;
+﻿IMPORT std,INQL_V2;
 
 EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 
 	EXPORT Accurint := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).Accurint_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'accurint','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).accurint_bldg)),-name);
 		
 		INQL_v2.layouts.rAccurint_In_Ext tMapping(INQL_v2.layouts.rAccurint_In L) := TRANSFORM
@@ -23,7 +23,7 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 	
 	EXPORT Custom := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).Custom_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'custom','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).custom_bldg)),-name);
 		
 		INQL_v2.layouts.rCustom_In_Ext tMapping(INQL_v2.layouts.rCustom_In L) := TRANSFORM
@@ -42,7 +42,7 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 	
 	EXPORT Batch := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).Batch_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'batch','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).Batch_bldg)),-name);
 		
 		INQL_v2.layouts.rBatch_In_Ext tMapping(INQL_v2.layouts.rBatch_In L) := TRANSFORM
@@ -80,7 +80,7 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 	
 	EXPORT Banko := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).Banko_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'banko','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).Banko_bldg)),-name);
 		
 		INQL_v2.layouts.rBanko_In_Ext tMapping(INQL_v2.layouts.rBanko_In L) := TRANSFORM
@@ -99,7 +99,7 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 	
 	EXPORT Bridger := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).Bridger_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'bridger','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).Bridger_bldg)),-name);
 		
 		INQL_v2.layouts.rBridger_In_Ext tMapping(INQL_v2.layouts.rBridger_In L) := TRANSFORM
@@ -118,7 +118,7 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 	
 	EXPORT Riskwise := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).Riskwise_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'riskwise','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).Riskwise_bldg)),-name);
 		
 		INQL_v2.layouts.rRiskwise_In_Ext tMapping(INQL_v2.layouts.rRiskwise_In L) := TRANSFORM
@@ -138,7 +138,7 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 	
 	EXPORT IDM := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).IDM_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'idm','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).IDM_bldg)),-name);
 		
 		INQL_v2.layouts.rIDM_In_Ext tMapping(INQL_v2.layouts.rIDM_In L) := TRANSFORM
@@ -157,7 +157,7 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 	
 	EXPORT SBA := FUNCTION	
 		
-		inFile := INQL_v2.Files(fcra).SBA_input_bldg;
+		inFile := INQL_V2.Files().InputFiles(fcra,true,'sba','building');
 		//lfn		 := sort(nothor(STD.File.SuperFileContents(INQL_v2.Superfile_List(fcra).SBA_bldg)),-name);
 		
 		INQL_v2.layouts.rSBA_In_Ext tMapping(INQL_v2.layouts.rSBA_In L) := TRANSFORM
@@ -173,5 +173,5 @@ EXPORT Standardize_input (boolean fcra = false, unsigned logType = 0) := MODULE
 		return dStd;
 		
 	END;	
-			
+
 END;

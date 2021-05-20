@@ -325,6 +325,7 @@ ver(string nm,string new_ver, string clstr='') :=
 
 nm := 'thor_data400::key::insuranceheader_segmentation::<<version>>::did_ind';
 aPrefLoc := '~thor_data400::key::insuranceheader_xlink::';
+aPrefLocID := '~thor_data400::key::insuranceheader_locid::';
 father := aPrefLoc + 'father::locid';
 qa     := aPrefLoc + 'qa::locid';
 
@@ -341,7 +342,8 @@ EXPORT movetoQA(string filedt) := sequential(
     STD.File.ClearSuperFile(father, true),
     STD.File.AddSuperFile(father,qa, addcontents := true),
     STD.File.ClearSuperFile(qa),
-    STD.File.AddSuperFile(qa, aPrefLoc + filedt + '::locid'),
+    STD.File.RenameLogicalFile(aPrefLoc + filedt + '::locid', aPrefLocID + filedt + '::locid'),
+    STD.File.AddSuperFile(qa, aPrefLocID + filedt + '::locid'),
     STD.File.FinishSuperFileTransaction(),
     );
         

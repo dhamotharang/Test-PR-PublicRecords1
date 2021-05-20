@@ -15,7 +15,8 @@ official_records.Out_Moxie_Dev_Population_Stats(official_records.File_Moxie_Part
            									   ,DoTheSTRATAStats)
 //setting delta build trigger
 boolean isDelta		:= official_records.Constants.Deltabuild;	
-pUpdateFlag		:=	if(isDelta,'D','F');
+//setting Dops update flag
+pUpdateFlag		:=	if(official_records.Constants.DeltaDopsUpdate,'D','F');
 dops_update := dops.updateversion('OfficialRecordsKeys',filedate,'skasavajjala@seisint.com',,'N',,l_updateflag:=pUpdateFlag);
 
 orbit_report.Orecs_Stats(getretval);

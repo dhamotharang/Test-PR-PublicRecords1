@@ -1,4 +1,4 @@
-export MAC_SK_Move_v2(kname, move_type, seq_name, numgenerations = '3', diffing = 'false') := macro
+﻿export MAC_SK_Move_v2(kname, move_type, seq_name, numgenerations = '3', diffing = 'false',isDelta = 'false') := macro
 	
 /* 
 	move_type may be
@@ -60,6 +60,7 @@ export MAC_SK_Move_v2(kname, move_type, seq_name, numgenerations = '3', diffing 
 #uniquename(prod_count)
 %prod_count% := FileServices.GetSuperFileSubCount(%prod%);
 
+//DF-29296: Add the option - isDelta for incremental key movement 
 #if(move_type='Q')
 seq_name := 
 	map(	  %built_count% = %qa_count% and
@@ -69,6 +70,12 @@ seq_name :=
 		  FileServices.GetSuperFileSubCount(%built%) = 0
 										=> output('Built is empty! No action taken.'),
 		  %ng% not in [2,3,4] => FAIL('ut.MAC_SK_Move failure, numgenerations not in [2,3,4]'),
+			isDelta => sequential(
+			  FileServices.StartSuperFileTransaction(),
+				FileServices.AddSuperFile(%qa%, %built%,, true),
+				FileServices.ClearSuperFile(%built%),
+				FileServices.FinishSuperFileTransaction(),	
+			output('incremental built moved into qa')),
 		sequential(
 		        FileServices.StartSuperFileTransaction(),
 				FileServices.AddSuperFile(%delete%, %todelete%,, true),
