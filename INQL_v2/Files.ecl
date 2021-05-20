@@ -1,4 +1,4 @@
-﻿IMPORT tools, data_services;
+﻿IMPORT tools,std,data_services;
 
 EXPORT Files(boolean fcra = false, boolean pDaily = true) := MODULE
 
@@ -19,78 +19,45 @@ EXPORT Files(boolean fcra = false, boolean pDaily = true) := MODULE
   
   Export MBS := dataset(data_services.foreign_new_logs + 'thor100_21::out::inquiry_acclogs::file_mbs', INQL_v2.layouts.FIDO_new_MBS, thor);
 
-	
-	
-	export Accurint_input
-		:= dataset(INQL_v2.Superfile_List(fcra).accurint, INQL_v2.layouts.rAccurint_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-  export Accurint_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).accurint_bldg, INQL_v2.layouts.rAccurint_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export Accurint_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).accurint_hist, INQL_v2.layouts.rAccurint_In_Ext, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-		
-		
-	export Custom_input
-		:= dataset(INQL_v2.Superfile_List(fcra).Custom, INQL_v2.layouts.rCustom_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export Custom_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).Custom_bldg, INQL_v2.layouts.rCustom_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export Custom_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).Custom_hist, INQL_v2.layouts.rCustom_In_Ext, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
+	//------------------------------------------------------------------------------------------------------------------------------------------------------
+    //Input Files. 
+	//File type - filetype='building' will read from building superfile.
+	//File type - filetype='built' will read from built superfile.
+	//File type - filetype='' will read from input superfile.
 
-	export Banko_input
-		:= dataset(INQL_v2.Superfile_List(fcra).Banko, INQL_v2.layouts.rBanko_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export Banko_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).Banko_bldg, INQL_v2.layouts.rBanko_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export Banko_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).Banko_hist, INQL_v2.layouts.rBanko_In_Ext, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
+    EXPORT InputFiles(fcra,pdaily,source,filetype='') := FUNCTIONMACRO
 
+    Separate := IF(source='bridger','\t', 
+	            IF(source='batch','|',
+				IF(source='ida',',',
+			    IF(source='idm',',','~~')))); 
 
-	export Batch_input
-		:= dataset(INQL_v2.Superfile_List(fcra).Batch, INQL_v2.layouts.rBatch_In, csv( separator('|'), terminator(['\n', '\r\n']), quote('"')), opt);
-	export Batch_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).Batch_bldg, INQL_v2.layouts.rBatch_In, csv( separator('|'), terminator(['\n', '\r\n']), quote('"')), opt);
-	export Batch_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).Batch_hist, INQL_v2.layouts.rBatch_In_Ext, csv( separator('|'), terminator(['\n', '\r\n']), quote('"')), opt);
-	
-	export BatchR3_input
-		:= dataset(INQL_v2.Superfile_List(fcra).BatchR3, INQL_v2.layouts.rBatchR3_In, thor, opt);
-  export BatchR3_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).BatchR3_bldg, INQL_v2.layouts.rBatchR3_In, thor, opt);
-	export BatchR3_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).BatchR3_hist, INQL_v2.layouts.rBatchR3_In_Ext, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
+    Format   := IF(source='batchr3', 'thor,opt',
+	            IF(source='batch','csv(separator(Separate),HEADING(1),QUOTE(\'"\'),TERMINATOR([\'\\n\',\'\\r\\n\'])),opt',
+			    IF(source='idm','csv(separator(Separate),HEADING(1),TERMINATOR([\'\\n\',\'\\r\\n\'])),opt',
+				IF(source='ida','csv(separator(Separate),HEADING(1),QUOTE(\'"\'),TERMINATOR([\'\\n\',\'\\r\\n\'])),opt',
+			    'csv(separator(Separate),TERMINATOR([\'\\n\',\'\\r\\n\'])),opt'))));
 
-	export Bridger_input
-		:= dataset(INQL_v2.Superfile_List(fcra).Bridger, INQL_v2.layouts.rBridger_In, csv( separator('\t'), terminator(['\n', '\r\n'])), opt);
-	export Bridger_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).Bridger_bldg, INQL_v2.layouts.rBridger_In, csv( separator('\t'), terminator(['\n', '\r\n'])), opt);
-	export Bridger_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).Bridger_hist, INQL_v2.layouts.rBridger_In_Ext, csv( separator('\t'), terminator(['\n', '\r\n'])), opt);
-		
-	export Riskwise_input
-		:= dataset(INQL_v2.Superfile_List(fcra).Riskwise, INQL_v2.layouts.rRiskwise_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export Riskwise_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).Riskwise_bldg, INQL_v2.layouts.rRiskwise_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export Riskwise_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).Riskwise_hist, INQL_v2.layouts.rRiskwise_In_Ext, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	
-	export IDM_input
-		:= dataset(INQL_v2.Superfile_List(fcra).IDM, INQL_v2.layouts.rIDM_In, csv( separator(','), terminator(['\n', '\r\n'])), opt);
-	export IDM_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).IDM_bldg, INQL_v2.layouts.rIDM_In, csv( separator(','), terminator(['\n', '\r\n'])), opt);
-	export IDM_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).IDM_hist, INQL_v2.layouts.rIDM_In_Ext, csv( separator(','), terminator(['\n', '\r\n'])), opt);
-		
-	export SBA_input
-		:= dataset(INQL_v2.Superfile_List(fcra).SBA, INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export SBA_input_bldg
-		:= dataset(INQL_v2.Superfile_List(fcra).SBA_bldg, INQL_v2.layouts.rSBA_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-	export SBA_input_hist
-		:= dataset(INQL_v2.Superfile_List(fcra).SBA_hist, INQL_v2.layouts.rSBA_In_Ext, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
-        
+	File     := IF(filetype='building',dataset(INQL_v2.Filenames(,FCRA,pDaily,source).InputBuilding, #EXPAND('INQL_v2.layouts.r'+source+'_In'),#EXPAND(Format)),
+	            IF(filetype='built',dataset(INQL_v2.Filenames(,FCRA,pDaily,source).InputBuilt, #EXPAND('INQL_v2.layouts.r'+source+'_In'),#EXPAND(Format)),
+		        dataset(INQL_v2.Filenames(,FCRA,pDaily,source).Input, #EXPAND('INQL_v2.layouts.r'+source+'_In'),#EXPAND(Format))));
+
+    return File;
+
+    ENDMACRO;
+ 
+    //------------------------------------------------------------------------------------------------------------------------------------------------------
+ 	//Batchr3 temp
+	export BatchR3_input      := dataset(INQL_v2.Filenames(,fcra,pDaily,).BatchR3, INQL_v2.layouts.rBatchR3_In, thor, opt);
+    export BatchR3_input_bldg := dataset(INQL_v2.Filenames(,fcra,pDaily,).BatchR3_bldg, INQL_v2.layouts.rBatchR3_In, thor, opt);
+	export BatchR3_input_hist := dataset(INQL_v2.Filenames(,fcra,pDaily,).BatchR3_hist, INQL_v2.layouts.rBatchR3_In_Ext, csv(separator('~~'), terminator(['\n', '\r\n'])), opt);
+
+    //------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	export bINQL_In_Bldg 		:= dataset(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_In_Bldg, INQL_v2.Layouts.Common_layout, thor);
-	export bINQL_Daily_Hist := dataset(INQL_v2.Filenames(,fcra).INQL_Base_Daily_history, INQL_v2.Layouts.Common_layout, thor, opt);
+	export bINQL_Daily_Hist     := dataset(INQL_v2.Filenames(,fcra).INQL_Base_Daily_history, INQL_v2.Layouts.Common_layout, thor, opt);
   
-  export LastDeployedDelta	:= dataset(INQL_v2.Filenames(,fcra,true).DeployedDelta, {string8 version, boolean Flushed}, flat);
+    export LastDeployedDelta	:= dataset(INQL_v2.Filenames(,fcra,true).DeployedDelta, {string8 version, boolean Flushed}, flat);
 	
  	/* Base File pVersions */
 	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base, INQL_v2.Layouts.Common_ThorAdditions, INQL_base);

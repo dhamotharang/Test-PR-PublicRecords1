@@ -1,4 +1,4 @@
-IMPORT Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
+﻿IMPORT Address, Ut, lib_stringlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services, hxmx, Scrubs, Scrubs_MX;
 
@@ -37,7 +37,7 @@ EXPORT fn_scrub_hxmx_mx (dataset(hxmx.layouts.base.mx_record) pBaseFile, string 
 																															,'MXScrubsReport.csv'
 																															,
 																															,
-																															,_Control.MyInfo.EmailAddressNotify);	
+																															,'jason.allerdings@lexisnexisrisk.com');	
 																														
 		//****************************************************************************************************
 
