@@ -21,9 +21,9 @@ EXPORT Proc_Build_Base(STRING FileDate ) := FUNCTION
 //                   Promotion of Consolidation eCrash Base files
 // ###########################################################################
    RoxieKeyBuild.Mac_SF_BuildProcess_V2(Infiles.Agencycmbnd, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_MBSAgency, FileDate, BuildConsolidationMBSAgency, 3, FALSE, TRUE);
-   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.CRU, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_CRU, FileDate, BuildConsolidationeCRU, 3, FALSE, TRUE); 
-   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.out, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_ECRASH, FileDate, BuildConsolidationeCrash, 3, FALSE, TRUE); 
-   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.prout, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_PR, FileDate, BuildConsolidationPR, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.AccidentReportsCRU, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_CRU, FileDate, BuildConsolidationCRU, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.AccidentReportsEcrash, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_ECRASH, FileDate, BuildConsolidationeCrash, 3, FALSE, TRUE); 
+   RoxieKeyBuild.Mac_SF_BuildProcess_V2(File_KeybuildV2.AccidentReportsPR, Files_eCrash.BASE_ECRASH_PREFIX, Files_eCrash.SUFFIX_CONSOLIDATION_PR, FileDate, BuildConsolidationPR, 3, FALSE, TRUE); 
 	 
 // ###########################################################################
 //                  Validation of eCrash & Supplemental Base
@@ -33,7 +33,7 @@ EXPORT Proc_Build_Base(STRING FileDate ) := FUNCTION
 // ###########################################################################
 //                  Validation of CRU Base & Trigger CRU build
 // ##########################################################################
-    ValidateCRUBase := fn_Validate_CRUBase(FileDate);	
+    ValidateAndTriggerCRU := fn_Validate_TriggerCRU(FileDate);	
 
 // ###########################################################################
 //                  Ecrash Base Builds
@@ -46,10 +46,10 @@ EXPORT Proc_Build_Base(STRING FileDate ) := FUNCTION
 													 BuildConsolidationMBSAgency,
 													 ValidateEcrashSuppBase,
 													 BuildCRUVehicleIncidents,
-													 BuildConsolidationeCRU,
+													 BuildConsolidationCRU,
 													 BuildConsolidationeCrash,
 													 BuildConsolidationPR, 
-                           ValidateCRUBase
+                           ValidateAndTriggerCRU
 													);
 	 RETURN BuildBase;	 
 END;

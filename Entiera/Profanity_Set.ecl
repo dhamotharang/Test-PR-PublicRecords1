@@ -1,4 +1,4 @@
-EXPORT Profanity_Set := MODULE
+﻿EXPORT Profanity_Set := MODULE
 
 	export Exceptions :=
 						'('
@@ -49,5 +49,6 @@ EXPORT Profanity_Set := MODULE
 						+'|prick'
 						+'|prostitute'
 						+'|queer'
+						+'|bigmanjonson'
 						+')';
 END;

@@ -61,11 +61,12 @@ Email_DataV2.Layouts.Base_BIP t_map_to_common (domain_d input) := TRANSFORM
 	SELF.append_rawaid  						:= input.RawAid;
 	SELF.clean_ssn 									:= '';
 	SELF.clean_dob 									:= 0;
-	SELF.date_first_seen  					:= input.date_first_seen;
-	SELF.date_last_seen  						:= input.date_last_seen;
+	SELF.date_first_seen  					:= Fn_CleanDate(input.date_first_seen);
+	SELF.date_last_seen  						:= Fn_CleanDate(input.date_last_seen);
 	
-	SELF.Date_Vendor_First_Reported :=  input.date_vendor_first_reported;
-	SELF.Date_Vendor_Last_Reported  := input.date_vendor_last_reported;
+	SELF.Date_Vendor_First_Reported := Fn_CleanDate(input.date_vendor_first_reported);
+	SELF.Date_Vendor_Last_Reported  := Fn_CleanDate(input.date_vendor_last_reported);
+	
 	SELF.append_email_username 			:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Username(SELF.orig_email));
 	SELF.append_domain 							:= ut.CleanSpacesAndUpper(Email_Data.Fn_Clean_Email_Domain(input.domain));
 	SELF.append_domain_type 				:= ut.CleanSpacesAndUpper(input.domain_type);

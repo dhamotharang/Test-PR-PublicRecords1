@@ -1,4 +1,4 @@
-#workunit('name','2x42 Process');
+﻿#workunit('name','2x42 Process');
 
 layout:= record
 	string	AccountNumber	;
@@ -34,7 +34,7 @@ end;
 f := choosen(dataset('~tfuerstenberg::in::chase_2530_bus_rep1_file1_in', Layout, csv(QUOTE('"'))),5);
 output(f);
 
-roxieIP :='http://roxiebatch.br.seisint.com:9856';  // roxiebatch
+roxieIP :='http://roxiethorvip.hpcc.risk.regn.net:9856';  // roxiebatch
 
 Layout_BIID_Soapcall := record
 	string	AccountNumber;

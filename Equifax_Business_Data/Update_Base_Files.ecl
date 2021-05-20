@@ -43,9 +43,9 @@ function
   dStandardize_Name_Contacts		:= Standardize_Name_Contacts.fAll (dIngestContacts, pversion);
 														
 	companies_dist 	:= distribute(dRollup,hash64(efx_id));
-	sortCompanies   := sort(companies_dist, efx_id, -dt_last_seen, record_type, normCompany_type, local);
+	sortCompanies   := sort(companies_dist, efx_id, -process_date, local);
 	contacts_dist 	:= distribute(dIngestContacts,hash64(efx_id));
-	sortContacts    := sort(contacts_dist, efx_id, -dt_last_seen, local);
+	sortContacts    := sort(contacts_dist, efx_id, -process_date, local);
 		
 	Layouts.Base_Contacts AppendCompanyInfo(Layouts.Base_contacts l, Layouts.Base r) :=
 	transform
@@ -69,14 +69,15 @@ function
 	end;
 
 	// Get all company records that are in the valid date range window, then select best one after join
-	contacts_getcompanyinfo := join(
-														 sortContacts
-														,sortCompanies
-														,			left.efx_id = right.efx_id
-														,AppendCompanyInfo(left,right)
-														,left outer
-														,local
-											);
+	contacts_getcompanyinfo := join( sortContacts
+																	,sortCompanies
+																	,trim(left.efx_id,left,right)  = trim(right.efx_id,left,right) and
+																	 left.process_date             = right.process_date
+																	,AppendCompanyInfo(left,right)
+																	,left outer
+																	,local
+											          );
+											
 											
 	distContacts	  := distribute	(contacts_getcompanyinfo, hash(rcid));
 	contacts_sort	  := sort				(distContacts, rcid, -company_date_last_seen, local)
@@ -86,9 +87,8 @@ function
   : persist(Equifax_Business_Data.Persistnames().CompanyContactDedup,SINGLE)
 	;
 	
-	dAppendDIdsContacts  := Equifax_Business_Data.Append_DIds_Contacts.fAll(contacts_dedup);
-	
-	dRollupContacts	:= Rollup_Contacts(contacts_dedup);
+	dAppendDIdsContacts  := Equifax_Business_Data.Append_DIds_Contacts.fAll(contacts_dedup);	
+	dRollupContacts	     := Rollup_Contacts(dAppendDIdsContacts);
 	
 	tools.mac_WriteFile(Filenames(pversion).base.Companies.new	,dRollup		,Build_Companies_File	,pShouldExport := false);
 	tools.mac_WriteFile(Filenames(pversion).base.Contacts.new		,dRollupContacts	,Build_Contacts_File	,pShouldExport := false);

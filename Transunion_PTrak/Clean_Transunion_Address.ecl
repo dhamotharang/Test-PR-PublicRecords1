@@ -1,6 +1,8 @@
 IMPORT  address, ut;
 
-norm_addresses := project(Transunion_PTrak.Normalize_Transunion_Update,transform(Transunion_PTrak.Layout_Transunion_Out.NormCleanAddressRec, self.CleanAddress := '', self := left));
+EXPORT Clean_Transunion_Address(STRING Full_filedate,STRING Update_filedate) := FUNCTION
+
+norm_addresses := project(Transunion_PTrak.Normalize_Transunion_Update(Full_filedate,Update_filedate),transform(Transunion_PTrak.Layout_Transunion_Out.NormCleanAddressRec, self.CleanAddress := '', self := left));
 
 cash_address		:= Transunion_PTrak.File_Transunion_Cash_Address;
 
@@ -56,7 +58,8 @@ BuildCashAddress:= SEQUENTIAL(for_cash_address,
 															FileServices.FinishSuperFileTransaction()
 );
 
-EXPORT Clean_Transunion_Address := BuildCashAddress;
+return BuildCashAddress;
 
+END;
 
 

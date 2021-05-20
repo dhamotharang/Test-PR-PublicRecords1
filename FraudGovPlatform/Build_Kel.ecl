@@ -61,11 +61,13 @@ BuildStatusReport :=
 
 			
 	Export	All := Sequential(
-										Build_Keys(pVersion).All
+										Build_Keys(pVersion).Kel
 										,Build_Base_Kel(pVersion).All
 										,Promote(pversion).buildfiles.New2Built
-										,Promote(pversion).buildfiles.Built2QA
-										,FraudGovPlatform.Promote(pversion).promote_keys
+										,Promote(pversion,,true).buildfiles.Built2QA
+										,Build_Keys(pversion).All
+										,Build_AutoKeys(pversion)			
+										,Promote(pversion,,true).promote_keys
 										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)

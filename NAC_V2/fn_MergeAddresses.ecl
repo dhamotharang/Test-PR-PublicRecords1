@@ -37,7 +37,7 @@ Replace previous address with new address
 								self.Mailing_Street2 := Coalesce1(newbase.Mailing_Street2, base.Mailing_Street2);
 								self.Mailing_City := Coalesce1(newbase.Mailing_City, base.Mailing_City);
 								self.Mailing_State := Coalesce1(newbase.Mailing_State, base.Mailing_State);
-								self.Mailing_Zip := Coalesce1(newbase.Physical_Zip, base.Mailing_Zip);
+								self.Mailing_Zip := Coalesce1(newbase.Mailing_Zip, base.Mailing_Zip);
 
 								// clean addresses
 								self.prim_range := Coalesce1(newbase.prim_range, base.prim_range);
@@ -67,6 +67,9 @@ Replace previous address with new address
 								self.geo_blk := Coalesce1(newbase.geo_blk, base.geo_blk);
 								self.geo_match := Coalesce1(newbase.geo_match, base.geo_match);
 								self.err_stat := Coalesce1(newbase.err_stat, base.err_stat);
+								
+								self.prepped_addr1 := newbase.prepped_addr1;
+								self.prepped_addr2 := newbase.prepped_addr2;
 						
 					self.created := IF(base.addressType='', Std.Date.Today(), base.created);
 					self.replaced := IF(newbase.addressType='', base.replaced, Std.Date.Today());
@@ -110,7 +113,7 @@ fn_MergeCaseAddresses(DATASET($.Layout_Base2) caseAddr, DATASET($.Layout_Base2) 
 		Do not process records that have previously been replaced
 	*/
 	unchanged := JOIN(current, caseAddr,
-							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND LEFT.GroupId = RIGHT.GroupId
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.GroupId = RIGHT.GroupId
 							AND LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode,
 								TRANSFORM($.Layout_Base2, self := LEFT),
 								LEFT ONLY, LOCAL);
@@ -123,7 +126,7 @@ fn_MergeCaseAddresses(DATASET($.Layout_Base2) caseAddr, DATASET($.Layout_Base2) 
 								RIGHT ONLY, LOCAL);*/
 
 	updatedAddress := JOIN(current, caseAddr,
-							LEFT.CaseId = RIGHT.CaseId AND LEFT.ClientId = RIGHT.ClientId AND LEFT.GroupId = RIGHT.GroupId
+							LEFT.CaseId = RIGHT.CaseId AND LEFT.GroupId = RIGHT.GroupId
 							AND LEFT.ProgramState = RIGHT.ProgramState and LEFT.ProgramCode = RIGHT.ProgramCode,
 								xForm(RIGHT, LEFT),
 								INNER, LOCAL);
@@ -156,9 +159,7 @@ EXPORT fn_MergeAddresses(DATASET($.Layout_Base2) newbase, DATASET($.Layout_Base2
 	
 	// addresses that apply to cases, not clients (ClientId='')
 	caseAddr := DISTRIBUTE(newbase(addresstype<>'', ClientId=''), HASH32(CaseID));
-
 	current := DISTRIBUTE(recent,HASH32(CaseID)); 
-	
 	CaseAddressesUpdated := IF(EXISTS(caseAddr), fn_MergeCaseAddresses(caseAddr, current), current);
 	
 	// addresses that apply to clients (ClientId<>'')

@@ -406,6 +406,8 @@
 				trim(subcatname, left, right) = 'PEP NG-R' 	=> 'PEP Non-Government - Immediate Relative',
 				trim(subcatname, left, right) = 'PEP NG-A' 	=> 'PEP Non-Government - Close Associate',
 				trim(subcatname, left, right) = 'SOE' 		=> 'PEP State Owned Entity',
+				trim(subcatname, left, right) = 'SIE' 		=> 'PEP State Invested Enterprise',
+				trim(subcatname, left, right) = 'IOS' 		=> 'PEP Instrumentality of State',
 				trim(subcatname, left, right) in ['Non-PEP', ''] => 'Non-PEP',
 				'');
 				
@@ -1421,6 +1423,22 @@
 				trim(kword, left, right) = 'UKHMT-NDS' =>SubGroup_Constants.numKeywordsID.KEYWORD_UKHMT_NDS,
 				trim(kword, left, right) = 'SLGAZ-NAT' =>SubGroup_Constants.numKeywordsID.KEYWORD_SLGAZ_NAT,
 				trim(kword, left, right) = 'BYKGB' =>SubGroup_Constants.numKeywordsID.KEYWORD_BYKGB,
+				trim(kword, left, right) = 'SECO-TB' =>SubGroup_Constants.numKeywordsID.KEYWORD_SECO_TB,
+				trim(kword, left, right) = 'ECPN-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ECPN_MW,
+				trim(kword, left, right) = 'DOPN-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_DOPN_MW,
+				trim(kword, left, right) = 'OFAC-RUSSIA-EO' =>SubGroup_Constants.numKeywordsID.KEYWORD_OFAC_RUSSIA_EO,
+				trim(kword, left, right) = 'TRMASAK' =>SubGroup_Constants.numKeywordsID.KEYWORD_TRMASAK,
+				trim(kword, left, right) = 'IDLPSE' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDLPSE,
+				trim(kword, left, right) = 'PTCMVM-AJC' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTCMVM_AJC,
+				trim(kword, left, right) = 'PTCMVM-DWN' =>SubGroup_Constants.numKeywordsID.KEYWORD_PTCMVM_DWN,
+				trim(kword, left, right) = 'FINMA-DU' =>SubGroup_Constants.numKeywordsID.KEYWORD_FINMA_DU,
+				trim(kword, left, right) = 'ARGBA-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARGBA_MW,
+				trim(kword, left, right) = 'ARMS-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARMS_MW,
+				trim(kword, left, right) = 'ARRNR-MW' =>SubGroup_Constants.numKeywordsID.KEYWORD_ARRNR_MW,
+				trim(kword, left, right) = 'IDMA' =>SubGroup_Constants.numKeywordsID.KEYWORD_IDMA,
+				trim(kword, left, right) = 'TWMPB-CV' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMPB_CV,
+				trim(kword, left, right) = 'NS-CCMC-EO13959' =>SubGroup_Constants.numKeywordsID.KEYWORD_NS_CCMC_EO13959,
+				trim(kword, left, right) = 'ROONJN' =>SubGroup_Constants.numKeywordsID.KEYWORD_ROONJN,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				

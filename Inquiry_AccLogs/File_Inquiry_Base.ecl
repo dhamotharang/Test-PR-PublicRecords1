@@ -16,7 +16,7 @@ export history := project(inquiry_acclogs.File_Inquiry_BaseSourced.history, inqu
 
   Vk:=sc[findex..lindex];
 	
-	VP:=dops.Getbuildversion('InquiryTableKeys','B','N','P','prod');//did_add.get_EnvVariable('inquiry_build_version','http://roxiestaging.br.seisint.com:9876')[1..8];
+	VP:=dops.Getbuildversion('InquiryTableKeys','B','N','P','prod');//did_add.get_EnvVariable('inquiry_build_version','http://certstagingvip.hpcc.risk.regn.net:9876')[1..8];
 	
   father_sf_empty := count(dataset('~thor_data400::out::inquiry_tracking::weekly_historical_father',inquiry_acclogs.Layout.Common_ThorAdditions_non_FCRA,thor, opt)) = 0;
   sf_complete := count(nothor(fileservices.superfilecontents('~thor_data400::out::inquiry_tracking::weekly_historical'))) =2;

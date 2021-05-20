@@ -1,4 +1,4 @@
-pb1i_layout := record
+﻿pb1i_layout := record
 	string30 ACCOUNT := '';
      string30 CMPY := '';
      string30 DBANAME := '';
@@ -89,7 +89,7 @@ end;
 batch_in := project(f,into_bus_input(LEFT));
 output(batch_in);
 
-roxieIP := 'roxiestaging.br.seisint.com:9876';
+roxieIP := 'certstagingvip.hpcc.risk.regn.net:9876';
 #stored('roxie_regression_system','vip');
 
 //roxieIP := 'stcloudroxievip.sc.seisint.com:9876';  //St. Cloud Roxie

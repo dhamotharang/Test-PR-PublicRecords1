@@ -1,11 +1,25 @@
-import Std, ut;
+﻿import Std, ut;
 
 r1 := RECORD
 	nac_v2.Layout_Payload;
 	Std.Date.Date_t	StartDate;
 END;
 
+// year 2099 is treated as open ended
+//	dats and months returned will be 0
+integer GetDaysBetween(unsigned4 StartDate, unsigned4 EndDate) := FUNCTION
+		EndYear := Std.Date.Year(EndDate);
+		return IF(EndYear = 2099, 0,
+							STD.Date.DaysBetween(StartDate, EndDate) + 1
+						);
+END;
 
+integer GetMonthsBetween(unsigned4 StartDate, unsigned4 EndDate) := FUNCTION
+		EndYear := Std.Date.Year(EndDate);
+		return IF(EndYear = 2099, 0,
+							STD.Date.MonthsBetween(StartDate, EndDate) + 1
+						);
+END;
 
 EXPORT To_Payload(dataset(nac_v2.Layout_Base2) base1) := FUNCTION
 
@@ -117,14 +131,14 @@ EXPORT To_Payload(dataset(nac_v2.Layout_Base2) base1) := FUNCTION
 									self.eligibility_period_start := left.StartDate;
 									self.eligibility_period_end := left.EndDate;
 									self.eligible_period_count_days := IF(left.eligibility_status_indicator='E',
-																									Std.Date.DaysBetween(
+																									GetDaysBetween(
 																										left.StartDate,
-																										left.EndDate) + 1,
+																										left.EndDate),
 																										0);
 									self.eligible_period_count_months := IF(left.eligibility_status_indicator='E',
-																									Std.Date.MonthsBetween(
+																									GetMonthsBetween(
 																										left.StartDate,
-																										left.EndDate) + 1,
+																										left.EndDate),
 																										0);
 									self := left;
 								));

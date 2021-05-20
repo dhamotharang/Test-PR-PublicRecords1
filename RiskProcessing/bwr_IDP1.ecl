@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA-idp1-process');
+﻿#workunit('name','NonFCRA-idp1-process');
 #option ('hthorMemoryLimit', 1000)
 
 
@@ -44,10 +44,10 @@ Scoring.Layout_IDPO_Soapcall into_IDPO_input(f le) := transform
 	
 	self.DataRestrictionMask := '000000000001';  // just ADVO restricted like GE is getting in production
 	
-	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'}], risk_indicators.Layout_Gateways_In);
+	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'}], risk_indicators.Layout_Gateways_In);
 
 // *** with Targus Gateway "ON" ***
-//	self.gateways := dataset([{'neutralroxie', 'http://roxiebatch.br.seisint.com:9856'},
+//	self.gateways := dataset([{'neutralroxie', 'http://roxiethorvip.hpcc.risk.regn.net:9856'},
 //						{'targus','http://rw_data_prod:Password01@gatewayprodesp.sc.seisint.com:7726/wsGateway/?ver_=1.70'}], risk_indicators.Layout_Gateways_In);
 
 	self := le;
@@ -61,7 +61,7 @@ ox := record
    riskwise.layout_idpo - ri - billing;
 end;
 
-roxieIP :='http://roxiebatch.br.seisint.com:9856';  // Roxiebatch
+roxieIP :='http://roxiethorvip.hpcc.risk.regn.net:9856';  // Roxiebatch
 
 
 xlayout := RECORD

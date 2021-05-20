@@ -1,4 +1,4 @@
-prii_layout := RECORD
+﻿prii_layout := RECORD
 string	ACCOUNT	;
 string	DateTime	;
 string	FirstName	;
@@ -65,10 +65,10 @@ l t_f(f le, INTEGER c) := TRANSFORM
 	SELF.GLBPurpose := 5;
 	SELF.IncludeAllAttributes := False;
 
-//	self.scores := dataset([{'Models.FraudAdvisor_Service','http://roxiestaging.br.seisint.com:9876', params}], models.Layout_Score_Chooser);
+//	self.scores := dataset([{'Models.FraudAdvisor_Service','http://certstagingvip.hpcc.risk.regn.net:9876', params}], models.Layout_Score_Chooser);
 						/*
-						{'Models.ThinDex_Service','http://roxiestaging.br.seisint.com:9876', params},
-						{'Models.StudentAdvisor_Service','http://roxiestaging.br.seisint.com:9876', student_params}], models.Layout_Score_Chooser);
+						{'Models.ThinDex_Service','http://certstagingvip.hpcc.risk.regn.net:9876', params},
+						{'Models.StudentAdvisor_Service','http://certstagingvip.hpcc.risk.regn.net:9876', student_params}], models.Layout_Score_Chooser);
 						*/
 	// use it for FCRA RiskView
 	self.scores := dataset([{'Models.RVBankCard_Service', 'http://ofcraroxievip.or.seisint.com:9876',params}], models.Layout_Score_Chooser); 

@@ -22,6 +22,7 @@ SANCTN_Mari.layouts_SANCTN_common.SANCTN_party_text mapPartyTxt(ds_PartyTxt L)  
 		TrimText := ut.CleanSpacesAndUpper(L.TXT);
 		replace_tilde := STD.Str.FindReplace(TrimText,'~','\r');
 		self.FIELD_TXT		:= STD.Str.FindReplace(replace_tilde, '&AMP;','&');
+		self:=[];
 		
 END;
 

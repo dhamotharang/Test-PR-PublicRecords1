@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////////////////////////
+﻿//////////////////////////////////////////////////////////////////////////////////////////////
 // -- BDID_Segment() function
 // -- Pass it the segment code(ex, '0010') and the update file(in base file format)
 // -- and it will BDID the combined update and base file
@@ -91,6 +91,21 @@ end;
 #else
 %File_Combined% := %File_In_common_fields%;
 #end
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// -- Set Record Type flag
+//////////////////////////////////////////////////////////////////////////////////////////
+%File_Combined_Grpd_Sort%	:= SORT(%File_Combined%, FILE_NUMBER, -process_date_last_seen,  local);
+%File_Combined_Grpd% 			:= GROUP(%File_Combined_Grpd_Sort%,	FILE_NUMBER, LOCAL);
+
+%Layout_Base% %SetRecordType%(%File_Combined_Grpd% l, %File_Combined_Grpd% r) := 
+transform
+	self.record_type 	:= if(l.record_type = '' or l.process_date = r.process_date, 'C', 'H');
+	SELF 			:= r;
+END;
+
+%File_Combined_Prop% := ITERATE(%File_Combined_Grpd%, %SetRecordType%(LEFT, RIGHT));
+
 //////////////////////////////////////////////////////////////////////////////////////////
 // -- Rollup on Raw Fields, setting date_first_seen, date_last_seen
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -105,7 +120,8 @@ transform
 	self := L;
 END;
 
-%File_Combined_dist% 	:= distribute(%File_Combined%,hash(FILE_NUMBER));
+%File_Combined_dist% 	:= distribute(%File_Combined_Prop%,hash(FILE_NUMBER));
+
 %File_Combined_sort% 	:= sort(%File_Combined_dist%, record, 
 					except 	bdid, date_first_seen, date_last_seen, process_date_first_seen, 
 									process_date_last_seen, record_type, process_date,
@@ -117,23 +133,9 @@ END;
 									local);
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// -- Set Record Type flag
-//////////////////////////////////////////////////////////////////////////////////////////
-%File_Combined_Grpd% 		:= GROUP(%File_Combined_rollup%, 	FILE_NUMBER, LOCAL);
-%File_Combined_Grpd_Sort% 	:= SORT(%File_Combined_Grpd%, 	-process_date_last_seen);
-
-%Layout_Base% %SetRecordType%(%File_Combined_Grpd_Sort% l, %File_Combined_Grpd_Sort% r) := 
-transform
-	self.record_type 	:= if(l.record_type = '' or l.process_date = r.process_date, 'C', 'H');
-	SELF 			:= r;
-END;
-
-%File_Combined_Prop% := GROUP(ITERATE(%File_Combined_Grpd_Sort%, %SetRecordType%(LEFT, RIGHT)));
-
-//////////////////////////////////////////////////////////////////////////////////////////
 // -- Distribute both files
 //////////////////////////////////////////////////////////////////////////////////////////
-%File_dist% := distribute(%File_Combined_Prop%,hash(FILE_NUMBER));
+%File_dist% := distribute(%File_Combined_rollup%,hash(FILE_NUMBER));
 %File_sort% := sort(%File_dist%,FILE_NUMBER,-process_date,local);
 
 %File_Header_dist%  := distribute(ebr.File_0010_Header_Base,hash(FILE_NUMBER));

@@ -124,10 +124,10 @@ EXPORT Infiles := MODULE
   jPersn := JOIN(dPersn, Incidents_ToDelete, 
 								 TRIM(LEFT.incident_id, ALL)= TRIM(RIGHT.incident_id, ALL),
 								 LEFT ONLY, LOCAL);
-  EXPORT tPersn := PROJECT(jPersn, TRANSFORM(Layout_Infiles_Fixed.persn,
+  SHARED tPersn := PROJECT(jPersn, TRANSFORM(Layout_Infiles_Fixed.persn,
                            SELF.person_type := STD.Str.ToUpperCase(LEFT.person_type);
 													 SELF := LEFT));												
-	SHARED uPerson :=	DEDUP(SORT(tPersn(incident_id <> ''),
+	EXPORT uPerson :=	DEDUP(SORT(tPersn(incident_id <> ''),
 													     incident_id, vehicle_unit_number, last_name, first_name, date_of_birth, address, city, state, zip_code, home_phone, 
 													     MAP(REGEXFIND('DRIVER|VEHICLE DRIVER|VEHICLEDRIVER', person_type) => 3, 
 															     REGEXFIND('OWNER|VEHICLE OWNER|VEHICLEOWNER', person_type) => 2, 
@@ -141,8 +141,8 @@ EXPORT Infiles := MODULE
   jVehicl := JOIN(dVehicl, Incidents_ToDelete,
 								  TRIM(LEFT.incident_id, ALL) = TRIM(RIGHT.incident_id, ALL),
 								  LEFT ONLY, LOCAL);
-  EXPORT tVehicl := PROJECT(jVehicl, TRANSFORM(Layout_Infiles_Fixed.vehicl, SELF:= LEFT));	
-	SHARED uVehicl := SORT(DEDUP(SORT(tVehicl(incident_id <> ''),
+  SHARED tVehicl := PROJECT(jVehicl, TRANSFORM(Layout_Infiles_Fixed.vehicl, SELF:= LEFT));	
+	EXPORT uVehicl := SORT(DEDUP(SORT(tVehicl(incident_id <> ''),
 											              vin, incident_id, unit_number, creation_date, LOCAL),
 									             vin, incident_id, unit_number, RIGHT, LOCAL),
 								         incident_id, LOCAL);

@@ -26,7 +26,7 @@ RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(SANCTN_Mari.key_nmls_midex,					Super
 RoxieKeyBuild.Mac_SK_BuildProcess_v2_Local(SANCTN_Mari.key_party_aka_dba,				SuperKeyName+'party_aka_dba',		BaseKeyName+'::party_aka_dba',	key17);
 
 
-Keys	:=	parallel(key1,key2,key3,key4,key5,key6,key7,key8,key9,key10,key11,key12,key13,key14,key15,key16,key17);
+Keys	:=	parallel(key1,/*key2,DF-28232*/key3,key4,key5,key6,key7,key8,key9,key10,key11,key12,key13,key14,key15,key16,key17);
 
 
 
@@ -51,7 +51,7 @@ RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'@version@::nmls_midex',			Ba
 //Added for key_party_aka_dba. 08/12/14
 RoxieKeyBuild.Mac_SK_Move_To_Built_V2(SuperKeyName+'@version@::party_aka_dba',	BaseKeyName+'::party_aka_dba',	mv17);
 
-Move_keys_orig	:=	parallel(mv1,mv2,mv3,mv4,mv5,mv6,mv7,mv8,mv9,mv10,mv11,mv12,mv13,mv14,mv15,mv16,mv17);
+Move_keys_orig	:=	parallel(mv1,/*mv2,DF-28232*/mv3,mv4,mv5,mv6,mv7,mv8,mv9,mv10,mv11,mv12,mv13,mv14,mv15,mv16,mv17);
 																
 
 //Move Orig to QA
@@ -75,7 +75,7 @@ RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::nmls_midex',		'Q',mv16_qa,
 //Added for key_party_aka_dba. 08/12/14
 RoxieKeyBuild.MAC_SK_Move_V2(SuperKeyName+'@version@::party_aka_dba',	'Q',mv17_qa,2);
 
-To_qa_orig	:=	parallel(mv1_qa,mv2_qa,mv3_qa,mv4_qa,mv5_qa,mv6_qa,mv7_qa,mv8_qa,mv9_qa,mv10_qa,mv11_qa,mv12_qa,mv13_qa,mv14_qa,mv15_qa,mv16_qa,mv17_qa);
+To_qa_orig	:=	parallel(mv1_qa,/*mv2_qa,DF-28232*/mv3_qa,mv4_qa,mv5_qa,mv6_qa,mv7_qa,mv8_qa,mv9_qa,mv10_qa,mv11_qa,mv12_qa,mv13_qa,mv14_qa,mv15_qa,mv16_qa,mv17_qa);
 
 // Build Autokeys
 autokeys	:=	SANCTN_Mari.proc_build_autokeys(filedate);

@@ -1,4 +1,4 @@
-IMPORT Business_Header, Business_Header_SS;
+﻿IMPORT Business_Header, Business_Header_SS;
 
 EXPORT rpc_for_BDIDs( DATASET(layouts.DIDMetaRec) batch_in ) :=
 	FUNCTION
@@ -34,7 +34,7 @@ EXPORT rpc_for_BDIDs( DATASET(layouts.DIDMetaRec) batch_in ) :=
 			' -ow ' + SIZEOF(Business_Header.layout_BDID_OutBatch_Expanded) +
 			' -b 100' +
 			' -mr 2' +
-			' -h ' + 'roxiebatch.br.seisint.com:9856' +
+			' -h ' + AccountMonitoring.constants.PROD_VIP +
 			' -r Result' +
 			' -q "<Business_Header.BH_BDID_Batch_Service format=\'raw\'>' +
 			'<bdid_batch_in id=\'id\' format=\'raw\'></bdid_batch_in>' +

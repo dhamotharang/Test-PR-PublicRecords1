@@ -28,8 +28,10 @@ module
 	export refs_l_sic                := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_sic'            	     ,pversion    );
 	export refs_l_rcid               := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_rcid'            	     ,pversion    );
 	export refs_l_fein               := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_fein'             	   ,pversion    );
-	export refs_l_contact            := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_contact'          	   ,pversion    );
-	export refs_l_url                := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_url'              	   ,pversion    );
+	export refs_l_contact            := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_contact'               ,pversion    );
+  export refs_l_contact_zip        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_contact_zip'           ,pversion    );
+  export refs_l_contact_st         := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_contact_st'          	 ,pversion    );
+  export refs_l_url                := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_url'              	   ,pversion    );
 	export refs_l_email              := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_email'            	   ,pversion    );
 	export refs_l_contact_did        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_contact_did'      	   ,pversion    );
 	export refs_l_contact_ssn        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::refs::l_contact_ssn'      	   ,pversion    );
@@ -44,18 +46,20 @@ module
 	export sup_ultid                 := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::sup::ultid'                    ,pversion    );  
 	export sup_rcid                  := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::sup::rcid'                     ,pversion    );  
 
-	export ext_data_payload              := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::ext_databyproxid::payload'        ,pversion    );
+	export ext_data_payload              := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::ext_databyproxid::payload'         ,pversion    );
 	export ext_data_l_cnpname            := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_cnpname::ext_data'          	   ,pversion    );
-	export ext_data_l_cnpname_zip        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_cnpname_zip::ext_data'       	  ,pversion    );
+	export ext_data_l_cnpname_zip        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_cnpname_zip::ext_data'       	   ,pversion    );
 	export ext_data_l_cnpname_st         := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_cnpname_st::ext_data'       	   ,pversion    );
-	export ext_data_l_cnpname_fuzzy      := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_cnpname_fuzzy::ext_data'       	,pversion    );
+	export ext_data_l_cnpname_fuzzy      := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_cnpname_fuzzy::ext_data'       	 ,pversion    );
 	export ext_data_l_address1           := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_address1::ext_data'         	   ,pversion    );
 	export ext_data_l_address2           := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_address2::ext_data'         	   ,pversion    );
 	export ext_data_l_address3           := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_address3::ext_data'         	   ,pversion    );
 	export ext_data_l_phone              := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_phone::ext_data'            	   ,pversion    );
 	export ext_data_l_sic                := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_sic::ext_data'            	     ,pversion    );
 	export ext_data_l_fein               := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_fein::ext_data'             	   ,pversion    );
-	export ext_data_l_contact            := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_contact::ext_data'          	   ,pversion    );
+	export ext_data_l_contact            := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_contact::ext_data'               ,pversion    );	
+  export ext_data_l_contact_zip        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_contact_zip::ext_data'           ,pversion    );
+	export ext_data_l_contact_st         := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_contact_st::ext_data'          	 ,pversion    );
 	export ext_data_l_url                := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_url::ext_data'              	   ,pversion    );
 	export ext_data_l_email              := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_email::ext_data'            	   ,pversion    );
 	export ext_data_l_contact_did        := tools.mod_FilenamesBuild(lcluster + 'key::BizLinkFull::@version@::proxid::l_contact_did::ext_data'      	   ,pversion    );
@@ -78,6 +82,8 @@ module
     + refs_l_sic                .dall_filenames
     + refs_l_fein               .dall_filenames
     + refs_l_contact            .dall_filenames
+    + refs_l_contact_zip        .dall_filenames
+    + refs_l_contact_st         .dall_filenames
     + refs_l_url                .dall_filenames
     + refs_l_email              .dall_filenames
     + refs_l_contact_did        .dall_filenames
@@ -102,8 +108,10 @@ module
     + ext_data_l_address3       .dall_filenames   
     + ext_data_l_phone          .dall_filenames   
     + ext_data_l_sic            .dall_filenames   
-    + ext_data_l_fein           .dall_filenames   
-    + ext_data_l_contact        .dall_filenames   
+    + ext_data_l_fein           .dall_filenames
+    + ext_data_l_contact        .dall_filenames    
+    + ext_data_l_contact_zip    .dall_filenames 
+    + ext_data_l_contact_st     .dall_filenames   
     + ext_data_l_url            .dall_filenames   
     + ext_data_l_email          .dall_filenames   
     + ext_data_l_contact_did    .dall_filenames   

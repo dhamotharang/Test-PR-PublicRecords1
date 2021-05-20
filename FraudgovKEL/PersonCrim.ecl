@@ -1,8 +1,6 @@
 ﻿IMPORT FraudgovKEL, FraudGovPlatform,doxie,Suppress;
-RunKelDemo :=false:stored('RunKelDemo');
 
-FileIn := If(RunKelDemo=false,FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Crim.built
-									,FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Crim_Demo.built); 
+FileIn := FraudGovPlatform.files(,FraudgovKEL.Constants.useOtherEnvironmentDali).base.Crim.built; 
 									
 PersonCrimPrep1 := PROJECT(FileIn,
        TRANSFORM({RECORDOF(LEFT), STRING off_cat_list}, 

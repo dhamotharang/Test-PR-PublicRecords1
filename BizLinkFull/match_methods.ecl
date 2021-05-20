@@ -1,4 +1,4 @@
-﻿IMPORT SALT44,std;
+IMPORT SALT44,std;
 EXPORT match_methods(DATASET(layout_BizHead) ih) := MODULE
 SHARED h := match_candidates(ih).candidates;
 EXPORT match_parent_proxid(TYPEOF(h.parent_proxid) L, TYPEOF(h.parent_proxid) R,  BOOLEAN RequiredField = FALSE) := IF(~RequiredField,

@@ -1,4 +1,4 @@
-import std;
+﻿import std;
 
 #option('skipFileFormatCrcCheck', 1);
 #option('maxLength', 131072);
@@ -87,9 +87,16 @@ export Mapping_and_Rollup_Addresses_Premium(dataset(Layout_WorldCheck_Premium) i
 	
 reformLocation 	:= project(ds_NormLocations, locationsTran(left));
 
-	//Fix mappings where street_1 = city name; city = ,; (i.e: Brejo Alegre, SÃ£o Paulo ~,~ BRAZIL)
 	Layout_temp cityTran(reformLocation l):= transform
-		self.Street_1		:= if(regexfind('State of', trim(l.City, left, right), 0) <> '' and trim(l.State, left, right) = '' and trim(l.Country, left, right) = 'USA'
+		self.Street_1		:= trim(l.Street_1, left, right);
+		self.City			:= if(l.City=',',
+											'',
+										if(l.City[length(l.City)]=',',
+											trim(l.City[1..length(l.City)-1], left, right),	
+											trim(l.City, left, right)));
+
+//Fix mappings where street_1 = city name; city = ,; (i.e: Brejo Alegre, SÃ£o Paulo ~,~ BRAZIL)
+/*		self.Street_1		:= if(regexfind('State of', trim(l.City, left, right), 0) <> '' and trim(l.State, left, right) = '' and trim(l.Country, left, right) = 'USA'
 													,''
 													,if(l.City=',' and stringlib.stringfind(',', l.Street_1, 2)=0 and l.Street_1<>'',
 														'',
@@ -105,6 +112,7 @@ reformLocation 	:= project(ds_NormLocations, locationsTran(left));
 											trim(l.City[1..length(l.City)-1], left, right),	
 											trim(l.City, left, right))))
 											);
+	*/	
 		
 		self.State		:= if(regexfind('State of', trim(l.City, left, right), 0) <> '' and trim(l.State, left, right) = '' and trim(l.Country, left, right) = 'USA'
 											,trim(regexreplace('State of', l.City[stringlib.stringfind(l.City, 'State of', 1)..stringlib.stringfind(l.City, ',', 1)-1], ''), left, right)
@@ -291,9 +299,9 @@ OtherAddr 	  := concatAddr(Street_1 <> '' or Street_2 <> '' or City <> '' or Sta
 		self 							:= L;
 	END;
 	
-	uniqueaddr11 := rollup(sort(uniqueaddr1, ID, Country), left.id = right.id and left.country = right.country and left.city = '' and right.city <> '', Xform1(LEFT, RIGHT));
+	uniqueaddr11 := rollup(sort(uniqueaddr1, ID, Country), left.id = right.id and left.country = right.country and left.city = '' and right.city = '' and left.street_1 = '' and right.street_1 <> '', Xform1(LEFT, RIGHT));
 	
-	uniqueaddr := rollup(sort(uniqueaddr11, ID, Country), left.id = right.id and left.country = right.country and left.city <> '' and right.city = '', Xform1(LEFT, RIGHT)) : persist('~thor_200::persist::worldcheck::normalized_addresses_premium');
+	uniqueaddr := rollup(sort(uniqueaddr11, ID, Country), left.id = right.id and left.country = right.country and left.city = '' and right.city = '' and left.street_1 <> '' and right.street_1 = '', Xform1(LEFT, RIGHT)) : persist('~thor_200::persist::worldcheck::normalized_addresses_premium');
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////
 	

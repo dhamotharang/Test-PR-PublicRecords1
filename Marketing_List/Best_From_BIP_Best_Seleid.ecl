@@ -52,17 +52,25 @@ function
   ds_best_prep := project(ds_best_get_active_seleids  ,transform(Marketing_List.Layouts.business_information_prep,
 
     // -- get best address and company name that are marketing approved.
-    emp_cnt_cd := left.employee_count ((employee_count_data_permits  & mktg_bmap) != 0);
-    sales_cd   := left.sales          ((sales_data_permits           & mktg_bmap) != 0);
+    emp_cnt_cd  := left.employee_count ((employee_count_data_permits       & mktg_bmap) != 0);
+    sales_cd    := left.sales          ((sales_data_permits                & mktg_bmap) != 0);
     
+    sic_codes   := left.sic_code       ((company_sic_code1_data_permits    & mktg_bmap) != 0);
+    naics_codes := left.naics_code     ((company_naics_code1_data_permits  & mktg_bmap) != 0);
+
+    employees_sources := table(emp_cnt_cd   ,{source} ,source);
+    revenue_sources   := table(sales_cd     ,{source} ,source);
+    sic_sources       := table(sic_codes    ,{source} ,source);
+    naics_sources     := table(naics_codes  ,{source} ,source);
+
     best_company_name := topn(left.company_name   ((company_name_data_permits         & mktg_bmap) != 0)                                                     ,1,-dt_last_seen               )[1];
     best_address      := topn(left.company_address((company_address_data_permits      & mktg_bmap) != 0)                                                     ,1, company_address_method     )[1];
     best_phone        := topn(left.company_phone  ((company_phone_data_permits        & mktg_bmap) != 0,Marketing_List.Validate_phone(company_phone) != '')  ,1, company_phone_method       )[1];
 
-    best_emp_cnt      := topn(left.employee_count ((employee_count_data_permits       & mktg_bmap) != 0)                                                     ,1, employee_count_method      )[1];
-    best_sales_cnt    := topn(left.sales          ((sales_data_permits                & mktg_bmap) != 0)                                                     ,1, sales_method               )[1];  
-    best_sic_codes    := topn(left.sic_code       ((company_sic_code1_data_permits    & mktg_bmap) != 0)                                                     ,5, company_sic_code1_method   );
-    best_naics_codes  := topn(left.naics_code     ((company_naics_code1_data_permits  & mktg_bmap) != 0)                                                     ,5, company_naics_code1_method );
+    best_emp_cnt      := topn(emp_cnt_cd                                                     ,1, employee_count_method      )[1];
+    best_sales_cnt    := topn(sales_cd                                                       ,1, sales_method               )[1];  
+    best_sic_codes    := topn(sic_codes                                                      ,5, company_sic_code1_method   );
+    best_naics_codes  := topn(naics_codes                                                    ,5, company_naics_code1_method );
   
     self.seleid              := left.seleid                             ;
     self.proxid              := 0                                       ;
@@ -91,16 +99,20 @@ function
 
     self.annual_revenue      := if(pPullFromBest = true ,if(exists(sales_cd  ) ,best_sales_cnt.sales         ,-1) ,0 )                                      ;
     #IF(Best_Has_Source_Fields = true)
-    self.src_revenue         := if(pPullFromBest = true ,if(exists(sales_cd  ) ,best_sales_cnt.source        ,'') ,'')                                                                           ;
+    self.src_revenue         := if(pPullFromBest = true ,if(exists(sales_cd  ) ,best_sales_cnt.source        ,'') ,'');
+    self.revenue_sources     := if(pPullFromBest = true ,if(exists(sales_cd  ) ,count(revenue_sources)       ,0 ) ,0 );
     #ELSE
     self.src_revenue         := ''                                                                            ;
+    self.revenue_sources     := 0;
     #END
     
     self.number_of_employees := if(pPullFromBest = true ,if(exists(emp_cnt_cd) ,best_emp_cnt.employee_count  ,-1) ,0 )                                     ;
     #IF(Best_Has_Source_Fields = true)
     self.src_employees       := if(pPullFromBest = true ,if(exists(emp_cnt_cd) ,best_emp_cnt.source          ,'') ,'')                                       ;  //remove until best has this!!!!!!
+    self.employees_sources   := if(pPullFromBest = true ,if(exists(emp_cnt_cd) ,count(employees_sources)     ,0 ) ,0 );
     #ELSE
     self.src_employees       := ''                                                                            ;
+    self.employees_sources   := 0;
     #END
 
     self.SIC_Primary         := best_sic_codes[1].company_sic_code1     ; //need to get these from the base file so we can rank them and use dt_last_seen
@@ -108,13 +120,25 @@ function
     self.SIC3                := best_sic_codes[3].company_sic_code1     ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC4                := best_sic_codes[4].company_sic_code1     ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC5                := best_sic_codes[5].company_sic_code1     ; //need to get these from the base file so we can rank them and use dt_last_seen
+    #IF(Best_Has_Source_Fields = true)
+    self.src_sics            := if(pPullFromBest = true ,if(exists(best_sic_codes) ,best_sic_codes[1].source  ,'') ,'')                                                                           ;
+    self.sic_sources         := if(pPullFromBest = true ,if(exists(best_sic_codes) ,count(sic_sources)        ,0 ) ,0 );
+    #ELSE
     self.src_sics            := ''                                      ;
+    self.sic_sources         := 0;
+    #END
     self.NAICS_Primary       := best_naics_codes[1].company_naics_code1 ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS2              := best_naics_codes[2].company_naics_code1 ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS3              := best_naics_codes[3].company_naics_code1 ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS4              := best_naics_codes[4].company_naics_code1 ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS5              := best_naics_codes[5].company_naics_code1 ; //need to get these from the base file so we can rank them and use dt_last_seen
+    #IF(Best_Has_Source_Fields = true)
+    self.src_naics           := if(pPullFromBest = true ,if(exists(best_naics_codes) ,best_naics_codes[1].source  ,'') ,'')                                                                           ;
+    self.naics_sources       := if(pPullFromBest = true ,if(exists(best_naics_codes) ,count(naics_sources)        ,0 ) ,0 );
+    #ELSE
     self.src_naics           := ''                                      ;
+    self.naics_sources       := 0;
+    #END
     self.dt_first_seen       := 0                                       ; //need to get from the base file
     self.dt_last_seen        := 0                                       ; //need to get from the base file
   ));

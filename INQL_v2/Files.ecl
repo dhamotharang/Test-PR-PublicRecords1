@@ -16,6 +16,8 @@ EXPORT Files(boolean fcra = false, boolean pDaily = true) := MODULE
 	//filter product_id and sub_product_id
 	FIDO_has_valid_product_id := FIDO_extract_out(mbs_product_id in [0,1, 2, 5,13] or (mbs_product_id = 7 and mbs_sub_product_id in [70001, 70004, 70005]));
 	EXPORT File_FIDO := dedup(FIDO_has_valid_product_id, all);
+  
+  Export MBS := dataset(data_services.foreign_new_logs + 'thor100_21::out::inquiry_acclogs::file_mbs', INQL_v2.layouts.FIDO_new_MBS, thor);
 
 	//------------------------------------------------------------------------------------------------------------------------------------------------------
     //Input Files. 
@@ -59,8 +61,12 @@ EXPORT Files(boolean fcra = false, boolean pDaily = true) := MODULE
 	
  	/* Base File pVersions */
 	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base, INQL_v2.Layouts.Common_ThorAdditions, INQL_base);
-	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_History_Appended,INQL_v2.layouts.Common_ThorAdditions_non_fcra, INQL_Base_History_Appended); 
-	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_History_NewIds,INQL_v2.layouts.base_history_newids, INQL_Base_History_NewIds); 
+	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_History_Appended, INQL_v2.layouts.Common_ThorAdditions_non_fcra, INQL_Base_History_Appended); 
+	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_History_NewIds, INQL_v2.layouts.base_history_newids, INQL_Base_History_NewIds); 
+	
+	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_DIDVille, INQL_v2.Layouts.Common_ThorAdditions, INQL_base_DIDVille);
+	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_History_Appended_DIDVille, INQL_v2.layouts.Common_ThorAdditions_non_fcra, INQL_Base_History_Appended_DidVille); 
+	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_History_NewIds_DIDVille, INQL_v2.layouts.base_history_newids, INQL_Base_History_NewIds_DidVille); 
 	
 	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).SBA_Base, INQL_v2.layouts.rSBA_Base, SBA_base, pOpt	:= 'false'); //this istemporary
 	tools.mac_FilesBase(INQL_v2.Filenames(,fcra,pDaily).Batch_PIIs_Base, INQL_v2.layouts.rBatch_PIIs_Base, Batch_PIIs_Base, pOpt	:= 'false');

@@ -1,4 +1,5 @@
 ﻿IMPORT did_add, STD,Data_Services,InsuranceHeader_Ingest,dops,InsuranceHeader_xLink; 
+IMPORT _Control;
 
 EXPORT Build_Date := MODULE
 
@@ -23,7 +24,7 @@ EXPORT BaseDate     := BaseFilename[STD.Str.Find(BaseFilename,'_w',1) + 2..STD.S
         BocaFilename  := NOTHOR(STD.File.GetSuperFileSubName(Data_Services.foreign_prod + 'thor_data400::base::header_raw',1));
 EXPORT	BocaRaw       := BocaFilename[STD.Str.Find(BocaFilename,'raw_',1) + 4..];
 
-EXPORT  BocaDopsOrig  := (UNSIGNED)did_add.get_EnvVariable('header_build_version','http://roxiebatch.br.seisint.com:9856');
+EXPORT  BocaDopsOrig  := (UNSIGNED)did_add.get_EnvVariable('header_build_version', 'http://' + _Control.RoxieEnv.boca_prodvip);
 EXPORT  BocaDops      := Files.BuildDate_Current_DS(BocaRawDate = BocaDopsOrig)[1].AlphaRawDate; 
 
   childFiles := NOTHOR(STD.File.SuperFileContents(InsuranceHeader_xLink.KeyNames().header_super, TRUE));

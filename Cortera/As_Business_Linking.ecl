@@ -97,7 +97,10 @@ EXPORT As_Business_Linking() := FUNCTION
 
 		self.source_record_id            := ((unsigned8)hdr.link_id << 32) | HASH32(self.company_name,SELF.company_phone,hdr.EXECUTIVE_NAME,hdr.Executive_Title);   
 		string temp_employees            := if(trim(hdr.total_employees) = '' OR trim(hdr.total_employees) = '0', trim(hdr.employee_range), trim(hdr.total_employees));
-		string temp_sales                := if(trim(hdr.total_sales) = '' OR trim(hdr.total_sales) = '0', trim(hdr.sales_range), trim(hdr.total_sales));
+		string temp_sales                := map(trim(hdr.total_sales) = '' OR trim(hdr.total_sales) = '0' => trim(hdr.sales_range)
+                                          , trim(hdr.sales_range) != '' and (unsigned)trim(hdr.total_sales) < 700000000 => trim(hdr.total_sales)  //total sales needs a range too.  the ones without a range are bad.  either too large(trillions) or negative numbers
+                                          ,                                                              ''
+                                        );
     self.employee_count_local_raw    := if(temp_employees != '0', 
 		                                    temp_employees, '');
 		self.revenue_local_raw           := if(temp_sales != '0', 

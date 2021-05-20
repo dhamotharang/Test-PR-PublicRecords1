@@ -8,22 +8,22 @@
 		DATASET(FsLogicalFileNameRecord) SuperFiles;
 	end;
 
-	GetFileDetails(string pFileType, boolean fcra = false) := function
+	GetFileDetails(string pFileType, boolean fcra = false, boolean encrypted = false) := function
 		rgxName 	:= '[0-9-]{4,}';
 		pVersion 	:= stringlib.stringfilterout(regexfind(rgxName, pFileType, 0), '-');
 		version 	:= if(pVersion = '', pDate, pVersion);
 		
-		LogicalFile := Filenames(,,version).InputFile;
-		Superfile   := Filenames().Input; 
+		LogicalFile := if(~encrypted,Filenames(,,version).InputFile,Filenames(,,version,true).InputFile);
+		Superfile   := if(~encrypted,Filenames().Input, Filenames(,,,true).Input); 
 		Separate 		:= '~~';
-
+		
 		SuperFiles := dataset([{Superfile}], FsLogicalFileNameRecord);
 											
 		ds := dataset([{LogicalFile, Separate, SuperFiles}], rFileDef);
 		return ds;	
 	end;
 
-export fSpray(dataset({FsFilenameRecord}) filelist, boolean fcra = false) := function
+export fSpray(dataset({FsFilenameRecord}) filelist, boolean fcra = false, boolean encrypted = false) := function
 	
 	pGroupName	:= INQL_FFD._Constants.GROUPNAME;
 	
@@ -31,11 +31,11 @@ export fSpray(dataset({FsFilenameRecord}) filelist, boolean fcra = false) := fun
 			self:=row(
 								{	 
 								 INQL_FFD._Constants.LZ						
-								,INQL_FFD._Constants.sprayingDir                           
+								,if(~encrypted, INQL_FFD._Constants.SPRAYINGDIR,INQL_FFD._Constants.SPRAYINGENCRYPTEDDIR)                          
 								,L.name                                      
 								,0
-								,GetFileDetails(L.name, fcra)[1].LogicalFile
-								,GetFileDetails(L.name, fcra)[1].Superfiles
+								,GetFileDetails(L.name, fcra, encrypted)[1].LogicalFile
+								,GetFileDetails(L.name, fcra, encrypted)[1].Superfiles
 								,pGroupName                                                
 								,''                                                    
 								,''                                                            

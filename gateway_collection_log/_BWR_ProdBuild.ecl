@@ -34,7 +34,7 @@ output(req_parsed, named('req_parsed'));
 output(resp_parsed, named('resp_parsed'));
 
 // we need this to append lexid (remote)
-gateways := dataset([{'neutralroxie', 'http://roxiestaging.br.seisint.com:9876'}], risk_indicators.Layout_Gateways_In);
+gateways := dataset([{'neutralroxie', 'http://certstagingvip.hpcc.risk.regn.net:9876'}], risk_indicators.Layout_Gateways_In);
 #STORED('Gateways', gateways);
 
 mod_access := MODULE(doxie.IDataAccess)END;

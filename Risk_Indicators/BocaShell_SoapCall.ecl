@@ -1,9 +1,9 @@
-/*2008-03-06T14:56:34Z (Todd  Steil_Prod)
+﻿/*2008-03-06T14:56:34Z (Todd  Steil_Prod)
 
 */
 import riskwise;
 
-export BocaShell_SoapCall(dataset(Layout_InstID_SoapCall) indataset, string roxieIP='http://roxiestaging.br.seisint.com:9876', integer thread_count=1)  := function
+export BocaShell_SoapCall(dataset(Layout_InstID_SoapCall) indataset, string roxieIP='http://certstagingvip.hpcc.risk.regn.net:9876', integer thread_count=1)  := function
 
 dist_dataset := DISTRIBUTE(indataset, RANDOM());
 

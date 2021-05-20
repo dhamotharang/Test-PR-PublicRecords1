@@ -1,4 +1,4 @@
-﻿IMPORT SALT44,STD;
+IMPORT SALT44,STD;
 EXPORT Scrubs := MODULE
 // The module to handle the case where no scrubs exist
   EXPORT NumRules := 32;
@@ -189,7 +189,7 @@ EXPORT FromNone(DATASET(Layout_BizHead) h) := MODULE
     clean_contact_email_Invalid := Fields.InValid_contact_email((SALT44.StrType)clean_contact_email);
     SELF.contact_email := IF(withOnfail, clean_contact_email, le.contact_email); // ONFAIL(CLEAN)
     SELF.contact_email_wouldClean := TRIM((SALT44.StrType)le.contact_email) <> TRIM((SALT44.StrType)clean_contact_email);
- 
+
     SELF := le;
   END;
   EXPORT ExpandedInfile := PROJECT(h,toExpanded(LEFT,FALSE));
@@ -309,7 +309,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     st_Total_ErrorCount := COUNT(GROUP,h.st_Invalid>0);
     zip_ALLOW_ErrorCount := COUNT(GROUP,h.zip_Invalid=1);
     zip_ALLOW_WouldModifyCount := COUNT(GROUP,h.zip_Invalid=1 AND h.zip_wouldClean);
- 
+
     company_url_CAPS_ErrorCount := COUNT(GROUP,h.company_url_Invalid=1);
     company_url_CAPS_WouldModifyCount := COUNT(GROUP,h.company_url_Invalid=1 AND h.company_url_wouldClean);
     company_url_ALLOW_ErrorCount := COUNT(GROUP,h.company_url_Invalid=2);
@@ -342,7 +342,7 @@ EXPORT FromExpanded(DATASET(Expanded_Layout) h) := MODULE
     name_suffix_Total_ErrorCount := COUNT(GROUP,h.name_suffix_Invalid>0);
     contact_email_CAPS_ErrorCount := COUNT(GROUP,h.contact_email_Invalid=1);
     contact_email_CAPS_WouldModifyCount := COUNT(GROUP,h.contact_email_Invalid=1 AND h.contact_email_wouldClean);
- 
+
     AnyRule_WithErrorsCount := COUNT(GROUP, h.company_name_Invalid > 0 OR h.company_name_prefix_Invalid > 0 OR h.cnp_name_Invalid > 0 OR h.company_fein_Invalid > 0 OR h.prim_name_Invalid > 0 OR h.sec_range_Invalid > 0 OR h.city_Invalid > 0 OR h.city_clean_Invalid > 0 OR h.st_Invalid > 0 OR h.zip_Invalid > 0 OR h.company_url_Invalid > 0 OR h.fname_Invalid > 0 OR h.fname_preferred_Invalid > 0 OR h.mname_Invalid > 0 OR h.lname_Invalid > 0 OR h.name_suffix_Invalid > 0 OR h.contact_email_Invalid > 0);
     AnyRule_WithEditsCount := COUNT(GROUP, h.company_name_wouldClean OR h.company_name_prefix_wouldClean OR h.cnp_name_wouldClean OR h.company_fein_wouldClean OR h.prim_name_wouldClean OR h.sec_range_wouldClean OR h.city_wouldClean OR h.city_clean_wouldClean OR h.st_wouldClean OR h.zip_wouldClean OR h.company_url_wouldClean OR h.fname_wouldClean OR h.fname_preferred_wouldClean OR h.mname_wouldClean OR h.lname_wouldClean OR h.name_suffix_wouldClean OR h.contact_email_wouldClean);
     FieldsChecked_WithErrors := 0;
@@ -671,4 +671,4 @@ EXPORT StandardStats(DATASET(Layout_BizHead) inFile, BOOLEAN doErrorOverall = TR
   RETURN scrubsSummaryOverall_Standard_addErr & scrubsSummaryOverall_Standard_GeneralErrs;
 END;
 END;
- 
+

@@ -1,4 +1,4 @@
-export RiskwiseMainFLGO_Soapcall(dataset(riskwise.Layout_FLG1) indataset,  string roxieIP='http://roxiestaging.br.seisint.com:9876')  := function
+﻿export RiskwiseMainFLGO_Soapcall(dataset(riskwise.Layout_FLG1) indataset,  string roxieIP='http://certstagingvip.hpcc.risk.regn.net:9876')  := function
 
 dist_dataset := DISTRIBUTE(indataset, RANDOM());
 

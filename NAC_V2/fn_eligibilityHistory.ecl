@@ -1,6 +1,4 @@
 ﻿IMPORT Std;
-	//									self.TotalEligiblePeriodsDays := (string5)(STD.Date.DaysBetween((unsigned4)left.startdate, (unsigned4)left.enddate)+1);
-	//									self.TotalEligiblePeriodsMonths	:= (string4)(STD.Date.MonthsBetween((unsigned4)left.startdate, (unsigned4)left.enddate)+1);
 
 rEligibilityHistory := RECORD
 	string2			ProgramState;
@@ -23,6 +21,21 @@ rEligibilityHistorySlim := RECORD
 	integer			TotalEligiblePeriodsDays := 0;
 	integer			TotalEligiblePeriodsMonths := 0;
   string			history := '';
+END;
+// year 2099 is treated as open ended
+//	dats and months returned will be 0
+integer GetDaysBetween(unsigned4 StartDate, unsigned4 EndDate) := FUNCTION
+		EndYear := Std.Date.Year(EndDate);
+		return IF(EndYear = 2099, 0,
+							STD.Date.DaysBetween(StartDate, EndDate) + 1
+						);
+END;
+
+integer GetMonthsBetween(unsigned4 StartDate, unsigned4 EndDate) := FUNCTION
+		EndYear := Std.Date.Year(EndDate);
+		return IF(EndYear = 2099, 0,
+							STD.Date.MonthsBetween(StartDate, EndDate) + 1
+						);
 END;
 
 EXPORT fn_eligibilityHistory(DATASET($.Layout_Base2) base = nac_v2.files.Base2) := FUNCTION
@@ -51,9 +64,9 @@ EXPORT fn_eligibilityHistory(DATASET($.Layout_Base2) base = nac_v2.files.Base2) 
 							IF(left.PeriodType = 'M', ((string)left.EndDate)[1..6], (string)left.EndDate);
 				self.history := (string20)his;
 				self.TotalEligiblePeriodsDays := IF(left.eligibility_status_indicator = 'E',
-											STD.Date.DaysBetween(left.startdate, left.enddate) + 1, 0);
+											GetDaysBetween(left.startdate, left.enddate), 0);
 				self.TotalEligiblePeriodsMonths := IF(left.eligibility_status_indicator = 'E',
-											STD.Date.MonthsBetween(left.startdate, left.enddate) + 1, 0);
+											GetMonthsBetween(left.startdate, left.enddate), 0);
 				self := left;
 			));
 			

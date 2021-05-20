@@ -3,7 +3,7 @@
 export Build_List(
 										dataset(Marketing_Suite_List_Gen.Layouts.Layout_Valid_ParmFile)	inParmFile,
 										string	JobID
-									)	:= module;
+									)	:= module
 									
 									
   /*----------------------------------------------------------------------------------------------------------------------
@@ -384,7 +384,7 @@ export Build_List(
 																trfMakeContactList(left,right),
 																local);	
 																
-	distAllContactList	:=	distribute(ContList1, hash(seleid,proxid));
+  distAllContactList	:=	distribute(ContList1, hash(seleid,proxid));
 	
 	/*---------------------------------------------------------------------------------------------------------------------
   | Join the Business Information section of the list to the Contact section of the list.
@@ -400,13 +400,18 @@ export Build_List(
 		self	:=	[];
 	end;
 	
-	MarketingFile		:=	Join(	distAllContactList,
-														dIndustry,
-														left.seleid = right.seleid and
-														left.proxid = right.proxid,
-														trfJoinMkt(left,right),
-														right outer,
-														local);
+  MarketingFile_Joined := Join(distAllContactList,
+                               dIndustry,
+                               left.seleid = right.seleid and
+                               left.proxid = right.proxid,
+                               trfJoinMkt(left,right),
+                               right outer,
+                               local);
+
+	/*---------------------------------------------------------------------------------------------------------------------
+  | DF-28846 - Added this function to eliminate many of the "duplicate" seleid records.
+  |----------------------------------------------------------------------------------------------------------------------*/															
+  MarketingFile := Marketing_Suite_List_Gen.fnDedupContacts(MarketingFile_Joined);
 														
 	/*---------------------------------------------------------------------------------------------------------------------
   | Generate the statistical file. This uses the entire Marketing File created above.
@@ -561,5 +566,5 @@ export Build_List(
 									),
 							doStats
 						);
-						
+
 end;
