@@ -4,8 +4,8 @@ IMPORT B_Person_S_S_N_6,CFG_Compile,E_Person,E_Person_S_S_N,E_Social_Security_Nu
 IMPORT * FROM KEL16.Null;
 EXPORT B_Person_S_S_N_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_S_S_N_6(__in,__cfg).__ENH_Person_S_S_N_6) __ENH_Person_S_S_N_6 := B_Person_S_S_N_6(__in,__cfg).__ENH_Person_S_S_N_6;
-  SHARED __EE1128249 := __ENH_Person_S_S_N_6;
-  EXPORT __ST170465_Layout := RECORD
+  SHARED __EE1130405 := __ENH_Person_S_S_N_6;
+  EXPORT __ST172129_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
@@ -18,11 +18,11 @@ EXPORT B_Person_S_S_N_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST170457_Layout := RECORD
+  EXPORT __ST172121_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
     KEL.typ.ndataset(E_Person_S_S_N(__in,__cfg).Valid_S_S_N_Layout) Valid_S_S_N_;
-    KEL.typ.ndataset(__ST170465_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST172129_Layout) Data_Sources_;
     KEL.typ.bool Is_Best_S_S_N_ := FALSE;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -31,12 +31,12 @@ EXPORT B_Person_S_S_N_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST170457_Layout __ND1128350__Project(B_Person_S_S_N_6(__in,__cfg).__ST171712_Layout __PP1128250) := TRANSFORM
-    __EE1128269 := __PP1128250.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE1128269),__ST170465_Layout),__NL(__EE1128269));
-    __BS1128296 := __T(__PP1128250.Data_Sources_);
-    SELF.Is_Best_S_S_N_ := EXISTS(__BS1128296(__T(__OP2(__T(__PP1128250.Data_Sources_).Source_,IN,__CN(['BP','NEN','NEQ'])))));
-    SELF := __PP1128250;
+  SHARED __ST172121_Layout __ND1130506__Project(B_Person_S_S_N_6(__in,__cfg).__ST173376_Layout __PP1130406) := TRANSFORM
+    __EE1130425 := __PP1130406.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE1130425),__ST172129_Layout),__NL(__EE1130425));
+    __BS1130452 := __T(__PP1130406.Data_Sources_);
+    SELF.Is_Best_S_S_N_ := EXISTS(__BS1130452(__T(__OP2(__T(__PP1130406.Data_Sources_).Source_,IN,__CN(['BP','NEN','NEQ'])))));
+    SELF := __PP1130406;
   END;
-  EXPORT __ENH_Person_S_S_N_5 := PROJECT(__EE1128249,__ND1128350__Project(LEFT));
+  EXPORT __ENH_Person_S_S_N_5 := PROJECT(__EE1130405,__ND1130506__Project(LEFT));
 END;

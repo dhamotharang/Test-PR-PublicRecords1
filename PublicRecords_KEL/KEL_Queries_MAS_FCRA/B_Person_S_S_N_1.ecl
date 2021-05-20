@@ -4,8 +4,8 @@ IMPORT B_Person_S_S_N_2,CFG_Compile,E_Person,E_Person_S_S_N,E_Social_Security_Nu
 IMPORT * FROM KEL16.Null;
 EXPORT B_Person_S_S_N_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_S_S_N_2(__in,__cfg).__ENH_Person_S_S_N_2) __ENH_Person_S_S_N_2 := B_Person_S_S_N_2(__in,__cfg).__ENH_Person_S_S_N_2;
-  SHARED __EE2159050 := __ENH_Person_S_S_N_2;
-  EXPORT __ST159321_Layout := RECORD
+  SHARED __EE2161206 := __ENH_Person_S_S_N_2;
+  EXPORT __ST160985_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
@@ -18,11 +18,11 @@ EXPORT B_Person_S_S_N_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST159313_Layout := RECORD
+  EXPORT __ST160977_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
     KEL.typ.ndataset(E_Person_S_S_N(__in,__cfg).Valid_S_S_N_Layout) Valid_S_S_N_;
-    KEL.typ.ndataset(__ST159321_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST160985_Layout) Data_Sources_;
     KEL.typ.bool Is_Best_S_S_N_ := FALSE;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -31,10 +31,10 @@ EXPORT B_Person_S_S_N_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST159313_Layout __ND2159055__Project(B_Person_S_S_N_2(__in,__cfg).__ST163023_Layout __PP2159051) := TRANSFORM
-    __EE2159070 := __PP2159051.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE2159070),__ST159321_Layout),__NL(__EE2159070));
-    SELF := __PP2159051;
+  SHARED __ST160977_Layout __ND2161211__Project(B_Person_S_S_N_2(__in,__cfg).__ST164687_Layout __PP2161207) := TRANSFORM
+    __EE2161226 := __PP2161207.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE2161226),__ST160985_Layout),__NL(__EE2161226));
+    SELF := __PP2161207;
   END;
-  EXPORT __ENH_Person_S_S_N_1 := PROJECT(__EE2159050,__ND2159055__Project(LEFT));
+  EXPORT __ENH_Person_S_S_N_1 := PROJECT(__EE2161206,__ND2161211__Project(LEFT));
 END;

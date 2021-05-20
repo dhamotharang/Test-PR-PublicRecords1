@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Bus
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Sele_Person(__in,__cfg).__Result) __E_Sele_Person := E_Sele_Person(__in,__cfg).__Result;
-  SHARED __EE1909339 := __E_Sele_Person;
-  EXPORT __ST217287_Layout := RECORD
+  SHARED __EE1910994 := __E_Sele_Person;
+  EXPORT __ST218908_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -21,12 +21,12 @@ EXPORT B_Sele_Person_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST217287_Layout __ND1909303__Project(E_Sele_Person(__in,__cfg).Layout __PP322973) := TRANSFORM
-    __EE1909278 := __PP322973.Contact_Info_;
+  SHARED __ST218908_Layout __ND1910958__Project(E_Sele_Person(__in,__cfg).Layout __PP324600) := TRANSFORM
+    __EE1910933 := __PP324600.Contact_Info_;
     __CC13330 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('bip_build_version'))),__CN(__cfg.CurrentDate));
-    __EE1909298 := __PP322973.Contact_Info_;
-    SELF.Assoc_Date_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE1909278,KEL.era.ToDate(__T(__EE1909278).Date_Last_Seen_)),>,__CC13330)),__ECAST(KEL.typ.nkdate,__CC13330),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE1909298,KEL.era.ToDate(__T(__EE1909298).Date_Last_Seen_))));
-    SELF := __PP322973;
+    __EE1910953 := __PP324600.Contact_Info_;
+    SELF.Assoc_Date_ := IF(__T(__OP2(KEL.Aggregates.MaxNN(__EE1910933,KEL.era.ToDate(__T(__EE1910933).Date_Last_Seen_)),>,__CC13330)),__ECAST(KEL.typ.nkdate,__CC13330),__ECAST(KEL.typ.nkdate,KEL.Aggregates.MaxNN(__EE1910953,KEL.era.ToDate(__T(__EE1910953).Date_Last_Seen_))));
+    SELF := __PP324600;
   END;
-  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE1909339,__ND1909303__Project(LEFT));
+  EXPORT __ENH_Sele_Person_7 := PROJECT(__EE1910994,__ND1910958__Project(LEFT));
 END;

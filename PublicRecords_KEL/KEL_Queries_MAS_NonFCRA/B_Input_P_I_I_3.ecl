@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_4,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_4(__in,__cfg).__ENH_Input_P_I_I_4) __ENH_Input_P_I_I_4 := B_Input_P_I_I_4(__in,__cfg).__ENH_Input_P_I_I_4;
-  SHARED __EE1713704 := __ENH_Input_P_I_I_4;
-  EXPORT __ST169116_Layout := RECORD
+  SHARED __EE1713517 := __ENH_Input_P_I_I_4;
+  EXPORT __ST170561_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -157,5 +157,5 @@ EXPORT B_Input_P_I_I_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Input_P_I_I_3 := PROJECT(__EE1713704,__ST169116_Layout);
+  EXPORT __ENH_Input_P_I_I_3 := PROJECT(__EE1713517,__ST170561_Layout);
 END;

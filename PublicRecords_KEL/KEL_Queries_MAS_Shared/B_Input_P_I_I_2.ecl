@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_3,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3) __ENH_Input_P_I_I_3 := B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3;
-  SHARED __EE210108 := __ENH_Input_P_I_I_3;
-  EXPORT __ST149020_Layout := RECORD
+  SHARED __EE211725 := __ENH_Input_P_I_I_3;
+  EXPORT __ST150637_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -145,11 +145,11 @@ EXPORT B_Input_P_I_I_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST149020_Layout __ND210647__Project(B_Input_P_I_I_3(__in,__cfg).__ST149713_Layout __PP210109) := TRANSFORM
+  SHARED __ST150637_Layout __ND212264__Project(B_Input_P_I_I_3(__in,__cfg).__ST151330_Layout __PP211726) := TRANSFORM
     __CC13459 := '-99999';
     __CC13464 := '-99998';
-    SELF.P___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP210109.Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC13459)),__ECAST(KEL.typ.nstr,__CN(__CC13464)));
-    SELF := __PP210109;
+    SELF.P___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP211726.Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC13459)),__ECAST(KEL.typ.nstr,__CN(__CC13464)));
+    SELF := __PP211726;
   END;
-  EXPORT __ENH_Input_P_I_I_2 := PROJECT(__EE210108,__ND210647__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_2 := PROJECT(__EE211725,__ND212264__Project(LEFT));
 END;

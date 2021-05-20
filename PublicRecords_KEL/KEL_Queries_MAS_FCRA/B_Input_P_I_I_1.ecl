@@ -4,8 +4,8 @@ IMPORT B_Input_P_I_I_2,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_2(__in,__cfg).__ENH_Input_P_I_I_2) __ENH_Input_P_I_I_2 := B_Input_P_I_I_2(__in,__cfg).__ENH_Input_P_I_I_2;
-  SHARED __EE1546299 := __ENH_Input_P_I_I_2;
-  EXPORT __ST155674_Layout := RECORD
+  SHARED __EE1548455 := __ENH_Input_P_I_I_2;
+  EXPORT __ST157338_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -149,13 +149,13 @@ EXPORT B_Input_P_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST155674_Layout __ND1546304__Project(B_Input_P_I_I_2(__in,__cfg).__ST160463_Layout __PP1546300) := TRANSFORM
+  SHARED __ST157338_Layout __ND1548460__Project(B_Input_P_I_I_2(__in,__cfg).__ST162127_Layout __PP1548456) := TRANSFORM
     SELF.C_U_R_R_E_N_T___D_A_T_E__2_Y_E_A_R_S_ := __cfg.CurrentDate;
     SELF.C_U_R_R_E_N_T___D_A_T_E__6_M_O_N_T_H_S_ := KEL.Routines.AdjustCalendar(__cfg.CurrentDate, -1, -6,0);
     __CC13459 := '-99999';
     __CC13464 := '-99998';
-    SELF.P___Inp_Cln_Arch_Dt_F1_Y_ := MAP(__PP1546300.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13459,__PP1546300.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_ > KEL.Routines.Today()=>__CC13464,KEL.Routines.DateToString(__PP1546300.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_,'%Y%m%d'));
-    SELF := __PP1546300;
+    SELF.P___Inp_Cln_Arch_Dt_F1_Y_ := MAP(__PP1548456.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13459,__PP1548456.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_ > KEL.Routines.Today()=>__CC13464,KEL.Routines.DateToString(__PP1548456.C_U_R_R_E_N_T___D_A_T_E__1_Y_E_A_R_S_,'%Y%m%d'));
+    SELF := __PP1548456;
   END;
-  EXPORT __ENH_Input_P_I_I_1 := PROJECT(__EE1546299,__ND1546304__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_1 := PROJECT(__EE1548455,__ND1548460__Project(LEFT));
 END;
