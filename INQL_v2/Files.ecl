@@ -53,7 +53,15 @@ EXPORT Files(boolean fcra = false, boolean pDaily = true) := MODULE
 	export BatchR3_input_hist := dataset(INQL_v2.Filenames(,fcra,pDaily,).BatchR3_hist, INQL_v2.layouts.rBatchR3_In_Ext, csv(separator('~~'), terminator(['\n', '\r\n'])), opt);
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------
-
+    //Temp for FCRA Scrubs.Will need remove after FCRA Spray V2
+	export Accurint_input
+	:= dataset(INQL_v2.Filenames(,true,pDaily,).accurint, INQL_v2.layouts.rAccurint_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
+    export Batch_input
+	:= dataset(INQL_v2.Filenames(,true,pDaily,).Batch, INQL_v2.layouts.rBatch_In, csv( separator('|'), terminator(['\n', '\r\n']), quote('"')), opt);
+	export Riskwise_input
+	:= dataset(INQL_v2.Filenames(,true,pDaily,).Riskwise, INQL_v2.layouts.rRiskwise_In, csv( separator('~~'), terminator(['\n', '\r\n'])), opt);
+	
+	//-----------------------------------------------------------------------------------------------------------------------------------------------------
 	export bINQL_In_Bldg 		:= dataset(INQL_v2.Filenames(,fcra,pDaily).INQL_Base_In_Bldg, INQL_v2.Layouts.Common_layout, thor);
 	export bINQL_Daily_Hist     := dataset(INQL_v2.Filenames(,fcra).INQL_Base_Daily_history, INQL_v2.Layouts.Common_layout, thor, opt);
   
