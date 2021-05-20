@@ -1,4 +1,4 @@
-IMPORT Address, Ut, lib_STRINGlib, _Control, business_header,_Validate, mdr,
+﻿IMPORT Address, Ut, lib_STRINGlib, _Control, business_header,_Validate, mdr,
 Header, Header_Slimsort, didville, ut, DID_Add,Business_Header_SS, NID, AID, watchdog,
 VersionControl,lib_fileservices,Health_Provider_Services, emdeon, Scrubs, Scrubs_Emdeon_SRecord;
 
@@ -35,7 +35,7 @@ EXPORT fn_scrub_emdeon_srecord (dataset(emdeon.Layouts.base.s_record) pBaseFile,
 																															,'EmdeonSplitsScrubsReport.csv'
 																															,
 																															,
-																															,_Control.MyInfo.EmailAddressNotify);	
+																															,'jason.allerdings@lexisnexisrisk.com');	
 																														
 		//****************************************************************************************************
 
