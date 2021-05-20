@@ -130,9 +130,9 @@ module
     ,if(pKey in [0 ,25] ,sequential(output(25 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address2         .logical ,100),named('Xlinkrefs_l_address2'          ))))
     ,if(pKey in [0 ,26] ,sequential(output(26 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_address3         .logical ,100),named('Xlinkrefs_l_address3'          ))))
     ,if(pKey in [0 ,27] ,sequential(output(27 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_phone            .logical ,100),named('Xlinkrefs_l_phone'             ))))
-    ,if(pKey in [0 ,28] ,sequential(output(28 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_fein             .logical ,100),named('Xlinkrefs_l_fein'    
+    ,if(pKey in [0 ,28] ,sequential(output(28 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_fein             .logical ,100),named('Xlinkrefs_l_fein'              ))))
     
-    ,if(pKey in [0 ,29] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact          .logical ,100),named('Xlinkrefs_l_contact'           ))))
+    // ,if(pKey in [0 ,29] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact          .logical ,100),named('Xlinkrefs_l_contact'           ))))
     ,if(pKey in [0 ,30] ,sequential(output(29 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_st       .logical ,100),named('Xlinkrefs_l_contact_st'        ))))
     ,if(pKey in [0 ,31] ,sequential(output(30 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_contact_zip      .logical ,100),named('Xlinkrefs_l_contact_zip'       ))))
     ,if(pKey in [0 ,32] ,sequential(output(31 ,named('KeyNumber'),overwrite) ,output(choosen(Xlinkrefs_l_url              .logical ,100),named('Xlinkrefs_l_url'               ))))
