@@ -95,8 +95,10 @@ EXPORT MAS_FCRA_Service() := MACRO
 	#STORED('DPPAPurposeValue', DPPA);
 	#STORED('IsFCRAValue', TRUE);
 	
+	TargusIsAllowed := DataPermissionMask[Risk_Indicators.iid_constants.posTargusPermission] = '1';
 	TargusGW := GatewaysClean(STD.Str.ToLowerCase(servicename) = 'targus')[1];
-	#STORED('TargusURL', TargusGW.url);
+	TargusGWURL := IF(TargusIsAllowed, TargusGW.url, '');
+	#STORED('TargusURL', TargusGWURL);
 	
 	// If allowed sources aren't passed in, use default list of allowed sources
 	SetAllowedSources := IF(COUNT(AllowedSourcesDataset) = 0, PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_FCRA, AllowedSourcesDataset);
@@ -161,7 +163,6 @@ EXPORT MAS_FCRA_Service() := MACRO
 							SELF := [];)]);
 							
 	RoyaltySet := TargusRoyaltyDS;
-					
 	OUTPUT(RoyaltySet, NAMED('RoyaltySet'));
 			
   OUTPUT( FinalResults, NAMED('Results') );

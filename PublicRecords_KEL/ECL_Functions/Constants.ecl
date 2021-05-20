@@ -1403,6 +1403,7 @@ end;
 		{MDR.SourceTools.src_Entiera},
 		{CityStateZip},
 		{PersonContext},
-		{MDR.SourceTools.src_sexoffender}
+		{MDR.SourceTools.src_sexoffender},
+		{ADL}
 	], Layout_Allowed_Sources);
 END;

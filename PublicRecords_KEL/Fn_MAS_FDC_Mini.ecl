@@ -169,6 +169,8 @@ end;
 							SELF.P_InpClnNameMid := right.P_InpClnNameMid,
 							SELF.P_InpClnNameFirst := right.P_InpClnNameFirst,
 							SELF.P_InpClnDOB := right.P_InpClnDOB,
+							SELF.LexIDSegment := RIGHT.LexIDSegment,
+							SELF.LexIDSegment2 := RIGHT.LexIDSegment2,
 							SELF := left,
 							SELF := []));
 
@@ -478,7 +480,7 @@ end;
 /*************************************************************************************************************/
 	
 	
-	Header__key_ADL_segmentation_Records := 
+	Header__key_ADL_segmentation_Records_NonFCRA := 
 		JOIN(Input_HHIDLexids_Input6thRep_preADL, Header.key_ADL_segmentation, //adl seg is nonFCRA only for now
 				Common.DoFDCJoin_Header__key_ADL_segmentation = TRUE  and  
 				LEFT.P_LexID > 0 AND
@@ -494,7 +496,24 @@ end;
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000), KEEP(1));
-						
+
+	// Since the ADL segmentation key doesn't live on the FCRA roxie, we grab this data while doing the LexID append for FCRA. Now we add that data to our FDC.
+	Header__key_ADL_segmentation_Records_FCRA := PROJECT(Input_FDC(LexIDSegment <> '' OR LexIDSegment2 <> ''), 
+				TRANSFORM(Layouts_FDC.Layout_Header__key_ADL_segmentation,
+					SELF.UIDAppend := LEFT.UIDAppend,
+					SELF.G_ProcUID := LEFT.G_ProcUID,
+					SELF.P_LexID := LEFT.P_LexID,
+					SELF.Src := PublicRecords_KEL.ECL_Functions.Constants.ADL,
+					SELF.DPMBitmap := SetDPMBitmap( Source :=  SELF.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
+					self.Archive_Date :=  '';		//no dates
+					SELF.ind1 := LEFT.LexIDSegment;
+					SELF.ind2 := LEFT.LexIDSegment2;
+					SELF.did := LEFT.P_LexID;
+					SELF := LEFT,
+					SELF := []));
+					
+	Header__key_ADL_segmentation_Records := Header__key_ADL_segmentation_Records_NonFCRA + Header__key_ADL_segmentation_Records_FCRA;
+	
 	//we only want to keep lexids from households with core or corevnossn
 	HHIDs_ADL_Lexids := Header__key_ADL_segmentation_Records(did  NOT IN InputLexids);
 	HHIDs_ADLs_Good_Lexids := HHIDs_ADL_Lexids(ind1 = PublicRecords_KEL.ECL_Functions.Constants.HouseHoldCORE OR ind1 = PublicRecords_KEL.ECL_Functions.Constants.HouseHoldCOREVNOSSN);
@@ -1039,7 +1058,6 @@ end;
 						SELF.Dataset_ConsumerStatementFlags := ROWS(RIGHT),
 						SELF := LEFT,
 						SELF := []));		
-	
 	
 	RETURN (With_ConsumerStatementFlags+With_Header_Addr_Hist_Records_6threp);
 	

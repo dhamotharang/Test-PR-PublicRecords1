@@ -18,6 +18,7 @@ QUERY: FCRAPersonAttributesV1Dynamic(Person LexID_in,
 					PERMITS DPM) <= Person(UID = LexID_in){
 		LexID := UID,
 		P_LexIDSeenFlag := P_LexIDSeenFlagFCRA,
+		P_LexIDCategory,
 		P_LexIDIsDeceasedFlag := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, P_LexIDIsDeceasedFlag),
 		PL_AstVehAirCntEv := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA_INT, PL_AstVehAirCntEv),
 		PL_AstVehAirEmrgDtListEv := IF(P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_AstVehAirEmrgDtListEv),      
