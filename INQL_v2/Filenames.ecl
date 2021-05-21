@@ -1,4 +1,4 @@
-﻿import versioncontrol,tools, data_services, std;
+﻿import versioncontrol,tools, data_services, std,INQL_V2;
 
 export Filenames(string pVersion = '', boolean pFCRA = false, boolean pDaily = true, string source='') := module
 
@@ -24,11 +24,20 @@ export Filenames(string pVersion = '', boolean pFCRA = false, boolean pDaily = t
 	export InputBuilding                         := Input + '::building_base';
     export InputTemplate                         := '~uspr::inql'+fcra+'in::'+source+'::'+pversion;
 
-
+    //Temp Batchr3 
 	export batchr3					             := prefix_batchr3 + 'in::' + INQL_v2._Constants.DatasetName + fcra + 'batchr3';
 	export batchr3_bldg		                     := prefix_batchr3 + 'in::' + INQL_v2._Constants.DatasetName + fcra + 'batchr3_bldg';
 	export batchr3_hist			                 := prefix_batchr3 + 'in::' + INQL_v2._Constants.DatasetName + fcra + 'batchr3_hist';
+
+    
+	//Temp Accurint for FCRA Scrubs
+	export accurint 			      	         := INQL_v2._Constants.FCRA_PREFIX + 'in::' + INQL_v2._Constants.DatasetName + fcra + '::accurint';
+	//Temp Batch for FCRA Scrubs
+	export batch 					 	         := INQL_v2._Constants.FCRA_PREFIX + 'in::' + INQL_v2._Constants.DatasetName + fcra + '::batch';
+	//Temp Riskwise for FCRA Scrubs
+	export riskwise 				             := INQL_v2._Constants.FCRA_PREFIX + 'in::' + INQL_v2._Constants.DatasetName + fcra + '::riskwise';	
 	
+
 	shared INQL_lBase 		                     := if(pFCRA or pDaily
 	                                                  ,prefix + INQL_v2._Constants.DatasetName + fcra + 'base::' // fcra and nonfcra daily - uspr format 
 													  ,prefix + 'base::' + INQL_v2._Constants.DatasetName + fcra // nonfcra weekly - thor_data format 

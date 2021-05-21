@@ -16,7 +16,7 @@ export EnvironmentVariables := module
 	export statLandingZoneFilePrefix := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 
 			'C:\\Orbit\\ProfileStats\\ProfileStat-', 
-			'C:\\Orbit\\'
+			'C:\\Orbit\\ProfileStats\\ProfileStat-'
 		);
 	export statLandingZoneServer := 
 		if (_control.ThisEnvironment.Name = 'Prod_Thor', 

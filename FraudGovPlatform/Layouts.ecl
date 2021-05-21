@@ -852,7 +852,6 @@ EXPORT Layouts := MODULE
 			string10	investigator_id := '';	
 			string3	cleared_fraud := ''; 
 			string250	reason_cleared_code := ''; 
-
 			//  Other fields
 			unsigned4	global_sid := 0;
 			unsigned8	record_sid := 0;
