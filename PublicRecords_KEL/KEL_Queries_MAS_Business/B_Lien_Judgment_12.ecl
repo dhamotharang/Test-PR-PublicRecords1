@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Lien_Judgment FROM PublicRecords_KEL.KEL_Queries_MAS_Busine
 IMPORT * FROM KEL16.Null;
 EXPORT B_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Lien_Judgment(__in,__cfg).__Result) __E_Lien_Judgment := E_Lien_Judgment(__in,__cfg).__Result;
-  SHARED __EE255853 := __E_Lien_Judgment;
-  EXPORT __ST222619_Layout := RECORD
+  SHARED __EE256527 := __E_Lien_Judgment;
+  EXPORT __ST223293_Layout := RECORD
     KEL.typ.nstr Filing_Number_;
     KEL.typ.nstr Original_Filing_Number_;
     KEL.typ.nstr Filing_Type_Description_;
@@ -28,11 +28,11 @@ EXPORT B_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST222614_Layout := RECORD
+  EXPORT __ST223288_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr R_M_S_I_D_;
-    KEL.typ.ndataset(__ST222619_Layout) Filing_;
+    KEL.typ.ndataset(__ST223293_Layout) Filing_;
     KEL.typ.ndataset(E_Lien_Judgment(__in,__cfg).Book_Filing_Details_Layout) Book_Filing_Details_;
     KEL.typ.nstr Agency_I_D_;
     KEL.typ.nstr Agency_;
@@ -51,14 +51,14 @@ EXPORT B_Lien_Judgment_12(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST222614_Layout __ND256162__Project(E_Lien_Judgment(__in,__cfg).Layout __PP256095) := TRANSFORM
-    __EE255701 := __PP256095.Filing_;
-    __ST222619_Layout __ND256098__Project(E_Lien_Judgment(__in,__cfg).Filing_Layout __PP256097) := TRANSFORM
-      SELF.T_M_S_I_D_ := __PP256095.T_M_S_I_D_;
-      SELF := __PP256097;
+  SHARED __ST223288_Layout __ND256836__Project(E_Lien_Judgment(__in,__cfg).Layout __PP256769) := TRANSFORM
+    __EE256375 := __PP256769.Filing_;
+    __ST223293_Layout __ND256772__Project(E_Lien_Judgment(__in,__cfg).Filing_Layout __PP256771) := TRANSFORM
+      SELF.T_M_S_I_D_ := __PP256769.T_M_S_I_D_;
+      SELF := __PP256771;
     END;
-    SELF.Filing_ := __PROJECT(__EE255701,__ND256098__Project(LEFT));
-    SELF := __PP256095;
+    SELF.Filing_ := __PROJECT(__EE256375,__ND256772__Project(LEFT));
+    SELF := __PP256769;
   END;
-  EXPORT __ENH_Lien_Judgment_12 := PROJECT(__EE255853,__ND256162__Project(LEFT));
+  EXPORT __ENH_Lien_Judgment_12 := PROJECT(__EE256527,__ND256836__Project(LEFT));
 END;

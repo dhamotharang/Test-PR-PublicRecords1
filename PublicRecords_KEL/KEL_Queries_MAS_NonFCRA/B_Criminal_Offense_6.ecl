@@ -4,8 +4,8 @@ IMPORT B_Criminal_Offense_7,CFG_Compile,E_Criminal_Offense FROM PublicRecords_KE
 IMPORT * FROM KEL16.Null;
 EXPORT B_Criminal_Offense_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Criminal_Offense_7(__in,__cfg).__ENH_Criminal_Offense_7) __ENH_Criminal_Offense_7 := B_Criminal_Offense_7(__in,__cfg).__ENH_Criminal_Offense_7;
-  SHARED __EE1596921 := __ENH_Criminal_Offense_7;
-  EXPORT __ST179798_Layout := RECORD
+  SHARED __EE1597595 := __ENH_Criminal_Offense_7;
+  EXPORT __ST180472_Layout := RECORD
     KEL.typ.nstr Case_Number_;
     KEL.typ.nkdate Case_Date_;
     KEL.typ.nstr Case_Type_Description_;
@@ -26,7 +26,7 @@ EXPORT B_Criminal_Offense_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST179751_Layout := RECORD
+  EXPORT __ST180425_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Offender_Key_;
     KEL.typ.nstr Offense_Type_;
@@ -72,7 +72,7 @@ EXPORT B_Criminal_Offense_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.nstr Court_County_;
     KEL.typ.nstr Arrest_Offense_Level_Mapped_;
     KEL.typ.nstr Court_Offense_Level_Mapped_;
-    KEL.typ.ndataset(__ST179798_Layout) Offense_Charges_;
+    KEL.typ.ndataset(__ST180472_Layout) Offense_Charges_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Criminal_Data_Sources_Layout) Criminal_Data_Sources_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Court_Offense_Level_Layout) Court_Offense_Level_;
     KEL.typ.ndataset(E_Criminal_Offense(__in,__cfg).Fcra_Data_Layout) Fcra_Data_;
@@ -85,16 +85,16 @@ EXPORT B_Criminal_Offense_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST179751_Layout __ND1596841__Project(B_Criminal_Offense_7(__in,__cfg).__ST181413_Layout __PP1596289) := TRANSFORM
-    __EE1596924 := __PP1596289.Offense_Charges_;
-    __ST179798_Layout __ND1596799__Project(B_Criminal_Offense_7(__in,__cfg).__ST181460_Layout __PP1596450) := TRANSFORM
-      __EE1596794 := __PP1596289.Offense_Charges_;
-      SELF.Criminal_Date_ := KEL.Aggregates.MinNN(__EE1596794,KEL.Routines.CastStringToDate(__T(__EE1596794).Valid_Date_));
-      SELF.Dismissed_Charges_ := __OR(IF(__T(__NT(__PP1596289.Court_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP1596289.Court_Disposition_Description_,=,__CN('DISMISSED')))),IF(__T(__NT(__PP1596289.Court_Additional_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP1596289.Court_Additional_Disposition_Description_,=,__CN('DISMISSED')))));
-      SELF := __PP1596450;
+  SHARED __ST180425_Layout __ND1597515__Project(B_Criminal_Offense_7(__in,__cfg).__ST182087_Layout __PP1596963) := TRANSFORM
+    __EE1597598 := __PP1596963.Offense_Charges_;
+    __ST180472_Layout __ND1597473__Project(B_Criminal_Offense_7(__in,__cfg).__ST182134_Layout __PP1597124) := TRANSFORM
+      __EE1597468 := __PP1596963.Offense_Charges_;
+      SELF.Criminal_Date_ := KEL.Aggregates.MinNN(__EE1597468,KEL.Routines.CastStringToDate(__T(__EE1597468).Valid_Date_));
+      SELF.Dismissed_Charges_ := __OR(IF(__T(__NT(__PP1596963.Court_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP1596963.Court_Disposition_Description_,=,__CN('DISMISSED')))),IF(__T(__NT(__PP1596963.Court_Additional_Disposition_Description_)),__ECAST(KEL.typ.nbool,__CN(FALSE)),__ECAST(KEL.typ.nbool,__OP2(__PP1596963.Court_Additional_Disposition_Description_,=,__CN('DISMISSED')))));
+      SELF := __PP1597124;
     END;
-    SELF.Offense_Charges_ := __PROJECT(__EE1596924,__ND1596799__Project(LEFT));
-    SELF := __PP1596289;
+    SELF.Offense_Charges_ := __PROJECT(__EE1597598,__ND1597473__Project(LEFT));
+    SELF := __PP1596963;
   END;
-  EXPORT __ENH_Criminal_Offense_6 := PROJECT(__EE1596921,__ND1596841__Project(LEFT));
+  EXPORT __ENH_Criminal_Offense_6 := PROJECT(__EE1597595,__ND1597515__Project(LEFT));
 END;
