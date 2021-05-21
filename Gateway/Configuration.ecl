@@ -120,6 +120,8 @@ export Configuration := module
   export IsHCHCO(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCO);
   export IsHCHCPBatch(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCPBatch);
   export IsHCHCOBatch(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IsHCHCOBatch);
+  export IsIconectivElep(string40 svcName) := STD.Str.ToLowerCase(trim(svcName))=STD.Str.ToLowerCase(Gateway.Constants.ServiceName.IconectivElep);
+
   // ************************************************************************
   // Use functions below to retrieve gateway configuration properties.
   //
