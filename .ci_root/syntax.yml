@@ -29,8 +29,10 @@ syntax-fast:
     - npm install
     - eclcc --version || true
     - echo "Fetching Dependency List"
+    - echo $CI_PROJECT_ID
+    - echo $CI_MERGE_REQUEST_IID
     - |
-      if node get_mr_query_list.js -m -d $CI_PROJECT_ID $CI_MERGE_REQUEST_IID > $DEP_FILE
+      if node get_mr_query_list.js -m -d -v $CI_PROJECT_ID $CI_MERGE_REQUEST_IID | tee $DEP_FILE
       then
       echo "Found $(cat $DEP_FILE | wc -l) Dependencies"
       querylist=$DEP_FILE
