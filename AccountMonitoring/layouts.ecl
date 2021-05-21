@@ -266,6 +266,10 @@ EXPORT layouts := MODULE
 			AccountMonitoring.product_files.email.main_key.clean_email;
 		END;
     
+   SHARED corteratradeline_documentid_record := RECORD
+			AccountMonitoring.product_files.corteratradeline.TradelineLinkids_key;
+		END;
+
 		template(default,doxie.layout_references);
 		template(bankruptcy,bankruptcy_documentid_record);
 		template(deceased,deceased_documentid_record);
@@ -294,6 +298,7 @@ EXPORT layouts := MODULE
 		template(watercraft,watercraft_documentid_record);
 		template(personheader,personheader_documentid_record);
 		template(email,email_documentid_record);
+		template(corteratradeline,corteratradeline_documentid_record);
 	END;
 	
 	EXPORT results := RECORD

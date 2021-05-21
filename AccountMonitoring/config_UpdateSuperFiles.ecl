@@ -167,6 +167,11 @@ end;
                       AccountMonitoring.product_files.foreclosure.Foreclosure_delta_rid_superkey_monitor, //(monitor::foreclosure::delta_rid)
                       AccountMonitoring.types.productMask.foreclosure 
                     }
+                  ,{
+                      AccountMonitoring.product_files.Corteratradeline.Tradeline_linkids_superfile, //(thor_400::key::Cortera_Tradeline::qa::linkIds' ; // - a superfile name referenced in dx_Cortera_Tradeline.Key_LinkIds, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process)
+                      AccountMonitoring.product_files.Corteratradeline.Tradeline_linkids_for_monitor, //(monitor::Cortera_Tradeline::linkIds)
+                      AccountMonitoring.types.productMask.Corteratradeline 
+                    }
             ],AccountMonitoring.layouts.UPDATE_SOURCE.roxie_monitor_superfile_layout);
 
    SuperfilesReturn := if(GetAll,Superfiles,Superfiles(AccountMonitoring.types.testPMBits(product_mask_supported, product_mask)));

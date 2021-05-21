@@ -778,6 +778,15 @@ EXPORT Get_Dataset_Versions(
 			
 		email_lf := email_Lexid + email_addr + email_main;
 		
+		// Cortera Tradeline
+		corteratradeline := PROJECT(FileServices.SuperFileContents(AccountMonitoring.product_files.corteratradeline.Tradeline_linkids_superkeyname),
+			TRANSFORM(Final_Layout,
+				SELF.product := 'CORTERA',
+				SELF.subfile := 'LINKID',
+				SELF.version := REGEXFIND(
+					'thor_data400::key::Cortera_Tradeline::linkids',  // thor_400::key::Cortera_Tradeline::linkIds::' + doxie.Version_SuperKey; // - a superfile name referenced in dx_Cortera_Tradeline.Key_LinkIds, 
+					LEFT.name,1,NOCASE)));
+		
 		All_Records :=
 			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_address)
 					OR
@@ -808,7 +817,8 @@ EXPORT Get_Dataset_Versions(
       // watercraft?  
       // Header might needed to be added here once all the CGMs start using the roxie-version of the superkey as created by updateSuperfiles
 
-			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_email), email_lf );
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_email), email_lf ) +
+			IF( AccountMonitoring.types.testPMBits (product_mask, AccountMonitoring.Constants.pm_corteratradeline), corteratradeline );
 			
  		valid_despray_criteria := despray_ip_address != '' AND despray_path != '';
 		ALLOW_OVERWRITE        := TRUE;

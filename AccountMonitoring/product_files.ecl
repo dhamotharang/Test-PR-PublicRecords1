@@ -1,12 +1,10 @@
-﻿﻿/*2011-07-06T18:43:20Z (Chris Albee_prod)
-Add BK daily files.
-*/
-IMPORT AccountMonitoring,BankruptcyV2, Business_Header, CellPhone, CourtLink, Corrections, Did_Add, Doxie, 
-			 Data_Services, Gong, Gong_Neustar, Header, Header_Quick, Header_Services, LiensV2, LN_PropertyV2, NID, PAW, 
-			 PhonesFeedback, Phonesplus, POE, Risk_Indicators, ut, UtilFile, Watchdog, 
-			 hygenics_crim, business_header_ss, PhonesInfo, BIPV2_Best, 
-			 Business_Credit, Business_Credit_Scoring, UCCV2, SAM, Inquiry_AccLogs, Corp2,
-			 VehicleV2, FAA, Watercraft, Phonesplus_v2, dx_PhonesInfo, dx_Phone_TCPA, dx_Property;
+﻿﻿IMPORT AccountMonitoring, BankruptcyV2, BIPV2_Best, Business_Credit, Business_Credit_Scoring, Business_Header, 
+       business_header_ss, CellPhone, Corp2, Corrections, CourtLink, Data_Services, Did_Add, Doxie, 
+       dx_Cortera_Tradeline, dx_Phone_TCPA, dx_PhonesInfo, dx_Property, 
+       FAA, Gong, Gong_Neustar, Header, Header_Quick, Header_Services, hygenics_crim, Inquiry_AccLogs, 
+       LiensV2, LN_PropertyV2, NID, PAW, PhonesFeedback, PhonesInfo, Phonesplus,			 
+       Phonesplus_v2, POE, Risk_Indicators, SAM, UCCV2, ut, UtilFile, VehicleV2, Watchdog, 
+       Watercraft;
 			 
 EXPORT product_files := MODULE
 
@@ -1565,4 +1563,28 @@ EXPORT product_files := MODULE
 				): INDEPENDENT; //PERSIST?
    
   END;
+  
+	// Adding Cortera Tradeline monitoring by SeleId
+	EXPORT corteratradeline := MODULE
+	 IMPORT dx_Cortera_Tradeline;
+
+    // Cortera Tradeline FILE(S)     
+		EXPORT Tradeline_linkids_superfile := 'thor_data400::key::Cortera_Tradeline::'+ doxie.Version_SuperKey +'::linkIds' ; // - a superfile name referenced in dx_Cortera_Tradeline.Key_LinkIds, to be used as RoxieSuperFile in fn_UpdateSuperFiles() process
+		EXPORT Tradeline_linkids_for_monitor := 'monitor::Cortera_Tradeline::linkIds';
+		EXPORT Tradeline_linkids_superkeyname := AccountMonitoring.constants.MONITOR_KEY_CLUSTER + Tradeline_linkids_for_monitor + '_qa'; // superfile used by monitoring process
+
+		SHARED corteraTradelineLinkIds_key_undist := 
+			PULL(INDEX( 
+           dx_Cortera_Tradeline.Key_LinkIds.Key,
+				   Tradeline_linkids_superkeyname)
+        );
+  
+		EXPORT TradelineLinkids_key :=
+			DISTRIBUTE(
+				corteraTradelineLinkIds_key_undist(SeleId !=0), 
+				HASH64(SELEID)
+				): INDEPENDENT; 
+   
+  END;
+
 END;

@@ -64,42 +64,44 @@ EXPORT files(UNSIGNED1 pseudo_environment) := MODULE
 		documents_template(watercraft);
 		documents_template(personheader);
 		documents_template(email);
+		documents_template(corteratradeline);
 	END;
 	
 	EXPORT history := MODULE
 	
-		// Creates a Dataset for the product name sent in call to history_template
-		SHARED history_template(string filename) := DATASET(filename, AccountMonitoring.layouts.history, THOR, OPT);
-		
-		// '~' + lib_thorlib.thorlib.cluster()  + '::' + 'base::Account_Monitoring::' + TRIM(AccountMonitoring.constants.pseudo_ext(pseudo_environment)) + 'history' + '<Product_Name ie: bankruptcy>'
-		EXPORT bankruptcy      := history_template(filenames(pseudo_environment).history.bankruptcy);
-		EXPORT deceased        := history_template(filenames(pseudo_environment).history.deceased);
-		EXPORT phone           := history_template(filenames(pseudo_environment).history.phone);
-		EXPORT address         := history_template(filenames(pseudo_environment).history.address);
-		EXPORT paw             := history_template(filenames(pseudo_environment).history.paw);
-		EXPORT property        := history_template(filenames(pseudo_environment).history.property);
-		EXPORT litigiousdebtor := history_template(filenames(pseudo_environment).history.litigiousdebtor);
-		EXPORT liens           := history_template(filenames(pseudo_environment).history.liens);
-		EXPORT criminal        := history_template(filenames(pseudo_environment).history.criminal);
-		EXPORT phonefeedback   := history_template(filenames(pseudo_environment).history.phonefeedback);
-		EXPORT foreclosure     := history_template(filenames(pseudo_environment).history.foreclosure);
-		EXPORT workplace       := history_template(filenames(pseudo_environment).history.workplace);
-		EXPORT reverseaddress  := history_template(filenames(pseudo_environment).history.reverseaddress);
-		EXPORT didupdate  		 := history_template(filenames(pseudo_environment).history.didupdate);
-		EXPORT bdidupdate  		 := history_template(filenames(pseudo_environment).history.bdidupdate);
-		EXPORT phoneownership	 := history_template(filenames(pseudo_environment).history.phoneownership);
-		EXPORT bipbestupdate	 := history_template(filenames(pseudo_environment).history.bipbestupdate);
-		EXPORT sbfe	 					 := history_template(filenames(pseudo_environment).history.sbfe);
-		EXPORT ucc	 					 := history_template(filenames(pseudo_environment).history.ucc);
-		EXPORT govtdebarred		 := history_template(filenames(pseudo_environment).history.govtdebarred);
-		EXPORT inquiry				 := history_template(filenames(pseudo_environment).history.inquiry);
-		EXPORT corp	 					 := history_template(filenames(pseudo_environment).history.corp);
-		EXPORT mvr	 					 := history_template(filenames(pseudo_environment).history.mvr);
-		EXPORT aircraft 			 := history_template(filenames(pseudo_environment).history.aircraft);
-		EXPORT watercraft			 := history_template(filenames(pseudo_environment).history.watercraft);
-		EXPORT personheader			 := history_template(filenames(pseudo_environment).history.personheader);
-		EXPORT email    			 := history_template(filenames(pseudo_environment).history.email);
-	END;
+    // Creates a Dataset for the product name sent in call to history_template
+    SHARED history_template(string filename) := DATASET(filename, AccountMonitoring.layouts.history, THOR, OPT);
+
+    // '~' + lib_thorlib.thorlib.cluster()  + '::' + 'base::Account_Monitoring::' + TRIM(AccountMonitoring.constants.pseudo_ext(pseudo_environment)) + 'history' + '<Product_Name ie: bankruptcy>'
+    EXPORT bankruptcy      := history_template(filenames(pseudo_environment).history.bankruptcy);
+    EXPORT deceased        := history_template(filenames(pseudo_environment).history.deceased);
+    EXPORT phone           := history_template(filenames(pseudo_environment).history.phone);
+    EXPORT address         := history_template(filenames(pseudo_environment).history.address);
+    EXPORT paw             := history_template(filenames(pseudo_environment).history.paw);
+    EXPORT property        := history_template(filenames(pseudo_environment).history.property);
+    EXPORT litigiousdebtor := history_template(filenames(pseudo_environment).history.litigiousdebtor);
+    EXPORT liens           := history_template(filenames(pseudo_environment).history.liens);
+    EXPORT criminal        := history_template(filenames(pseudo_environment).history.criminal);
+    EXPORT phonefeedback   := history_template(filenames(pseudo_environment).history.phonefeedback);
+    EXPORT foreclosure     := history_template(filenames(pseudo_environment).history.foreclosure);
+    EXPORT workplace       := history_template(filenames(pseudo_environment).history.workplace);
+    EXPORT reverseaddress  := history_template(filenames(pseudo_environment).history.reverseaddress);
+    EXPORT didupdate       := history_template(filenames(pseudo_environment).history.didupdate);
+    EXPORT bdidupdate      := history_template(filenames(pseudo_environment).history.bdidupdate);
+    EXPORT phoneownership  := history_template(filenames(pseudo_environment).history.phoneownership);
+    EXPORT bipbestupdate   := history_template(filenames(pseudo_environment).history.bipbestupdate);
+    EXPORT sbfe            := history_template(filenames(pseudo_environment).history.sbfe);
+    EXPORT ucc             := history_template(filenames(pseudo_environment).history.ucc);
+    EXPORT govtdebarred    := history_template(filenames(pseudo_environment).history.govtdebarred);
+    EXPORT inquiry         := history_template(filenames(pseudo_environment).history.inquiry);
+    EXPORT corp            := history_template(filenames(pseudo_environment).history.corp);
+    EXPORT mvr             := history_template(filenames(pseudo_environment).history.mvr);
+    EXPORT aircraft        := history_template(filenames(pseudo_environment).history.aircraft);
+    EXPORT watercraft      := history_template(filenames(pseudo_environment).history.watercraft);
+    EXPORT personheader    := history_template(filenames(pseudo_environment).history.personheader);
+    EXPORT email           := history_template(filenames(pseudo_environment).history.email);
+    EXPORT corteratradeline := history_template(filenames(pseudo_environment).history.corteratradeline);
+  END;
 	
 	// Creates the dataset that the results will be written to
 	EXPORT results := 

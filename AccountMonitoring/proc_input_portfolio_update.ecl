@@ -68,20 +68,21 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 		process_documents_foreclosure       := process_input_file(fnms.documents.foreclosure.remote      ,fnms.documents.foreclosure.update);
 		process_documents_workplace         := process_input_file(fnms.documents.workplace.remote        ,fnms.documents.workplace.update);
 		process_documents_reverseaddress    := process_input_file(fnms.documents.reverseaddress.remote   ,fnms.documents.reverseaddress.update);
-		process_documents_didupdate    			:= process_input_file(fnms.documents.didupdate.remote   		 ,fnms.documents.didupdate.update);
-		process_documents_bdidupdate   			:= process_input_file(fnms.documents.bdidupdate.remote   		 ,fnms.documents.bdidupdate.update);
-		process_documents_phoneownership		:= process_input_file(fnms.documents.phoneownership.remote   ,fnms.documents.phoneownership.update);
-		process_documents_bipbestupdate			:= process_input_file(fnms.documents.bipbestupdate.remote    ,fnms.documents.bipbestupdate.update);
-		process_documents_sbfe							:= process_input_file(fnms.documents.sbfe.remote    				 ,fnms.documents.sbfe.update);
-		process_documents_ucc								:= process_input_file(fnms.documents.ucc.remote    				 	 ,fnms.documents.ucc.update);
-		process_documents_govtdebarred			:= process_input_file(fnms.documents.govtdebarred.remote     ,fnms.documents.govtdebarred.update);
-		process_documents_inquiry						:= process_input_file(fnms.documents.inquiry.remote    		 	 ,fnms.documents.inquiry.update);
-		process_documents_corp							:= process_input_file(fnms.documents.corp.remote    			 	 ,fnms.documents.corp.update);
-		process_documents_mvr								:= process_input_file(fnms.documents.mvr.remote    				 	 ,fnms.documents.mvr.update);
-		process_documents_aircraft					:= process_input_file(fnms.documents.aircraft.remote			 	 ,fnms.documents.aircraft.update);
-		process_documents_watercraft				:= process_input_file(fnms.documents.watercraft.remote   	 	 ,fnms.documents.watercraft.update);
-		process_documents_personheader				:= process_input_file(fnms.documents.personheader.remote   	 	 ,fnms.documents.personheader.update);
-		process_documents_email     				:= process_input_file(fnms.documents.email.remote   	 	    ,fnms.documents.email.update);
+		process_documents_didupdate         := process_input_file(fnms.documents.didupdate.remote        ,fnms.documents.didupdate.update);
+		process_documents_bdidupdate        := process_input_file(fnms.documents.bdidupdate.remote       ,fnms.documents.bdidupdate.update);
+		process_documents_phoneownership    := process_input_file(fnms.documents.phoneownership.remote   ,fnms.documents.phoneownership.update);
+		process_documents_bipbestupdate     := process_input_file(fnms.documents.bipbestupdate.remote    ,fnms.documents.bipbestupdate.update);
+		process_documents_sbfe              := process_input_file(fnms.documents.sbfe.remote             ,fnms.documents.sbfe.update);
+		process_documents_ucc               := process_input_file(fnms.documents.ucc.remote              ,fnms.documents.ucc.update);
+		process_documents_govtdebarred      := process_input_file(fnms.documents.govtdebarred.remote     ,fnms.documents.govtdebarred.update);
+		process_documents_inquiry           := process_input_file(fnms.documents.inquiry.remote          ,fnms.documents.inquiry.update);
+		process_documents_corp              := process_input_file(fnms.documents.corp.remote             ,fnms.documents.corp.update);
+		process_documents_mvr               := process_input_file(fnms.documents.mvr.remote              ,fnms.documents.mvr.update);
+		process_documents_aircraft          := process_input_file(fnms.documents.aircraft.remote         ,fnms.documents.aircraft.update);
+		process_documents_watercraft        := process_input_file(fnms.documents.watercraft.remote       ,fnms.documents.watercraft.update);
+		process_documents_personheader      := process_input_file(fnms.documents.personheader.remote     ,fnms.documents.personheader.update);
+		process_documents_email             := process_input_file(fnms.documents.email.remote            ,fnms.documents.email.update);
+		process_documents_corteratradeline := process_input_file(fnms.documents.corteratradeline.remote,fnms.documents.corteratradeline.update);
 
 
 		spray_all_files := PARALLEL(
@@ -112,7 +113,8 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_aircraft.spray,
 			process_documents_watercraft.spray,
 			process_documents_personheader.spray,
-			process_documents_email.spray
+			process_documents_email.spray,
+			process_documents_corteratradeline.spray
 		);
 		
 		update_all_superfiles := PARALLEL(
@@ -143,7 +145,8 @@ EXPORT proc_input_portfolio_update( UNSIGNED1 pseudo_environment,
 			process_documents_aircraft.update,
 			process_documents_watercraft.update,
 			process_documents_personheader.update,
-			process_documents_email.update
+			process_documents_email.update,
+			process_documents_corteratradeline.update
 		);
 			
 		RETURN SEQUENTIAL( IF( NOT valid_spray_criteria, 
