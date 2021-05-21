@@ -24,16 +24,16 @@
 		import faa, Suppress;
 		
 		local Base_File_In := suppress.applyregulatory.getFile('file_faa_cert_inj.thor', faa.Regulatory.base_layout_airmen_certificate);
-	
+	  
 		local start := max(base_ds,(unsigned)unique_id);
-
-		recordof(base_ds) add_id(faa.regulatory.base_layout_airmen_certificate l) := transform
-			self.unique_id := intformat(start + (unsigned)l.unique_id,7,1);
+    // 
+		recordof(base_ds) add_id(faa.regulatory.base_layout_airmen_certificate l, INTEGER C) := transform
+			self.unique_id := (string7)(start + C) ;
 			self := l;
 			self := [];
 		end;
 
-		local supp_data := project(Base_File_In, add_id(left));
+		local supp_data := project(Base_File_In, add_id(left, COUNTER));
 
 		local total := dedup(sort(base_ds + supp_data,current_flag, letter, unique_id, rec_type, cer_type, cer_type_mapped, cer_level, cer_level_mapped, cer_exp_date, ratings, -date_last_seen) ,except date_first_seen, date_last_seen); 
 
@@ -125,14 +125,14 @@
 	
 		local start := max(base_ds,(unsigned)unique_id);
 
-		recordof(base_ds) add_id(faa.regulatory.base_layout_airmen_data l) := transform
-			self.unique_id := intformat(start + (unsigned)l.unique_id,7,1);
+		recordof(base_ds) add_id(faa.regulatory.base_layout_airmen_data l, INTEGER C) := transform
+			self.unique_id := (string7)(start + C) ;
 			self.source := mdr.sourceTools.src_Airmen;
 			self := l;
 			self := [];
 		end;
 		
-		local supp_data := project(Base_File_In, add_id(left));
+		local supp_data := project(Base_File_In, add_id(left, COUNTER));
 
 		local total := base_ds + supp_data;
 

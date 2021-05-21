@@ -19,6 +19,6 @@
 	{'17','PEP Non-Government - Immediate Relative','','3'},
 	{'18','PEP Non-Government - Close Associate','','3'},
 	{'19','PEP State Owned Entity','','3'},
-	{'21','PEP State Invested Enterprise','','3'},
-	{'22','PEP Instrumentality of State','','3'}],
+	{'21','State Invested Enterprise','','3'},
+	{'22','Instrumentality of State','','3'}],
 	Layout_Subcategory);

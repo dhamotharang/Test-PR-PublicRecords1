@@ -2038,7 +2038,12 @@ EXPORT dsSourceCriteria := DATASET([
 {'US Executive Order 13959','2025'},
 {'FCA (UK) Unregistered Cryptoasset Businesses List','2026'},
 {'EC (CFSP) 2021/711 Myanmar/Burma List','2027'},
-{'EC 2021/706 Myanmar/Burma List','2028'}
+{'EC 2021/706 Myanmar/Burma List','2028'},
+{'Belarus State Security Committee Unilateral Terrorist List','2029'},
+{'EC (CFSP) 2021/751 Syria List','2030'},
+{'EC 2021/743 Syria List','2031'},
+{'MID Russia Denied Entry List','2032'},
+{'New Jersey Chapter 25 Prohibited List','2033'}
 
 ],r);
 

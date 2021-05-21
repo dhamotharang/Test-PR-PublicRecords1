@@ -1,98 +1,69 @@
-﻿import Versioncontrol, _Control, fbn_new,lib_thorlib , ut, std, tools;
+﻿import Versioncontrol, _Control, fbn_new,lib_thorlib , ut, std, tools,INQL_V2;
 
-	pDate := (string8)std.date.today():INDEPENDENT;
-
+    pDate := (string8)std.date.today():INDEPENDENT;
 	rFileDef := record
 		string 	LogicalFile;	
 		string5 Separate;
 		DATASET(FsLogicalFileNameRecord) SuperFiles;
 	end;
 
-	GetFileDetails(string pFileType, boolean fcra = false) := function
-		rgxName 	:= '[0-9-]{4,}';
-		pVersion 	:= stringlib.stringfilterout(regexfind(rgxName, pFileType, 0), '-');
+	GetFileDetails(string fversion,string pFileType,string pPrefix, boolean fcra = false) := function
+        rgxName 	:= '[0-9-]{4,}';
+        pVersion 	:= stringlib.stringfilterout(regexfind(rgxName, fversion, 0), '-');
 		version 	:= if(pVersion = '', pDate, pVersion);
 		
-		LogicalFile := map(
-										regexfind(INQL_v2._Constants.FILE_TYPES[1],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).bridger,
-										regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType)		=> INQL_v2.LogicalFile_List(fcra, version).riskwise,
-										regexfind(INQL_v2._Constants.FILE_TYPES[3],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).banko,
-										regexfind(INQL_v2._Constants.FILE_TYPES[4],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).batch,
-										regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).custom,
-										regexfind(INQL_v2._Constants.FILE_TYPES[6],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).idm,									
-										regexfind(INQL_v2._Constants.FILE_TYPES[7],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).sba,
-										regexfind(INQL_v2._Constants.FILE_TYPES[8],pFileType)  	=> INQL_v2.LogicalFile_List(fcra, version).deconfliction,
-										regexfind(INQL_v2._Constants.FILE_TYPES[9],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).transaction,
-										regexfind(INQL_v2._Constants.FILE_TYPES[10],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).accurint,
-										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) 	=> INQL_v2.LogicalFile_List(fcra, version).accurint,
-										'');
-		
-		Superfile := map(
-										regexfind(INQL_v2._Constants.FILE_TYPES[1],pFileType) 	=> INQL_v2.Superfile_List(fcra).bridger,
-										regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType) 	=> INQL_v2.Superfile_List(fcra).riskwise,
-										regexfind(INQL_v2._Constants.FILE_TYPES[3],pFileType) 	=> INQL_v2.Superfile_List(fcra).banko,
-										regexfind(INQL_v2._Constants.FILE_TYPES[4],pFileType) 	=> INQL_v2.Superfile_List(fcra).batch,
-										regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType) 	=> INQL_v2.Superfile_List(fcra).custom,
-										regexfind(INQL_v2._Constants.FILE_TYPES[6],pFileType) 	=> INQL_v2.Superfile_List(fcra).idm,
-										regexfind(INQL_v2._Constants.FILE_TYPES[7],pFileType) 	=> INQL_v2.Superfile_List(fcra).sba,
-										regexfind(INQL_v2._Constants.FILE_TYPES[8],pFileType)  	=> INQL_v2.Superfile_List(fcra).deconfliction,
-										regexfind(INQL_v2._Constants.FILE_TYPES[9],pFileType) 	=> INQL_v2.Superfile_List(fcra).transaction,
-										regexfind(INQL_v2._Constants.FILE_TYPES[10],pFileType) 	=> INQL_v2.Superfile_List(fcra).accurint,
-										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) 	=> INQL_v2.Superfile_List(fcra).accurint,
-										'');
-		Separate := map(
-										regexfind(INQL_v2._Constants.FILE_TYPES[1],pFileType) 	=> '\t',
-										regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType) 	=> '~~',
-										regexfind(INQL_v2._Constants.FILE_TYPES[3],pFileType) 	=> '~~',									
-										regexfind(INQL_v2._Constants.FILE_TYPES[4],pFileType) 	=> '|',
-										regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType) 	=> '~~',
-										regexfind(INQL_v2._Constants.FILE_TYPES[6],pFileType) 	=> ',',
-										regexfind(INQL_v2._Constants.FILE_TYPES[7],pFileType) 	=> '~~',
-										regexfind(INQL_v2._Constants.FILE_TYPES[8],pFileType)  	=> '~~',
-										regexfind(INQL_v2._Constants.FILE_TYPES[9],pFileType) 	=> '~~',
-										regexfind(INQL_v2._Constants.FILE_TYPES[10],pFileType) 	=> '~~',
-										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) 	=> '~~',
-										'');
-		
-		sf_accurint_cc 	:= INQL_v2.Superfile_List(fcra).accurint_cc;
-		sf_accurint_sl 	:= INQL_v2.Superfile_List(fcra).accurint_sl;
-		sf_accurint_fdn	:= INQL_v2.Superfile_List(fcra).accurint_fdn;
-		sf_riskwise_sl 	:= INQL_v2.Superfile_List(fcra).riskwise_sl;
-		sf_custom_sl 		:= INQL_v2.Superfile_List(fcra).custom_sl;
-														
-		SuperFiles := map(
-										regexfind(INQL_v2._Constants.FILE_TYPES[11],pFileType) => dataset([{sf_accurint_cc}, {sf_accurint_sl}, {sf_accurint_fdn}], FsLogicalFileNameRecord)
-									 ,regexfind(INQL_v2._Constants.FILE_TYPES[2],pFileType)  => dataset([{sf_riskwise_sl}], FsLogicalFileNameRecord)
-									 ,regexfind(INQL_v2._Constants.FILE_TYPES[5],pFileType)  => dataset([{sf_custom_sl}], FsLogicalFileNameRecord)
-									 ,dataset([], FsLogicalFileNameRecord)
-									 )
-										+
-									dataset([{Superfile}], FsLogicalFileNameRecord);
-											
-		ds := dataset([{LogicalFile, Separate, SuperFiles}], rFileDef);
-		return ds;	
-	end;
 
-export fSpray(dataset({FsFilenameRecord}) filelist, boolean fcra = false) := function
+    LogicalFile := IF(pFileType='transaction',pPrefix + '::in::mbs::'+version+'::transaction_desc',
+				   INQL_V2.Filenames(version,fcra,,pFileType).InputTemplate);
+	
+	Superfile  :=  IF(pFileType='transaction',pPrefix + '::in::transaction_desc',
+				   INQL_V2.Filenames(version,fcra,,pFileType).Input);
+	
+	Separate   := IF(pFileType='bridger','\t', 
+	              IF(pFileType='batch','|',
+				  IF(pFileType='idm',',','~~'))); 
+
+	
+	sf_accurint_cc 	:= pPrefix + '::in::accurint_acclogs_cc';
+	sf_accurint_sl 	:= pPrefix + '::in::accurint_acclogs_sl';
+	sf_accurint_fdn	:= '~thor_data400::in::fdn::sprayed::glb5';	
+	sf_riskwise_sl 	:= pPrefix + '::in::riskwise_acclogs_sl';
+	sf_custom_sl 	:= pPrefix + '::in::custom_acclogs_sl';
+													
+	SuperFiles := if(pFileType='accurint' and fcra=false,dataset([{sf_accurint_cc}, {sf_accurint_sl}, {sf_accurint_fdn}], FsLogicalFileNameRecord),
+				  if(pFileType='riskwise',dataset([{sf_riskwise_sl}], FsLogicalFileNameRecord),
+				  if(pFileType='custom',dataset([{sf_custom_sl}], FsLogicalFileNameRecord)
+											)
+										)
+									)
+									+
+									dataset([{Superfile}], FsLogicalFileNameRecord);
+										
+	ds := dataset([{LogicalFile, Separate, SuperFiles}], rFileDef);
+	return ds;	
+end;
+
+export fSpray(dataset({FsFilenameRecord,string source}) filelist, boolean fcra = false) := function
 	
 	pGroupName	:= INQL_v2._Constants.GROUPNAME;
+	pPrefix		:= if(fcra, '~thor10_231', '~thor100_21');
 	
 	tools.Layout_Sprays.Info xForm(filelist L) := transform
 			self:=row(
 								{	 
-								 INQL_v2._Constants.LZ						
+								 INQL_v2._Constants.LZ	
 								,INQL_v2._Constants.sprayingDir                           
 								,L.name                                      
 								,0
-								,GetFileDetails(L.name, fcra)[1].LogicalFile
-								,GetFileDetails(L.name, fcra)[1].Superfiles
+								,GetFileDetails(L.name,L.source, pPrefix, fcra)[1].LogicalFile
+								,GetFileDetails(L.name,L.source, pPrefix, fcra)[1].Superfiles
 								,pGroupName                                                
 								,''                                                    
 								,''                                                            
 								,'VARIABLE'                                                         
 								,''
 								,''
-								,GetFileDetails(L.name, fcra)[1].Separate
+								,GetFileDetails(L.name,L.source, pPrefix, fcra)[1].Separate
 								,''               //'\\n,\\r\\n'
 								,','                     //''
 								,true
