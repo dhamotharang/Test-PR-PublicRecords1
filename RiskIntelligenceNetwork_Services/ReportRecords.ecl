@@ -113,18 +113,19 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
 
  ds_pr_appends := RiskIntelligenceNetwork_Services.Functions.getPublicRecordsAppends(ds_in_w_did, ds_pr_best_ungrp, in_params);
  ds_API_Assessment := RiskIntelligenceNetwork_Analytics.Functions.GetAPILiveAssessment(ds_pr_appends, in_params);
+ // ds_API_Assessment := dataset([], RiskIntelligenceNetwork_analytics.Layouts.LiveAssessmentScores);
   
  //Build Final Result:
  IdentityResolved := MAP(// Input identity found in contributory data
-                         InputDidFoundInCR OR (~multiple_did_resolved AND ds_dids_combined_dedup[1].RecordSource = _Constant.RECORD_SOURCE.CONTRIBUTED) => _Constant.IDENTITY_FLAGS.IDENTITY_IN_CONTRIB, 
+                         ~multiple_did_resolved AND (InputDidFoundInCR OR ds_dids_combined_dedup[1].RecordSource = _Constant.RECORD_SOURCE.CONTRIBUTED) => _Constant.IDENTITY_FLAGS.IDENTITY_IN_CONTRIB, 
                          // Input identity not found in contributory data or public records data
-                         ~InputDidFoundInPR AND ~InputDidFoundInCR AND ~EXISTS(ds_dids_combined_dedup) AND hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.IDENTITY_NOT_FOUND,
+                         ~multiple_did_resolved AND ~InputDidFoundInPR AND ~InputDidFoundInCR AND ~EXISTS(ds_dids_combined_dedup) AND hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.IDENTITY_NOT_FOUND,
                          // Input identity not found in contributory data but found in public records through real-time search
-                         ~InputDidFoundInCR AND (InputDidFoundInPR OR (~multiple_did_resolved AND ds_dids_combined_dedup[1].RecordSource = _Constant.RECORD_SOURCE.REALTIME)) => _Constant.IDENTITY_FLAGS.REALTIME_IDENTITY,
+                         ~multiple_did_resolved AND ~InputDidFoundInCR AND (InputDidFoundInPR OR ds_dids_combined_dedup[1].RecordSource = _Constant.RECORD_SOURCE.REALTIME) => _Constant.IDENTITY_FLAGS.REALTIME_IDENTITY,
                          // Input identity not found in contributory data or public records and does not contain enough information to produce an identity, Unscorable
-                         (~InputDidFoundInCR OR ~InputDidFoundInPR OR ~EXISTS(ds_dids_combined_dedup)) AND ~hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.UNSCORABLE_IDENTITY,
+                         ~multiple_did_resolved AND (~InputDidFoundInCR OR ~InputDidFoundInPR OR ~EXISTS(ds_dids_combined_dedup)) AND ~hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.UNSCORABLE_IDENTITY,
                          //Multiple LexIDs found in contributory or PR.
-                         multiple_did_resolved AND (InputDidFoundInCR OR InputDidFoundInPR OR EXISTS(ds_dids_combined_dedup)) => _Constant.IDENTITY_FLAGS.MULTIPLE_IDENTITY,
+                         multiple_did_resolved => _Constant.IDENTITY_FLAGS.MULTIPLE_IDENTITY,
                          '');
  
  ds_RiskAttributes_sorted := SORT(ds_API_Assessment.entitystats, -risklevel, -(indicatortype = 'ID'), indicatortype, record);
@@ -160,28 +161,28 @@ EXPORT ReportRecords (DATASET(FraudShared_Services.Layouts.BatchInExtended_rec) 
  OUTPUT(deltabase_log, NAMED('log_delta__fraudgov_delta__identity'));
  
 //  Debug Outputs
-//  OUTPUT(ds_in, named('ds_in'));
-//  OUTPUT(hasMinimunInputForRINID, named('hasMinimunInputForRINID'));
-//  OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
-//  OUTPUT(InputDidFoundInCR, named('InputDidFoundInCR'));
-//  OUTPUT(ds_in_without_did, named('ds_in_without_did'));
-//  OUTPUT(ds_input_pii, named('ds_input_pii'));
-//  OUTPUT(ds_pr_did, named('ds_pr_did'));
-//  OUTPUT(ds_pr_did_final, named('ds_pr_did_final'));
-//  OUTPUT(ds_auto_out, named('ds_auto_out'));
-//  OUTPUT(ds_payload_recs, named('ds_payload_recs'));
-//  OUTPUT(ds_payload_recs_filtered, named('ds_payload_recs_filtered'));
-//  OUTPUT(ds_contributory_dids, named('ds_contributory_dids'));
-//  OUTPUT(ds_dids_combined, named('ds_dids_combined'));
-//  OUTPUT(ds_dids_combined_dedup, named('ds_dids_combined_dedup'));
-//  OUTPUT(multiple_did_resolved, named('multiple_did_resolved'));
-//  OUTPUT(ds_in_w_did, named('ds_in_w_did'));
-//  OUTPUT(ds_pr_best_ungrp, named('ds_pr_best_ungrp'));
-//  OUTPUT(ds_pr_appends, named('ds_pr_appends'));
-//  OUTPUT(ds_API_Assessment, named('ds_API_Assessment')); 
+ // OUTPUT(ds_in, named('ds_in'));
+ // OUTPUT(hasMinimunInputForRINID, named('hasMinimunInputForRINID'));
+ // OUTPUT(InputDidFoundInPR, named('InputDidFoundInPR'));
+ // OUTPUT(InputDidFoundInCR, named('InputDidFoundInCR'));
+ // OUTPUT(ds_in_without_did, named('ds_in_without_did'));
+ // OUTPUT(ds_input_pii, named('ds_input_pii'));
+ // OUTPUT(ds_pr_did, named('ds_pr_did'));
+ // OUTPUT(ds_pr_did_final, named('ds_pr_did_final'));
+ // OUTPUT(ds_auto_out, named('ds_auto_out'));
+ // OUTPUT(ds_payload_recs, named('ds_payload_recs'));
+ // OUTPUT(ds_payload_recs_filtered, named('ds_payload_recs_filtered'));
+ // OUTPUT(ds_contributory_dids, named('ds_contributory_dids'));
+ // OUTPUT(ds_dids_combined, named('ds_dids_combined'));
+ // OUTPUT(ds_dids_combined_dedup, named('ds_dids_combined_dedup'));
+ // OUTPUT(multiple_did_resolved, named('multiple_did_resolved'));
+ // OUTPUT(ds_in_w_did, named('ds_in_w_did'));
+ // OUTPUT(ds_pr_best_ungrp, named('ds_pr_best_ungrp'));
+ // OUTPUT(ds_pr_appends, named('ds_pr_appends'));
+ // OUTPUT(ds_API_Assessment, named('ds_API_Assessment')); 
 //  OUTPUT(ds_RiskAttributes_sorted, named('ds_RiskAttributes_sorted')); 
 //  OUTPUT(ds_KnownRisks_sorted, named('ds_KnownRisks_sorted')); 
-//  OUTPUT(IdentityResolved, named('IdentityResolved'));
+ // OUTPUT(IdentityResolved, named('IdentityResolved'));
 //  OUTPUT(result, named('result'));
  
  RETURN result;
