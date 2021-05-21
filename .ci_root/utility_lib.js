@@ -267,7 +267,7 @@ let getMergeRequest = async function(proj_id, mr_id, token = '',
 // Dependency Graph
 // ------------------------------------------
 let loadRawAttributeInfo = async function() {
-  const url = 'http://10.176.152.172/ecldocsbuffer/attributes.json';
+  const url = 'https://bctwpprroxie301.risk.regn.net/ecldocsjson/roxiedev.json';
   let out = null;
 
   console.log('Fetching Attribute Info From: ' + url);

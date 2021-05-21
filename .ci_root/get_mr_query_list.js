@@ -3,6 +3,7 @@
 let arg = process.argv.slice(2);
 let use_mr = false;
 let use_dep = false;
+let verbose = false;
 let pid = '0';
 let mrid = '0';
 let tok = '';
@@ -11,6 +12,7 @@ let argct = 0;
 for (let a of arg) {
   if (a.toLowerCase() == '-m') use_mr = true;
   else if (a.toLowerCase() == '-d') use_dep = true;
+  else if (a.toLowerCase() == '-v') verbose = true;
   else {
     switch(argct) {
       case 0: pid = a; break;
@@ -53,9 +55,9 @@ let main = async function() {
   // getting list directly from merge request is default
   if (!use_mr && !use_dep) use_mr = true;
 
-  // disable console logging so we don't get status msgs in output
+  // disable console logging so we don't get status msgs in output (unless we're verbose)
   let ctrl = new LogControl();
-  ctrl.disable();
+  if (!verbose) ctrl.disable();
 
   let info = await ut.getMergeRequest(pid, mrid, tok, true);
 
@@ -85,7 +87,7 @@ let main = async function() {
   }
 
   // now we can log again
-  ctrl.enable();
+  if (!verbose) ctrl.enable();
   
   // output our results
   for (let item of out) {
