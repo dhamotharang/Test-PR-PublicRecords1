@@ -112,6 +112,7 @@ let apiCall = async function(url, token = '', timeout = 8000) {
   catch (error) {
     result.status.text = error;
     console.log('Error: Request Failed');
+    console.log('Error Text: ' + error);
   }
 
   return result;
