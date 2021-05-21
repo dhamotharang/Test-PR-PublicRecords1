@@ -38,5 +38,8 @@
     EXPORT GLOBAL_SID := 28141; // hard-coded here, but coming from Orbit.
   END;
 
+  EXPORT IconectivElep := MODULE
+    EXPORT GLOBAL_SID := 28961; // hard-coded here, but coming from Orbit (item# 56604, created on 04/07/2021).
+  END;
 
 END;

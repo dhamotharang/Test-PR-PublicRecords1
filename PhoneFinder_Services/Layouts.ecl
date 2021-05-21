@@ -91,11 +91,24 @@
         STRING10      phone;
     END;
 
+   // v---- Added next 7 lines for the 2021-06-02 Phone Porting Data for LE project
+    EXPORT ServiceProviderInfo := RECORD
+      STRING10 id;
+      STRING40 company;
+      STRING100 contact;
+      STRING20 contact_phone;
+    END;
+
     EXPORT PortHistory :=
     RECORD
       STRING ServiceProvider;
       UNSIGNED4 PortStartDate;
       UNSIGNED4 PortEndDate;
+      // v---- Added next 4 lines for the 2021-06-02 Phone Porting Data for LE project
+      ServiceProviderInfo ServiceProviderInfo;
+      UNSIGNED4 DateOfChange;
+      ServiceProviderInfo AltServiceProviderInfo;
+      ServiceProviderInfo LastAltServiceProviderInfo;
     END;
 
     EXPORT Porting :=
@@ -112,7 +125,11 @@
       BOOLEAN 	Prepaid;
       UNSIGNED1 serviceType;
       STRING PortingStatus;
-
+      // v---- Added next 4 lines for the 2021-06-02 Phone Porting Data for LE project
+      ServiceProviderInfo ServiceProviderInfo;
+      UNSIGNED4 DateOfChange;
+      ServiceProviderInfo AltServiceProviderInfo;
+      ServiceProviderInfo LastAltServiceProviderInfo;
     END;
 
     EXPORT SpoofHistory :=
@@ -589,7 +606,21 @@
         #APPEND(PortingHistory,
                 'STRING PortingHistory' + %'cntPorts'% + '_ServiceProvider;' +
                 'STRING8 PortingHistory' + %'cntPorts'% + '_PortStartDate;' +
-                'STRING8 PortingHistory' + %'cntPorts'% + '_PortEndDate;');
+                'STRING8 PortingHistory' + %'cntPorts'% + '_PortEndDate;' +
+                // Revised the 1 line above(---^) and added the next 13 lines(---v) for the 2021-06-02 Phone Porting Data for LE project
+                'STRING4   PortingHistory' + %'cntPorts'% + '_ServiceProviderId;' +
+                'STRING60  PortingHistory' + %'cntPorts'% + '_ServiceProviderCompany;' +
+                'STRING60  PortingHistory' + %'cntPorts'% + '_ServiceProviderContact;' +
+                'STRING10  PortingHistory' + %'cntPorts'% + '_ServiceProviderContactPhone;' +
+                'STRING8   PortingHistory' + %'cntPorts'% + '_DateOfChange;' +
+                'STRING4   PortingHistory' + %'cntPorts'% + '_AltServiceProviderId;' +
+                'STRING60  PortingHistory' + %'cntPorts'% + '_AltServiceProviderCompany;' +
+                'STRING60  PortingHistory' + %'cntPorts'% + '_AltServiceProviderContact;' +
+                'STRING10  PortingHistory' + %'cntPorts'% + '_AltServiceProviderContactPhone;' +
+                'STRING4   PortingHistory' + %'cntPorts'% + '_LastAltServiceProviderId;' +
+                'STRING60  PortingHistory' + %'cntPorts'% + '_LastAltServiceProviderCompany;' +
+                'STRING60  PortingHistory' + %'cntPorts'% + '_LastAltServiceProviderContact;' +
+                'STRING10  PortingHistory' + %'cntPorts'% + '_LastAltServiceProviderContactPhone;');
         #SET(cntPorts,%cntPorts% + 1)
       #END
     #END
@@ -646,7 +677,9 @@
     #END
 
     EXPORT BatchOut :=
-    RECORD,MAXLENGTH(20000)
+    RECORD,MAXLENGTH(61000) 
+    //NOTE: ^--- This length may seem excessive, but it had to be increased for the 2021-06-02 Phone Porting Data for 
+    //      LE project due to adding 13 new PortingHistory fields(410 bytes each) * 100 (MaxPorts) = 41000 + 20000 = 61000
       BatchIn;
       %IdentityInfo%
       %OtherPhones%
@@ -756,11 +789,18 @@
       STRING   ContactPhone;
       STRING   ContactPhoneExt;
       STRING   Fax;
+      // v---- Added the next 4 lines for the 2021-06-02 Phone Porting Data for LE project
+      ServiceProviderInfo ServiceProvider;
+      UNSIGNED4 DateOfChange;
+      ServiceProviderInfo AltServiceProvider;
+      ServiceProviderInfo LastAltServiceProvider; 
       %RoyaltyInfo%
       BatchShare.Layouts.ShareErrors;
     END;
 
   END;
+//***** end of PhoneFinder MODULE *****
+
 
   EXPORT SubjectPhone := RECORD
     STRING20 	acctno;
@@ -780,11 +820,50 @@
     UNSIGNED4  port_start_dt				  {XPATH('port_start_dt')};
     UNSIGNED4  port_end_dt					  {XPATH('port_end_dt')};
     BOOLEAN	  is_ported						  {XPATH('is_ported')};
+    // v---- Added next 2 lines for the 2021-06-02 Phone Porting Data for LE project
+    STRING10   alt_spid             {XPATH('alt_spid')};
+    STRING10   lalt_spid            {XPATH('lalt_spid')};
   END;
 
   EXPORT PortedMetadata := RECORD
     Phones.Layouts.portedMetadata_Main;
   END;
+
+  // v---- Added the next 3 record layouts for the 2021-06-02 Phone Porting Data for LE project
+  EXPORT SubPhone_PortedMetadata_Comb_Plus := RECORD
+    SubjectPhone;
+    PortedMetadata  -phone; // remove the 1 field(phone) from this one that is also on the SubjectPhone layout above, 
+                            // to mimic what the first 3 joins in PhoneFinder_Services.GetPhonesPortedMetadata are doing.
+    // v--- Additional fields needed by the project's new coding
+    string40  sp_company := '';
+    string100 sp_contact := '';
+    string20  sp_contact_phone := '';
+    string8   sp_dateofchange := ''; 
+    string40  alt_sp_company := '';
+    string100 alt_sp_contact := '';
+    string20  alt_sp_contact_phone := '';
+    string40  lalt_sp_company := '';
+    string100 lalt_sp_contact := '';
+    string20  lalt_sp_contact_phone := '';
+    unsigned4 parent_seq := 0;
+    unsigned4 child_seq := 0;
+    string10  lookup_id := '';
+    string40  lookup_company := '';
+    string100 lookup_contact := '';
+    string20  lookup_contact_phone := '';
+  END;
+
+  EXPORT SubPhone_Porting_Comb := RECORD
+    SubjectPhone;
+    PhoneFinder.Porting;
+  END;
+
+  EXPORT IconectivElepRequest_ext:= RECORD
+    iesp.iconectiv_elep.t_IconectivElepRequest;
+    STRING20 	acctno;
+    UNSIGNED6 DID;
+  END;
+  // ^----- end of the new 3 layouts added for the 2021-06-02 Phone Porting Data for LE project
 
   EXPORT DeltabaseResponse := RECORD
     DATASET (DeltaPortedDataRECORD) RECORDs	 {XPATH('Records/Rec'), MAXCOUNT(PhoneFinder_Services.Constants.MaxPortedMatches)};

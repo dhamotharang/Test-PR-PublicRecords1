@@ -12,6 +12,9 @@ export Constants := module
     export integer STATUS_SUCCESS := 0;
     export integer MAX_THREADS := 20;
     export integer TARGUS_TIMEOUT := 6;
+    export integer ICONECTIV_ELEP_RETRIES := 1;
+    export integer ICONECTIV_ELEP_TIMEOUT := 10;
+    export integer ICONECTIV_ELEP_NUM_THREADS := 10;
   end;
 
   export ServiceName := module
@@ -26,6 +29,7 @@ export Constants := module
     export String40 Targus := 'targus'; // active, as of 07/24/2012
     export String40 Metronet := 'metronet'; // active, as of 07/24/2012
     export String40 AccuDataOCN := 'accudata_ocn'; // active as of 5/2017
+    export String40 IconectivElep := 'iconectivelep'; // iconectiv ELEP porting info for LE, active in ESP prod as of 05/19/2021
 
     // Vehicles
     export String40 Polk := 'polk'; // active, as of 07/24/2012

@@ -10,7 +10,7 @@ EXPORT GetPortedPhones_Deltabase(DATASET(PhoneFinder_Services.Layouts.SubjectPho
 									
 		SELF.Select := 	'SELECT ' +
 									// Generate the Response Layout.  NOTE: If you alter anything in this section you MUST update PhoneFinder_Services.Layouts.DeltaPortedDataRecord
-									'i.id, i.date_added, i.phone, i.source, i.spid, i.port_start_dt, i.port_end_dt, is_ported ' +
+									'i.id, i.date_added, i.phone, i.source, i.spid, i.port_start_dt, i.port_end_dt, is_ported, i.alt_spid, i.lalt_spid ' +
 									// Select the Deltabase Table
 									'FROM delta_phonefinder.delta_phones_metadata i ' +
 									// Choose appropriate phones

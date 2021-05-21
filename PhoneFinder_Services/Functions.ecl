@@ -444,10 +444,38 @@
                                                                 TRANSFORM(iesp.phonefinder.t_PortingHistory,
                                                                           SELF.PortStartDate := iesp.ECL2ESP.toDate(ValidateDate(LEFT.PortStartDate)),
                                                                           SELF.PortEndDate   := iesp.ECL2ESP.toDate(ValidateDate(LEFT.PortEndDate)),
+                                                                          // v---- Added next 13 lines for the 2021-06-02 Phone Porting for LE project
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.Id                     := LEFT.ServiceProviderInfo.id,
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.Company                := LEFT.ServiceProviderInfo.company,
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.Contact                := LEFT.ServiceProviderInfo.contact,
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.ContactPhone           := LEFT.ServiceProviderInfo.contact_phone,
+                                                                          SELF.PortValidationInfo.DateOfChange                               := iesp.ECL2ESP.toDate(ValidateDate(LEFT.DateOfChange)),
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.Id                  := LEFT.AltServiceProviderInfo.id,
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.Company             := LEFT.AltServiceProviderInfo.company,
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.Contact             := LEFT.AltServiceProviderInfo.contact,
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.ContactPhone        := LEFT.AltServiceProviderInfo.contact_phone,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.Id              := LEFT.LastAltServiceProviderInfo.id,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.Company         := LEFT.LastAltServiceProviderInfo.company,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.Contact         := LEFT.LastAltServiceProviderInfo.contact,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.ContactPhone    := LEFT.LastAltServiceProviderInfo.contact_phone,
                                                                           SELF               := LEFT)),
                                                         iesp.Constants.Phone_Finder.MaxPorts));
       SELF.PortingCount                     := pInput.PortingCount;
       SELF.PortingCode                      := pInput.PortingCode;
+      // v---- Added next 13 lines for the 2021-06-02 Phone Porting for LE project
+      SELF.PortValidationInfo.ServiceProviderInfo.Id                  := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.id,'');
+      SELF.PortValidationInfo.ServiceProviderInfo.Company             := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.company,'');
+      SELF.PortValidationInfo.ServiceProviderInfo.Contact             := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.contact,'');
+      SELF.PortValidationInfo.ServiceProviderInfo.ContactPhone        := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.contact_phone,'');
+      SELF.PortValidationInfo.DateOfChange                            := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate(ValidateDate(pInput.DateOfChange)));
+      SELF.PortValidationInfo.AltServiceProviderInfo.Id               := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.id,'');,
+      SELF.PortValidationInfo.AltServiceProviderInfo.Company          := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.company,'');
+      SELF.PortValidationInfo.AltServiceProviderInfo.Contact          := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.contact,'');
+      SELF.PortValidationInfo.AltServiceProviderInfo.ContactPhone     := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.contact_phone,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.Id           := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.id,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.Company      := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.company,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.Contact      := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.contact,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.ContactPhone := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.contact_phone,'');
       SELF.PortingStatus                    := pInput.PortingStatus;
       SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
                                                         TRANSFORM(iesp.phonefinder.t_SpoofCommon,
@@ -837,6 +865,20 @@
       SELF.LastPortedDate                   := IF(inMod.IncludePortingDetails,iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.LastPortedDate)));
       SELF.PortingCount                     := pInput.PortingCount;
       SELF.PortingCode                      := pInput.PortingCode;
+      // v---- Added next 13 lines for the 2021-06-02 Phone Porting for LE project
+      SELF.PortValidationInfo.ServiceProviderInfo.Id                  := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.id,'');
+      SELF.PortValidationInfo.ServiceProviderInfo.Company             := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.company,''); 
+      SELF.PortValidationInfo.ServiceProviderInfo.Contact             := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.contact,'');
+      SELF.PortValidationInfo.ServiceProviderInfo.ContactPhone        := IF(inMod.IncludePortingDetails, pInput.ServiceProviderInfo.contact_phone,'');
+      SELF.PortValidationInfo.DateOfChange                            := IF(inMod.IncludePortingDetails, iesp.ECL2ESP.toDate($.Functions.ValidateDate(pInput.DateOfChange)));
+      SELF.PortValidationInfo.AltServiceProviderInfo.Id               := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.id,'');,
+      SELF.PortValidationInfo.AltServiceProviderInfo.Company          := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.company,'');
+      SELF.PortValidationInfo.AltServiceProviderInfo.Contact          := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.contact,'');
+      SELF.PortValidationInfo.AltServiceProviderInfo.ContactPhone     := IF(inMod.IncludePortingDetails, pInput.AltServiceProviderInfo.contact_phone,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.Id           := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.id,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.Company      := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.company,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.Contact      := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.contact,'');
+      SELF.PortValidationInfo.LastAltServiceProviderInfo.ContactPhone := IF(inMod.IncludePortingDetails, pInput.LastAltServiceProviderInfo.contact_phone,'');
       Phone_Status                          := pInput.PhoneStatus;
       SELF.ActivationDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.Active, iesp.ECL2ESP.toDate(pInput.ActivationDate));
       SELF.DisconnectDate                   := IF(Phone_Status = PhoneFinder_Services.Constants.PhoneStatus.INACTIVE, iesp.ECL2ESP.toDate(pInput.DisconnectDate));
@@ -844,6 +886,20 @@
                                                                 TRANSFORM(iesp.phonefinder.t_PortingHistory,
                                                                           SELF.PortStartDate := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.PortStartDate)),
                                                                           SELF.PortEndDate   := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.PortEndDate)),
+                                                                          // v---- Added next 13 lines for the 2021-06-02 Phone Porting for LE project
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.Id                     := LEFT.ServiceProviderInfo.id,
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.Company                := LEFT.ServiceProviderInfo.company,
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.Contact                := LEFT.ServiceProviderInfo.contact,
+                                                                          SELF.PortValidationInfo.ServiceProviderInfo.ContactPhone           := LEFT.ServiceProviderInfo.contact_phone,
+                                                                          SELF.PortValidationInfo.DateOfChange                               := iesp.ECL2ESP.toDate($.Functions.ValidateDate(LEFT.DateOfChange)),
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.Id                  := LEFT.AltServiceProviderInfo.id,
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.Company             := LEFT.AltServiceProviderInfo.company,
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.Contact             := LEFT.AltServiceProviderInfo.contact,
+                                                                          SELF.PortValidationInfo.AltServiceProviderInfo.ContactPhone        := LEFT.AltServiceProviderInfo.contact_phone,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.Id              := LEFT.LastAltServiceProviderInfo.id,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.Company         := LEFT.LastAltServiceProviderInfo.company,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.Contact         := LEFT.LastAltServiceProviderInfo.contact,
+                                                                          SELF.PortValidationInfo.LastAltServiceProviderInfo.ContactPhone    := LEFT.LastAltServiceProviderInfo.contact_phone,
                                                                           SELF               := LEFT)),
                                                         iesp.Constants.Phone_Finder.MaxPorts));
       SELF.SpoofingData.Spoof               := PROJECT(pInput.Spoof,
@@ -1087,7 +1143,20 @@
         #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_ServiceProvider := pInput.phone_info.PortingHistory[' + %'p'% + '].ServiceProvider;\n')
         #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_PortStartDate := iesp.ECL2ESP.t_DateToString8(pInput.phone_info.PortingHistory[' + %'p'% + '].PortStartDate);\n')
         #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_PortEndDate := iesp.ECL2ESP.t_DateToString8(pInput.phone_info.PortingHistory[' + %'p'% + '].PortEndDate);\n')
-
+        // Added next 13 lines for 2021-06-02 Phone Porting Data for LE project
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_ServiceProviderId := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.ServiceProviderInfo.Id;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_ServiceProviderCompany := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.ServiceProviderInfo.Company;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_ServiceProviderContact := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.ServiceProviderInfo.Contact;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_ServiceProviderContactPhone := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.ServiceProviderInfo.ContactPhone;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_DateOfChange := iesp.ECL2ESP.t_DateToString8(pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.DateOfChange);\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_AltServiceProviderId := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.AltServiceProviderInfo.Id;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_AltServiceProviderCompany := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.AltServiceProviderInfo.Company;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_AltServiceProviderContact := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.AltServiceProviderInfo.Contact;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_AltServiceProviderContactPhone := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.AltServiceProviderInfo.ContactPhone;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_LastAltServiceProviderId := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.LastAltServiceProviderInfo.Id;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_LastAltServiceProviderCompany := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.LastAltServiceProviderInfo.Company;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_LastAltServiceProviderContact := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.LastAltServiceProviderInfo.Contact;\n')
+        #APPEND(PortingHistory, 'SELF.PortingHistory' + %'p'% + '_LastAltServiceProviderContactPhone := pInput.phone_info.PortingHistory[' + %'p'% + '].PortValidationInfo.LastAltServiceProviderInfo.ContactPhone;\n')
         #SET(p, %p% + 1)
       #END
     #END
@@ -1226,6 +1295,20 @@
       SELF.CallForwardingIndicator            := phoneInfo.CallForwardingIndicator;
       SELF.PhoneVerificationDescription       := phoneInfo.VerificationStatus.PhoneVerificationDescription;
       SELF.PhoneVerified                      := phoneInfo.VerificationStatus.PhoneVerified;
+      // Added next 13 lines for 2021-06-02 Phone Porting Data for LE project
+      SELF.ServiceProvider.id                   := phoneInfo.PortValidationInfo.ServiceProviderInfo.Id;
+      SELF.ServiceProvider.company              := phoneInfo.PortValidationInfo.ServiceProviderInfo.Company;
+      SELF.ServiceProvider.contact              := phoneInfo.PortValidationInfo.ServiceProviderInfo.Contact;
+      SELF.ServiceProvider.contact_phone        := phoneInfo.PortValidationInfo.ServiceProviderInfo.ContactPhone;
+      SELF.DateOfChange                         := iesp.ECL2ESP.DateToInteger(phoneInfo.PortValidationInfo.DateofChange); 
+      SELF.AltServiceProvider.id                := phoneInfo.PortValidationInfo.AltServiceProviderInfo.Id;
+      SELF.AltServiceProvider.company           := phoneInfo.PortValidationInfo.AltServiceProviderInfo.Company;
+      SELF.AltServiceProvider.contact           := phoneInfo.PortValidationInfo.AltServiceProviderInfo.Contact;
+      SELF.AltServiceProvider.contact_phone     := phoneInfo.PortValidationInfo.AltServiceProviderInfo.ContactPhone;
+      SELF.LastAltServiceProvider.id            := phoneInfo.PortValidationInfo.LastAltServiceProviderInfo.Id;
+      SELF.LastAltServiceProvider.company       := phoneInfo.PortValidationInfo.LastAltServiceProviderInfo.Company;
+      SELF.LastAltServiceProvider.contact       := phoneInfo.PortValidationInfo.LastAltServiceProviderInfo.Contact;
+      SELF.LastAltServiceProvider.contact_phone := phoneInfo.PortValidationInfo.LastAltServiceProviderInfo.ContactPhone;
       SELF                                    := phoneInfo.GeoLocation;
       SELF                                    := ocInfo.Address;
       SELF                                    := ocInfo;
