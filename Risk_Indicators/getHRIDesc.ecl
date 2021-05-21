@@ -190,6 +190,9 @@ export getHRIDesc(string5 rc, boolean nextgen_credit = false) := CASE(TRIM(rc),
 'IS' => 'Input SSN possibly randomly issued by SSA, but invalid when first associated with the input identity',
 'CL' => 'The input SSN is not the primary SSN for the input identity',
 
+//this new risk indicator will be used for the PayPal Custom CVI (e.g. CCVI2105_1)
+'BL' => 'The input SSN is on the Bancorp list',
+
 'FM' => 'Subject is listed on the Direct Marketing Association \'Do Not Mail\' list',
 'FB' => 'No record on file sourced by a national credit bureau',
 'FQ' => 'High velocity of identity events',
