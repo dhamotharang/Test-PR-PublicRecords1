@@ -28,6 +28,8 @@
 		STRING20 P_InpClnNameFirst;
 		STRING20 P_InpClnNameMid;
 		STRING30 P_InpClnNameLast;		
+		STRING30 P_InpClnSurname1;		
+		STRING30 P_InpClnSurname2;		
 		STRING20 p_inpclnarchdt;
 		STRING10 P_InpClnDOB;
 		STRING10 P_InpClnAddrPrimRng;
@@ -121,6 +123,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		INTEGER G_ProcUID; 
 		Boolean HeaderRec;
 		STRING Archive_Date;
+		unsigned4 first_ingest_date;
 		dpmtype;
 		dx_Header.layout_header;	
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
@@ -131,6 +134,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Doxie__Key_Header)-dt_first_seen;//same as dx_Header.layout_header;
 		unsigned dt_first_seen;
 		STRING Archive_Date;
+		unsigned4 first_ingest_date;
+		STRING DOBPadded;
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
 		Boolean HeaderRec;//for corrections
@@ -146,6 +151,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Header_Quick__Key_Did)- dt_first_seen;
 		unsigned dt_first_seen;
 		STRING Archive_Date;
+		unsigned4 first_ingest_date;
+		STRING DOBPadded;
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
 		Boolean HeaderRec;//for corrections
@@ -176,6 +183,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Doxie_Files.Key_Offenders);
 		STRING2 src;
 		STRING Archive_Date;
+		STRING DOBPadded;
+		STRING DOB_AliasPadded;
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.crim_correct_ofk;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.crim_correct_ffid;		
@@ -643,6 +652,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.Death_correct_ffid;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.Death_correct_record_id;
+		STRING DOB8Padded;
 	END;
 
 	SHARED DriversV2__Key_DL_DID := DriversV2.Key_DL_DID;
@@ -652,6 +662,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		unsigned dt_first_seen;
 		STRING2 src;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		dpmtype;
 	END;
 
@@ -662,6 +673,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		unsigned dt_first_seen;
 		STRING2 src;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		dpmtype;
 	END;
 	
@@ -685,10 +697,9 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 
 	
 // --------------------[ Relatives ]--------------------
-	SHARED Relatives__Key_Relatives_V3 := Relationship.key_relatives_v3;
 	EXPORT Layout_Relatives__Key_Relatives_V3 := RECORD
 		LayoutIDs;
-		RECORDOF(Relatives__Key_Relatives_V3);
+		Relationship.layout_GetRelationship.interfaceOutputNeutral;
 		UNSIGNED1 CoSourceCount;
 		UNSIGNED1 CoSourceSum;
 		STRING2 src;
@@ -696,18 +707,6 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
 	END;
 	
-	//Marketing
-	SHARED Relatives__Key_Marketing_Header_Relatives := dx_Relatives_v3.Key_Marketing_Header_Relatives();
-	EXPORT Layout_Relatives__Key_Marketing_Header_Relatives := RECORD
-		LayoutIDs;
-		RECORDOF(Relatives__Key_Marketing_Header_Relatives);
-		UNSIGNED1 CoSourceCount;
-		UNSIGNED1 CoSourceSum;
-		STRING2 src;
-		STRING Archive_Date;
-		dpmtype;
-	END;	
-
 	SHARED BBB2__kfetch_BBB_LinkIds := BBB2.Key_BBB_LinkIds.Kfetch2;
 	EXPORT Layout_BBB2__kfetch_BBB_LinkIds := RECORD
 		LayoutIDs;
@@ -1007,6 +1006,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
 		STRING2 Src;
 		STRING Archive_Date;
+		STRING DOBPadded;
 	END;	
 	
 	SHARED dx_PhonesInfo_Key_Phones_Type := dx_PhonesInfo.Key_Phones_Type;
@@ -1055,6 +1055,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Risk_Indicators__Correlation_Risk__key_addr_dob_summary); // Once Normalized, it contains src
 		dpmtype;
 		STRING Archive_Date;
+		STRING DOBPadded;
 	END;
 	EXPORT Layout_Risk_Indicators__Correlation_Risk__key_addr_dob_summary := RECORD
 		LayoutIDs;
@@ -1062,6 +1063,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Risk_Indicators__Correlation_Risk__key_addr_dob_summary.summary); // it contains src
 		dpmtype;
 		STRING Archive_Date;
+		STRING DOBPadded;
 	END;
 
 
@@ -1106,6 +1108,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Risk_Indicators__key_ssn_dob_summary);
 		dpmtype;
 		STRING Archive_Date;
+		STRING DOBPadded;
 	END;
 	
 	EXPORT Layout_ssn_dob_summary_records := RECORD
@@ -1114,6 +1117,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(Risk_Indicators__key_ssn_dob_summary.summary);
 		dpmtype;
 		STRING Archive_Date;
+		STRING DOBPadded;
 	END;
 //
  SHARED Risk_Indicators__key_ssn_name_summary := Risk_Indicators.Correlation_Risk.key_ssn_name_summary;
@@ -1313,6 +1317,8 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		PropertyV2_Key_Search_Fid_Records.seleid;
 		PropertyV2_Key_Search_Fid_Records.proxid;
 		PropertyV2_Key_Search_Fid_Records.powid;
+		PropertyV2_Key_Search_Fid_Records.fname;
+		PropertyV2_Key_Search_Fid_Records.lname;
 		PropertyV2_Key_Search_Fid_Records.persistent_record_id;//overrides & suppressions
 		PropertyV2_Key_Search_Fid_Records.vendor_source_flag;
 		BOOLEAN PartyIsBuyerOrOwner;
@@ -1452,6 +1458,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		STRING2 src;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides;
 		STRING Archive_Date;//not archivable but we need this here for vault
+		STRING DOBPadded;
 	END;
 	
 	//watchdog data is NOT archivable. Forcibly remove all dates so they can't accidentally be used
@@ -1463,6 +1470,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		STRING3 src;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides;
 		STRING Archive_Date;//not archivable but we need this here for vault
+		STRING DOBPadded;
 	END;
 	
 	//watchdog data is NOT archivable. Forcibly remove all dates so they can't accidentally be used
@@ -1474,6 +1482,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		STRING3 src;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides;
 		STRING Archive_Date;//not archivable but we need this here for vault
+		STRING DOBPadded;
 	END;
 	
 	SHARED dx_ConsumerFinancialProtectionBureau__Key_BLKGRP := IF( Options.isFCRA, dx_ConsumerFinancialProtectionBureau.Key_BLKGRP(TRUE), dx_ConsumerFinancialProtectionBureau.Key_BLKGRP(FALSE) );
@@ -1500,8 +1509,9 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		LayoutIDs;
 		RECORDOF(name_dob_summary__key);
 		dpmtype;
-    STRING2 src;
+		STRING2 src;
 		STRING Archive_Date;
+		STRING DOBPadded;
 	END;
   
 	EXPORT Layout_name_dob_summary_key_norm_records := RECORD
@@ -1568,6 +1578,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		dpmtype;
         STRING2 src;
 		STRING Archive_Date;
+		STRING DOBPadded;
 	END;
   
 	EXPORT Layout_phone_dob_summary_key_norm_records := RECORD
@@ -1693,6 +1704,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		RECORDOF(fraudpoint3__Key_DID);
 		dpmtype;
 		STRING3 src;
+		STRING DOBPadded;
 	END;		
 	
 	//inquiries fcra
@@ -1700,6 +1712,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	EXPORT Layout_Inquiry_AccLogs__Key_FCRA_SSN := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Key_FCRA_SSN);
 		STRING2 src;
@@ -1710,6 +1723,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	EXPORT Layout_Inquiry_AccLogs__Key_FCRA_Phone := RECORD
 		LayoutPhoneGeneric;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Key_FCRA_Phone);
 		STRING2 src;
@@ -1720,6 +1734,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	EXPORT Layout_Inquiry_AccLogs__Key_FCRA_Address := RECORD
 		LayoutAddressGeneric;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Key_FCRA_Address);
 		STRING2 src;
@@ -1730,6 +1745,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	EXPORT Layout_Inquiry_AccLogs__Key_FCRA_DID := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Key_FCRA_DID);
 		STRING2 src;
@@ -1741,6 +1757,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_Address := RECORD
 		LayoutAddressGeneric;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_Address);
 		STRING2 src;
@@ -1753,6 +1770,7 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_DID := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_DID);
 		STRING2 src;
@@ -1765,6 +1783,7 @@ SHARED Inquiry_AccLogs__Inquiry_Table_Email := Inquiry_AccLogs.Key_Inquiry_Email
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_Email := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_Email);
 		STRING2 src;
@@ -1777,6 +1796,7 @@ SHARED Inquiry_AccLogs__Inquiry_Table_Email := Inquiry_AccLogs.Key_Inquiry_Email
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_FEIN := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_FEIN);
 		STRING2 src;
@@ -1789,6 +1809,7 @@ SHARED Inquiry_AccLogs__Inquiry_Table_Email := Inquiry_AccLogs.Key_Inquiry_Email
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_LinkIds := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_LinkIds);
 		STRING2 src;
@@ -1801,6 +1822,7 @@ SHARED Inquiry_AccLogs__Inquiry_Table_Email := Inquiry_AccLogs.Key_Inquiry_Email
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_Phone := RECORD
 		LayoutPhoneGeneric;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_Phone);
 		STRING2 src;
@@ -1813,6 +1835,7 @@ SHARED Inquiry_AccLogs__Inquiry_Table_Email := Inquiry_AccLogs.Key_Inquiry_Email
 	EXPORT Layout_Inquiry_AccLogs__Inquiry_Table_SSN := RECORD
 		LayoutIDs;
 		STRING Archive_Date;
+		STRING DOBPadded;
 		STRING DateOfInquiry;
 		RECORDOF(Inquiry_AccLogs__Inquiry_Table_SSN);
 		STRING2 src;
@@ -1909,8 +1932,6 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 	END;
 	
 	// ===================[ Composite Layout ]===================
-  
-
 	EXPORT Layout_FDC := RECORD
 		LayoutIDs_Inputs;
 //datasets in mini FDC
@@ -1922,13 +1943,12 @@ SHARED Phone_Search_layout := BIPV2_Build.key_high_risk_industries.Phone_Search;
 		DATASET(Layout_dx_Header__key_did_hhid) Dataset_dx_Header__key_did_hhid;
 		DATASET(Layout_dx_Header__key_hhid_did) Dataset_dx_Header__key_hhid_did;	
 		DATASET(Layout_Relatives__Key_Relatives_V3) Dataset_Relatives__Key_Relatives_V3;
-		DATASET(Layout_Relatives__Key_Marketing_Header_Relatives) Dataset_Relatives__Key_Marketing_Header_Relatives3;		
 		DATASET(Layout_Header__key_ADL_segmentation) Dataset_Header__key_ADL_segmentation;		
 		DATASET(Layout_Doxie__Key_Header) Dataset_Doxie__Key_Header;		
 		DATASET(Layout_Header_Quick__Key_Did) Dataset_Header_Quick__Key_Did;	
 		DATASET(Layout_Header__Key_Addr_Hist) Dataset_Header__Key_Addr_Hist;	
-	
 		dataset(Layout_ConsumerStatementFlags) Dataset_ConsumerStatementFlags;
+
 
 //These are now in alphabetical order by PACKAGE NOT KEY.  please keep this in this order, if you are unsure where to put a key please check DOPS
 

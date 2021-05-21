@@ -102,8 +102,8 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isFCRA := is_FCRA;
-		EXPORT BOOLEAN isMarketing := Is_Marketing;	  
-		EXPORT BOOLEAN isBRM_Marketing := TRUE;  //this is used in the FDC code to turn off specific keys that are not needed for attributes but are still included in the below entity boolean groups
+        EXPORT BOOLEAN isMarketing := Is_Marketing;
+
 		EXPORT STRING100 Allowed_Sources := AllowedSources;
 		EXPORT STRING5 IndustryClass := Industry_Class; // When set to UTILI or DRMKT this restricts Utility data
 		EXPORT BOOLEAN Override_Experian_Restriction := OverrideExperianRestriction;
@@ -118,7 +118,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 			Override_Experian_Restriction,//OverrideExperianRestriction
 			'',//PermissiblePurpose - For FCRA Products Only
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile);
+			PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile);
 		
 		// BIP Append Options
    EXPORT UNSIGNED BIPAppendScoreThreshold := MAP(NOT BIPAppend_ReAppend => 0, // 
@@ -134,25 +134,12 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 		EXPORT STRING100 BatchUID := _BatchUID;
 		EXPORT UNSIGNED6 GlobalCompanyId := _GCID;				
 
-		//default options in PublicRecords_KEL.Interface_Options have been changed to FALSE
-		EXPORT BOOLEAN IncludeAircraft := TRUE;
-		EXPORT BOOLEAN IncludeAddress := TRUE;
-		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
-		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
-		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
-		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
-		EXPORT BOOLEAN IncludeEducation := TRUE;
-		EXPORT BOOLEAN IncludeEmail := TRUE;
-		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
-		EXPORT BOOLEAN IncludePerson := TRUE;
-		EXPORT BOOLEAN IncludeProperty := TRUE;
-		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
-		EXPORT BOOLEAN IncludeTradeline := TRUE;
-		EXPORT BOOLEAN IncludeVehicle := TRUE;
-		EXPORT BOOLEAN IncludeWatercraft := TRUE;
-		EXPORT BOOLEAN IncludeUCC := TRUE;
-    
+	
   END;	
+				
+		//default setting for keys is false, turn on only what is needed for attributes		
+		JoinFlags := BRM_Marketing_attributes.Join_Interface_Options(PublicRecords_KEL.Join_Interface_Options);
+				
 				
 	//For now we have only one version of the attributes V1.There are 2 fields for attributes now just in case we will be having new version sooner.
 	AttrsRequested := DATASET([ {STD.Str.ToUpperCase(AttributeVer1_in)},{STD.Str.ToUpperCase(AttributeVer2_in)} ],BRM_Marketing_Attributes.Layout_BRM_NonFCRA.AttributeGroupRec);
@@ -202,7 +189,7 @@ EXPORT BRM_Marketing_Attr_Batch_Services() := MACRO
 
 	valid_inputs := IF(allow_MA_attrs_only,batchin_with_UID(MinimumInputMet()));
 						
-	ResultSet := BRM_Marketing_Attributes.Fn_Get_All_BRM_Attrs(valid_inputs, Options);	
+	ResultSet := BRM_Marketing_Attributes.Fn_Get_All_BRM_Attrs(valid_inputs, Options, JoinFlags);	
 													
 	FinalSet := join(batchin_with_UID,ResultSet, left.g_procbusUID = right.g_procbusUID,
 													TRANSFORM(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Intermediate_Layout,

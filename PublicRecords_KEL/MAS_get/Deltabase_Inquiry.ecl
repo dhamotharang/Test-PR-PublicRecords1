@@ -8,7 +8,21 @@ SHARED Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 SHARED NotRegulated := PublicRecords_KEL.ECL_Functions.Constants.NotRegulated;
 SHARED BlankString  := PublicRecords_KEL.ECL_Functions.Constants.BlankString;
 SHARED SetDPMBitmap := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.SetValue;
-SHARED CFG_File     := PublicRecords_KEL.CFG_Compile;
+SHARED CFG_File     := PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile;
+
+SHARED DOBPaddingLayout := RECORD
+	UNSIGNED4 DOB;
+	STRING8 DOBPadded;
+END;
+SHARED CleanDateOfBirth(UNSIGNED4 dob_in) := FUNCTION
+	Result := MAP(
+		STD.Date.IsValidDate(dob_in)										=> ROW({dob_in, ''}, DOBPaddingLayout),
+		STD.Date.IsValidDate((UNSIGNED4)(((STRING)dob_in)[1..6] + '01'))	=> ROW({(((STRING)dob_in)[1..6] + '01'), 'YYYYMM01'}, DOBPaddingLayout),
+		STD.Date.IsValidDate((UNSIGNED4)(((STRING)dob_in)[1..4] + '0101'))	=> ROW({(((STRING)dob_in)[1..4] + '0101'), 'YYYY0101'}, DOBPaddingLayout),
+																				ROW({dob_in, ''}, DOBPaddingLayout));
+		
+	RETURN Result;
+END;
 
 
 EXPORT GetDeltaBaseRec(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides) shell) := function
@@ -74,7 +88,10 @@ EXPORT Inquiry_Address(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase)
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date := '';			
+					self.Archive_Date := '';
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)LEFT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := LEFT,
 					SELF := [])); 
 
@@ -94,7 +111,10 @@ EXPORT Inquiry_Did(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) := 
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date := '';					
+					self.Archive_Date := '';	
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)LEFT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := LEFT,
 					SELF := [])); 
 
@@ -115,6 +135,9 @@ EXPORT Inquiry_Email(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) :
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
 					self.Archive_Date := '';
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)LEFT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := LEFT,
 					SELF := [])); 
 
@@ -134,7 +157,10 @@ EXPORT Inquiry_Phone(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) :
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date := '';					
+					self.Archive_Date := '';	
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)LEFT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := LEFT,
 					SELF := [])); 
 
@@ -154,7 +180,10 @@ EXPORT Inquiry_SSN(DATASET(Inquiry_Deltabase.Layouts.Inquiry_All) deltabase) := 
 					SELF.IsUpdateRecord := FALSE,  //to help with debugging and data questions
 					SELF.IsDeltaBaseRecord := TRUE, 
 					SELF.DPMBitmap := SetDPMBitmap( Source := MDR.sourceTools.src_InquiryAcclogs, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := NotRegulated, DPPA_Restricted := NotRegulated, DPPA_State := BlankString, KELPermissions := CFG_File),
-					self.Archive_Date := '';					
+					self.Archive_Date := '';	
+					DOBCleaned := CleanDateOfBirth((UNSIGNED)LEFT.person_q.dob);
+					SELF.person_q.dob := (STRING)DOBCleaned.dob;
+					SELF.DOBPadded := DOBCleaned.DOBPadded;
 					SELF := LEFT,
 					SELF := [])); 
 

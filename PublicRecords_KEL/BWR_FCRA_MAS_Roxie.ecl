@@ -36,6 +36,9 @@ Include_Inferred_Performance := FALSE;
 Retain_Input_Lexid := FALSE;//keep what we have on input
 Append_PII := FALSE;//keep what we have on input
 
+Is_Prescreen := false;
+// Is_Prescreen := TRUE;
+
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
@@ -84,7 +87,7 @@ Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~bbraaten::out::PersonFCRA_Roxie_100k_Current_RR_20200728_'+ ThorLib.wuid();
+OutputFile := '~USERNAME::out::PersonFCRA_Roxie_100k_Current_TICKETNUMBER_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -121,7 +124,6 @@ p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p := p2(Account in ['TMOBSEP7088-158349', 'TMOBSEP7088-87504','TARG4547-221442', 'TMOBJUN7088-196571','AAAA7833-104166']); 
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
 SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
-self.IPAddress := '';
 SELF := LEFT));
 
 soapLayout := RECORD
@@ -137,6 +139,7 @@ soapLayout := RECORD
 	BOOLEAN IncludeMinors;
 	BOOLEAN RetainInputLexid;
 	BOOLEAN appendpii;
+	BOOLEAN isprescreen;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -174,6 +177,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.GLBPurpose := Settings.GLBAPurpose;
     SELF.DPPAPurpose := Settings.DPPAPurpose;
     SELF.IncludeMinors := Settings.IncludeMinors;
+		SELF.isprescreen := is_prescreen;
     SELF.IsMarketing := FALSE;
     SELF.OutputMasterResults := Output_Master_Results;
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;

@@ -1,4 +1,4 @@
-import address, riskwise;
+﻿import address, riskwise;
 
 // store the address cleaning logic in one place
 export MOD_AddressClean := module

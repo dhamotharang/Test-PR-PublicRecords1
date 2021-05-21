@@ -2,7 +2,8 @@
 
 
 EXPORT Fn_Get_All_BRM_Attrs(DATASET(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.Batch_Input) InputData,
-                             PublicRecords_KEL.Interface_Options Options) := FUNCTION
+                             PublicRecords_KEL.Interface_Options Options,
+                             PublicRecords_KEL.Join_Interface_Options JoinFlags) := FUNCTION
 	
   ds_input := 
 			PROJECT(InputData,
@@ -26,7 +27,9 @@ EXPORT Fn_Get_All_BRM_Attrs(DATASET(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.
 	// Append BIP IDs
 	withBIPIDs := PublicRecords_KEL.ECL_Functions.Fn_AppendBIPIDs_Roxie( Prep_CleanBusiness, Prep_RepInput, Options );
 
-	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Prep_RepInput, Options, withBIPIDs );
+	FDCDatasetMini := PublicRecords_KEL.Fn_MAS_FDC_Mini( Prep_RepInput, Options, JoinFlags, withBIPIDs );
+	
+	FDCDataset := PublicRecords_KEL.Fn_MAS_FDC( Prep_RepInput, Options, JoinFlags, withBIPIDs , FDCDatasetMini);
 	
 	// PIIBII Attributes
 	InputPIIBIIAttributes := BRM_Marketing_Attributes.Fn_GetBRM_InputBIIAttributes(withBIPIDs, Prep_RepInput, Options);

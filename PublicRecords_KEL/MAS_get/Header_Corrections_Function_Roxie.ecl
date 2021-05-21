@@ -180,9 +180,10 @@ corrPlusHeader := JOIN(base_hf_uncorrected, overrideHeaderDID, // this includes 
 											(left.persistent_record_id=right.head.persistent_record_id) // new way, using persistent_record_id
 											) and 
 									//dont correct those what will later be suppressed
-									(trim((string)right.did) + trim((string)right.head.rid) not in left.header_correct_record_id	)// old way - exclude corrected records from prior to 11/13/2012
+									(trim((string)right.did) + trim((string)right.head.rid) not in left.header_correct_record_id)// old way - exclude corrected records from prior to 11/13/2012
 									and 
-										(trim((string)right.head.persistent_record_id ) not in left.header_correct_record_id),  // new way - using persistent_record_id	
+										(trim((string)right.head.persistent_record_id ) not in left.header_correct_record_id)  // new way - using persistent_record_id	
+																	AND (trim((string)right.head.rid) not in left.header_correct_record_id), //sometimes persist id is blank and all we have is a rid
 										combineHeaderCorrections(LEFT, RIGHT), 
 											atmost(ut.limits.HEADER_PER_DID),
 												LEFT OUTER);	
@@ -369,7 +370,7 @@ finalCorr2 := ROLLUP(sortedSet,
 										left.headerrec=right.headerrec, //new -- seems to keep us from rollup up QH records
 												getCorrectCorrections(LEFT,RIGHT));									
 									
-base_hf := PROJECT(finalCorr2 + corrOnly, TRANSFORM(tempHeader, SELF := LEFT));
+base_hf := PROJECT(finalCorr2 + corrOnly, TRANSFORM(tempHeader, SELF := LEFT, self.first_ingest_date := []));//first_ingest_date will be populated later
 
 
 // do left only join with the suppressions file.  if suppression exists, can't use that header record
@@ -384,7 +385,8 @@ valid_header_records_old := join(base_hf, FCRA.Key_Override_Flag_DID,
 	
 //	header_correct_record_id was grabbed from person context which will be the only suppressions soon aug 2020??
 valid_header_records := valid_header_records_old((trim((string)did) + trim((string)rid) not in header_correct_record_id	)// old way - exclude corrected records from prior to 11/13/2012
-																									and (trim((string)persistent_record_id ) not in header_correct_record_id));  // new way - using persistent_record_id	
+																									and (trim((string)persistent_record_id ) not in header_correct_record_id) AND // new way - using persistent_record_id	
+																												trim((string)rid) not in header_correct_record_id);   //sometimes persist id is blank and all we have is a rid
 
 // output(base_hf_uncorrected, named('base_hf_uncorrected'));	
 // output(corrPlusHeader, named('corrPlusHeader'));	
