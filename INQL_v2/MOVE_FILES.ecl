@@ -43,6 +43,13 @@ export MOVE_FILES(boolean fcra = false, boolean pDaily = false, string buildingT
     EXPORT Batchr3Move 							:= sequential(if(isFCRA,movepre_fcra, movepre_nonfcra));
 																			
 	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	//Temp Batchr3 _bldg clear after build
+	export In_Bldg := sequential(
+					FS.StartSuperFileTransaction(),
+						nothor(apply(In_Bldg_SF, FS.ClearSuperFile('~' + name, false))),
+					FS.FinishSuperFileTransaction()
+						);
+	//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 	//New version
 	
 	shared In_SF_New 			:= nothor(FS.LogicalFileList('uspr::inql' + if(fcra, '::fcra', '::nonfcra') + '::in*',false,true))(~regexfind('::built|_built|::building_base|_sl|_cc|_fdn|_hist', name));
