@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Bus
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__in,__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__in,__cfg).__Result;
-  SHARED __EE271016 := __E_Input_B_I_I;
-  EXPORT __ST221985_Layout := RECORD
+  SHARED __EE271690 := __E_Input_B_I_I;
+  EXPORT __ST222659_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -79,11 +79,11 @@ EXPORT B_Input_B_I_I_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST221985_Layout __ND1879976__Project(E_Input_B_I_I(__in,__cfg).Layout __PP270675) := TRANSFORM
-    __CC13474 := '-99999';
-    __CC13479 := '-99998';
-    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP270675.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13474)),__ECAST(KEL.typ.nstr,__PP270675.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13479)));
-    SELF := __PP270675;
+  SHARED __ST222659_Layout __ND1880650__Project(E_Input_B_I_I(__in,__cfg).Layout __PP271349) := TRANSFORM
+    __CC13690 := '-99999';
+    __CC13695 := '-99998';
+    SELF.Bus_Input_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP271349.B___Inp_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13690)),__ECAST(KEL.typ.nstr,__PP271349.B___Inp_Cln_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13695)));
+    SELF := __PP271349;
   END;
-  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE271016,__ND1879976__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_10 := PROJECT(__EE271690,__ND1880650__Project(LEFT));
 END;

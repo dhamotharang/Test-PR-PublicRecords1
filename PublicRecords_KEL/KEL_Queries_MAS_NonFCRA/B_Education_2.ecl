@@ -4,6 +4,6 @@ IMPORT B_Education_3,B_Education_8,CFG_Compile,E_Education FROM PublicRecords_KE
 IMPORT * FROM KEL16.Null;
 EXPORT B_Education_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Education_3(__in,__cfg).__ENH_Education_3) __ENH_Education_3 := B_Education_3(__in,__cfg).__ENH_Education_3;
-  SHARED __EE1920057 := __ENH_Education_3;
-  EXPORT __ENH_Education_2 := __EE1920057;
+  SHARED __EE1920731 := __ENH_Education_3;
+  EXPORT __ENH_Education_2 := __EE1920731;
 END;

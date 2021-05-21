@@ -4,8 +4,8 @@ IMPORT B_Person_11,CFG_Compile,E_Person FROM PublicRecords_KEL.KEL_Queries_MAS_N
 IMPORT * FROM KEL16.Null;
 EXPORT B_Person_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_11(__in,__cfg).__ENH_Person_11) __ENH_Person_11 := B_Person_11(__in,__cfg).__ENH_Person_11;
-  SHARED __EE1571281 := __ENH_Person_11;
-  EXPORT __ST218899_Layout := RECORD
+  SHARED __EE1571955 := __ENH_Person_11;
+  EXPORT __ST219573_Layout := RECORD
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.nstr Filing_Type_Description_;
     KEL.typ.nint Amount_;
@@ -21,7 +21,7 @@ EXPORT B_Person_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST184159_Layout := RECORD
+  EXPORT __ST184833_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Lex_I_D_Segment_;
     KEL.typ.nstr Lex_I_D_Segment2_;
@@ -33,7 +33,7 @@ EXPORT B_Person_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.ndataset(E_Person(__in,__cfg).Hunt_Fish_Layout) Hunt_Fish_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Consumer_Statement_Flags_Layout) Consumer_Statement_Flags_;
     KEL.typ.ndataset(E_Person(__in,__cfg).Thrive_Layout) Thrive_;
-    KEL.typ.ndataset(__ST218899_Layout) All_Lien_Data_;
+    KEL.typ.ndataset(__ST219573_Layout) All_Lien_Data_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
     KEL.typ.epoch Date_Last_Seen_ := 0;
@@ -41,19 +41,19 @@ EXPORT B_Person_10(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST184159_Layout __ND1571207__Project(B_Person_11(__in,__cfg).__ST184386_Layout __PP1570821) := TRANSFORM
-    __EE1571205 := __PP1570821.All_Lien_Data_;
-    __ST218899_Layout __ND1571111__Project(B_Person_11(__in,__cfg).__ST94153_Layout __PP1570918) := TRANSFORM
-      __CC33975 := ['CORRECTED FEDERAL TAX LIEN','FEDERAL TAX LIEN','FEDERAL TAX LIEN RELEASE','FEDERAL TAX RELEASE'];
-      SELF.Is_Federal_Tax_Lien_ := __AND(__CN(__PP1570918.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP1570918.Filing_Type_Description_,IN,__CN(__CC33975)));
-      __CC33996 := ['CITY TAX LIEN','COUNTY TAX LIEN','COUNTY TAX LIEN RELEASE','CITY TAX LIEN RELEASE','ILLINOIS TAX LIEN','ILLINOIS TAX RELEASE','PROPERTY TAX LIEN','PROPERTY TAX RELEASE'];
-      SELF.Is_Other_Tax_Lien_ := __AND(__CN(__PP1570918.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP1570918.Filing_Type_Description_,IN,__CN(__CC33996)));
-      __CC33986 := ['JUDGMENT or STATE TAX LIEN','STATE TAX LIEN','STATE TAX LIEN RELEASE','STATE TAX LIEN RENEWAL','STATE TAX LIEN RENEWED','STATE TAX RELEASE','STATE TAX WARRANT','STATE TAX WARRANT RELEASE','STATE TAX WARRANT RENEWED'];
-      SELF.Is_State_Tax_Lien_ := __AND(__CN(__PP1570918.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP1570918.Filing_Type_Description_,IN,__CN(__CC33986)));
-      SELF := __PP1570918;
+  SHARED __ST184833_Layout __ND1571881__Project(B_Person_11(__in,__cfg).__ST185060_Layout __PP1571495) := TRANSFORM
+    __EE1571879 := __PP1571495.All_Lien_Data_;
+    __ST219573_Layout __ND1571785__Project(B_Person_11(__in,__cfg).__ST94373_Layout __PP1571592) := TRANSFORM
+      __CC34191 := ['CORRECTED FEDERAL TAX LIEN','FEDERAL TAX LIEN','FEDERAL TAX LIEN RELEASE','FEDERAL TAX RELEASE'];
+      SELF.Is_Federal_Tax_Lien_ := __AND(__CN(__PP1571592.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP1571592.Filing_Type_Description_,IN,__CN(__CC34191)));
+      __CC34212 := ['CITY TAX LIEN','COUNTY TAX LIEN','COUNTY TAX LIEN RELEASE','CITY TAX LIEN RELEASE','ILLINOIS TAX LIEN','ILLINOIS TAX RELEASE','PROPERTY TAX LIEN','PROPERTY TAX RELEASE'];
+      SELF.Is_Other_Tax_Lien_ := __AND(__CN(__PP1571592.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP1571592.Filing_Type_Description_,IN,__CN(__CC34212)));
+      __CC34202 := ['JUDGMENT or STATE TAX LIEN','STATE TAX LIEN','STATE TAX LIEN RELEASE','STATE TAX LIEN RENEWAL','STATE TAX LIEN RENEWED','STATE TAX RELEASE','STATE TAX WARRANT','STATE TAX WARRANT RELEASE','STATE TAX WARRANT RENEWED'];
+      SELF.Is_State_Tax_Lien_ := __AND(__CN(__PP1571592.Landlord_Tenant_Dispute_Flag_ = FALSE),__OP2(__PP1571592.Filing_Type_Description_,IN,__CN(__CC34202)));
+      SELF := __PP1571592;
     END;
-    SELF.All_Lien_Data_ := __PROJECT(__EE1571205,__ND1571111__Project(LEFT));
-    SELF := __PP1570821;
+    SELF.All_Lien_Data_ := __PROJECT(__EE1571879,__ND1571785__Project(LEFT));
+    SELF := __PP1571495;
   END;
-  EXPORT __ENH_Person_10 := PROJECT(__EE1571281,__ND1571207__Project(LEFT));
+  EXPORT __ENH_Person_10 := PROJECT(__EE1571955,__ND1571881__Project(LEFT));
 END;

@@ -4,8 +4,8 @@ IMPORT CFG_Compile,E_Email,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_FCR
 IMPORT * FROM KEL16.Null;
 EXPORT B_Email_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Email(__in,__cfg).__Result) __E_Email := E_Email(__in,__cfg).__Result;
-  SHARED __EE309437 := __E_Email;
-  EXPORT __ST165725_Layout := RECORD
+  SHARED __EE310105 := __E_Email;
+  EXPORT __ST166399_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Email_Address_;
     KEL.typ.ndataset(E_Email(__in,__cfg).Email_Rec_Key_Layout) Email_Rec_Key_;
@@ -33,11 +33,11 @@ EXPORT B_Email_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compi
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST165725_Layout __ND1169424__Project(E_Email(__in,__cfg).Layout __PP309242) := TRANSFORM
-    __CC13138 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('email_build_version'))),__CN(__cfg.CurrentDate));
-    __CC39870 := 2556;
-    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC13138),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP309242.Date_Last_Seen_))),<,__CN(__CC39870));
-    SELF := __PP309242;
+  SHARED __ST166399_Layout __ND1170092__Project(E_Email(__in,__cfg).Layout __PP309910) := TRANSFORM
+    __CC13354 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('email_build_version'))),__CN(__cfg.CurrentDate));
+    __CC40086 := 2556;
+    SELF.Emails7y_ := __OP2(FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__CC13354),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP309910.Date_Last_Seen_))),<,__CN(__CC40086));
+    SELF := __PP309910;
   END;
-  EXPORT __ENH_Email_3 := PROJECT(__EE309437,__ND1169424__Project(LEFT));
+  EXPORT __ENH_Email_3 := PROJECT(__EE310105,__ND1170092__Project(LEFT));
 END;
