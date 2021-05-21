@@ -9,8 +9,10 @@
 	<part name="GLBPurpose" type="xsd:integer"/>
 	<part name="DPPAPurpose" type="xsd:integer"/>
 	<part name="IsMarketing" type="xsd:boolean"/>
+	<part name="IsPrescreen" type="xsd:boolean"/>
 	<part name="RetainInputLexid" type="xsd:boolean"/>
 	<part name="AppendPII" type="xsd:boolean"/>
+	<part name="CaliforniaInPerson" type="xsd:boolean"/>
 	<part name="IndustryClass" type="xsd:string"/>
 	<part name="IntendedPurpose" type="xsd:string"/>
 	<part name="AllowedSourcesDataset" type="tns:XmlDataSet" cols="100" rows="8"/>
@@ -35,8 +37,10 @@ EXPORT MAS_FCRA_Service() := MACRO
 		'DPPAPurpose',
 		'IndustryClass',
 		'IsMarketing',
+		'IsPrescreen',
 		'RetainInputLexid',
 		'AppendPII',
+		'CaliforniaInPerson',
 		'IncludeMinors',
 		'IntendedPurpose',
 		'AllowedSourcesDataset',
@@ -54,6 +58,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 	UNSIGNED1 GLBA := 0 : STORED('GLBPurpose');
 	UNSIGNED1 DPPA := 0 : STORED('DPPAPurpose');
 	BOOLEAN Is_Marketing := FALSE : STORED('IsMarketing');
+	BOOLEAN Is_Prescreen := FALSE : STORED('IsPrescreen');
 	BOOLEAN Include_Minors := TRUE : STORED('IncludeMinors');
 	STRING5 Industry_Class := '' : STORED('IndustryClass');
 	STRING Intended_Purpose := '' : STORED('IntendedPurpose'); // Can be set to 'PRESCREENING' for FCRA Pre-Screen applications
@@ -62,6 +67,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 	
 	BOOLEAN Retain_Input_Lexid := FALSE : STORED('RetainInputLexid');//keep what we have on input
 	BOOLEAN Append_PII := FALSE : STORED('AppendPII');//keep what we have on input
+	BOOLEAN California_In_Person := FALSE : STORED('CaliforniaInPerson');//keep what we have on input
 	BOOLEAN Allow_Inferred_Performance := FALSE : STORED('AllowInferredPerformance');//keep what we have on input
 		
 	// Nulling out stored variables to not propagate to Attributes.kel
@@ -103,6 +109,7 @@ EXPORT MAS_FCRA_Service() := MACRO
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
+		EXPORT BOOLEAN IsPrescreen := Is_Prescreen; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN IncludeMinors := Include_Minors; // When TRUE enables Marketing Restrictions
 		EXPORT DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) Allowed_Sources_Dataset := FinalAllowedSources;
 		EXPORT DATA57 KEL_Permissions_Mask := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.Generate(
@@ -116,72 +123,30 @@ EXPORT MAS_FCRA_Service() := MACRO
 			FALSE, /*OverrideExperianRestriction*/
 			Intended_Purpose,
 			Industry_Class,
-			PublicRecords_KEL.CFG_Compile,
+			PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile,
 			FALSE, /*IsInsuranceProduct*/
 			FinalAllowedSources);
 		
 		EXPORT DATASET(Gateway.Layouts.Config) Gateways := GatewaysClean;
 		EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
-		EXPORT BOOLEAN BestPIIAppend := Append_PII; //do not append best pii for running
-
+		EXPORT BOOLEAN BestPIIAppend :=  Append_PII; //do not append best pii for running, always append best pii for prescreen
+		EXPORT BOOLEAN CaliforniaInPerson := California_In_Person; //do not append best pii for running
 		
-		// Override Include* Entity/Association options here if certain entities can be turned off to speed up processing.
-		// This will bypass uneccesary key JOINS in PublicRecords_KEL.Fn_MAS_FDC if the keys don't contribute to any 
-		// ENTITIES/ASSOCIATIONS being used by the query.	
-
-		EXPORT BOOLEAN IncludeAccident := TRUE;
-		EXPORT BOOLEAN IncludeAddress := TRUE;
-		EXPORT BOOLEAN IncludeAddressSummary := TRUE;
-		EXPORT BOOLEAN IncludeAircraft := TRUE;
-		EXPORT BOOLEAN IncludeBankruptcy := TRUE;
-		EXPORT BOOLEAN IncludeBusinessSele := TRUE;
-		EXPORT BOOLEAN IncludeBusinessProx := TRUE;
-		EXPORT BOOLEAN IncludeCriminalOffender := TRUE;
-		EXPORT BOOLEAN IncludeCriminalOffense := TRUE;
-		EXPORT BOOLEAN IncludeCriminalPunishment := TRUE;
-		EXPORT BOOLEAN IncludeDriversLicense := TRUE;
-		EXPORT BOOLEAN IncludeEducation := TRUE;
-		EXPORT BOOLEAN IncludeEBRTradeline := TRUE;
-		EXPORT BOOLEAN IncludeEmail := TRUE;
-		EXPORT BOOLEAN IncludeEmployment := TRUE;
-		EXPORT BOOLEAN IncludeForeclosure := TRUE;
-		EXPORT BOOLEAN IncludeGeolink := TRUE;
-		EXPORT BOOLEAN IncludeHousehold := TRUE;
-		EXPORT BOOLEAN IncludeInquiry := TRUE;
-		EXPORT BOOLEAN IncludeLienJudgment := TRUE;
-		EXPORT BOOLEAN IncludeNameSummary := TRUE;
-		EXPORT BOOLEAN IncludePerson := TRUE;
-		EXPORT BOOLEAN IncludePhone := TRUE;
-		EXPORT BOOLEAN IncludePhoneSummary := TRUE;
-		EXPORT BOOLEAN IncludeProfessionalLicense := TRUE;
-		EXPORT BOOLEAN IncludeProperty := TRUE;
-		EXPORT BOOLEAN IncludePropertyEvent := TRUE;
-		EXPORT BOOLEAN IncludeSexOffender := TRUE;
-		EXPORT BOOLEAN IncludeSocialSecurityNumber := TRUE;
-		EXPORT BOOLEAN IncludeSSNSummary := TRUE;
-		EXPORT BOOLEAN IncludeSurname := TRUE;
-		EXPORT BOOLEAN IncludeTIN := TRUE;
-		EXPORT BOOLEAN IncludeTradeline := TRUE;
-		EXPORT BOOLEAN IncludeUtility := TRUE;
-		EXPORT BOOLEAN IncludeVehicle := TRUE;
-		EXPORT BOOLEAN IncludeWatercraft := TRUE;
-		EXPORT BOOLEAN IncludeZipCode := TRUE;
-		EXPORT BOOLEAN IncludeUCC := TRUE;
-		EXPORT BOOLEAN IncludeMini := TRUE;
-		EXPORT BOOLEAN IncludeOverrides := TRUE;
 		EXPORT BOOLEAN IncludeInferredPerformance := Allow_Inferred_Performance;
 
-
+	
 	END;
+	
+	JoinFlags := PublicRecords_KEL.Internal_Join_Interface_Options(PublicRecords_KEL.Join_Interface_Options);
 
 	IF(options.RetainInputLexid = FALSE AND options.BestPIIAppend = TRUE, FAIL('Insufficient Input'));
 
-  ResultSet := PublicRecords_KEL.FnRoxie_GetAttrs(ds_input, Options);
+  ResultSet := PublicRecords_KEL.FnRoxie_GetAttrsFCRA(ds_input, Options, JoinFlags);
+//calls LIB_FCRAPersonAttributes
 
 	FinalResults := PROJECT(ResultSet, 
 		TRANSFORM(PublicRecords_KEL.ECL_Functions.Layout_Person_FCRA,
-			SELF := LEFT,
-			SELF := []));
+			SELF := LEFT));
 			
 	TargusRoyaltyCount := COUNT(ResultSet(TargusRoyalty <> 0));
 

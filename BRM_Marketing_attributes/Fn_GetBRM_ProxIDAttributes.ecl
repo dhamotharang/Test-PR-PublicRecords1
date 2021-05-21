@@ -14,15 +14,7 @@ EXPORT Fn_GetBRM_ProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 		DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput;
 	END;
 	
-	LayoutBusinessProxIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
-																														0, 				
-																														0, 				
-																														0, 				
-																														0, 				
-																														DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
-																														DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 		
-																														0, 
-																														PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
+	LayoutBusinessProxIDAttributes := BRM_Marketing_attributes.BRM_KEL.L_Compile.Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic_Res0_Layout;
 
 	
  BusinessProxAttributesInput := DENORMALIZE(InputData, RepInput, 
@@ -37,7 +29,7 @@ EXPORT Fn_GetBRM_ProxIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
                                                 LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
                                                 TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessProxIDAttributes},
                                                           SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-                                                          NonFCRABusinessProxIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
+                                                          NonFCRABusinessProxIDResults := BRM_Marketing_attributes.BRM_KEL.Q_Non_F_C_R_A_Business_Prox_I_D_Attributes_V1_Dynamic(
                                                             LEFT.InputData.B_LexIDUlt,
                                                             LEFT.InputData.B_LexIDOrg,
                                                             LEFT.InputData.B_LexIDLegal,

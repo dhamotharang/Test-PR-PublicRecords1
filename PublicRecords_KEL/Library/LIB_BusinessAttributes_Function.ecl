@@ -10,6 +10,11 @@ EXPORT LIB_BusinessAttributes_Function(DATASET(PublicRecords_KEL.ECL_Functions.L
 #if(Use_BusinessAttributes_Library)
 	BusinessAttributes_Results := LIBRARY('PublicRecords_KEL.Library.LIB_BusinessAttributes', PublicRecords_KEL.Library.LIB_BusinessAttributes_Interface(InputData, RepInput, FDCDataset, Options)).Results;
 #else
+
+//input bii
+//sele
+//prox
+
 	InputPIIBIIAttributes := PublicRecords_KEL.FnRoxie_GetInputBIIAttributes(InputData, RepInput, Options);
 
 	BusinessSeleIDAttributes := PublicRecords_KEL.FnRoxie_GetBusinessSeleIDAttributes(InputData, RepInput, FDCDataset, Options);
