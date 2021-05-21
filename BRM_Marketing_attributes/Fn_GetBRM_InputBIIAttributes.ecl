@@ -15,14 +15,10 @@ EXPORT Fn_GetBRM_InputBIIAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layo
                          SELF.RepInput := ROWS(RIGHT),
                          SELF.BusinessInput := LEFT));
 	
-	LayoutBIIAttributes := RECORDOF( PublicRecords_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
-                         0, 
-												       PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
+	LayoutBIIAttributes := BRM_Marketing_attributes.BRM_KEL.L_Compile.Input_Bus_Attributes_V1_Dynamic_Res0_Layout;
 	
 	BIIAttributes_Results := NOCOMBINE(PROJECT(BIIAttributesInput, TRANSFORM(LayoutBIIAttributes,
-                                                                  NonFCRABIIResults := PublicRecords_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
+                                                                  NonFCRABIIResults := BRM_Marketing_attributes.BRM_KEL.Q_Input_Bus_Attributes_V1_Dynamic(
                                                                                         LEFT.RepInput,
                                                                                         DATASET(LEFT.BusinessInput),
                                                                                         (INTEGER)LEFT.BusinessInput.B_InpClnArchDt[1..8],

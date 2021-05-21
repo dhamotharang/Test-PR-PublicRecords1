@@ -1,0 +1,76 @@
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
+IMPORT B_Tradeline_6,CFG_Compile,E_Tradeline,FN_Compile FROM BRM_Marketing_attributes.BRM_KEL;
+IMPORT * FROM KEL16.Null;
+EXPORT B_Tradeline_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
+  SHARED VIRTUAL TYPEOF(B_Tradeline_6(__in,__cfg).__ENH_Tradeline_6) __ENH_Tradeline_6 := B_Tradeline_6(__in,__cfg).__ENH_Tradeline_6;
+  SHARED __EE883038 := __ENH_Tradeline_6;
+  EXPORT __ST164280_Layout := RECORD
+    KEL.typ.nkdate A_R_Date_;
+    KEL.typ.nint Total_A_R_;
+    KEL.typ.nint Current_A_R_;
+    KEL.typ.nint Aging1_To30_;
+    KEL.typ.nint Aging31_To60_;
+    KEL.typ.nint Aging61_To90_;
+    KEL.typ.nint Aging91_Plus_;
+    KEL.typ.nint Credit_Limit_;
+    KEL.typ.nint Segment_I_D_;
+    KEL.typ.nkdate File_Date_;
+    KEL.typ.nstr Status_;
+    KEL.typ.nkdate First_Sale_Date_;
+    KEL.typ.nkdate Last_Sale_Date_;
+    KEL.typ.nint Aging1_To30_L_N_;
+    KEL.typ.nint Aging31_To60_L_N_;
+    KEL.typ.nint Aging61_To90_L_N_;
+    KEL.typ.nint Aging91_Plus_L_N_;
+    KEL.typ.nbool Carrier_Segment_;
+    KEL.typ.nint Current_A_R_L_N_;
+    KEL.typ.nbool Fleet_Segment_;
+    KEL.typ.nbool Materials_Segment_;
+    KEL.typ.nbool Operations_Segment_;
+    KEL.typ.nint Record_Age_In_Days_;
+    KEL.typ.nkdate Record_Date_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  EXPORT __ST164273_Layout := RECORD
+    KEL.typ.nuid UID;
+    KEL.typ.nint Ult_I_D_;
+    KEL.typ.nint Org_I_D_;
+    KEL.typ.nint Sele_I_D_;
+    KEL.typ.nstr Account_Key_;
+    KEL.typ.ndataset(__ST164280_Layout) Records_;
+    KEL.typ.ndataset(E_Tradeline(__in,__cfg).Vendor_Dates_Layout) Vendor_Dates_;
+    KEL.typ.ndataset(E_Tradeline(__in,__cfg).Data_Sources_Layout) Data_Sources_;
+    KEL.typ.epoch Archive___Date_ := 0;
+    KEL.typ.epoch Date_First_Seen_ := 0;
+    KEL.typ.epoch Date_Last_Seen_ := 0;
+    KEL.typ.epoch Hybrid_Archive_Date_ := 0;
+    KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
+    KEL.typ.int __RecordCount := 0;
+  END;
+  SHARED __ST164273_Layout __ND883318__Project(B_Tradeline_6(__in,__cfg).__ST166283_Layout __PP883039) := TRANSFORM
+    __EE883068 := __PP883039.Records_;
+    __ST164280_Layout __ND883264__Project(B_Tradeline_6(__in,__cfg).__ST166290_Layout __PP883069) := TRANSFORM
+      SELF.Aging1_To30_L_N_ := IF(__T(__OR(__NT(__PP883069.Aging1_To30_),__OP2(__PP883069.Aging1_To30_,<,__CN(0)))),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__PP883069.Aging1_To30_));
+      SELF.Aging31_To60_L_N_ := IF(__T(__OR(__NT(__PP883069.Aging31_To60_),__OP2(__PP883069.Aging31_To60_,<,__CN(0)))),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__PP883069.Aging31_To60_));
+      SELF.Aging61_To90_L_N_ := IF(__T(__OR(__NT(__PP883069.Aging61_To90_),__OP2(__PP883069.Aging61_To90_,<,__CN(0)))),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__PP883069.Aging61_To90_));
+      SELF.Aging91_Plus_L_N_ := IF(__T(__OR(__NT(__PP883069.Aging91_Plus_),__OP2(__PP883069.Aging91_Plus_,<,__CN(0)))),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__PP883069.Aging91_Plus_));
+      SELF.Carrier_Segment_ := __OP2(__PP883069.Segment_I_D_,IN,__CN([1,4,5,6,8]));
+      SELF.Current_A_R_L_N_ := IF(__T(__OR(__NT(__PP883069.Current_A_R_),__OP2(__PP883069.Current_A_R_,<,__CN(0)))),__ECAST(KEL.typ.nint,__CN(0)),__ECAST(KEL.typ.nint,__PP883069.Current_A_R_));
+      SELF.Fleet_Segment_ := __OP2(__PP883069.Segment_I_D_,IN,__CN([2,3,9]));
+      SELF.Materials_Segment_ := __OP2(__PP883069.Segment_I_D_,IN,__CN([10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25]));
+      SELF.Operations_Segment_ := __OP2(__PP883069.Segment_I_D_,IN,__CN([26,27,28,29,30,31,32,33,34,35]));
+      __CC13415 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('cortera_build_version'))),__CN(__cfg.CurrentDate));
+      SELF.Record_Age_In_Days_ := FN_Compile(__cfg).FN_A_B_S_D_A_Y_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,__PP883069.Record_Date_),__ECAST(KEL.typ.nkdate,__CC13415));
+      SELF := __PP883069;
+    END;
+    SELF.Records_ := __PROJECT(__EE883068,__ND883264__Project(LEFT));
+    SELF := __PP883039;
+  END;
+  EXPORT __ENH_Tradeline_5 := PROJECT(__EE883038,__ND883318__Project(LEFT));
+END;

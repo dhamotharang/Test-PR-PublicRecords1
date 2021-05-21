@@ -43,7 +43,7 @@ EXPORT Fn_Clean_Date (STRING InDate,
 			SELF.ValidPortion_00    := Validate_Date.fCorrectedDateString(InDateinNums); 
 			SELF.ValidPortion_01    := Validate_Date.fCorrectedDateString(InDateinNums, TRUE); 
 			
-			SELF.TimeStamp					:= if(SELF.DateValid, FullInDateinNums[9..], '');
+			SELF.TimeStamp					:= if(SELF.DateValid, IF(LENGTH(FullInDateinNums[9..]) = 5, '0' + FullInDateinNums[9..], FullInDateinNums[9..]), '');
    END;  
  
   RETURN DATASET([ClndDate()]);

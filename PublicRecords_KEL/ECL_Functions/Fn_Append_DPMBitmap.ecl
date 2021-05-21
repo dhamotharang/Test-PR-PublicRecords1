@@ -8,7 +8,7 @@ EXPORT Fn_Append_DPMBitmap(
 							Pre_GLB_Restriction_Rules = 'FALSE', 
 							DPPA_Restriction_Rules = 'FALSE', 
 							DPPA_State = '\'\'', 
-							KELPermissions = PublicRecords_KEL.CFG_Compile, 
+							KELPermissions = PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile, 
 							Generic_Restriction_Rules = 'FALSE', 
 							Is_Business_Header_Rules = 'FALSE', 
 							Marketing_State = '\'\'', 

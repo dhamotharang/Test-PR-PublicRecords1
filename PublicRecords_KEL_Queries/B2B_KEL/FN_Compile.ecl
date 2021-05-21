@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT $,Email_Data,NID,PublicRecords_KEL,Royalty,STD,address,header;
 IMPORT CFG_Compile FROM PublicRecords_KEL_Queries.B2B_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT KEL.typ.nbool FN_R_E_A_L_E_Q_U_A_L(KEL.typ.nfloat __Pval1, KEL.typ.nfloat __Pval2) := FUNCTION
     RETURN __OP2(__FN1(ABS,__OP2(__Pval1,-,__Pval2)),<,__CN(1.0E-8));
@@ -27,6 +27,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
   END;
   EXPORT KEL.typ.bool FN_Is_Not_Enough_To_Clean(KEL.typ.nstr __PFieldToCheck) := FUNCTION
     RETURN IF(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN('')))),TRUE,FALSE);
+  END;
+  EXPORT KEL.typ.bool FN_Is_Not_Enough_To_Clean_Int(KEL.typ.nstr __PFieldToCheck) := FUNCTION
+    RETURN IF(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CAST(KEL.typ.str,__CN(0))))),TRUE,FALSE);
   END;
   EXPORT KEL.typ.nbool FN_City_State_Zip_Not_Populated_Check(KEL.typ.nstr __PCity, KEL.typ.nstr __PState, KEL.typ.nstr __PZip) := FUNCTION
     RETURN __AND(__OR(__NT(__PZip),__OP2(__PZip,=,__CN(''))),__OR(__OR(__NT(__PCity),__OP2(__PCity,=,__CN(''))),__OR(__NT(__PState),__OP2(__PState,=,__CN('')))));
@@ -133,9 +136,9 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_STD_Str_FilterOut_ValidChars(Field);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  SHARED __CC13525 := -99999;
+  SHARED __CC13682 := -99999;
   EXPORT KEL.typ.str FN_Validate_Flag(KEL.typ.nstr __PFieldToCheck) := FUNCTION
-    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13525,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
+    RETURN MAP(__T(__OR(__NT(__PFieldToCheck),__OP2(__PFieldToCheck,=,__CN(''))))=>(KEL.typ.str)__CC13682,__T(__OP2(FN__fn_Filter_Out_Valid_Chars(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__FN1(KEL.Routines.TrimBoth,__PFieldToCheck)))),=,__CN('')))=>'0','1');
   END;
   EXPORT KEL.typ.nstr FN__fn_Bogus_Names(KEL.typ.nstr __PsNameFirst, KEL.typ.nstr __PsNameMid, KEL.typ.nstr __PsNameLast) := FUNCTION
     sNameFirst := __T(__PsNameFirst);
@@ -166,12 +169,11 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __Value := PublicRecords_KEL.ECL_Functions.Fn_RemoveSpecialChars(field1, replacement);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nstr);
   END;
-  EXPORT KEL.typ.nbool FN__fn_In_Voters_State(KEL.typ.nstr __PState, KEL.typ.nbool __PisFCRA, KEL.typ.nstr __Phistorydate) := FUNCTION
+  EXPORT KEL.typ.nbool FN__fn_In_Voters_State(KEL.typ.nstr __PState, KEL.typ.nstr __Phistorydate) := FUNCTION
     State := __T(__PState);
-    isFCRA := __T(__PisFCRA);
     historydate := __T(__Phistorydate);
-    __IsNull := __NL(__PState) OR __NL(__PisFCRA) OR __NL(__Phistorydate);
-    __Value := PublicRecords_KEL.ECL_Functions.FN_inVotersState(State,isFCRA,historydate);
+    __IsNull := __NL(__PState) OR __NL(__Phistorydate);
+    __Value := PublicRecords_KEL.ECL_Functions.FN_inVotersState(State,historydate);
     RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
   END;
   EXPORT KEL.typ.nbool FN__fn_In_Drivers_State(KEL.typ.nstr __PState) := FUNCTION
@@ -290,6 +292,96 @@ EXPORT FN_Compile(CFG_Compile __cfg = CFG_Compile) := MODULE
     __IsNull := __NL(__Px);
     __Value := (STRING) x[..8];
     RETURN __BNT(__Value,__IsNull,KEL.typ.nkdate);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Year_Filled(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].YearFilled;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Month_Filled(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].MonthFilled;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Day_Filled(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].DayFilled;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Year_Non_Zero(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].YearNonZero;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Month_Non_Zero(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].MonthNonZero;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Day_Non_Zero(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].DayNonZero;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Year_Valid(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].YearValid;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Month_Valid(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].MonthValid;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Day_Valid(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].DayValid;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
+  END;
+  EXPORT KEL.typ.nbool FN_Fn___Clean___Date___Chron_State_Unknown(KEL.typ.nstr __PDateVar, KEL.typ.nint __PMinDate, KEL.typ.nint __PMaxDate, KEL.typ.nbool __PSetDef) := FUNCTION
+    DateVar := __T(__PDateVar);
+    MinDate := __T(__PMinDate);
+    MaxDate := __T(__PMaxDate);
+    SetDef := __T(__PSetDef);
+    __IsNull := __NL(__PDateVar) OR __NL(__PMinDate) OR __NL(__PMaxDate) OR __NL(__PSetDef);
+    __Value := PublicRecords_KEL.ECL_Functions.Fn_Clean_Date(DateVar, MinDate, MaxDate, SetDef)[1].ChronStateUnknown;
+    RETURN __BNT(__Value,__IsNull,KEL.typ.nbool);
   END;
   EXPORT KEL.typ.nstr FN_Standardize_Nickname(KEL.typ.nstr __PFirstName) := FUNCTION
     FirstName := __T(__PFirstName);

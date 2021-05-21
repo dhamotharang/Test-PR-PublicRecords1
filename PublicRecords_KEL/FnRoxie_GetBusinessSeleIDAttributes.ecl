@@ -17,24 +17,33 @@ LayoutBIIAndPII := RECORD
 		DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput;
 	END;
 	
-	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
-																	0, // UltID
-																	0, // OrgID
-																	0, // SeleID
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
-																	0, // ArchiveDate
-																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
-																	
+																
 	BusinessSeleAttributesInput := DENORMALIZE(RecordsWithSeleID, RepInput, 
 		LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,  GROUP,
 		TRANSFORM(LayoutBIIAndPII, 
 			SELF.RepInput := ROWS(RIGHT),
 			SELF.InputData := LEFT));
 					
-	BusinessSeleAttributes_Results := NOCOMBINE(PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
+	// BusinessSeleAttributes_Results := NOCOMBINE(JOIN(BusinessSeleAttributesInput, FDCDataset,//think we need FDCDataset(repnumber != 6) - repnumber needed for batch
+		// LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
+		// TRANSFORM({INTEGER G_ProcBusUID, PublicRecords_KEL.KEL_Queries_MAS_Business.L_Compile.Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic_Res0_Layout},
+			// SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
+			// NonFCRABusinessSeleIDResults := PublicRecords_KEL.KEL_Queries_MAS_Business.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+				// LEFT.InputData.B_LexIDUlt,
+				// LEFT.InputData.B_LexIDOrg,
+				// LEFT.InputData.B_LexIDLegal,
+				// LEFT.RepInput,
+				// DATASET(LEFT.InputData),
+				// (INTEGER)LEFT.InputData.B_InpClnArchDt[1..8],
+				// Options.KEL_Permissions_Mask, 
+				// DATASET(RIGHT)).res0;
+			// SELF := NonFCRABusinessSeleIDResults[1]), 
+		// LEFT OUTER, ATMOST(100), KEEP(1)));
+
+
+	BusinessSeleAttributes_Results := NOCOMBINE(PROJECT(BusinessSeleAttributesInput, TRANSFORM({INTEGER G_ProcBusUID, PublicRecords_KEL.KEL_Queries_MAS_Business.L_Compile.Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic_Res0_Layout},
 		SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-		NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+		NonFCRABusinessSeleIDResults := PublicRecords_KEL.KEL_Queries_MAS_Business.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
 				LEFT.InputData.B_LexIDUlt,
 				LEFT.InputData.B_LexIDOrg,
 				LEFT.InputData.B_LexIDLegal,
@@ -45,20 +54,14 @@ LayoutBIIAndPII := RECORD
 				FDCDataset).res0;
 		SELF := NonFCRABusinessSeleIDResults[1])));
 
-
 	BusinessSeleIDAttributesRaw := KEL.Clean(BusinessSeleAttributes_Results, true, true, true);
 
-	LayoutBusinessSeleIDNoDatesAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(
-																	0, // UltID
-																	0, // OrgID
-																	0, // SeleID
-																	0, // ArchiveDate
-																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
+
 
 	BusinessSeleAttributes_NoDates_Results := IF(Options.OutputMasterResults,
-		NOCOMBINE(PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes},
+		NOCOMBINE(PROJECT(InputData, TRANSFORM({INTEGER G_ProcBusUID, PublicRecords_KEL.KEL_Queries_MAS_Business.L_Compile.Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic_Res0_Layout},
 			SELF.G_ProcBusUID := LEFT.G_ProcBusUID;
-			NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(
+			NonFCRABusinessSeleIDResults := PublicRecords_KEL.KEL_Queries_MAS_Business.Q_Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic(
 				LEFT.B_LexIDUlt,
 				LEFT.B_LexIDOrg,
 				LEFT.B_LexIDLegal, 				
@@ -66,7 +69,7 @@ LayoutBIIAndPII := RECORD
 				Options.KEL_Permissions_Mask, 				
 				FDCDataset).res0;
 			SELF := NonFCRABusinessSeleIDResults[1]))),
-		DATASET([],{INTEGER G_ProcBusUID, LayoutBusinessSeleIDNoDatesAttributes}));
+		DATASET([],{INTEGER G_ProcBusUID, PublicRecords_KEL.KEL_Queries_MAS_Business.L_Compile.Non_F_C_R_A_Business_Sele_I_D_No_Dates_Attributes_V1_Dynamic_Res0_Layout}));
 	
 	BusinessSeleIDNoDatesAttributesRaw := KEL.Clean(BusinessSeleAttributes_NoDates_Results, TRUE, TRUE, TRUE);
 	

@@ -1,16 +1,16 @@
 ﻿// EXPORT BWR_FCRA_MAS_Roxie_Master_Only := 'todo';
 
-#workunit('name','MAS FCRA Consumer dev156 1 thread');
+#workunit('name','MAS FCRA Consumer dev156 2 thread');
 IMPORT PublicRecords_KEL, RiskWise, STD, Gateway, UT, SALT38, SALTRoutines;
 /* PublicRecords_KEL.BWR_FCRA_MAS_Roxie */
-threads := 1;
+threads := 2;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 NeutralRoxieIP:= RiskWise.Shortcuts.staging_neutral_roxieIP;
 // PCG_Dev := riskwise.shortcuts.gw_personContext;
 
-//InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
-InputFile := '~mas::uat::mas_fcra_10k_sample_20200707.csv';
+InputFile := '~mas::uatsamples::consumer_fcra_100k_07102019.csv';
+// InputFile := '~mas::uat::mas_fcra_10k_sample_20200707.csv';
 // InputFile := '~mas::uatsamples::consumer_fcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv'; //Samesample as NonFCRA only testing IP validation
 
@@ -35,6 +35,8 @@ Include_Minors := TRUE;
 Retain_Input_Lexid := FALSE;//keep what we have on input
 Append_PII := FALSE;//keep what we have on input
 
+Is_Prescreen := false;
+// Is_Prescreen := TRUE;
 // Inteded Purpose for FCRA. Stubbing this out for now so it can be used in the settings output for now.
 Intended_Purpose := ''; 
 // Intended_Purpose := 'PRESCREENING'; 
@@ -82,7 +84,7 @@ Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 RecordsToRun := 0;
 eyeball := 25;
 
-OutputFile := '~akoenen::out::PersonFCRA_Roxie_100k_archive_KS6961_after_'+ ThorLib.wuid();
+OutputFile := '~akoenen::out::PersonFCRA_Roxie_100k_current_after_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -134,6 +136,7 @@ soapLayout := RECORD
 	BOOLEAN IncludeMinors;
 	BOOLEAN RetainInputLexid;
 	BOOLEAN appendpii;
+	BOOLEAN isprescreen;
 	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -169,6 +172,7 @@ soapLayout trans (pp le):= TRANSFORM
     SELF.GLBPurpose := Settings.GLBAPurpose;
     SELF.DPPAPurpose := Settings.DPPAPurpose;
     SELF.IncludeMinors := Settings.IncludeMinors;
+    SELF.isprescreen := is_prescreen;
     SELF.IsMarketing := FALSE;
     SELF.OutputMasterResults := Output_Master_Results;
 		SELF.AllowedSourcesDataset := AllowedSourcesDataset;
@@ -204,11 +208,11 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_FCRA_Service', 
+				'publicrecords_kel.MAS_FCRA_Service.61', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
 				// XPATH('*'),
-				XPATH('publicrecords_kel.MAS_FCRA_ServiceResponse/Results/Result/Dataset[@name=\'MasterResults\']/Row'),
+				XPATH('publicrecords_kel.MAS_FCRA_Service.61Response/Results/Result/Dataset[@name=\'MasterResults\']/Row'),
         RETRY(2), TIMEOUT(300),
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));

@@ -55,6 +55,14 @@ Output_Master_Results := TRUE;
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
 
+// Use_Ingest_Date := TRUE; 
+Use_Ingest_Date := false; 
+
+// TurnOffHouseHolds := TRUE;
+TurnOffHouseHolds := FALSE;
+// TurnOffRelatives := TRUE;
+TurnOffRelatives := FALSE;
+
 // Use default list of allowed sources
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.
@@ -102,7 +110,7 @@ Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW + Insurance
 RecordsToRun := 0;
 eyeball := 120;
 
-OutputFile := '~bbraaten::out::PersonNonFCRA_Roxie_100k_Current_KS-6233_'+ ThorLib.wuid();
+OutputFile := '~USERNAME::out::PersonNonFCRA_Roxie_100k_Current_TICKETNUMBER_'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -152,7 +160,10 @@ soapLayout := RECORD
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN TurnOffHouseHolds;
+	BOOLEAN TurnOffRelatives;	
 	BOOLEAN IncludeMinors;
+	BOOLEAN UseIngestDate;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	UNSIGNED1 LexIdSourceOptout;
@@ -177,6 +188,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT boolean UseIngestDate := Use_Ingest_Date;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 	EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
@@ -215,7 +227,10 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IncludeMinors := Settings.IncludeMinors;
+	SELF.UseIngestDate := Settings.UseIngestDate;
 	SELF.IsMarketing := FALSE;
+	SELF.TurnOffHouseHolds := TurnOffHouseHolds;
+	SELF.TurnOffRelatives := TurnOffRelatives;	
 	self.RetainInputLexid := Settings.RetainInputLexid;
 	self.appendpii := Settings.BestPIIAppend; //do not append best pii for running
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
