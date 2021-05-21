@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk_BIP, MDR, STD, BIPV2, Header, PublicRecords_KEL, risk_indicators;
+﻿IMPORT Business_Risk_BIP, MDR, STD, BIPV2, Header, PublicRecords_KEL, risk_indicators, Accident_Services;
 
 /*
 -99999: No LexID or input needed is not populated
@@ -38,6 +38,32 @@ EXPORT Constants := MODULE
 	EXPORT STRING HouseHoldCORE := 'CORE';
 	EXPORT STRING HouseHoldCOREVNOSSN := 'COREVNOSSN';
 	
+	EXPORT SetValidStateSrcs := [mdr.sourceTools.src_ME_DL,mdr.sourceTools.src_Experian_DL];//DL set
+	
+	EXPORT SOURCESFCRA := [mdr.sourceTools.src_Entiera, //'ET'
+													mdr.sourceTools.src_MediaOne,  //'M1'
+													mdr.sourceTools.src_Acquiredweb,//'AW'
+													mdr.sourceTools.src_SalesChannel];// 'SC'
+													
+	EXPORT SOURCESNONFCRA := [mdr.sourcetools.src_InfutorNare, //'!I'
+														mdr.sourceTools.src_Entiera, //'ET'
+														mdr.sourceTools.src_Anchor, //'AN'
+														mdr.sourceTools.src_Acquiredweb, //'AW'
+														mdr.sourceTools.src_MediaOne,   //'M1'
+														mdr.sourceTools.src_Datagence, //'DG'
+														mdr.sourceTools.src_RealSource, //'RS'
+														mdr.sourceTools.src_SalesChannel, //  'SC'
+														mdr.sourceTools.src_Wired_Assets_Email];//'W@'
+
+	
+	EXPORT accRptCodes := Accident_Services.Constants.FLAccident_source+Accident_Services.Constants.NtlAccident_source+Accident_Services.Constants.eCrashAccident_source;
+	
+	// can't use new mexico or pennsylvania real estate in the shell
+	EXPORT restricted_Mari_vendor_set := ['S0822',
+	'S0843',
+	'S0900',
+	'S0868'
+	];
 
 	//These were made up by MAS
 	EXPORT CCW_Source_MAS :=	'CCW';//conceal carry

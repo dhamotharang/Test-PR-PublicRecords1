@@ -54,8 +54,7 @@ Score_threshold := 80;
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
-// Output_Master_Results := FALSE;
-Output_Master_Results := TRUE; 
+Output_Master_Results := FALSE;
 
 // Toggle to include/exclude SALT profile of results file
 // Output_SALT_Profile := FALSE;
@@ -88,7 +87,10 @@ Input_Gateways := (NeutralRoxie_GW + Targus_GW)(URL <> '');
 RecordsToRun := 0;
 eyeball := 100;
 
-OutputFile := '~USERNAME::out::PersonFCRA_Roxie_100k_Current_TICKETNUMBER_'+ ThorLib.wuid();
+name := STD.System.Job.User();
+archivemode := if(histDate = (STRING)STD.Date.Today(), 'Current', 'Archive');
+
+OutputFile := '~'+name+'::out::PersonFCRA_MAS_Roxie_'+ archivemode +'_';
 
 prii_layout := RECORD
     STRING Account             ;
@@ -122,6 +124,8 @@ p_in := DATASET(InputFile, prii_layout, CSV(QUOTE('"'), HEADING(SINGLE)));
 // P_IN1 := p_in( ACCOUNT IN ['AAAA7833-122054', 'TMOBJUN7088-84991']);
 p := IF (RecordsToRun = 0, P_IN, CHOOSEN (P_IN, RecordsToRun));
 //p2 := p_in;
+counts_ := count(p);
+
 //p := p2(Account in ['TMOBSEP7088-158349', 'TMOBSEP7088-87504','TARG4547-221442', 'TMOBJUN7088-196571','AAAA7833-104166']); 
 PP := PROJECT(P(Account != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Layout, 
 SELF.historydate := if(histDate = '0', LEFT.historydate, histDate);
@@ -274,14 +278,14 @@ Passed_Person :=
 		INNER, KEEP(1));
       
 Error_Inputs := JOIN(DISTRIBUTE(p, HASH64(Account)), DISTRIBUTE(Passed_Person, HASH64(P_InpAcct)), LEFT.Account = RIGHT.P_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL); 
-OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE, expire(45));
+OUTPUT(Error_Inputs,,OutputFile+counts_+'_' + ThorLib.wuid()+'_Error_Inputs', CSV (QUOTE('"')), OVERWRITE, expire(45));
 
   
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Person, eyeball), NAMED('Sample_FCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
-OUTPUT(Passed_Person,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +counts_+'_' + ThorLib.wuid()+'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
+OUTPUT(Passed_Person,,OutputFile+counts_+'_' + ThorLib.wuid()+ '_Layout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 	
 Output(ave(Passed, time_ms), named('average_time_ms')); 
 

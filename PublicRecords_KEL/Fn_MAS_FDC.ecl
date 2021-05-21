@@ -936,7 +936,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					SELF := LEFT,
 					SELF := []));		
 	
-	PropertyV2__Key_Search_Fid_Records :=	// dates not kept, does not need DateSelector
+	PropertyV2__Key_Search_Fid_Records :=	
 			JOIN(Property_lookup_search_records, LN_PropertyV2.key_search_fid(Options.isFCRA),
 				Common.DoFDCJoin_PropertyV2__Key_Search_Fid = TRUE AND
 				KEYED(LEFT.ln_fares_id = RIGHT.ln_fares_id) and
@@ -1009,10 +1009,12 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				SELF.State           := LEFT.st,
 				SELF.ZIP5            := LEFT.zip,
 				SELF.SecondaryRange  := LEFT.sec_range,	
+				SELF.Postdirectional  := LEFT.postdir,	
+				SELF.Predirectional  := LEFT.predir,	
 				self := LEFT,
 				Self := [];));
 
-	addresses_for_AVM_slim := dedup(sort((addresses_for_AVM+Input_Address_Current_Previous)(PrimaryName != '' AND ZIP5 != ''), PrimaryRange, PrimaryName, SecondaryRange, State, ZIP5, UIDAppend ),PrimaryRange, PrimaryName, SecondaryRange, State, ZIP5, UIDAppend );//dedup by avm keyed fields
+	addresses_for_AVM_slim := dedup(sort((addresses_for_AVM+Input_Address_Current_Previous)(PrimaryName != '' AND ZIP5 != ''), PrimaryRange, PrimaryName, SecondaryRange, Predirectional, Postdirectional,State, ZIP5, UIDAppend ),PrimaryRange, PrimaryName, SecondaryRange,  Predirectional, Postdirectional,State, ZIP5, UIDAppend );//dedup by avm keyed fields
 /*************************************************************************************************************/
 
 
@@ -1025,7 +1027,9 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 					LEFT.State = RIGHT.st AND
 					LEFT.ZIP5 = RIGHT.zip AND
 					LEFT.PrimaryRange = RIGHT.prim_range AND
-					LEFT.SecondaryRange = RIGHT.sec_range),		
+					LEFT.SecondaryRange = RIGHT.sec_range)	and
+					left.Predirectional=right.predir and
+					left.Postdirectional=right.postdir,
 				TRANSFORM(Layouts_FDC.Layout_AVM_V2_Key_AVM_Address_Records,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
@@ -1922,6 +1926,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 				Common.DoFDCJoin_Prof_License_Mari__Key_Did = TRUE AND NOT Options.IsPrescreen AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.s_did) and
+				right.std_source_upd not in PublicRecords_KEL.ECL_Functions.Constants.restricted_Mari_vendor_set and 
 				ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Prof_License_Mari__Key_Did,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2011,6 +2016,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 		JOIN(Key_DX_Email__Key_Email_Payload_Full, DX_Email.Key_Email_Payload(Options.isFCRA),
 					Common.DoFDCJoin_Email_Data__Key_Email_Payload = TRUE AND 
 					KEYED(LEFT.email_rec_key = RIGHT.email_rec_key) and
+					right.Email_SRC IN PublicRecords_KEL.ECL_Functions.Constants.SOURCESNONFCRA AND
 					ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_DX_Email__Key_Email_Payload,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2039,6 +2045,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					Common.DoFDCJoin_Email_Data__Key_Did_FCRA = TRUE AND
 					LEFT.P_LexID > 0 AND
 					KEYED(LEFT.P_LexID = RIGHT.did) and
+					right.Email_SRC IN PublicRecords_KEL.ECL_Functions.Constants.SOURCESFCRA AND
 					ArchiveDate((string)right.date_first_seen, (string)right.date_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Email_Data__Key_Did_FCRA,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2206,6 +2213,8 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 					LEFT.ZIP5 = RIGHT.zip AND
 					LEFT.PrimaryRange = RIGHT.prim_range AND
 					LEFT.SecondaryRange = RIGHT.sec_range) and
+					// addr type = 'S' means that this is the service address
+					RIGHT.addr_type='S' and
 					ArchiveDate((string)right.date_first_seen) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_UtilFile__Key_Address,
 					SELF.Src := MDR.sourceTools.src_Utilities,
@@ -2329,6 +2338,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 				Common.DoFDCJoin_DriversV2__Key_DL_DID = TRUE AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.did) and
+				right.source_code IN PublicRecords_KEL.ECL_Functions.Constants.SetValidStateSrcs AND
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_DriversV2__Key_DL_DID,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -2360,6 +2370,7 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
 				Common.DoFDCJoin_DriversV2__Key_DL_Number = TRUE AND
 				LEFT.P_InpClnDL != '' AND
 				KEYED(LEFT.P_InpClnDL = RIGHT.s_dl) and
+				right.source_code IN PublicRecords_KEL.ECL_Functions.Constants.SetValidStateSrcs AND
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_DriversV2__Key_DL_Number,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -4404,6 +4415,7 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 				Common.DoFDCJoinfn_FLAccidents_Ecrash__key_Ecrash_accnbr = TRUE AND 
 				KEYED(LEFT.accident_nbr = RIGHT.l_accnbr) and 
 				LEFT.P_LexID=(UNSIGNED)RIGHT.did AND
+				RIGHT.report_code IN PublicRecords_KEL.ECL_Functions.Constants.accRptCodes AND
 				ArchiveDate((string)right.dt_first_seen) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_FLAccidents_Ecrash__key_EcrashV2_accnbr,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -4430,7 +4442,8 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 			JOIN(FLAccidents_Ecrash__Key_EcrashV2_did, FLAccidents_Ecrash.Key_ECrash4,
 				Common.DoFDCJoinfn_FLAccidents_Ecrash__key_Ecrash = TRUE AND 
 				KEYED(LEFT.accident_nbr = RIGHT.l_acc_nbr) and
-				LEFT.P_LexID=(UNSIGNED)RIGHT.did,
+				LEFT.P_LexID=(UNSIGNED)RIGHT.did AND
+				RIGHT.report_code IN PublicRecords_KEL.ECL_Functions.Constants.accRptCodes,
 				TRANSFORM(Layouts_FDC.Layout_FLAccidents_Ecrash__Key_ECrash4,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
@@ -4913,6 +4926,7 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 					Common.DoFDCJoin_Thrive__Key_did_QA = TRUE AND
 					LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and
+				right.src = mdr.sourceTools.src_Thrive_PD AND
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Thrive__Key___Did_QA,
 					SELF.UIDAppend := LEFT.UIDAppend,
@@ -4931,6 +4945,7 @@ Key_SexOffender_SPK := IF( Options.isFCRA, SexOffender.Key_SexOffender_SPK(TRUE)
 					Common.DoFDCJoin_Thrive__Key_did_QA = TRUE AND
 					LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID =RIGHT.did) and
+				right.src = mdr.sourceTools.src_Thrive_PD AND
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) <= (STRING)STD.Date.AdjustDate((INTEGER)LEFT.P_InpClnArchDt[1..8],2,0,0) AND
 				ArchiveDate((string)right.dt_first_seen, (string)right.dt_vendor_first_reported) >= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Thrive__Key___Did_QA,

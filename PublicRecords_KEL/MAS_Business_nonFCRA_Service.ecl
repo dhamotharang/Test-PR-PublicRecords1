@@ -2,7 +2,6 @@
 <message name="MAS_Business_nonFCRA_Service">
 	<part name="input" type="tns:XmlDataSet" cols="100" rows="8"/>
 	<part name="ScoreThreshold" type="xsd:integer"/> 
-	<part name="ExcludeConsumerAttributes" type="xsd:boolean"/>
 	<part name="OutputMasterResults" type="xsd:boolean"/>
 	<part name="BIPAppendScoreThreshold" type="xsd:integer"/>
 	<part name="BIPAppendWeightThreshold" type="xsd:integer"/>
@@ -38,7 +37,6 @@ EXPORT MAS_Business_nonFCRA_Service() := MACRO
         'input',
         'ScoreThreshold',
         'Gateways',
-        'ExcludeConsumerAttributes',
         'OutputMasterResults',
         'BIPAppendScoreThreshold',
         'BIPAppendWeightThreshold',
@@ -84,7 +82,6 @@ BOOLEAN Default_IncludeMinors := TRUE;
 	// Read interface params
 	ds_input := DATASET([],PublicRecords_KEL.ECL_Functions.Input_Bus_Layout) : STORED('input');
 	INTEGER Score_threshold := 80 : STORED('ScoreThreshold');
-	BOOLEAN Exclude_Consumer_Attributes := FALSE : STORED('ExcludeConsumerAttributes');
 	BOOLEAN Output_Master_Results := FALSE : STORED('OutputMasterResults');
 	STRING100 DataRestrictionMask := '' : STORED('DataRestrictionMask');
 	STRING100 DataPermissionMask := Default_data_permission_mask : STORED('DataPermissionMask');
@@ -152,7 +149,6 @@ BOOLEAN Default_IncludeMinors := TRUE;
 		EXPORT UNSIGNED GLBAPurpose := GLBA;
 		EXPORT UNSIGNED DPPAPurpose := DPPA;
 		EXPORT BOOLEAN IsFCRA := FALSE;
-		EXPORT BOOLEAN ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 		EXPORT BOOLEAN OutputMasterResults := Output_Master_Results;
 		EXPORT BOOLEAN isMarketing := Is_Marketing; // When TRUE enables Marketing Restrictions
 		EXPORT BOOLEAN TurnOffRelatives := Turn_Off_Relatives; 
