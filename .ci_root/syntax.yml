@@ -32,7 +32,7 @@ syntax-fast:
     - echo $CI_PROJECT_ID
     - echo $CI_MERGE_REQUEST_IID
     - |
-      if node get_mr_query_list.js -m -d -v $CI_PROJECT_ID $CI_MERGE_REQUEST_IID | tee $DEP_FILE
+      if node get_mr_query_list.js -m -d -v 4322 $CI_MERGE_REQUEST_IID $CIToken_Arqs | tee $DEP_FILE
       then
       echo "Found $(cat $DEP_FILE | wc -l) Dependencies"
       querylist=$DEP_FILE
