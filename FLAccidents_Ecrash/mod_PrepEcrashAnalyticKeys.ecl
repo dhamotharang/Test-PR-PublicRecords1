@@ -1,8 +1,7 @@
 ﻿IMPORT STD, dx_Ecrash;
 
-EXPORT mod_PrepEcrashAnalyticKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = FLAccidents_Ecrash.File_KeybuildV2.out) := MODULE
+EXPORT mod_PrepEcrashAnalyticKeys(DATASET(Layout_eCrash.Consolidation) EcrashIn = Files_eCrash.Ds_Base_Consolidation_Ecrash) := MODULE
 
-//Infile := FLAccidents_Ecrash.File_KeybuildV2.out(report_code in ['EA','TM','TF'] AND report_type_id = 'A' AND work_type_id NOT IN['2','3']) ;
 Infile := EcrashIn((report_code IN ['EA','TF'] OR (report_code = 'TM' AND STD.Str.ToUpperCase(report_status) IN ['COMPLETED'] )) AND report_type_id = 'A' AND work_type_id NOT IN['2','3']) ;
  
 Layout_eCrash.Consolidation transInFile(Layout_eCrash.Consolidation L) := TRANSFORM

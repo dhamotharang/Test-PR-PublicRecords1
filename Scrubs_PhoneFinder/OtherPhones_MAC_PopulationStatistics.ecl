@@ -1,5 +1,5 @@
 ﻿ 
-EXPORT OtherPhones_MAC_PopulationStatistics(infile,Ref='',Input_transaction_id = '',Input_sequence_number = '',Input_phone_id = '',Input_phonenumber = '',Input_risk_indicator = '',Input_phone_type = '',Input_phone_status = '',Input_listing_name = '',Input_porting_code = '',Input_phone_forwarded = '',Input_verified_carrier = '',Input_date_added = '',Input_filename = '',OutFile) := MACRO
+EXPORT OtherPhones_MAC_PopulationStatistics(infile,Ref='',Input_transaction_id = '',Input_sequence_number = '',Input_phone_id = '',Input_phonenumber = '',Input_risk_indicator = '',Input_phone_type = '',Input_phone_status = '',Input_listing_name = '',Input_porting_code = '',Input_phone_forwarded = '',Input_verified_carrier = '',Input_date_added = '',Input_identity_count = '',Input_carrier = '',Input_phone_star_rating = '',Input_filename = '',OutFile) := MACRO
   IMPORT SALT311,Scrubs_PhoneFinder;
   #uniquename(of)
   %of% := RECORD
@@ -78,6 +78,24 @@ EXPORT OtherPhones_MAC_PopulationStatistics(infile,Ref='',Input_transaction_id =
       '' 
     #ELSE
         IF( le.Input_date_added = (TYPEOF(le.Input_date_added))'','',':date_added')
+    #END
+ 
++    #IF( #TEXT(Input_identity_count)='' )
+      '' 
+    #ELSE
+        IF( le.Input_identity_count = (TYPEOF(le.Input_identity_count))'','',':identity_count')
+    #END
+ 
++    #IF( #TEXT(Input_carrier)='' )
+      '' 
+    #ELSE
+        IF( le.Input_carrier = (TYPEOF(le.Input_carrier))'','',':carrier')
+    #END
+ 
++    #IF( #TEXT(Input_phone_star_rating)='' )
+      '' 
+    #ELSE
+        IF( le.Input_phone_star_rating = (TYPEOF(le.Input_phone_star_rating))'','',':phone_star_rating')
     #END
  
 +    #IF( #TEXT(Input_filename)='' )

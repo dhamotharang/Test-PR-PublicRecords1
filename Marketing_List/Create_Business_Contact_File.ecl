@@ -79,7 +79,10 @@ functionmacro
   ds_get_active_proxids := join(ds_crosswalk  ,ds_active_proxids  ,left.proxid = right.proxid ,transform({recordof(left) - contactSSNs - contactDOBs - contactPhones},self.jobtitles := project(left.jobtitles,transform(recordof(left),self.executive_ind_order := bipv2.bl_tables.Rank_ExecutiveTitles(left.job_title),self := left)),self := left)  ,hash);
  
   ds_prep := project(ds_get_active_proxids  ,transform(Marketing_List.Layouts.business_contact,
-    best_contact_name := topn(left.contactnames((contact_name_permits & mktg_bmap) != 0) ,1                                                                                                     ,-dt_last_seen_at_business);
+    eligible_contact_names          := left.contactnames((contact_name_permits & mktg_bmap) != 0);
+    eligible_contact_names_sources  := table(eligible_contact_names  ,{source} ,source ,few);
+
+    best_contact_name := topn(eligible_contact_names ,1                                                                                                     ,-dt_last_seen_at_business);
     job_titles        := topn(left.jobtitles   ((job_title_permits    & mktg_bmap) != 0) ,5 ,map(executive_ind_order = 0 and trim(job_title) = '' => 9999 ,executive_ind_order = 0 => 99  ,executive_ind_order + 1) ,-dt_title_last_seen      );
 
     // bipv2.bl_tables.executivetitles -- where the executive_ind_order comes from.  the contact key where the crosswalk gets this executive ind from does not look right.  some presidents and ceos are 99.  doens't make sense.
@@ -97,9 +100,10 @@ functionmacro
     self.proxid               := left.proxid                            ;
     self.lexid                := left.contact_did                       ;
     self.empid                := left.empid                             ;
-    self.fname                := best_contact_name[1].fname             ;
-    self.lname                := best_contact_name[1].lname             ;
+    self.fname                := regexreplace('[^[:print:]]' ,best_contact_name[1].fname ,'' ,nocase)   ;
+    self.lname                := regexreplace('[^[:print:]]' ,best_contact_name[1].lname ,'' ,nocase)   ;
     self.src_name             := best_contact_name[1].source            ;
+    self.name_sources         := count(eligible_contact_names_sources)  ;
     self.title                := job_titles[1].job_title                ;
     self.title_dt_first_seen  := job_titles[1].dt_title_first_seen      ;
     self.title_dt_last_seen   := job_titles[1].dt_title_first_seen      ;

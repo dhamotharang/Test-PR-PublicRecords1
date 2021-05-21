@@ -1,4 +1,4 @@
-export File_In_Subcategory_Premium := dataset([
+﻿export File_In_Subcategory_Premium := dataset([
 	{'20','Non-PEP','','3'},
 	{'1','PEP International Organization','','3'},
 	{'2','PEP International Organization - Immediate Relative','','3'},
@@ -18,5 +18,7 @@ export File_In_Subcategory_Premium := dataset([
 	{'16','PEP Non-Government','','3'},
 	{'17','PEP Non-Government - Immediate Relative','','3'},
 	{'18','PEP Non-Government - Close Associate','','3'},
-	{'19','PEP State Owned Entity','','3'}],
+	{'19','PEP State Owned Entity','','3'},
+	{'21','PEP State Invested Enterprise','','3'},
+	{'22','PEP Instrumentality of State','','3'}],
 	Layout_Subcategory);

@@ -8,9 +8,7 @@ EXPORT Regulatory := module
 
 		import AID, BIPV2, Suppress;
 	 
-		export	LZ_xAID		:=	unsigned8;
-
-		export	Party_layout	:= 
+		Export Party_layout:= 
 				record
 						string30		Vehicle_Key;
 						string15		Iteration_Key;
@@ -56,11 +54,11 @@ EXPORT Regulatory := module
 						string150		Append_Ace1_PrepAddr1	:=	'';
 						string100		Append_Ace1_PrepAddr2	:=	'';
 //					AID.Common.xAID	Append_Ace1_RawAID		:=	0;
-						LZ_xAID			Append_Ace1_RawAID		:=	0;
+						unsigned8 	Append_Ace1_RawAID		:=	0;
 						string150		Append_Ace2_PrepAddr1	:=	'';
 						string50		Append_Ace2_PrepAddr2	:=	'';
 //					AID.Common.xAID	Append_Ace2_RawAID		:=	0;
-						LZ_xAID			Append_Ace2_RawAID		:=	0;
+						unsigned8 	Append_Ace2_RawAID		:=	0;
 						
 						string10		prim_range;
 						string2			predir;
@@ -148,49 +146,50 @@ EXPORT Regulatory := module
 						string8			SRC_FIRST_DATE	:= '';	//New fields added for Infutor batch project - bug #155364
 						string8			SRC_LAST_DATE	:= '';		//New fields added for Infutor batch project
 				end;
-
-// reference to new location
-	  export LZ_l_xlink_ids := Suppress.Layout_regulatory.LZ_l_xlink_ids ;
-
-		export	Party_Bip_layout:=	
-				record
+				
+    export LZ_l_xlink_ids := Suppress.Layout_regulatory.LZ_l_xlink_ids ;
+		
+		export	Party_Bip_layout	:=record
 						Party_Layout;
 						// Bipv2.IDlayouts.l_xlink_ids;
 						LZ_l_xlink_ids;		 							
 						unsigned8		source_rec_id := 0;	 	//Added for BIP project
-				end;
-				
-		//New layout added for CCPA-103	 
-	export Party_CCPA :=  record
-		Party_Bip_layout;
-		unsigned4 global_sid := 0;
-		unsigned8 record_sid := 0;
-		string30 raw_name;
-	end;	
+		end;
 	
+		// Layout of the Vehicle base file 
+		export	Party_CCPA_in	:=record
+		        Party_Bip_layout ;
+						//Added for CCPA-103
+						unsigned4 global_sid := 0;
+						unsigned8 record_sid := 0;
+						//Added for DF-25578
+						string30 raw_name;
+    end;		
+		
+				
 		//
 		// process vehicle party information
 		//
 		export applyMotorVehicleP(ds) := 
-				functionmacro					
-						VehiclePartySupHash(recordof(ds) L) := hashmd5(trim((string)l.Vehicle_key, 	 left, right), 
+				functionmacro	
+				
+						VehiclePartySupHashAll(recordof(ds) L) := hashmd5(trim((string)l.Vehicle_key, left, right));
+	         
+					  VehiclePartySupHashRegistrant(recordof(ds) L) := hashmd5(trim((string)l.Vehicle_key, left, right), 
+																													 trim((string)l.Iteration_key, left, right));
+																													 
+					  VehiclePartySupHashUniqueRegistrant(recordof(ds) L) := hashmd5(trim((string)l.Vehicle_key, 	 left, right), 
 																													 trim((string)l.Iteration_key, left, right),
-																													 trim((string)l.sequence_key,  left, right),
 																													 trim((string)l.Append_Clean_CName,  left, right),
 																													 trim((string)l.fname,         left, right),
 																													 trim((string)l.mname,         left, right),
 																													 trim((string)l.lname,         left, right));
-																													 
-    				VehiclePartySupHashAll(recordof(ds) L) := hashmd5(trim((string)l.Vehicle_key, left, right), 
-																													 trim((string)l.Append_Clean_CName, left, right),
-																													 trim((string)l.fname,         left, right),
-																													 trim((string)l.mname,         left, right),
-																													 trim((string)l.lname,         left, right));
-																													 
-						  VehiclePartySupHashEmpty(recordof(ds) L) := hashmd5('') ; 																							 
-									
-					  	ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_vehicle_party_sup.txt', VehiclePartySupHash, VehiclePartySupHashAll, VehiclePartySupHashEmpty) ;																							 
-						
+																														 
+	         
+						ds1 := Suppress.applyRegulatory.complex_sup_trio(ds, 'file_vehicle_party_sup.txt', VehiclePartySupHashAll, 
+																																										 VehiclePartySupHashRegistrant,
+																																										 VehiclePartySupHashUniqueRegistrant);
+
 						return suppress.applyRegulatory.simple_append(ds1, 'file_vehicle_party_inj.thor', VehicleV2.Regulatory.Party_Bip_layout); 
 				endmacro;
 

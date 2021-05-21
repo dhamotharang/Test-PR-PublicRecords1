@@ -1,4 +1,4 @@
-#workunit('name','FCRA-RiskView Process');
+﻿#workunit('name','FCRA-RiskView Process');
 #option ('hthorMemoryLimit', 1000);
 import models, Riskwise, Risk_Indicators;
 
@@ -85,8 +85,8 @@ END;
 DataRestrictionMask := '10000100010001000000000000000000000000000'; // to restrict fares, experian and transunion -- returns liens and judgments
 // DataRestrictionMask := '10000100010001000000000000000000000000001';//to restrict fares, LIENS/Jdgmts, experian and transunion 
 
-fcraroxieIP := 'http://fcrabatch.sc.seisint.com:9876'; 
-neutralroxieIP := 'http://roxiebatch.br.seisint.com:9856';
+fcraroxieIP := 'http://fcrathorvip.hpcc.risk.regn.net:9876'; 
+neutralroxieIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
 // fcraroxieIP := riskwise.shortcuts.staging_fcra_roxieIP;
 // neutralroxieip := riskwise.shortcuts.staging_neutral_roxieIP;
 

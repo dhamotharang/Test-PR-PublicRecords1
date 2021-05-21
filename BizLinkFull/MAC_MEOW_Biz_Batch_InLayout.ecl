@@ -1,4 +1,4 @@
-﻿ 
+
 EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs = 'false',Stats = '',In_bGetAllScores = 'true',In_disableForce = 'false',DoClean = 'true') := MACRO
   IMPORT SALT44,BizLinkFull;
   #UNIQUENAME(ToProcess)
@@ -15,7 +15,7 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   #UNIQUENAME(dups)
   // In case multiple copies of the same indicative are in there - remove them
   SALT44.MAC_Dups_Note(%infile_clean%,%TPRec%,%fats%,%dups%,,BizLinkFull.Config_BIP.meow_dedup);
- 
+
   #UNIQUENAME(key_cnp_name)
   %key_cnp_name% := BizLinkFull.Specificities(BizLinkFull.file_BizHead).cnp_name_values_key;
   #UNIQUENAME(A_cnp_name)
@@ -24,7 +24,7 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   %key_company_url% := BizLinkFull.Specificities(BizLinkFull.file_BizHead).company_url_values_key;
   #UNIQUENAME(A_company_url)
   %A_company_url% := SALT44.mac_wordbag_appendspecs_th(%A_cnp_name%,company_url,company_url_wb,%key_company_url%,company_url,AsIndex);
- 
+
   %ToProcess% := %A_company_url%(Entered_proxid = 0 AND Entered_seleid = 0 AND Entered_orgid = 0 AND Entered_ultid = 0);
     #UNIQUENAME(OutputNewIDs)
     #IF (#TEXT(Input_proxid) <> '' OR #TEXT(Input_seleid) <> '' OR #TEXT(Input_orgid) <> '' OR #TEXT(Input_ultid) <> '')
@@ -114,10 +114,26 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
   #ELSE
     %OutputL_URL% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
   #END
+  #UNIQUENAME(OutputL_CONTACT_ZIP)
+  #IF(#TEXT(Input_fname_preferred)<>'' AND #TEXT(Input_lname)<>'' AND #TEXT(Input_zip)<>'')
+    #UNIQUENAME(HoldL_CONTACT_ZIP)
+    %HoldL_CONTACT_ZIP% := %ToProcess%;
+    BizLinkFull.Key_BizHead_L_CONTACT_ZIP.MAC_ScoredFetch_Batch(%HoldL_CONTACT_ZIP%,UniqueId,fname_preferred,lname,zip_cases,mname,cnp_name_wb,st,fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,%OutputL_CONTACT_ZIP%,AsIndex,In_disableForce)
+  #ELSE
+    %OutputL_CONTACT_ZIP% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
+  #END
+  #UNIQUENAME(OutputL_CONTACT_ST)
+  #IF(#TEXT(Input_fname_preferred)<>'' AND #TEXT(Input_lname)<>'' AND #TEXT(Input_st)<>'')
+    #UNIQUENAME(HoldL_CONTACT_ST)
+    %HoldL_CONTACT_ST% := %ToProcess%(~BizLinkFull.Key_BizHead_L_CONTACT_ZIP.CanSearch(ROW(%ToProcess%)));
+    BizLinkFull.Key_BizHead_L_CONTACT_ST.MAC_ScoredFetch_Batch(%HoldL_CONTACT_ST%,UniqueId,fname_preferred,lname,st,mname,cnp_name_wb,fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,%OutputL_CONTACT_ST%,AsIndex,In_disableForce)
+  #ELSE
+    %OutputL_CONTACT_ST% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
+  #END
   #UNIQUENAME(OutputL_CONTACT)
   #IF(#TEXT(Input_fname_preferred)<>'' AND #TEXT(Input_lname)<>'')
     #UNIQUENAME(HoldL_CONTACT)
-    %HoldL_CONTACT% := %ToProcess%;
+    %HoldL_CONTACT% := %ToProcess%(~BizLinkFull.Key_BizHead_L_CONTACT_ST.CanSearch(ROW(%ToProcess%)) AND ~BizLinkFull.Key_BizHead_L_CONTACT_ZIP.CanSearch(ROW(%ToProcess%)));
     BizLinkFull.Key_BizHead_L_CONTACT.MAC_ScoredFetch_Batch(%HoldL_CONTACT%,UniqueId,fname_preferred,lname,mname,cnp_name_wb,zip_cases,st,fname,company_sic_code1,cnp_number,cnp_btype,cnp_lowv,prim_name,city,prim_range,sec_range,parent_proxid,sele_proxid,org_proxid,ultimate_proxid,sele_flag,org_flag,ult_flag,%OutputL_CONTACT%,AsIndex,In_disableForce)
   #ELSE
     %OutputL_CONTACT% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
@@ -163,7 +179,7 @@ EXPORT MAC_MEOW_Biz_Batch_InLayout(infile,OutFile,AsIndex = 'true',In_UpdateIDs 
     %OutputL_CONTACT_DID% := DATASET([],BizLinkFull.Process_Biz_Layouts.LayoutScoredFetch);
   #END
   #UNIQUENAME(AllRes)
-  %AllRes% := %OutputL_CNPNAME_ZIP%+%OutputL_CNPNAME_ST%+%OutputL_CNPNAME%+%OutputL_CNPNAME_FUZZY%+%OutputL_ADDRESS1%+%OutputL_ADDRESS2%+%OutputL_ADDRESS3%+%OutputL_PHONE%+%OutputL_FEIN%+%OutputL_URL%+%OutputL_CONTACT%+%OutputL_CONTACT_SSN%+%OutputL_EMAIL%+%OutputL_SIC%+%OutputL_SOURCE%+%OutputL_CONTACT_DID%+%OutputNewIDs%;
+  %AllRes% := %OutputL_CNPNAME_ZIP%+%OutputL_CNPNAME_ST%+%OutputL_CNPNAME%+%OutputL_CNPNAME_FUZZY%+%OutputL_ADDRESS1%+%OutputL_ADDRESS2%+%OutputL_ADDRESS3%+%OutputL_PHONE%+%OutputL_FEIN%+%OutputL_URL%+%OutputL_CONTACT_ZIP%+%OutputL_CONTACT_ST%+%OutputL_CONTACT%+%OutputL_CONTACT_SSN%+%OutputL_EMAIL%+%OutputL_SIC%+%OutputL_SOURCE%+%OutputL_CONTACT_DID%+%OutputNewIDs%;
   #UNIQUENAME(All)
   %All% := BizLinkFull.Process_Biz_Layouts.CombineAllScores(%AllRes%, In_bGetAllScores, In_disableForce);
   #UNIQUENAME(OutFile0)

@@ -1,5 +1,4 @@
-﻿IMPORT PRTE2_PhonesInfo;
-EXPORT BWR_ONE_TIME_CODE := MODULE
+﻿EXPORT BWR_ONE_TIME_CODE := MODULE
 
 SHARED MakeSuperKeys(string name) := FUNCTION
 	FileServices.CreateSuperFile (RegExReplace('@version@', name, 'qa'));
@@ -19,13 +18,18 @@ SHARED MakeSuperFiles(string name) := FUNCTION
 END;
 
 EXPORT DO := FUNCTION
- MakeSuperKeys (Constants.KeyName_phones + Constants.KeyName_lerg6 + '_@version@');
 
-MakeSuperFiles (Constants.base_phones_ported_metadata + '@version@');
-MakeSuperFiles (Constants.base_carrier_reference + '@version@');
+  MakeSuperKeys ('~prte::key::phones_transaction_@version@');
+ 
+  MakeSuperKeys  ('~prte::key::phones_type_@version@');
+ 
+  MakeSuperFiles ('~prte::base::metadata_trans@version@');
+ 
+  MakeSuperFiles ('~prte::base::metadata_type@version@');
+ 
+  FileServices.CreateSuperFile ('~prte::in::met::metadata_trans');
 
-MakeSuperKeys (Constants.KeyName_phones + Constants.KeyName_phones_ported_metadata + '@version@');
-MakeSuperKeys (Constants.KeyName_phones + Constants.KeyName_carrier_reference + '@version@');
+  FileServices.CreateSuperFile ('~prte::in::met::metadata_type');
 
 RETURN 'SUCCESS';
 

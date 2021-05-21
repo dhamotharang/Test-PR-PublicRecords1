@@ -1,4 +1,4 @@
-﻿import tools, STD, FraudShared;
+﻿import tools, STD;
 lay_builds 	:= tools.Layout_FilenameVersions.builds;
 lay_inputs	:= tools.Layout_FilenameVersions.Inputs;
 
@@ -9,9 +9,10 @@ export Promote(
 	,boolean pDelete = true
 	,boolean pIsTesting = false
 	,dataset(lay_inputs) pInputFilenames = 	Filenames(pversion).Input.dAll_filenames
+	,dataset(lay_inputs) pMBSInputFilenames = Filenames(pversion).Input.dMBS_filenames
 	,dataset(lay_builds) pBuildFilenames = 	Filenames(pversion).dAll_filenames
 											+ Keynames  (pversion).dAll_filenames
-																					
+																																
 ) :=
 module
 	export sprayedfiles := module
@@ -54,6 +55,7 @@ module
 
 	end;
 	export inputfiles	:= tools.mod_PromoteInput(pversion,pInputFilenames,pFilter,pDelete,pIsTesting);
+	export MBSInputfiles := tools.mod_PromoteInput(pversion,pMBSInputFilenames,pFilter,pDelete,pIsTesting);
 	export buildfiles	:= tools.mod_PromoteBuild(pversion,pBuildFilenames,pFilter,pDelete,pIsTesting);
 	export rollbackinput := tools.mod_RollbackInput(pInputFilenames,pFilter,pDelete,pIsTesting);
 
@@ -68,18 +70,25 @@ module
 			, inputfiles.Using2Used
 			, inputfiles.New2Sprayed
 	);
+
+	export promote_MBSinputs := sequential(
+			  MBSinputfiles.Sprayed2Using
+			, MBSinputfiles.Using2Used
+			, MBSinputfiles.New2Sprayed
+	);
+
 	export promote_base := sequential(
 			  buildfiles.Built2QA
 	);
 
 	export promote_keys := sequential(
 			// Promote Shared Files
-			  FraudShared.Promote(pDelete := pDelete).buildfiles.Built2QA			
+			  buildfiles.Built2QA			
 			// Clean Up Shared Files	
-			, FraudShared.Promote().buildfiles.cleanup	
-			//Remove the Demo file from father sf, which was moved from qa as a promote routeine
-			, STD.File.RemoveSuperFile(FraudShared.Filenames().Base.Main.Father,	Filenames().Input.DemoData.Sprayed)
+			, buildfiles.cleanup	
+			//FraudGovPlatform the Demo file from father sf, which was moved from qa as a promote routeine
+			, STD.File.RemoveSuperFile(FraudGovPlatform.Filenames().Base.Main.Father,	Filenames().Input.DemoData.Sprayed)
 	);
 	
-	Export Clear_DemoData := STD.File.RemoveSuperFile(FraudShared.Filenames().Base.Main.Built,	Filenames().Input.DemoData.Sprayed);
+	Export Clear_DemoData := STD.File.RemoveSuperFile(FraudGovPlatform.Filenames().Base.Main.Built,	Filenames().Input.DemoData.Sprayed);
 end;

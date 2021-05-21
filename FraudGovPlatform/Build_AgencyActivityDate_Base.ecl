@@ -1,8 +1,8 @@
-﻿import STD,ut,FraudShared,tools;
+﻿import STD,ut,tools;
 
 export Build_AgencyActivityDate_Base (
             string pversion
-        , dataset(FraudShared.Layouts.Base.Main) pBaseFile = $.Files().Base.Main_Orig.Built 
+        , dataset(FraudGovPlatform.Layouts.Base.Main) pBaseFile = $.Files().Base.Main_Orig.Built 
         ) := 
 module 
 

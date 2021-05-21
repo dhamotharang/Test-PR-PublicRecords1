@@ -12,11 +12,11 @@ import BIPV2_xlink_segmentation;
 export IdAppendRoxieLocal(
 		dataset(BIPV2.IdAppendLayouts.AppendInput) inputDs
 		,unsigned scoreThreshold = 75
-		,unsigned weightThreshold = 44
-		,boolean disableSaltForce = false
+		,unsigned weightThreshold = IdConstants.APPEND_WEIGHT_THRESHOLD_ROXIE
+		,boolean disableSaltForce = true
 		,boolean primForcePost = false 
 		,boolean useFuzzy = true
-		,boolean doZipExpansion = true
+		,boolean doZipExpansion = false
 		,boolean reAppend = true
 		,boolean segmentation = true
 	) := function
@@ -49,8 +49,8 @@ inputDsZip :=
 			map(nozip => dataset([], BizLinkFull.Process_Biz_Layouts.layout_zip_cases),
 		      doZipExpansion => zipCases,
 			    oneZip);
-		self.city := if(doZipExpansion, zipsExpanded[1].city, left.city);
-		self.state := if(doZipExpansion, zipsExpanded[1].state, left.state);
+		self.city := if(doZipExpansion, if(zipsExpanded[1].city='', left.city, zipsExpanded[1].city) , left.city);
+		self.state := if(doZipExpansion, if(zipsExpanded[1].state='', left.state, zipsExpanded[1].state), left.state);
 		lenPhone := length(trim(left.phone10));
 		self.company_phone_3 := if(lenPhone = 10, left.phone10[..3], '');
 		self.company_phone_7 := if(lenPhone = 10, left.phone10[4..10], if(lenPhone = 7, trim(left.phone10), ''));
@@ -325,15 +325,5 @@ topIds :=
 	suppressed :=  BIPV2_Suppression.macSuppress(preSuppression + passThruPreSuppress);
 
 	return suppressed;
-
-	// return parallel(
-		// output(SALTInput, named('SALTInput'));
-		// output(rawResults, named('rawResults'));
-		// output(preSuppression, named('preSuppression'));
-		// output(passThru0, named('passThru0'));
-		// output(passThru, named('passThru'));
-		// output(passThruPreSuppress, named('passThruPreSuppress'));
-		// output(suppressed, named('suppressed'));
-	// );
 
 end;

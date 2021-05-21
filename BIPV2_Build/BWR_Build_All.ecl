@@ -90,6 +90,8 @@ SkipVerifyKeys        := SkipCopyOtherKeys    ;
 SkipUpdateDOPS        := SkipVerifyKeys       ;
 SkipDOTSpecsPost      := SkipUpdateDOPS       ;
 SkipSeleRelSpecsPost  := SkipDOTSpecsPost     ;
+SkipUnderlinkReport   := SkipSeleRelSpecsPost ;
+
 OmitDisposition       := 'preserve'            ;// NOTE: Set to 'preserve' or 'ghost' to recover from a missing source in the ingest file
 RenameKeysFilter         := 'bipv2_proxid|strnbrname|bipv2_relative|biz_preferred'  ;
 InputFilenameForProxMj6  := BIPV2_Proxid.filenames().out.built    ; //'BIPV2_Files.files_dotid.FILE_BASE'  //default is to start where we left off
@@ -183,6 +185,7 @@ BIPV2_Build.proc_build_all(
   ,pSkipUpdateDOPS        := SkipUpdateDOPS
   ,pSkipDOTSpecsPost      := SkipDOTSpecsPost
   ,pSkipSeleRelSpecsPost  := SkipSeleRelSpecsPost
+  ,pSkipUnderlinkReport   := SkipUnderlinkReport
   ,pOmitDisposition       := OmitDisposition
   ,pRenameKeysFilter          := RenameKeysFilter
   // ,pDotFilenameForProx        := DotFilenameForProx

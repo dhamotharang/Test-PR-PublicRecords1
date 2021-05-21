@@ -1,4 +1,4 @@
-#workunit('name','NonFCRA-Chargeback Defender Score and Attr');
+﻿#workunit('name','NonFCRA-Chargeback Defender Score and Attr');
 #option ('hthorMemoryLimit', 1000)
 #option ('linkCountedRows', false);
 
@@ -101,7 +101,7 @@ end;
 soap_in := project( f, to_soap(LEFT) );
 output(soap_in, named('soap_in'));
 
-ip := 'http://roxiebatch.br.seisint.com:9856'; // roxiebatch
+ip := 'http://roxiethorvip.hpcc.risk.regn.net:9856'; // roxiebatch
 svc:= 'Models.ChargebackDefender_Service';
 
 layout_with_errcode := record

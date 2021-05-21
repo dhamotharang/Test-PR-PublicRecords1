@@ -1,4 +1,4 @@
-Import dops, History_Analysis;
+﻿Import dops, History_Analysis;
 
 Export Layouts := Module
     Export layout_master_build := Record
@@ -12,26 +12,26 @@ Export Layouts := Module
 
 //datasetname,buildversion,whenqalive,whenprodlive,clusterflag,updateflag,superkey,templatelogicalkey,size,recordcoun
     Export layout_keysizedhistory := Record 
-        String25 datasetname;
+        String   datasetname;
         String10 buildversion;
         String25 whenQAlive;
         String25 whenProdLive;
         String1  clusterflag;
         String1  updateflag;
-        String60 superkey;
-        String60 templatelogicalkey;
+        String   superkey;
+        String   templatelogicalkey;
         String   size;
         String   recordcount;
     End;
 
     Export layout_dopsservice := Record
-        String25 datasetname;
+        String   datasetname;
         String1  clusterflag;
         String25 whenqalive;
         string25 whenprodlive;
         String10 buildversion;
-        String60 superkey;
-        String60 logicalkey;
+        String   superkey;
+        String   logicalkey;
         Integer8 size;
         Integer8 recordcount;
         String1  updateflag;
@@ -55,12 +55,12 @@ Export Layouts := Module
         String15  master_build;
     End;
     Export baseRecQA:= Record
-        String25   datasetname;
+        String     datasetname;
         String10   prevbuild_version:= '';
         String10   buildversion;
         String25   whenqalive;
         String1    updateflag;
-        String60   superkey;
+        String     superkey;
         Integer8   previous_size:=0;
         Integer8   size;    
         Integer8   delta_size:=0;
@@ -72,12 +72,12 @@ Export Layouts := Module
     End;
 
     Export baseRecProd:= Record
-        String25   datasetname;
+        String     datasetname;
         String10   prevbuild_version:= '';
         String10   buildversion;
         String25   whenprodlive;
         String1    updateflag;
-        String60   superkey;
+        String     superkey;
         Integer8   previous_size:=0;
         Integer8   size;    
         Integer8   delta_size:=0;
@@ -89,8 +89,8 @@ Export Layouts := Module
     End;
 
     Export statisticsRec := Record  
-        String25   datasetname;
-        String60   superkey;
+        String     datasetname;
+        String     superkey;
         String1    updateflag;
         Unsigned   numberofdeltas;
         Real       Min_FilesizeReal;//Min
@@ -117,9 +117,11 @@ Export Layouts := Module
         Real       StDev_FilesizePercent;//StDev_8
         Real       Plus2StDev_FilesizePercent;//Plus2StDev_9
         Real       Minus2StDev_FilesizePercent;//Minus2StDev_10
-        Unsigned   NumLessThanQ1_FilesizePercent;//NumLessThanQ1_11
-        Unsigned   BtwnQ1AndQ3_FilesizePercent;//BtwnQ1AndQ3_12
-        Unsigned   NumMoreThanQ3_FilesizePercent;//NumMoreThanQ3_12
+        Real       MinThresholdSize;//New
+        Real       MaxThresholdSize;//New
+        Unsigned   NumLessThanMinThresholdSize;//NumLessThanQ1_11
+        Unsigned   BtwnThresholdSize;//BtwnQ1AndQ3_12
+        Unsigned   NumMoreThanMaxThresholdSize;//NumMoreThanQ3_13
         // Record Count Calculations
         // Real
         Real       Min_RecordCountReal;//Min_14
@@ -146,19 +148,11 @@ Export Layouts := Module
         Real       StDev_RecordCountPercent;//StDev_34
         Real       Plus2StDev_RecordCountPercent;//Plus2StDev_35
         Real       Minus2StDev_RecordCountPercent;//Minus2StDev_36
-        Real       MinThreshold;//New
-        Real       MaxThreshold;//New
-        Unsigned   NumLessThanMinThreshold;//NumLessThanQ1_37
-        Unsigned   BtwnMinThresholdAndMaxThreshold;//BtwnQ1AndQ3_38
-        Unsigned   NumMoreThanMaxThreshold;//NumMoreThanQ3_39
+        Real       MinThresholdCount;//New
+        Real       MaxThresholdCount;//New
+        Unsigned   NumLessThanMinThresholdCount;//NumLessThanQ1_37
+        Unsigned   BtwnThresholdCount;//BtwnQ1AndQ3_38
+        Unsigned   NumMoreThanMaxThresholdCount;//NumMoreThanQ3_39
     End;
-
-    Export validateDeltasRec := RECORD
-        String25 datasetname;
-        String10 buildversion;
-        String60 superkey;
-        Integer8 size;
-        Integer8 recordcount;
-    END;
 
 End;

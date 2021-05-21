@@ -1,6 +1,6 @@
-﻿import FraudShared,doxie,Suppress;
+﻿import doxie,Suppress;
 EXPORT File_KeyBuild (
-dataset(FraudShared.Layouts.Base.Main)										pBaseMainBuilt									= Fraudshared.Files().Base.Main.Built  ) 
+dataset(FraudGovPlatform.Layouts.Base.Main)										pBaseMainBuilt									= FraudGovPlatform.Files().Base.Main.Built  ) 
 := 
 Function 
 import ut, Std; 
@@ -11,7 +11,7 @@ import ut, Std;
   Outfile               := BaseMain ;
 
 
-	DpatchIdentityDatadid   := project ( Outfile , transform (FraudShared.Layouts.KeyBuild, 
+	DpatchIdentityDatadid   := project ( Outfile , transform (FraudGovPlatform.Layouts.KeyBuild, 
 													self.ssn	:= left.clean_ssn;
 													self.zip	:= left.clean_zip;
 													self.ip_address	:= left.clean_ip_address;

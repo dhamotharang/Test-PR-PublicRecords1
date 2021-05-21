@@ -1,5 +1,5 @@
 ﻿import inquiry_acclogs, inql_v2;
-In_File_ := inql_v2.Files().bridger_input;
+In_File_ := INQL_V2.Files().InputFiles(false,true,'bridger','building');
 //Inquiry_AccLogs.File_Bridger_Logs.preprocess;
 
 layout := record

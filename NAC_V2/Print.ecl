@@ -390,7 +390,7 @@ onboarding_message := IF(show_email_message, IsOnboardingMessage, '');
 
 		records := rr_cases + rr_clients + rr_addresses + rr_contacts + rr_exceptions + rr_badRecords;
 	
-		return SORT(CHOOSEN(records, 1000),errorcode);		// HHSCO-35
+		RETURN CHOOSEN(SORT(records, errorcode), 1000);		// HHSCO-35
 			
 	END;
 

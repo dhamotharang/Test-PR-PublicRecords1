@@ -1,4 +1,4 @@
-import ut,business_risk;
+import Data_Services,Seed_Files;
 
 d :=  Seed_Files.File_BInstantID;
 
@@ -11,4 +11,4 @@ newtable := table(d,newrec);
 
 export key_BInstantID := index(newtable,{dataset_name,hashvalue},
 																	{newtable},
-																	'~thor_data400::key::testseed::qa::binstantid');
+																	Data_Services.Data_location.Prefix('NONAMEGIVEN') + 'thor_data400::key::testseed::qa::binstantid');

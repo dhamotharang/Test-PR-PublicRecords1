@@ -3,7 +3,7 @@ import Data_services, LN_PropertyV2_Fast;
 File_Assessment_bitmap := dataset(
 																	 LN_PropertyV2_Fast.filenames.baseFull.assessment
 																	,LN_PropertyV2.Layouts.layout_property_common_model_base_scrubs
-																	,flat);
+																	,flat,opt);
 
 ln_propertyv2.layout_property_common_model_base	tRemoveGarbageChars(File_Assessment_bitmap pInput)	:=
 transform

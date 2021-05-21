@@ -54,6 +54,9 @@
 	//CCPA-283 Adding CCPA new fields
 	unsigned6	did;
 	unsigned3 did_score;
-	UNSIGNED4 global_sid;
-	UNSIGNED8 record_sid;
+	UNSIGNED4 global_sid:=0;
+	UNSIGNED8 record_sid:=0;
+   UNSIGNED4 dt_effective_first:=0;
+  UNSIGNED4 dt_effective_last:=0;
+  UNSIGNED1 delta_ind := 0;
  END;

@@ -1,15 +1,14 @@
-import ut,FLAccidents_Ecrash, _control, std;
+﻿import ut,FLAccidents_Ecrash, _control, std;
 
 EXPORT Build_eCrash(string version) := module
 	
-	BaseFile0 := dataset(ut.foreign_prod+'thor_data400::base::ecrash',FLAccidents_Ecrash.Layout_Basefile, thor, opt);
-	ecrashDS := BaseFile0(Report_code in ['EA','TF','TM'] and work_type_id in ['0','1'] and geo_long <> '' and geo_lat <> '' );
-	
-	agency := dataset(ut.foreign_prod+'thor_data400::in::ecrash::agency'
-													 ,FLAccidents_Ecrash.Layout_Infiles.agency
-													 ,csv(terminator('\n'), separator('~~'),quote('"')))(Agency_ID != 'Agency_ID') ;
+  BaseFile0 := FLAccidents_Ecrash.BaseFile;
+  ecrashDS := BaseFile0(Report_code in ['EA','TF','TM'] and work_type_id in ['0','1'] and geo_long <> '' and geo_lat <> '' );
+                
+  dagency := distributed(FLAccidents_Ecrash.Files_MBSAgency.DS_BASE_AGENCY, hash32(Agency_ID));
+  agency := dedup(sort(dagency, Agency_ID, local), Agency_ID, local);
 													 
-	shared crash_from_directagency_only := join(ecrashDS, agency, left.agency_id = right.agency_id, transform({ecrashDS, string src_id, string100 agency_ori}, self.src_id := right.source_id; self.agency_ori := right.agency_ori; self := left;), lookup)(src_id in ['E','I', 'C']);
+	shared crash_from_directagency_only := join(ecrashDS, agency, left.agency_id = right.agency_id, transform({ecrashDS, string src_id}, self.src_id := right.source_id; self := left;), lookup)(src_id in ['E','I', 'C']);
 	// shared crash_from_agency_only := join(ecrashDS, agency, left.agency_id = right.agency_id, transform({ecrashDS, string src_id}, self.src_id := right.source_id; self := left;), lookup)(src_id in ['E','I']);
 	
 	BairCrashlayout := record

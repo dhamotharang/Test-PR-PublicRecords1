@@ -13,7 +13,7 @@ EXPORT RawInput_Layout_IDA := RECORD
     STRING12 dl;
     STRING5 dlstate;
     STRING10 phone;
-    UNSIGNED8 clientassigneduniquerecordid;
+    STRING clientassigneduniquerecordid;
     STRING50 emailaddress;
     STRING15 ipaddress;
   END;

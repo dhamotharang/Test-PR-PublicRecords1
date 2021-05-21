@@ -24,8 +24,11 @@ transform
 	self.clean_officer_name.lname 			:= choose(cnt, l.clean_officer_name_1.lname, l.clean_officer_name_2.lname, l.clean_officer_name_3.lname);
 	self.clean_officer_name.name_suffix := choose(cnt, l.clean_officer_name_1.name_suffix, l.clean_officer_name_2.name_suffix, l.clean_officer_name_3.name_suffix);
 	self.clean_officer_name.name_score  := choose(cnt, l.clean_officer_name_1.name_score, l.clean_officer_name_2.name_score, l.clean_officer_name_3.name_score);
-	self 				:= l;
-	self				:=[];
+	self.process_date_first_seen				:= (unsigned4)l.process_date;
+	self.process_date_last_seen					:= self.process_date_first_seen;
+	self.record_type										:= 'C';	
+	self 																:= l;
+	self																:= [];
 end;
 
 File_in2base := normalize(File_in, 3, Convert2Base(left, counter));

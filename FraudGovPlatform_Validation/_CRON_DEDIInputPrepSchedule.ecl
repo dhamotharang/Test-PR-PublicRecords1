@@ -9,8 +9,7 @@ ThorName:=IF(_control.ThisEnvironment.Name<> 'Prod_Thor',Constants.ThorName_Dev,
 version:=ut.GetDate : independent;
 
 lECL1 :=
- 'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
- +'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
+ 'import FraudGovPlatform,FraudGovPlatform_Validation,Scrubs_FraudGov,ut,STD;\n'
 +'#OPTION(\'multiplePersistInstances\',FALSE);\n'
 +'wuname := \'FraudGov DEDI Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
@@ -29,8 +28,14 @@ lECL1 :=
 +'version:=ut.GetDate : independent;\n'
 +'if(active_workunit\n'
 +'		,email(\'**** WARNING - Workunit \'+d_wu+\' in Wait, Queued, or Running *******\')\n'
-+'		,sequential(FraudGovPlatform_Validation.SprayAndQualifyDEDI(\''+version+'\')\n'
-+'		,Scrubs_FraudGov.MAC_Scrubs_Report(\''+version+'\',\'Scrubs_FraudGov\',\'DEDI\', Scrubs_FraudGov.DEDI_In_DEDI, FraudGovPlatform_Validation.Mailing_List().Alert))\n'
++'		,sequential(\n'
++'					FraudGovPlatform_Validation.SprayAndQualifyDEDI(\''+version+'\'),\n'
++'					IF(\n'
++'						STD.File.GetSuperFileSubCount(FraudGovPlatform.Filenames().Sprayed.DisposableEmailDomains)>0,\n'
++'						Scrubs_FraudGov.MAC_Scrubs_Report(\''+version+'\',\'Scrubs_FraudGov\',\'DEDI\', Scrubs_FraudGov.DEDI_In_DEDI, FraudGovPlatform_Validation.Mailing_List().Alert),\n'
++'						output(\'No new contributory files to process\')\n'
++'		 			)\n'
++'		)\n'
 +'	):failure(email(\'FraudGov DEDI Input Prep Failed\'));\n'
 ;
 #WORKUNIT('protect',true);

@@ -13,9 +13,9 @@
 // See below end of this macro for requirements.
 IMPORT DI_Metrics, STD;
 
-EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'DataInsightAutomation@lexisnexisrisk.com', timePeriod) := FUNCTIONMACRO
+EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'DataInsightAutomation@lexisnexisrisk.com', timePeriod, today) := FUNCTIONMACRO
 
-  filedate := (STRING8)Std.Date.Today();
+  filedate := (STRING8)today;
 
   // tradeline_data_in   := PULL(Cortera_Tradeline.Key_LinkIds.Key);
   tradeline_data_in   := DI_Metrics.Monthly_Cortera_Tradeline_Metrics.Cortera_Tradeline_Key_LinkIds_alias;
@@ -49,9 +49,9 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
         SELF.ar_date      := LEFT.ar_date,
         SELF.current_ar   := (INTEGER)TRIM(LEFT.current_ar,LEFT,RIGHT),
         SELF.aging_91plus := (INTEGER)TRIM(LEFT.aging_91plus,LEFT,RIGHT),
-        SELF.weekly       := LEFT.dt_vendor_first_reported,
-        SELF.monthly      := LEFT.dt_vendor_first_reported DIV 100,
-        SELF.yearly       := LEFT.dt_vendor_first_reported DIV 10000
+        SELF.weekly       := (UNSIGNED4)LEFT.ar_date,
+        SELF.monthly      := (UNSIGNED4)LEFT.ar_date DIV 100,
+        SELF.yearly       := (UNSIGNED4)LEFT.ar_date DIV 10000
       )
     );
 
@@ -147,6 +147,7 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
     INTEGER Date;              // Date of ending time period for which metrics are calculated
     INTEGER CountAllTLs;       // Count of all tradelines for the current time period
     INTEGER CountNewTLs;       // Count of new tradelines for the current time period
+    INTEGER CountInactiveTLs;  // Count of inactive tradelines for the current time period
     INTEGER TtlValAllTLs;      // Total tradeline $ value across all SELEIDs over time (per time period)
     INTEGER TtlValNewTLs;      // Total tradeline $ value across new SELEIDs over time (per time period)
     INTEGER TtlValTLsGT91Days; // (Extra) Total tradeline $ value aging_91plus across unique SELEIDs over time (per time period)
@@ -272,7 +273,7 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
   // 4. Get median number and median value of Tradelines among all seleids to calculate:
   //    MdnCountTLsPerSeleID;    // Median count of tradelines per unique SELEID
   //    MdnValTLsPerSeleID;      // Median tradeline $ value per unique SELEID
-  ds_tradelines_stats_3 :=
+  ds_tradelines_stats_3_pre :=
     DENORMALIZE(
       ds_tradelines_stats_2, tbl_TL_counts_and_values_per_seleid,
       LEFT.Date = RIGHT.timePeriod,
@@ -286,6 +287,25 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
       SKEW(1.0)
     );
 
+  ds_tradelines_stats_3 := PROJECT( ds_tradelines_stats_3_pre, { layout_tradelines_info AND NOT [CountInactiveTLs] } );
+  
+  // 5. Calculate the number of Tradelines that have become Inactive during the last timeperiod
+  layout_tradelines_info_slim := RECORD
+    INTEGER Date;              // Date of ending time period for which metrics are calculated
+    INTEGER CountInactiveTLs;  // Count of all tradelines that haven't been seen in the last 2 years
+  END;
+
+  ds_tradelines_stats_4_pre := 
+    ITERATE(
+      ds_tradelines_stats_3_pre,
+      TRANSFORM( layout_tradelines_info,
+        SELF.CountInactiveTLs := LEFT.CountAllTLs + RIGHT.CountNewTLs - RIGHT.CountAllTLs,
+        SELF := RIGHT
+      )
+    );
+
+  ds_tradelines_stats_4 := PROJECT( ds_tradelines_stats_4_pre, layout_tradelines_info_slim );
+  
   _timePeriod := 
     TRIM(
       CASE( 
@@ -298,21 +318,33 @@ EXPORT CorteraTradeLineHistory(destinationIP, destinationpath, emailContact = 'D
     );
   
   fileName_stem := '~thor_data400::data_insight::data_metrics::';
-  fileName      := 'CorteraTradelineHistory_' + _timePeriod + '_' + filedate + '.csv';
-  fileName_full := fileName_stem + fileName;
+  
+  fileName_history_active_TLs := 'CorteraTradelineHistory_' + _timePeriod + '_' + filedate + '.csv';
+  fileName_history_active_TLs_full := fileName_stem + fileName_history_active_TLs;
 
-  output_to_thor := 
-    OUTPUT( ds_tradelines_stats_3, , fileName_full, CSV(HEADING(SINGLE), SEPARATOR(','), TERMINATOR('\r\n'), QUOTE('\"')), OVERWRITE, EXPIRE(30) );
+  fileName_history_inactive_TLs := 'CorteraTradelineHistoryInactive_' + _timePeriod + '_' + filedate + '.csv';
+  fileName_history_inactive_TLs_full := fileName_stem + fileName_history_inactive_TLs;
+
+  output_to_thor_active_TLs := 
+    OUTPUT( ds_tradelines_stats_3, , fileName_history_active_TLs_full, CSV(HEADING(SINGLE), SEPARATOR(','), TERMINATOR('\r\n'), QUOTE('\"')), OVERWRITE, EXPIRE(30) );
+
+  output_to_thor_inactive_TLs := 
+    OUTPUT( ds_tradelines_stats_4, , fileName_history_inactive_TLs_full, CSV(HEADING(SINGLE), SEPARATOR(','), TERMINATOR('\r\n'), QUOTE('\"')), OVERWRITE, EXPIRE(30) );
 
   // Despray to bctlpedata12 (one thor file and one csv file). FTP to \\Risk\inf\Data_Factory\DI_Landingzone
-  despray_to_LZ := // charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
-    STD.File.DeSpray( fileName_full, destinationIP, destinationpath + fileName, , , , TRUE );
+  despray_to_LZ_active_TLs := // charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
+    STD.File.DeSpray( fileName_history_active_TLs_full, destinationIP, destinationpath + fileName_history_active_TLs, , , , TRUE );
+
+  despray_to_LZ_inactive_TLs := // charlene's team will create the monthly folder yyyymmdd otherwise HPCC creates the folder
+    STD.File.DeSpray( fileName_history_inactive_TLs_full, destinationIP, destinationpath + fileName_history_inactive_TLs, , , , TRUE );
 
   // If everything in the Sequential statement runs it will send the Success email, else the Failure email.
   email_alert := 
     SEQUENTIAL(
-      output_to_thor,
-      despray_to_LZ
+      output_to_thor_active_TLs,
+      output_to_thor_inactive_TLs,
+      despray_to_LZ_active_TLs,
+      despray_to_LZ_inactive_TLs
     ) :
     SUCCESS(FileServices.SendEmail(emailContact, 'Cortera Group: CorteraTradelineHistory (' + _timePeriod + ') Build Succeeded', WORKUNIT + ': Build complete.' + filedate)),
     FAILURE(FileServices.SendEmail(emailContact, 'Cortera Group: CorteraTradelineHistory (' + _timePeriod + ') Failed', WORKUNIT + filedate + '\n' + FAILMESSAGE));

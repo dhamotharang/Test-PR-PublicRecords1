@@ -1,7 +1,7 @@
 ﻿IMPORT _control, LiensV2, Email_DataV2, data_services, STD, ut; 
-export ChartsGeoMaps_Evictions(string pHostname, string pTarget, string pContact ='\' \'') := function
+export ChartsGeoMaps_Evictions(string pHostname, string pTarget, string pContact ='\' \'', STRING today = (STRING8)STD.Date.Today()) := function
 
-filedate := (STRING8)Std.Date.Today();
+filedate := today;
 
 //Evictions from Non FCRA Liens Key 
 Key_LiensV2_main := Pull(LiensV2.key_liens_main_ID(eviction = 'Y'));
@@ -45,9 +45,9 @@ despray_year_tbl := STD.File.DeSpray('~thor_data400::data_insight::data_metrics:
 //if everything in the Sequential statement runs, it will send the Success email, else it will send the Failure email
 email_alert := SEQUENTIAL(
 					output(srt_tbl_evic_st,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Evictions_By_Jurisdiction_'+ filedate +'.csv'
-					, csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					, csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,output(srt_tbl_evic_yr,,'~thor_data400::data_insight::data_metrics::tbl_ChartsGeoMaps_Evictions_By_Year_Jurisdiction_'+ filedate +'.csv'
-					, csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')),overwrite)
+					, csv(heading(single), separator('|'),terminator('\r\n'),quote('\"')), overwrite, expire(10))
 					,despray_state_tbl
 					,despray_year_tbl):
 					Success(FileServices.SendEmail(pContact, 'ChartsGeoMaps Group: ChartsGeoMaps_Evictions Build Succeeded', workunit + ': Build complete.' + filedate)),

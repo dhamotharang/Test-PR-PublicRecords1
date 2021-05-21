@@ -128,7 +128,7 @@ EXPORT modCallFunctions := MODULE
 
 
   // roxieIP 		 := 'http://10.173.3.1:9876'; // Dev 1-way 1
-  // roxieIP 		 := 'http://roxiestaging.br.seisint.com:9876'; // Cert
+  // roxieIP 		 := 'http://certstagingvip.hpcc.risk.regn.net:9876'; // Cert
 	roxieIP := 'http://roxiebatch.br.seisint.com:9856'; // Prod
 
   serviceName := 'BIPV2.IDfunctions_Service';

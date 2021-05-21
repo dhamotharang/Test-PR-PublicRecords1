@@ -1,8 +1,7 @@
-/*
+﻿/*
 see documentation on gforge->ecl->docs->autokeys
 https://gforge.seisint.com/docman/?group_id=21#
 */
-
 
 import autokeyi,autokey,business_header;
 
@@ -151,9 +150,9 @@ MODULE
 		bmod := MakeBmod(in_mod);
 		
 		dopkeys := parallel(parallel(
-			L_ivisitor.BuildI_Indv_Address_keybuild(pmod),
-			L_ivisitor.BuildI_Indv_CityStName_keybuild(pmod),
-			L_ivisitor.BuildI_Indv_Name_keybuild(pmod),
+			if('A' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Address_keybuild(pmod)),
+			if('I' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_CityStName_keybuild(pmod)),
+			if('N' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Name_keybuild(pmod)),
 			L_ivisitor.BuildI_Indv_Custom1_keybuild(pmod),
 			L_ivisitor.BuildI_Indv_Custom2_keybuild(pmod),
 			L_ivisitor.BuildI_Indv_Custom3_keybuild(pmod),
@@ -170,8 +169,8 @@ MODULE
 				output('AUTOKEY BUILD: SSN key skipped'),
 				L_ivisitor.BuildI_Indv_SSN_keybuild(pmod)
 			),
-			L_ivisitor.BuildI_Indv_StName_keybuild(pmod),
-			L_ivisitor.BuildI_Indv_Zip_keybuild(pmod),
+			if('T' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_StName_keybuild(pmod)),
+			if('Z' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Zip_keybuild(pmod)),
 			if(
 				'-' in in_mod.L_build_skip_set,
 				L_ivisitor.BuildI_Indv_ZipPRLname_keybuild(pmod)
@@ -179,14 +178,14 @@ MODULE
 			
 			);
 		dobkeys := parallel(
-			L_ivisitorb.BuildI_Biz_Address_keybuild(bmod),
-			L_ivisitorb.BuildI_Biz_CityStName_keybuild(bmod),
-			L_ivisitorb.BuildI_Biz_Name_keybuild(bmod),
-			L_ivisitorb.BuildI_Biz_NameWords_keybuild(bmod),
+			if('D' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Address_keybuild(bmod)),
+			if('J' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_CityStName_keybuild(bmod)),
+			if('M' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Name_keybuild(bmod)),
+			if('W' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_NameWords_keybuild(bmod)),
 			if('Q' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Phone_keybuild(bmod)),
 			if('F' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_FEIN_keybuild(bmod)),
-			L_ivisitorb.BuildI_Biz_StName_keybuild(bmod),
-			L_ivisitorb.BuildI_Biz_Zip_keybuild(bmod),
+			if('U' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_StName_keybuild(bmod)),
+			if('Y' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Zip_keybuild(bmod)),
 			L_ivisitorb.BuildI_Biz_Custom1_keybuild(bmod),
 			L_ivisitorb.BuildI_Biz_Custom2_keybuild(bmod),
 			L_ivisitorb.BuildI_Biz_Custom3_keybuild(bmod),
@@ -212,9 +211,9 @@ MODULE
 		bmod := MakeBmod(in_mod);
 		
 		mvpkeys := parallel(
-			L_ivisitor.BuildI_Indv_Address_keymove(pmod),
-			L_ivisitor.BuildI_Indv_CityStName_keymove(pmod),
-			L_ivisitor.BuildI_Indv_Name_keymove(pmod),
+			if('A' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Address_keymove(pmod)),
+			if('I' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_CityStName_keymove(pmod)),
+			if('N' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Name_keymove(pmod)),
 			if(
 				'P' in in_mod.L_build_skip_set, 
 				output('AUTOKEY MOVE: Phone key skipped'),
@@ -225,8 +224,8 @@ MODULE
 				output('AUTOKEY MOVE: SSN key skipped'),
 				L_ivisitor.BuildI_Indv_SSN_keymove(pmod)
 			),
-			L_ivisitor.BuildI_Indv_StName_keymove(pmod),
-			L_ivisitor.BuildI_Indv_Zip_keymove(pmod),
+			if('T' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_StName_keymove(pmod)),
+			if('Z' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Zip_keymove(pmod)),
 			if(
 				'-' in in_mod.L_build_skip_set,
 				L_ivisitor.BuildI_Indv_ZipPRLname_keymove(pmod)
@@ -239,10 +238,10 @@ MODULE
 			);
 
 		mvbkeys := parallel(
-			L_ivisitorb.BuildI_Biz_Address_keymove(bmod),
-			L_ivisitorb.BuildI_Biz_CityStName_keymove(bmod),
-			L_ivisitorb.BuildI_Biz_Name_keymove(bmod),
-			L_ivisitorb.BuildI_Biz_NameWords_keymove(bmod),
+			if('D' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Address_keymove(bmod)),
+			if('J' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_CityStName_keymove(bmod)),
+			if('M' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Name_keymove(bmod)),
+			if('W' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_NameWords_keymove(bmod)),
 			if(
 				'Q' in in_mod.L_build_skip_set, 
 				output('AUTOKEYB2 MOVE: Phone key skipped'),
@@ -253,8 +252,8 @@ MODULE
 				output('AUTOKEYB2 MOVE: FEIN key skipped'),
 				L_ivisitorb.BuildI_Biz_FEIN_keymove(bmod)
 			),
-			L_ivisitorb.BuildI_Biz_StName_keymove(bmod),
-			L_ivisitorb.BuildI_Biz_Zip_keymove(bmod),
+			if('U' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_StName_keymove(bmod)),
+			if('Y' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Zip_keymove(bmod)),
 			L_ivisitorb.BuildI_Biz_Custom1_keymove(bmod),
 			L_ivisitorb.BuildI_Biz_Custom2_keymove(bmod),
 			L_ivisitorb.BuildI_Biz_Custom3_keymove(bmod),
@@ -278,9 +277,9 @@ MODULE
 		pmod := makePmod(in_mod);
 		bmod := MakeBmod(in_mod);
 		mvpkeys := parallel(
-			L_ivisitor.BuildI_Indv_Address_keymoveQA(pmod),
-			L_ivisitor.BuildI_Indv_CityStName_keymoveQA(pmod),
-			L_ivisitor.BuildI_Indv_Name_keymoveQA(pmod),
+			if('A' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Address_keymoveQA(pmod)),
+			if('I' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_CityStName_keymoveQA(pmod)),
+			if('N' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Name_keymoveQA(pmod)),
 			if(
 				'P' in in_mod.L_build_skip_set, 
 				output('AUTOKEY MOVEQA: Phone key skipped'),
@@ -291,8 +290,8 @@ MODULE
 				output('AUTOKEY MOVEQA: SSN key skipped'),
 				L_ivisitor.BuildI_Indv_SSN_keymoveQA(pmod)
 			),
-			L_ivisitor.BuildI_Indv_StName_keymoveQA(pmod),
-			L_ivisitor.BuildI_Indv_Zip_keymoveQA(pmod),
+			if('T' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_StName_keymoveQA(pmod)),
+			if('Z' not in in_mod.L_build_skip_set, L_ivisitor.BuildI_Indv_Zip_keymoveQA(pmod)),
 			if(
 				'-' in in_mod.L_build_skip_set,
 				L_ivisitor.BuildI_Indv_ZipPRLname_keymoveQA(pmod)
@@ -305,10 +304,10 @@ MODULE
 			);
 
 		mvbkeys := parallel(
-			L_ivisitorb.BuildI_Biz_Address_keymoveQA(bmod),
-			L_ivisitorb.BuildI_Biz_CityStName_keymoveQA(bmod),
-			L_ivisitorb.BuildI_Biz_Name_keymoveQA(bmod),
-			L_ivisitorb.BuildI_Biz_NameWords_keymoveQA(bmod),
+			if('D' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Address_keymoveQA(bmod)),
+			if('J' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_CityStName_keymoveQA(bmod)),
+			if('M' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Name_keymoveQA(bmod)),
+			if('W' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_NameWords_keymoveQA(bmod)),
 			if(
 				'Q'in in_mod.L_build_skip_set, 
 				output('AUTOKEYB2 MOVEQA: Phone key skipped'),
@@ -319,8 +318,8 @@ MODULE
 				output('AUTOKEYB2 MOVEQA: FEIN key skipped'),
 				L_ivisitorb.BuildI_Biz_FEIN_keymoveQA(bmod)
 			),
-			L_ivisitorb.BuildI_Biz_StName_keymoveQA(bmod),
-			L_ivisitorb.BuildI_Biz_Zip_keymoveQA(bmod),
+			if('U' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_StName_keymoveQA(bmod)),
+			if('Y' not in in_mod.L_build_skip_set, L_ivisitorb.BuildI_Biz_Zip_keymoveQA(bmod)),
 			L_ivisitorb.BuildI_Biz_Custom1_keymoveQA(bmod),
 			L_ivisitorb.BuildI_Biz_Custom2_keymoveQA(bmod),
 			L_ivisitorb.BuildI_Biz_Custom3_keymoveQA(bmod),

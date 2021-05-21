@@ -3,7 +3,7 @@
 /* DOCUMENTATION: https://confluence.rsi.lexisnexis.com/display/GTG/OTTO+-+Data+Build
 /* AUTHORS: DATA ENGINEERING (SESHA NOOKALA, OSCAR BARRIENTOS)
 /**************************************************************************************************************************************************/
-import tools, _control, FraudShared, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;
+import tools, _control, Orbit3, FraudGovPlatform_Validation, STD, FraudGovPlatform_Analytics;
 
 export Build_Kel(
 	 string pversion 	
@@ -61,11 +61,13 @@ BuildStatusReport :=
 
 			
 	Export	All := Sequential(
-										Build_Keys(pVersion).All
+										Build_Keys(pVersion).Kel
 										,Build_Base_Kel(pVersion).All
 										,Promote(pversion).buildfiles.New2Built
-										,Promote(pversion).buildfiles.Built2QA
-										,FraudGovPlatform.Promote(pversion).promote_keys
+										,Promote(pversion,,true).buildfiles.Built2QA
+										,Build_Keys(pversion).All
+										,Build_AutoKeys(pversion)			
+										,Promote(pversion,,true).promote_keys
 										,Orbit3.proc_Orbit3_CreateBuild_AddItem('FraudGov',pversion)
 										,_Control.fSubmitNewWorkunit(GenerateDashboards,ThorName)
 										,_Control.fSubmitNewWorkunit(BuildStatusReport,ECLThorName)

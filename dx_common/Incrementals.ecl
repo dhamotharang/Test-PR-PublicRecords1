@@ -57,7 +57,7 @@ EXPORT Incrementals := MODULE
         // (1) record is older than delta (stale)
         // (2) record has been deleted
         is_stale := LEFT.dt_first_field < RIGHT.dt_first_field;
-        is_delete := RIGHT.dt_last_field > 0; 
+        is_delete := RIGHT.dt_last_field > 0 AND LEFT.dt_first_field <= RIGHT.dt_last_field; 
         SELF.rid_field := IF(RIGHT.rid_field > 0 AND (is_stale OR is_delete), 
           SKIP, LEFT.rid_field); 
         SELF := LEFT;

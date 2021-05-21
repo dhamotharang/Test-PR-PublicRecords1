@@ -6,7 +6,6 @@ ThorName:=IF(_control.ThisEnvironment.Name<>'Prod_Thor',Constants.ThorName_Dev,C
 
 lECL1 :=
  'import FraudGovPlatform_Validation,Scrubs_FraudGov,ut;\n'
-+'#CONSTANT	(\'Platform\',\'FraudGov\');\n'
 +'wuname := \'FraudGov NAC Input Prep\';\n'
 +'#WORKUNIT(\'name\', wuname);\n'
 +'#WORKUNIT(\'priority\',\'high\');\n'

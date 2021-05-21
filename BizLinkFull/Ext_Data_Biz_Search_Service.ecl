@@ -1,98 +1,98 @@
-﻿/*--SOAP--
+/*--SOAP--
 <message name="Ext_Data_Biz_Search_Service">
- 
+
 <part name="parent_proxid" type="xsd:string"/>
- 
+
 <part name="sele_proxid" type="xsd:string"/>
- 
+
 <part name="org_proxid" type="xsd:string"/>
- 
+
 <part name="ultimate_proxid" type="xsd:string"/>
- 
+
 <part name="has_lgid" type="xsd:string"/>
- 
+
 <part name="empid" type="xsd:string"/>
- 
+
 <part name="source" type="xsd:string"/>
- 
+
 <part name="source_record_id" type="xsd:string"/>
- 
+
 <part name="source_docid" type="xsd:string"/>
- 
+
 <part name="company_name" type="xsd:string"/>
- 
+
 <part name="company_name_prefix" type="xsd:string"/>
- 
+
 <part name="cnp_name" type="xsd:string"/>
- 
+
 <part name="cnp_number" type="xsd:string"/>
- 
+
 <part name="cnp_btype" type="xsd:string"/>
- 
+
 <part name="cnp_lowv" type="xsd:string"/>
- 
+
 <part name="company_phone" type="xsd:string"/>
- 
+
 <part name="company_phone_3" type="xsd:string"/>
- 
+
 <part name="company_phone_3_ex" type="xsd:string"/>
- 
+
 <part name="company_phone_7" type="xsd:string"/>
- 
+
 <part name="company_fein" type="xsd:string"/>
- 
+
 <part name="company_sic_code1" type="xsd:string"/>
- 
+
 <part name="active_duns_number" type="xsd:string"/>
- 
+
 <part name="prim_range" type="xsd:string"/>
- 
+
 <part name="prim_name" type="xsd:string"/>
- 
+
 <part name="sec_range" type="xsd:string"/>
- 
+
 <part name="city" type="xsd:string"/>
- 
+
 <part name="city_clean" type="xsd:string"/>
- 
+
 <part name="st" type="xsd:string"/>
- 
+
 <part name="zip_cases" type="tns:XmlDataSet"/>
- 
+
 <part name="company_url" type="xsd:string"/>
- 
+
 <part name="isContact" type="xsd:string"/>
- 
+
 <part name="contact_did" type="xsd:string"/>
- 
+
 <part name="title" type="xsd:string"/>
- 
+
 <part name="fname" type="xsd:string"/>
- 
+
 <part name="fname_preferred" type="xsd:string"/>
- 
+
 <part name="mname" type="xsd:string"/>
- 
+
 <part name="lname" type="xsd:string"/>
- 
+
 <part name="name_suffix" type="xsd:string"/>
- 
+
 <part name="contact_ssn" type="xsd:string"/>
- 
+
 <part name="contact_email" type="xsd:string"/>
- 
+
 <part name="sele_flag" type="xsd:string"/>
- 
+
 <part name="org_flag" type="xsd:string"/>
- 
+
 <part name="ult_flag" type="xsd:string"/>
- 
+
 <part name="fallback_value" type="xsd:string"/>
- 
+
 <part name="CONTACTNAME" type="xsd:string"/>
- 
+
 <part name="STREETADDRESS" type="xsd:string"/>
- 
+
 <part name="proxid" type="unsignedInt"/>
 <part name="ultid" type="unsignedInt"/>
 <part name="orgid" type="unsignedInt"/>
@@ -109,7 +109,8 @@
 <part name="UniqueID" type="xsd:integer"/>
 </message>
 */
- 
+
+
 /*--INFO-- Search Ext_Data for matching data!</p>
 <p>Input fields are cleaned according to the standard hygiene requirements of this file.</p>
 <p>The more data input the better; but unless one of the following field combinations are present the UBER key will be used:-</p>
@@ -123,6 +124,8 @@
 <p>company_phone_7</p>
 <p>company_fein</p>
 <p>company_url</p>
+<p>fname_preferred:lname:zip</p>
+<p>fname_preferred:lname:st</p>
 <p>fname_preferred:lname</p>
 <p>contact_ssn</p>
 <p>contact_email</p>
@@ -137,114 +140,117 @@ EXPORT Ext_Data_Biz_Search_Service := MACRO
   UNSIGNED Input_MaxIds := IF(InputMaxIds0=0,50,InputMaxIds0);
   UNSIGNED Input_LeadThreshold := 0 : STORED('LeadThreshold', FORMAT(SEQUENCE(3)));
   UNSIGNED Input_EFR_BitMap := 0 : STORED('EFR_BitMap', FORMAT(SEQUENCE(4)));
- 
+
   SALT44.StrType Input_parent_proxid := '' : STORED('parent_proxid', FORMAT(SEQUENCE(5)));
- 
+
   SALT44.StrType Input_sele_proxid := '' : STORED('sele_proxid', FORMAT(SEQUENCE(6)));
- 
+
   SALT44.StrType Input_org_proxid := '' : STORED('org_proxid', FORMAT(SEQUENCE(7)));
- 
+
   SALT44.StrType Input_ultimate_proxid := '' : STORED('ultimate_proxid', FORMAT(SEQUENCE(8)));
- 
+
   SALT44.StrType Input_has_lgid := '' : STORED('has_lgid', FORMAT(SEQUENCE(9)));
- 
+
   SALT44.StrType Input_empid := '' : STORED('empid', FORMAT(SEQUENCE(10)));
- 
+
   SALT44.StrType Input_source := '' : STORED('source', FORMAT(SEQUENCE(11)));
- 
+
   SALT44.StrType Input_source_record_id := '' : STORED('source_record_id', FORMAT(SEQUENCE(12)));
- 
+
   SALT44.StrType Input_source_docid := '' : STORED('source_docid', FORMAT(SEQUENCE(13)));
- 
+
   SALT44.StrType Input_company_name := '' : STORED('company_name', FORMAT(SEQUENCE(14)));
- 
+
   SALT44.StrType Input_company_name_prefix := '' : STORED('company_name_prefix', FORMAT(SEQUENCE(15)));
- 
+
   SALT44.StrType Input_cnp_name := '' : STORED('cnp_name', FORMAT(SEQUENCE(16)));
- 
+
   SALT44.StrType Input_cnp_number := '' : STORED('cnp_number', FORMAT(SEQUENCE(17)));
- 
+
   SALT44.StrType Input_cnp_btype := '' : STORED('cnp_btype', FORMAT(SEQUENCE(18)));
- 
+
   SALT44.StrType Input_cnp_lowv := '' : STORED('cnp_lowv', FORMAT(SEQUENCE(19)));
- 
+
   SALT44.StrType Input_company_phone := '' : STORED('company_phone', FORMAT(SEQUENCE(20)));
- 
+
   SALT44.StrType Input_company_phone_3 := '' : STORED('company_phone_3', FORMAT(SEQUENCE(21)));
- 
+
   SALT44.StrType Input_company_phone_3_ex := '' : STORED('company_phone_3_ex', FORMAT(SEQUENCE(22)));
- 
+
   SALT44.StrType Input_company_phone_7 := '' : STORED('company_phone_7', FORMAT(SEQUENCE(23)));
- 
+
   SALT44.StrType Input_company_fein := '' : STORED('company_fein', FORMAT(SEQUENCE(24)));
- 
+
   SALT44.StrType Input_company_sic_code1 := '' : STORED('company_sic_code1', FORMAT(SEQUENCE(25)));
- 
+
   SALT44.StrType Input_active_duns_number := '' : STORED('active_duns_number', FORMAT(SEQUENCE(26)));
- 
+
   SALT44.StrType Input_prim_range := '' : STORED('prim_range', FORMAT(SEQUENCE(27)));
- 
+
   SALT44.StrType Input_prim_name := '' : STORED('prim_name', FORMAT(SEQUENCE(28)));
- 
+
   SALT44.StrType Input_sec_range := '' : STORED('sec_range', FORMAT(SEQUENCE(29)));
- 
+
   SALT44.StrType Input_city := '' : STORED('city', FORMAT(SEQUENCE(30)));
- 
+
   SALT44.StrType Input_city_clean := '' : STORED('city_clean', FORMAT(SEQUENCE(31)));
- 
+
   SALT44.StrType Input_st := '' : STORED('st', FORMAT(SEQUENCE(32)));
- 
+
   DATASET(BizLinkFull.Process_Biz_Layouts.layout_zip_cases) Input_zip := DATASET([],BizLinkFull.Process_Biz_Layouts.layout_zip_cases)  : STORED('zip_cases', FORMAT(SEQUENCE(33)));
   SALT44.StrType Input_company_url := '' : STORED('company_url', FORMAT(SEQUENCE(34)));
- 
+
   SALT44.StrType Input_isContact := '' : STORED('isContact', FORMAT(SEQUENCE(35)));
- 
+
   SALT44.StrType Input_contact_did := '' : STORED('contact_did', FORMAT(SEQUENCE(36)));
- 
+
   SALT44.StrType Input_title := '' : STORED('title', FORMAT(SEQUENCE(37)));
- 
+
   SALT44.StrType Input_fname := '' : STORED('fname', FORMAT(SEQUENCE(38)));
- 
+
   SALT44.StrType Input_fname_preferred := '' : STORED('fname_preferred', FORMAT(SEQUENCE(39)));
- 
+
   SALT44.StrType Input_mname := '' : STORED('mname', FORMAT(SEQUENCE(40)));
- 
+
   SALT44.StrType Input_lname := '' : STORED('lname', FORMAT(SEQUENCE(41)));
- 
+
   SALT44.StrType Input_name_suffix := '' : STORED('name_suffix', FORMAT(SEQUENCE(42)));
- 
+
   SALT44.StrType Input_contact_ssn := '' : STORED('contact_ssn', FORMAT(SEQUENCE(43)));
- 
+
   SALT44.StrType Input_contact_email := '' : STORED('contact_email', FORMAT(SEQUENCE(44)));
- 
+
   SALT44.StrType Input_sele_flag := '' : STORED('sele_flag', FORMAT(SEQUENCE(45)));
- 
+
   SALT44.StrType Input_org_flag := '' : STORED('org_flag', FORMAT(SEQUENCE(46)));
- 
+
   SALT44.StrType Input_ult_flag := '' : STORED('ult_flag', FORMAT(SEQUENCE(47)));
- 
+
   SALT44.StrType Input_fallback_value := '' : STORED('fallback_value', FORMAT(SEQUENCE(48)));
- 
+
   SALT44.StrType Input_CONTACTNAME := '' : STORED('CONTACTNAME', FORMAT(SEQUENCE(49)));
- 
+
   SALT44.StrType Input_STREETADDRESS := '' : STORED('STREETADDRESS', FORMAT(SEQUENCE(50)));
- 
- 
+
+
+
   BOOLEAN FullMatch := FALSE : STORED('MatchAllInOneRecord', FORMAT(SEQUENCE(51)));
   BOOLEAN RecordsOnly := FALSE: STORED('RecordsOnly', FORMAT(SEQUENCE(52)));
- 
+
+
   UNSIGNED e_seleid := 0 : STORED('seleid', FORMAT(SEQUENCE(53)));
   UNSIGNED e_orgid := 0 : STORED('orgid', FORMAT(SEQUENCE(54)));
   UNSIGNED e_ultid := 0 : STORED('ultid', FORMAT(SEQUENCE(55)));
   UNSIGNED e_powid := 0 : STORED('powid', FORMAT(SEQUENCE(56)));
   UNSIGNED e_proxid := 0 : STORED('proxid', FORMAT(SEQUENCE(57)));
   UNSIGNED e_rcid := 0 : STORED('rcid', FORMAT(SEQUENCE(58)));
- 
+
   BOOLEAN Input_bGetAllScores := FALSE : STORED('bGetAllScores', FORMAT(SEQUENCE(59)));
- 
+
   BOOLEAN Input_disableForce := FALSE : STORED('disableForce', FORMAT(SEQUENCE(60)));
- 
- 
+
+
+
   Template := DATASET([],BizLinkFull.Process_Biz_Layouts.InputLayout);
   Input_Data := DATASET([{(TYPEOF(Template.UniqueID))Input_UniqueID,Input_MaxIds,Input_LeadThreshold,Input_bGetAllScores,Input_disableForce,Input_EFR_BitMap
   ,(TYPEOF(Template.parent_proxid))Input_parent_proxid
@@ -293,10 +299,10 @@ EXPORT Ext_Data_Biz_Search_Service := MACRO
   ,(TYPEOF(Template.fallback_value))Input_fallback_value
   ,(TYPEOF(Template.CONTACTNAME))Input_CONTACTNAME
   ,(TYPEOF(Template.STREETADDRESS))Input_STREETADDRESS
- 
+
   ,RecordsOnly,FullMatch,e_rcid,e_proxid,e_seleid,e_orgid,e_ultid,e_powid}],BizLinkFull.Process_Biz_Layouts.InputLayout);
   pm := BizLinkFull.Mod_Ext_Data().MEOW_(Input_Data); // Instantiate search module
- 
+
   OUTPUT(pm.Data_,NAMED('Results'));
 ENDMACRO;
- 
+

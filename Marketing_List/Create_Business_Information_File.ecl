@@ -73,22 +73,28 @@ functionmacro
     ,self.seleid_level.SIC3               := right.SIC3                          ;
     ,self.seleid_level.SIC4               := right.SIC4                          ;
     ,self.seleid_level.SIC5               := right.SIC5                          ;
-    // ,self.seleid_level.src_sics           := right.src_sics                   ;
+    ,self.seleid_level.src_sics           := right.src_sics                      ;
+    ,self.seleid_level.sic_sources        := right.sic_sources                   ;
     ,self.seleid_level.NAICS_Primary      := right.NAICS_Primary                 ;
     ,self.seleid_level.NAICS2             := right.NAICS2                        ;
     ,self.seleid_level.NAICS3             := right.NAICS3                        ;
     ,self.seleid_level.NAICS4             := right.NAICS4                        ;
     ,self.seleid_level.NAICS5             := right.NAICS5                        ;
-    // ,self.seleid_level.src_naics          := right.src_naics                    ;
+    ,self.seleid_level.src_naics          := right.src_naics                     ;
+    ,self.seleid_level.naics_sources      := right.naics_sources                 ;
                                                                                   
     ,self.seleid_level.number_of_employees  := if(right.seleid != 0 and pPullFromBest = true                                      ,right.number_of_employees  ,-1);
     ,self.seleid_level.annual_revenue       := if(right.seleid != 0 and pPullFromBest = true                                      ,right.annual_revenue       ,-1);
     #IF(Best_Has_Source_Fields = true)
       ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue      >= 0 and pPullFromBest = true ,right.src_revenue          ,'');
       ,self.seleid_level.src_employees        := if(right.seleid != 0 and right.number_of_employees >= 0 and pPullFromBest = true ,right.src_employees        ,'');
+      ,self.seleid_level.revenue_sources      := if(right.seleid != 0 and right.annual_revenue      >= 0 and pPullFromBest = true ,right.revenue_sources      ,0 );
+      ,self.seleid_level.employees_sources    := if(right.seleid != 0 and right.number_of_employees >= 0 and pPullFromBest = true ,right.employees_sources    ,0 );
     #ELSE
       ,self.seleid_level.src_revenue          := '';
       ,self.seleid_level.src_employees        := '';
+      ,self.seleid_level.revenue_sources      := 0 ;
+      ,self.seleid_level.employees_sources    := 0 ;
     #END
     // ,self.seleid_level.src_revenue          := if(right.seleid != 0 and right.annual_revenue      >= 0  ,right.src_revenue          ,'');
     // ,self.seleid_level.src_employees        := if(right.seleid != 0 and right.number_of_employees >= 0  ,right.src_employees        ,'');
@@ -124,22 +130,24 @@ functionmacro
 
   ds_industry_codes   := Marketing_List.Best_Industry_Codes (%ds_base_best%   ,ds_mrktg_list_best_seleid  ,pDebug ,pSampleProxids);
 
-  ds_both_best_both_base_plus_Industry := join(ds_both_best_both_base ,ds_industry_codes  ,left.seleid = right.seleid ,transform(recordof(left)
+  ds_both_best_both_base_plus_Industry := ds_both_best_both_base;
+  /*
+join(ds_both_best_both_base ,ds_industry_codes  ,left.seleid = right.seleid ,transform(recordof(left)
     // ,self.seleid_level.SIC_Primary        := right.SIC_Primary       
     // ,self.seleid_level.SIC2               := right.SIC2              
     // ,self.seleid_level.SIC3               := right.SIC3              
     // ,self.seleid_level.SIC4               := right.SIC4              
     // ,self.seleid_level.SIC5               := right.SIC5  
-    ,self.seleid_level.src_sics           := right.src_sics
+    // ,self.seleid_level.src_sics           := right.src_sics
     // ,self.seleid_level.NAICS_Primary      := right.NAICS_Primary     
     // ,self.seleid_level.NAICS2             := right.NAICS2            
     // ,self.seleid_level.NAICS3             := right.NAICS3            
     // ,self.seleid_level.NAICS4             := right.NAICS4            
     // ,self.seleid_level.NAICS5             := right.NAICS5            
-    ,self.seleid_level.src_naics          := right.src_naics
+    // ,self.seleid_level.src_naics          := right.src_naics
     ,self                                 := left
   ) ,hash ,left outer);
-
+*/
   ds_best_emps_sales  := Marketing_List.Best_Sales_And_Employees(
                            seleid
                           ,pdca_base        
@@ -154,7 +162,7 @@ functionmacro
                           ,pSampleProxids
                         );
 
-  // -- if no data for emp num or revenue, set to -1.
+  #IF(pPullFromBest = false)// -- if no data for emp num or revenue, set to -1.
   ds_return_result_biz := join(ds_both_best_both_base_plus_Industry ,ds_best_emps_sales  ,left.seleid = right.seleid ,transform(recordof(left)
     ,self.seleid_level.number_of_employees  := map(right.seleid != 0                                    and pPullFromBest = false => right.number_of_employees  ,pPullFromBest = true => left.seleid_level.number_of_employees  ,-1)
     ,self.seleid_level.annual_revenue       := map(right.seleid != 0                                    and pPullFromBest = false => right.annual_revenue       ,pPullFromBest = true => left.seleid_level.annual_revenue       ,-1)
@@ -162,13 +170,20 @@ functionmacro
     ,self.seleid_level.src_employees        := map(right.seleid != 0 and right.number_of_employees >= 0 and pPullFromBest = false => right.src_employees        ,pPullFromBest = true => left.seleid_level.src_employees        ,'')  //PUT BACK UNTIL BEST HAS THIS STUFF!!!
     ,self                                   := left
   ) ,hash ,left outer);
+  #ELSE
+    ds_return_result_biz := ds_both_best_both_base_plus_Industry;
+  #END
   
   ds_return_result_validate_address := ds_return_result_biz(
      Marketing_List.Validate_Address(proxid_level.business_address,proxid_level.city,proxid_level.state,proxid_level.zip5)
     ,Marketing_List.Validate_Address(seleid_level.business_address,seleid_level.city,seleid_level.state,seleid_level.zip5)
   );
 
-  ds_return_result := project(ds_return_result_validate_address ,Marketing_List.Layouts.business_information);  
+  ds_return_result := project(ds_return_result_validate_address ,transform(Marketing_List.Layouts.business_information
+    ,self.seleid_level.business_name := regexreplace('[^[:print:]]' ,left.seleid_level.business_name ,'' ,nocase)
+    ,self.proxid_level.business_name := regexreplace('[^[:print:]]' ,left.proxid_level.business_name ,'' ,nocase)
+    ,self                            := left
+  ));  
   
   ds_filtered_out_recs := join(ds_return_result_biz ,ds_return_result ,left.proxid = right.proxid ,transform(left)  ,left only,hash);
 

@@ -1,4 +1,4 @@
-﻿EXPORT macCleanAnalyticUIOutput(dIn, rIn, strCodesToIgnore = '-99999\', \'99998\', \'-99997') := FUNCTIONMACRO
+﻿EXPORT macCleanAnalyticUIOutput(dIn, rIn, strCodesToIgnore = '-99999\', \'-99998\', \'-99997') := FUNCTIONMACRO
   LOADXML('<xml/>');
   #DECLARE(FieldsCleaning) #SET(FieldsCleaning, '')
   #EXPORTXML(Fields, RECORDOF(rIn))

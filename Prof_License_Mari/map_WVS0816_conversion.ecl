@@ -79,7 +79,12 @@ EXPORT map_WVS0816_conversion(STRING pVersion) := FUNCTION
 		// License Information
 		SELF.LICENSE_NBR	    := TrimLicNo;
 		SELF.RAW_LICENSE_TYPE	:= TrimLicType;
-		SELF.STD_LICENSE_TYPE := trim(SELF.RAW_LICENSE_TYPE,LEFT,RIGHT);
+		SELF.STD_LICENSE_TYPE := MAP(TrimLicType='CR' => 'R',
+																	TrimLicType='LR' => 'L',
+																	TrimLicType='CG' => 'G',
+																	' ');
+		
+		// trim(SELF.RAW_LICENSE_TYPE,LEFT,RIGHT);
 		
 		SELF.RAW_LICENSE_STATUS := '';
 		SELF.STD_LICENSE_STATUS := 'A';

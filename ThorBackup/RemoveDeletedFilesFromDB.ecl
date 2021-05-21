@@ -8,7 +8,26 @@ shared desprayfilename := '~yogurt::desrpay::'+regexreplace('-',WORKUNIT[2..],''
 export getlist() := function
 	superlist := sort(thorbackup.Constants.Fulllist(environment),-subname);
 	ds := sort(fileservices.logicalfilelist()(ut.DaysApart(regexreplace('-',modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays),-name);
-	fromdbds := sort(thorbackup.GetDeleteFilesFromDB(,environment,,,,'2')(ut.DaysApart(regexreplace('-',modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays),-filename);
+	d := thorbackup.GetDeleteFilesFromDB(,environment,,,,'2',noofdays := (string)noofdays);//(ut.DaysApart(regexreplace('-',modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays),-filename);
+	
+	s_rec := record
+		d;
+		string slimmodified := '';
+		integer ndays := '';
+		integer daysapart := '';
+		boolean isdelete := false;
+	end;
+	
+	s_rec x(d l) := transform
+		self.slimmodified := regexreplace('-',l.modified,'')[1..8];
+		self.ndays := thorbackup.constants.getthreshold(noofdays).ndays;
+		self.daysapart := ut.DaysApart(regexreplace('-',l.modified,'')[1..8],ut.GetDate);
+		self.isdelete := (ut.DaysApart(regexreplace('-',l.modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays);
+		self := l;
+	end;
+	
+	fromdbds := sort(project(d,x(left)),-filename)(isdelete);
+	
 	// files moved to in super
 	typeof(fromdbds) getfilestodelete(superlist l, fromdbds r) := transform
 		self := r;
@@ -54,7 +73,8 @@ export getlist() := function
 	
 	
 	
-	return groupbaskets;
+	return groupbaskets;//(ut.DaysApart(regexreplace('-',modified,'')[1..8],ut.GetDate) > thorbackup.constants.getthreshold(noofdays).ndays)
+										
 
 end;
 

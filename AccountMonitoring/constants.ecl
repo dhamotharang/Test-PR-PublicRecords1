@@ -86,5 +86,9 @@ EXPORT constants := MODULE
 		PSEUDO_ENVIRONMENT = PSEUDO.TEST1 => 'TEST1::',
 		PSEUDO_ENVIRONMENT = PSEUDO.TEST2 => 'TEST2::',
 		/* DEFAULT */                        '');
-		
+	
+	// Vip for roxie cluster
+	// Note: currently defined in constants, once  _control.RoxieEnv is updated, should switch.	
+	EXPORT CERT_VIP := 'http://certstagingvip.hpcc.risk.regn.net:9876';
+	EXPORT PROD_VIP := 'http://roxiethorvip.hpcc.risk.regn.net:9856';
 END;

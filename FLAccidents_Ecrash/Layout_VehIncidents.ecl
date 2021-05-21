@@ -24,8 +24,8 @@
 	END;
 	
 	EXPORT enum_code_desc := RECORD
-   STRING50 code;
-   STRING50 description;
+   STRING65 code;
+   STRING150 description;
   END;
 	
 	EXPORT Citations_ChildRec := RECORD

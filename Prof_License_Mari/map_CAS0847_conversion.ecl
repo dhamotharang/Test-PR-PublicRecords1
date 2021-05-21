@@ -409,7 +409,7 @@ EXPORT map_CAS0847_conversion(STRING pVersion) := FUNCTION
 	ds_map_base := project(OutRecs, xTransToBase(left));
 
 	// Adding to Superfile
-	d_final := output(ds_map_base, ,mari_dest+pVersion+'::'+src_cd,/*__compressed__,*/overwrite);
+	d_final := output(ds_map_base, ,mari_dest+pVersion+'::'+src_cd,__compressed__,overwrite);
 			
 	// add_super := sequential(fileservices.startsuperfiletransaction(),
 														// fileservices.addsuperfile(mari_dest+src_cd,mari_dest+pVersion+'::'+src_cd),

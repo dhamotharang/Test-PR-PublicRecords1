@@ -8,6 +8,8 @@
     BIPV2_Field_Suppression._BWR_Remove_Candidates                -- Remove Candidates from custome suppression/explosion file.
     BIPV2_Field_Suppression._BWR_Initialize_Suppression_Counter   -- initialize suppression counter for suppression file to zero.  This make the next suppression call using this file explode the clusters too.
     BIPV2_Field_Suppression._BWR_Increment_Suppression_Counter    -- increment the suppression counter in the suppression file + 1.  This will make the next suppression call not explode the clusters.
+    BIPV2_Field_Suppression._BWR_Decrement_Suppression_Counter    -- decrement the suppression counter in the suppression file - 1.  This will basically return the suppression back to before the last call of it.  
+                                                                      Good for rollbacks where you need to rerun the code that calls the suppression.
     BIPV2_Field_Suppression.mac_Suppress                          -- Suppression macro call.  Will need to modify this to add fields/context/id fields if we add new fields to the suppression file.
                                                                      Future improvement is to generate the code from the suppression file to call this macro.
   Underlinks:
@@ -18,12 +20,14 @@
 
   Suppression:
     BIPV2.BWR_ManualSuppression                 -- suppress records from output keys in the kfetch(example here: BIPV2_Suppression.BWR_Test).
-    BIPV2_Suppression.BWR_ManualSuppression     -- same as BIPV2.ManualSuppression.addCandidates from BIPV2.BWR_ManualSuppression above.
+    BIPV2_Suppression.BWR_ManualSuppression     -- adds seleid, proxid pairs to the suppression key, updates BIPV2SuppressionKeys in DOPS.  this can suppress proxids in queries.
 
     BIPV2_Field_Suppression._BWR_Add_Candidates                   -- Add candidates to custom Suppression/Explosion file.  Will work for all clusters/fields.
     BIPV2_Field_Suppression._BWR_Remove_Candidates                -- Remove Candidates from custome suppression/explosion file.
     BIPV2_Field_Suppression._BWR_Initialize_Suppression_Counter   -- initialize suppression counter for suppression file to zero.  This make the next suppression call using this file explode the clusters too.
     BIPV2_Field_Suppression._BWR_Increment_Suppression_Counter    -- increment the suppression counter in the suppression file + 1.  This will make the next suppression call not explode the clusters.
+    BIPV2_Field_Suppression._BWR_Decrement_Suppression_Counter    -- decrement the suppression counter in the suppression file - 1.  This will basically return the suppression back to before the last call of it.  
+                                                                      Good for rollbacks where you need to rerun the code that calls the suppression.
     BIPV2_Field_Suppression.mac_Suppress                          -- Suppression macro call.  Will need to modify this to add fields/context/id fields if we add new fields to the suppression file.
                                                                      Future improvement is to generate the code from the suppression file to call this macro.
     

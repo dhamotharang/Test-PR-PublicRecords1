@@ -78,20 +78,24 @@ function
     self.business_email      := ''                                  ;//need to get this from the base file
     self.annual_revenue      := 0                                   ;
     self.src_revenue         := ''                                  ;
+    self.revenue_sources     := 0                                   ;
     self.number_of_employees := 0                                   ;
     self.src_employees       := ''                                  ;
+    self.employees_sources   := 0                                   ;
     self.SIC_Primary         := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC2                := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC3                := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC4                := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.SIC5                := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.src_sics            := ''                                  ;
+    self.sic_sources         := 0                                   ;
     self.NAICS_Primary       := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS2              := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS3              := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS4              := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.NAICS5              := ''                                  ; //need to get these from the base file so we can rank them and use dt_last_seen
     self.src_naics           := ''                                  ;
+    self.naics_sources       := 0                                   ;
     self.dt_first_seen       := 0                                   ;  //need to get from the base file
     self.dt_last_seen        := 0                                   ;  //need to get from the base file
   ));

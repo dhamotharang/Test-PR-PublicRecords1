@@ -3,18 +3,20 @@
 EXPORT Constants := module
  EXPORT dops_name := 'PhonesMetadataKeys';
  
- //infiles are current production copies of the PhoneFraud base files at the time of the prte build
-	EXPORT in_phones_ported_metadata	:= Data_Services.foreign_prod + 'thor_data400::base::phones::ported_metadata_main';
-	EXPORT in_carrier_reference						:= Data_Services.foreign_prod + 'thor_data400::base::phones::source_reference_main';
-	
-	EXPORT base_phones_ported_metadata	:= '~prte::base::phones::ported_metadata_main';
-	EXPORT base_carrier_reference 			 	:= '~prte::base::phones::phones::source_reference_main';
-	
- EXPORT KeyName_phones := '~prte::key::';
+ Export trans_in_name:= '~prte::in::met::metadata_trans';
 
- EXPORT KeyName_phones_ported_metadata := 	'phones_ported_metadata'; 
- EXPORT KeyName_carrier_reference:= 	'phonesmetadata::carrier_reference'; 
+ Export type_in_name:= '~prte::in::met::metadata_type';
+
+ Export trans_in_prime_name:= '~thor_data400::key::phones_transaction_qa';
+
+ export type_in_prime_name:='~thor_data400::key::phones_type_qa';
  
- Export KeyName_lerg6 :='phones_lerg6';
-	 
-END;
+ Export trans_base_name:= '~prte::base::metadata_trans';
+
+ Export type_base_name:= '~prte::base::metadata_type';
+ 
+ Export KeyName_trans:= 	'~prte::key::phones_transaction_'; 
+ 
+ Export KeyName_type:= 	'~prte::key::phones_type_'; 
+ 
+ END;

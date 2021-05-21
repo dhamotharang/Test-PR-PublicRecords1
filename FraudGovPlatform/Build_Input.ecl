@@ -1,7 +1,7 @@
-﻿import tools, FraudShared,FraudGovPlatform_Validation;
+﻿import tools, FraudGovPlatform_Validation;
 EXPORT Build_Input (
 	 string pversion
-	,dataset(FraudShared.Layouts.Input.mbs) MBS_Sprayed = FraudShared.Files().Input.MBS.sprayed
+	,dataset(Layouts.Input.mbs) MBS_Sprayed = Files().Input.MBS.sprayed
 	) :=
 module
 

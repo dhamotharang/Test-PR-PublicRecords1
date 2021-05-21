@@ -99,9 +99,23 @@ History_Analysis.Layouts.statisticsRec tCalculate(CombinedRec L, dataset(Combine
         Self.StDev_FilesizePercent:=SimpleStats[2].sd;
         Self.Plus2StDev_FilesizePercent:=Self.Mean_FilesizePercent+(2*Self.StDev_FilesizePercent);
         Self.Minus2StDev_FilesizePercent:=Self.Mean_FilesizePercent-(2*Self.StDev_FilesizePercent);
-        self.NumLessThanQ1_FilesizePercent:=count(R(number=2 and value<Self.Q1_FilesizePercent));
-        self.BtwnQ1AndQ3_FilesizePercent:=count(R(number=2 and value>=Self.Q1_FilesizePercent and value<=Self.Q3_FilesizePercent));
-        self.NumMoreThanQ3_FilesizePercent:=count(R(number=2 and value>Self.Q3_FilesizePercent));
+        
+        //Calculations For Thresholds Percent Change Record Count
+        Actual_Difference_Median_Q1_Size:=map(
+            self.median_FilesizePercent<0 and self.Q1_FilesizePercent<0=>ABS(self.Q1_FilesizePercent-self.median_FilesizePercent),
+            self.median_FilesizePercent >= 0 and self.Q1_FilesizePercent<0=>self.median_FilesizePercent+abs(self.Q1_FilesizePercent),
+            self.median_FilesizePercent-self.Q1_FilesizePercent
+        );
+        Actual_Difference_Q3_Median_Size:=map(
+            self.Q3_FilesizePercent<0 and self.median_FilesizePercent<0=>ABS(self.median_FilesizePercent-self.Q3_FilesizePercent),
+            self.Q3_FilesizePercent >= 0 and self.median_FilesizePercent<0=>self.Q3_FilesizePercent+abs(self.median_FilesizePercent),
+            self.Q3_FilesizePercent-self.median_FilesizePercent
+        );
+        Self.MinThresholdSize:=if(truncate(Self.median_FilesizePercent-(2*Actual_Difference_Median_Q1_Size))>=0,-1,truncate(Self.median_FilesizePercent-(2*Actual_Difference_Median_Q1_Size)));
+        Self.MaxThresholdSize:=if(roundup(Self.median_FilesizePercent+(2*Actual_Difference_Q3_Median_Size))<=0,1,roundup(Self.median_FilesizePercent+(2*Actual_Difference_Q3_Median_Size)));
+        self.NumLessThanMinThresholdSize:=count(R(number=2 and value<Self.MinThresholdSize));
+        self.BtwnThresholdSize:=count(R(number=2 and value>=Self.MinThresholdSize and value<=Self.MaxThresholdSize));
+        self.NumMoreThanMaxThresholdSize:=count(R(number=2 and value>Self.MaxThresholdSize));
         //Record Count Calculations
         //Real
         Self.Min_RecordCountReal:=SimpleStats[3].minval;
@@ -132,11 +146,23 @@ History_Analysis.Layouts.statisticsRec tCalculate(CombinedRec L, dataset(Combine
         Self.StDev_RecordCountPercent:=SimpleStats[4].sd;
         Self.Plus2StDev_RecordCountPercent:=Self.Mean_RecordCountPercent+(2*Self.StDev_RecordCountPercent);
         Self.Minus2StDev_RecordCountPercent:=Self.Mean_RecordCountPercent-(2*Self.StDev_RecordCountPercent);
-				Self.MinThreshold:=if(truncate(Self.median_RecordCountPercent-(2*(Self.median_RecordCountPercent-Self.Q1_RecordCountPercent)))>=0,-1,truncate(Self.median_RecordCountPercent-(2*(Self.median_RecordCountPercent-Self.Q1_RecordCountPercent))));
-        Self.MaxThreshold:=roundup(Self.median_RecordCountPercent+(2*(Self.Q3_RecordCountPercent-Self.median_RecordCountPercent)));
-        self.NumLessThanMinThreshold:=count(R(number=4 and value<Self.MinThreshold));
-        self.BtwnMinThresholdAndMaxThreshold:=count(R(number=4 and value>=Self.MinThreshold and value<=Self.MaxThreshold));
-        self.NumMoreThanMaxThreshold:=count(R(number=4 and value>Self.MaxThreshold));
+        
+        //Calculations For Thresholds Percent Change Record Count
+        Actual_Difference_Median_Q1_Count:=map(
+            self.median_RecordCountPercent<0 and self.Q1_RecordCountPercent<0=>ABS(self.Q1_RecordCountPercent-self.median_RecordCountPercent),
+            self.median_RecordCountPercent >= 0 and self.Q1_RecordCountPercent<0=>self.median_RecordCountPercent+abs(self.Q1_RecordCountPercent),
+            self.median_RecordCountPercent-self.Q1_RecordCountPercent
+        );
+        Actual_Difference_Q3_Median_Count:=map(
+            self.Q3_RecordCountPercent<0 and self.median_RecordCountPercent<0=>ABS(self.median_RecordCountPercent-self.Q3_RecordCountPercent),
+            self.Q3_RecordCountPercent >= 0 and self.median_RecordCountPercent<0=>self.Q3_RecordCountPercent+abs(self.median_RecordCountPercent),
+            self.Q3_RecordCountPercent-self.median_RecordCountPercent
+        );
+        Self.MinThresholdCount:=if(truncate(Self.median_RecordCountPercent-(2*Actual_Difference_Median_Q1_Count))>=0,-1,truncate(Self.median_RecordCountPercent-(2*Actual_Difference_Median_Q1_Count)));
+        Self.MaxThresholdCount:=if(roundup(Self.median_RecordCountPercent+(2*Actual_Difference_Q3_Median_Count))<=0,1,roundup(Self.median_RecordCountPercent+(2*Actual_Difference_Q3_Median_Count)));
+        self.NumLessThanMinThresholdCount:=count(R(number=4 and value<Self.MinThresholdCount));
+        self.BtwnThresholdCount:=count(R(number=4 and value>=Self.MinThresholdCount and value<=Self.MaxThresholdCount));
+        self.NumMoreThanMaxThresholdCount:=count(R(number=4 and value>Self.MaxThresholdCount));
         Self:=L;
     END;
 

@@ -1,6 +1,6 @@
-export MAC_AcceptSK_to_QA(fname_in,outaction,diffing='false',
+﻿export MAC_AcceptSK_to_QA(fname_in,outaction,diffing='false',
                           accept_skip_set='[]',
-						  useAllLookups = 'false') :=
+						  useAllLookups = 'false',numgenerations = '3',isDelta='false') :=
 MACRO
 
 #uniquename(out1);
@@ -14,16 +14,18 @@ MACRO
 #uniquename(out7);
 #uniquename(out8);
 
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Address','Q',%out1%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'CityStName','Q',%out2%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Name','Q',%out3%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Phone','Q',%out4%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Phone2','Q',%out4_2%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'SSN','Q',%out5%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'SSN2','Q',%out5_2%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'StName','Q',%out6%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Zip','Q',%out7%,,diffing)
-RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'ZipPRLName','Q',%out8%,,diffing)
+//DF-29296: Add the option - isDelta for incremental key movement 
+
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Address','Q',%out1%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'CityStName','Q',%out2%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Name','Q',%out3%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Phone','Q',%out4%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Phone2','Q',%out4_2%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'SSN','Q',%out5%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'SSN2','Q',%out5_2%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'StName','Q',%out6%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'Zip','Q',%out7%,numgenerations,diffing,isDelta)
+RoxieKeyBuild.MAC_SK_Move_v2(fname_in+'ZipPRLName','Q',%out8%,numgenerations,diffing,isDelta)
 
 
 outaction := if('C' in accept_skip_set,output('AUTOKEY MOVE: All Contact keys skipped'),

@@ -1,4 +1,4 @@
-Import ut;
+﻿Import Data_Services,Seed_Files;
 
 TestSeedLayout := record
   string20 dataset_name;
@@ -35,5 +35,4 @@ TestSeedLayout := record
 END;
 
 //Please rename the input file appropriately
-// EXPORT file_AMLRiskAttributesBusn := DATASET('~mwalklin::in::amlattrib_business_testseeds', TestSeedLayout, CSV(HEADING(single), QUOTE('"')));
-EXPORT file_AMLRiskAttributesbusn := DATASET('~thor_data400::base::testseed_amlriskattributesbusn', TestSeedLayout, CSV(HEADING(single), QUOTE('"')));
+EXPORT file_AMLRiskAttributesbusn := DATASET(Data_Services.Data_location.Prefix('NONAMEGIVEN')+'~thor_data400::base::testseed_amlriskattributesbusn', TestSeedLayout, CSV(HEADING(single), QUOTE('"')));
