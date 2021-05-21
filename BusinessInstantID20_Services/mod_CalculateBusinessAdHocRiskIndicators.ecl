@@ -3,6 +3,7 @@ EXPORT Mod_CalculateBusinessAdHocRiskIndicators( DATASET(BusinessInstantID20_Ser
                         Business_Risk_BIP.Layouts.Shell BusShell, 
                         BusinessInstantID20_Services.iOptions Options,
                         DATASET(BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat) watchlist_results,
+                        INTEGER  SEQ,
                         INTEGER cnt
                         ) := 
 		MODULE
@@ -10,20 +11,20 @@ EXPORT Mod_CalculateBusinessAdHocRiskIndicators( DATASET(BusinessInstantID20_Ser
       SHARED bus_verification      := BusinessInstantID20_Services.mod_CalculateBVI( BusShell, useSBFE,watchlist_results);
       SHARED mod_Risk_Indicators   := Business_Risk_BIP.mod_CalculateRiskIndicators( BusShell, bus_verification.bvi, bus_verification.bvi_desc_key, useSBFE );
       SHARED pop_bus_name          := Business_Risk_BIP.Common.SetBoolean(TRIM(ds_input[1].CompanyName) <> '' OR TRIM(ds_input[1].AltCompanyName) <> '');
-      SHARED BOOLEAN OFACHit := ((watchlist_results[1].bus_ofac_table_1 <> '' AND watchlist_results[1].bus_ofac_record_number_1[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_1='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_2 <> '' AND watchlist_results[1].bus_ofac_record_number_2[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_2='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_3 <> '' AND watchlist_results[1].bus_ofac_record_number_3[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_3='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_4 <> '' AND watchlist_results[1].bus_ofac_record_number_4[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_4='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_5 <> '' AND watchlist_results[1].bus_ofac_record_number_5[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_5='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_6 <> '' AND watchlist_results[1].bus_ofac_record_number_6[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_6='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_7 <> '' AND watchlist_results[1].bus_ofac_record_number_7[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[1].bus_ofac_table_7='OFC' );
-      SHARED BOOLEAN OtherHit := ((watchlist_results[1].bus_ofac_table_1 <> '' AND watchlist_results[1].bus_ofac_record_number_1[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_1<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_2 <> '' AND watchlist_results[1].bus_ofac_record_number_2[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_2<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_3 <> '' AND watchlist_results[1].bus_ofac_record_number_3[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_3<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_4 <> '' AND watchlist_results[1].bus_ofac_record_number_4[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_4<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_5 <> '' AND watchlist_results[1].bus_ofac_record_number_5[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_5<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_6 <> '' AND watchlist_results[1].bus_ofac_record_number_6[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_6<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_7 <> '' AND watchlist_results[1].bus_ofac_record_number_7[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[1].bus_ofac_table_7<>'OFC' );
+     SHARED BOOLEAN OFACHit := ((watchlist_results[SEQ].bus_ofac_table_1 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_1[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[SEQ].bus_ofac_table_1='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_2 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_2[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[SEQ].bus_ofac_table_2='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_3 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_3[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[SEQ].bus_ofac_table_3='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_4 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_4[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[SEQ].bus_ofac_table_4='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_5 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_5[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[SEQ].bus_ofac_table_5='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_6 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_6[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[SEQ].bus_ofac_table_6='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_7 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_7[1..4] IN ['OFAC', 'OFC']) OR watchlist_results[SEQ].bus_ofac_table_7='OFC' );
+      SHARED BOOLEAN OtherHit := ((watchlist_results[SEQ].bus_ofac_table_1 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_1[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[SEQ].bus_ofac_table_1<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_2 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_2[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[SEQ].bus_ofac_table_2<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_3 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_3[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[SEQ].bus_ofac_table_3<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_4 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_4[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[SEQ].bus_ofac_table_4<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_5 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_5[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[SEQ].bus_ofac_table_5<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_6 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_6[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[SEQ].bus_ofac_table_6<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_7 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_7[1..4] NOT IN ['OFAC', 'OFC']) AND watchlist_results[SEQ].bus_ofac_table_7<>'OFC' );
       SHARED isCode10 := ((BOOLEAN)(pop_bus_name = '1') AND (BOOLEAN)OFACHit);
       SHARED isCode11 := ((BOOLEAN)(pop_bus_name = '1') AND (BOOLEAN)OtherHit);
       SHARED mod_rcSet := BusinessInstantID20_Services.rcSet( BusShell, useSBFE, bus_verification.bvi_desc_key );
