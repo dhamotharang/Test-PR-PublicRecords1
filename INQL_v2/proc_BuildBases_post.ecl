@@ -3,9 +3,8 @@
 export proc_BuildBases_post(boolean isFCRA = false) := function
 	
 
-  daily  				:= 		sequential(
-																		  notify(INQL_v2._CRON_ECL('FILES CONSOLIDATE',isFCRA,true).EVENT_NAME, '*');
-																		  INQL_v2.CLEAR_FILES(isFCRA).In_Bldg;
+  daily  				:= 		sequential(                               INQL_V2.MOVE_FILES(isFCRA,true,).In_Bldg,
+																		  INQL_V2.MOVE_FILES(isFCRA,true,).Bldg_To_Built_New
 																		);
 	
   
