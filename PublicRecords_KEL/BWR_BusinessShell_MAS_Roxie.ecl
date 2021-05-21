@@ -31,7 +31,6 @@ BIPAppend_ReAppend := TRUE; // Set to FALSE to avoid re-appending BIP IDs if BIP
 BIPAppend_Include_AuthRep := FALSE; // Determines whether Auth Rep data is used in BIP Append
 // Business Options
 BusinessShellVersion := 31; // Set which Business Shell version you want to run. By default for this BWR, it should be 31.
-Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 AllowedSources := Business_Risk_BIP.Constants.Default_AllowedSources; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 LinkSearchLevel := Business_Risk_BIP.Constants.LinkSearch.Default; // Searches at the default level (SeleID)
@@ -221,7 +220,6 @@ soapLayout := RECORD
 	UNSIGNED1 GLBPurpose;
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
-	BOOLEAN ExcludeConsumerAttributes;
 	BOOLEAN IsMarketing;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -292,7 +290,6 @@ soapLayout intoMAS(inDataReadyDist le, INTEGER c):= TRANSFORM
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
 	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
-	SELF.ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
 	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;

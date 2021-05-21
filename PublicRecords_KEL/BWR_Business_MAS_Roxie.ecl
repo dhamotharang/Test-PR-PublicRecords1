@@ -55,14 +55,12 @@ BIPAppend_Include_AuthRep := FALSE; // Determines whether Auth Rep data is used 
 
 // Output additional file in Master Layout
 // Master results are for R&D/QA purposes ONLY. This should only be set to TRUE for internal use.
-// Output_Master_Results := FALSE;
-Output_Master_Results := TRUE; 
+Output_Master_Results := FALSE;
 
 // Toggle to include/exclude SALT profile of results file
 // Output_SALT_Profile := FALSE;
 Output_SALT_Profile := TRUE;
 
-Exclude_Consumer_Attributes := FALSE; //if TRUE, bypasses consumer logic and sets all consumer shell fields to blank/0.
 
 // Use_Ingest_Date := TRUE; 
 Use_Ingest_Date := false;
@@ -100,7 +98,10 @@ eyeball := 120;
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~bbraaten::out::Business_Roxie_100k_Current_Inquiry_Deltabase_'+ ThorLib.wuid();
+name := STD.System.Job.User();
+archivemode := if(historyDate = (STRING)STD.Date.Today(), 'Current', 'Archive');
+
+OutputFile := '~'+name+'::out::Business_MAS_Roxie_'+archivemode+'_';
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -225,6 +226,7 @@ END;
 inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));//with heading last 1 record never runs
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
+counts_ := count(inDataRecs);
 // inDataReady := PROJECT(inDataRecs(AccountNumber NOT IN ['Account', 'SBFEExtract2016_0013010111WBD0101_3439841667_003']), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 inDataReady := PROJECT(inDataRecs(AccountNumber != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
 	SELF.ArchiveDate := IF(historyDate = '0', LEFT.ArchiveDate, (STRING)HistoryDate);
@@ -244,7 +246,6 @@ soapLayout := RECORD
 	UNSIGNED1 GLBPurpose;
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
-	BOOLEAN ExcludeConsumerAttributes;
 	BOOLEAN IsMarketing;
 	BOOLEAN TurnOffHouseHolds;
 	BOOLEAN TurnOffRelatives;
@@ -329,7 +330,6 @@ soapLayout trans (inDataReadyDist le):= TRANSFORM
 	SELF.OutputMasterResults := Output_Master_Results;
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
 	SELF.ExcludeSourcesDataset := ExcludeSourcesDataset;
-	SELF.ExcludeConsumerAttributes := Exclude_Consumer_Attributes;
 	SELF.BIPAppendScoreThreshold := Settings.BusinessLexIDThreshold;
 	SELF.BIPAppendWeightThreshold := Settings.BusinessLexIDWeightThreshold;
 	SELF.BIPAppendPrimForce := Settings.BusinessLexIDPrimForce;
@@ -372,8 +372,8 @@ OUTPUT( ResultSet, NAMED('Results') );
 
 //temp patch for pullid blanking out b input account
 results_temp := project(resultset, transform(layout_MAS_Business_Service_output, 	
-													self.Results.B_InpAcct := if(TRIM(left.Results.B_InpAcct) = '', left.Results.P_InpAcct, left.Results.B_InpAcct);
-													self.MasterResults.B_InpAcct := if(TRIM(left.MasterResults.B_InpAcct) = '', left.MasterResults.P_InpAcct, left.MasterResults.B_InpAcct);
+													// self.Results.B_InpAcct := if(TRIM(left.Results.B_InpAcct) = '', left.Results.P_InpAcct, left.Results.B_InpAcct);
+													// self.MasterResults.B_InpAcct := if(TRIM(left.MasterResults.B_InpAcct) = '', left.MasterResults.P_InpAcct, left.MasterResults.B_InpAcct);
 													self.Results := left.Results;
 													self.MasterResults := left.MasterResults;
 													));
@@ -426,14 +426,14 @@ Passed_Business :=
 		INNER, KEEP(1));
        
 Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_Business, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL);  
-OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, expire(45));
+OUTPUT(Error_Inputs,,OutputFile+counts_+'_' + ThorLib.wuid()+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, expire(45));
   
   
 IF(Output_Master_Results, OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout')));
 OUTPUT(CHOOSEN(Passed_Business, eyeball), NAMED('Sample_NonFCRA_Layout'));
 
-IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
-OUTPUT(Passed_Business,,OutputFile + '.csv', CSV(HEADING(single), QUOTE('"')), expire(45));	
+IF(Output_Master_Results, OUTPUT(Passed_with_Extras,,OutputFile+counts_+'_' + ThorLib.wuid()+'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45)));
+OUTPUT(Passed_Business,,OutputFile +counts_+'_' + ThorLib.wuid()+'_Layout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));	
 
 Output(ave(Passed, time_ms), named('average_time_ms')); 
 

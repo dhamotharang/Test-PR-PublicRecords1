@@ -2,7 +2,7 @@
 
 EXPORT Layouts := MODULE
 
-	SHARED LayoutInputPIIEchoInternal := RECORD
+	EXPORT LayoutInputPIIEchoInternal := RECORD
 		STRING65 P_InpAcct;
 		INTEGER7 P_InpLexID;
 		STRING78 P_InpNameFirst;
@@ -24,7 +24,7 @@ EXPORT Layouts := MODULE
 		STRING20 P_InpArchDt;
 	END;
 
-	SHARED LayoutInputPIICleanInternal := RECORD
+	EXPORT LayoutInputPIICleanInternal := RECORD
 		INTEGER7 P_LexID;
 		INTEGER3 P_LexIDScore;
 		STRING6 P_InpClnNamePrfx;
@@ -185,7 +185,7 @@ EXPORT Layouts := MODULE
 		LayoutAppendedAddresses;
 	END;
 	
-	SHARED LayoutInputPIIInternal := RECORD
+	EXPORT LayoutInputPIIInternal := RECORD
 		LayoutInputPIIEchoInternal;
 		STRING1 P_InpAcctFlag;
 		STRING1 P_InpLexIDFlag;
@@ -331,7 +331,7 @@ EXPORT Layouts := MODULE
 		STRING3 InsPhoneSrc;
 	END;
 	
-	SHARED LayoutHighRiskAddressInternal := RECORD
+	EXPORT LayoutHighRiskAddressInternal := RECORD
 		STRING PI_InpAddrSICCodeHRList;
 		STRING PI_InpAddrNAICSCodeHRList;
 		STRING6 PI_InpAddrIsHRCorrectFacFlag;
@@ -342,7 +342,7 @@ EXPORT Layouts := MODULE
 		LayoutHighRiskAddressInternal;
 	END;
 
-	SHARED LayoutInferredAttributesInternal := RECORD
+	EXPORT LayoutInferredAttributesInternal := RECORD
 		STRING10 P_InpClnArchDtF6M;
 		STRING10 P_InpClnArchDtF1Y;
 		STRING10 P_InpClnArchDtF2Y;
@@ -356,7 +356,7 @@ EXPORT Layouts := MODULE
 		LayoutInferredAttributesInternal;
 	END;
 
-	SHARED LayoutAddrSummaryInternal := RECORD
+	EXPORT LayoutAddrSummaryInternal := RECORD
 		STRING100 PI_SrcWInpFLAListEv;
 		STRING300 PI_SrcWInpFLAEmrgDtListEv;
 		STRING300 PI_SrcWInpFLALastDtListEv;
@@ -370,7 +370,7 @@ EXPORT Layouts := MODULE
 		LayoutAddrSummaryInternal;
 	END;
 
-	SHARED LayoutPhoneSumInternal := RECORD
+	EXPORT LayoutPhoneSumInternal := RECORD
 			STRING100 PI_SrcWInpPDListEv; 
 			STRING300 PI_SrcWInpPDEmrgDtListEv; 
 			STRING300 PI_SrcWInpPDLastDtListEv;
@@ -387,7 +387,7 @@ EXPORT Layouts := MODULE
 		LayoutPhoneSumInternal;
 	END;
 	
-	SHARED LayoutNSumInternal := RECORD
+	EXPORT LayoutNSumInternal := RECORD
 		STRING100 PI_SrcWInpFLDListEv;
 		STRING300 PI_SrcWInpFLDEmrgDtListEv;
 		STRING300 PI_SrcWInpFLDLastDtListEv;
@@ -398,7 +398,7 @@ EXPORT Layouts := MODULE
 		LayoutNSumInternal;
 	END;
 	
-	SHARED LayoutSSNSumInternal := RECORD
+	EXPORT LayoutSSNSumInternal := RECORD
 		STRING100 PI_SrcWInpASListEv;
 		STRING300 PI_SrcWInpASEmrgDtListEv;
 		STRING300 PI_SrcWInpASLastDtListEv;
@@ -426,7 +426,7 @@ EXPORT Layouts := MODULE
 		LayoutAddrSummaryInternal;
 	END;
 
-	SHARED LayoutInputBIIBusinessEchoInternal := RECORD
+	EXPORT LayoutInputBIIBusinessEchoInternal := RECORD
 		STRING65 B_InpAcct;
 		// INTEGER	G_ProcBusUID;
 		INTEGER7 B_InpLexIDUlt;
@@ -451,7 +451,7 @@ EXPORT Layouts := MODULE
 		STRING20 B_InpArchDt;
 	END;
 	
-	SHARED LayoutInputBIIRepEchoInternal := RECORD
+	EXPORT LayoutInputBIIRepEchoInternal := RECORD
 		INTEGER7 B_Rep1InpLexID;
 		STRING78 B_Rep1InpNameFirst;
 		STRING78 B_Rep1InpNameMid;
@@ -533,7 +533,7 @@ EXPORT Layouts := MODULE
 		STRING25 B_Rep5InpDLState;
 	END;
 	
-	SHARED LayoutInputBIIBusinessCleanInternal := RECORD
+	EXPORT LayoutInputBIIBusinessCleanInternal := RECORD
 		INTEGER7 B_LexIDUlt;
 		INTEGER7 B_LexIDOrg;
 		INTEGER7 B_LexIDLegal;
@@ -580,7 +580,7 @@ EXPORT Layouts := MODULE
 		LayoutExternalFlags;
 	END;
 	
-	Shared LayoutInputBIIRepCleanInternal := RECORD
+	EXPORT LayoutInputBIIRepCleanInternal := RECORD
 		STRING6		B_Rep1InpClnNamePrfx;
 		STRING20 	B_Rep1InpClnNameFirst;
 		STRING20 	B_Rep1InpClnNameMid;
@@ -775,7 +775,7 @@ EXPORT Layouts := MODULE
 		STRING10 B_Rep6InpClnSSN;
 	END;
 	
-	SHARED LayoutInputBIIInternal := RECORD
+	EXPORT LayoutInputBIIInternal := RECORD
 		LayoutInputBIIBusinessEchoInternal;
 		LayoutInputBIIRepEchoInternal;
 		STRING1	B_InpArchDtFlag;
@@ -1081,7 +1081,7 @@ EXPORT Layouts := MODULE
 		STRING6 B_InpValNameMatchesAltNameFlag;
 	END;
 	
-	SHARED LayoutPersonInternal := RECORD
+	EXPORT LayoutPersonInternal := RECORD
 		STRING6	P_LexIDSeenFlag;
 		STRING12 P_LexIDCategory;
 		STRING6 P_LexIDIsDeceasedFlag;
@@ -1529,7 +1529,7 @@ EXPORT Layouts := MODULE
 		LayoutPersonInternal;
 	END;
 	
-	SHARED LayoutBusinessSeleIDInternal := RECORD
+	EXPORT LayoutBusinessSeleIDInternal := RECORD
 		STRING6 B_LexIDLegalSeenFlag;
 		STRING6 B_LexIDLegalRstdOnlyFlag;
 		STRING BE_VerSrcListEv;
@@ -2072,7 +2072,7 @@ EXPORT Layouts := MODULE
 		LayoutBusinessSeleIDInternal;
 	END;
 	
-	SHARED LayoutBusinessProxIDInternal := RECORD
+	EXPORT LayoutBusinessProxIDInternal := RECORD
 		STRING6 B_LexIDLocSeenFlag;
 		STRING120 BP_BestName;
 		// INTEGER7 BP_BestAddrLocID;
@@ -2090,7 +2090,7 @@ EXPORT Layouts := MODULE
 		LayoutBusinessProxIDInternal;
 	END;
 	
-	SHARED LayoutBuildDatesInternal := RECORD
+	EXPORT LayoutBuildDatesInternal := RECORD
 		STRING10 G_BuildDrgCrimDt;
 		STRING10 G_BuildAstVehAutoDt;
 		STRING10 G_BuildAstVehAirDt;

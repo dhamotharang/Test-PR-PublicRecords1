@@ -104,7 +104,10 @@ eyeball := 20;
 AllowedSources := ''; // Stubbing this out for use in settings output for now. To be used to turn on DNBDMI by setting to 'DNBDMI'
 OverrideExperianRestriction := FALSE; // Stubbing this out for use in settings output for now. To be used to control whether Experian Business Data (EBR and CRDB) is returned.
 
-OutputFile := '~akoenen::out::Business_Roxie_100k_Current_ks-6961_after_'+ ThorLib.wuid();
+name := STD.System.Job.User();
+archivemode := if(historyDate = (STRING)STD.Date.Today(), 'Current', 'Archive');
+
+OutputFile := '~'+name+'::out::Business_MAS_Roxie_'+archivemode+'_';
 
 prii_layout := RECORD
 	STRING AccountNumber;
@@ -229,6 +232,7 @@ END;
 inData := DATASET(InputFile, prii_layout, CSV(QUOTE('"')));//with heading last 1 record never runs
 OUTPUT(CHOOSEN(inData, eyeball), NAMED('inData'));
 inDataRecs := IF (RecordsToRun = 0, inData, CHOOSEN (inData, RecordsToRun));
+counts_ := count(inDataRecs);
 // inDataReady := PROJECT(inDataRecs(AccountNumber NOT IN ['Account', 'SBFEExtract2016_0013010111WBD0101_3439841667_003']), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout,
 inDataReady := PROJECT(inDataRecs(AccountNumber != 'Account'), TRANSFORM(PublicRecords_KEL.ECL_Functions.Input_Bus_Layout, 
 	SELF.ArchiveDate := IF(historyDate = '0', LEFT.ArchiveDate, (STRING)HistoryDate);
@@ -307,7 +311,7 @@ END;
 
 layout_MAS_Business_Service_output := RECORD
     unsigned8 time_ms{xpath('_call_latency_ms')} := 0;  // picks up timing
-	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
+	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA;
 	STRING G_ProcErrorCode := '';
 END;
 
@@ -376,7 +380,7 @@ OUTPUT( ResultSet, NAMED('Results') );
 
 
 results_temp := project(resultset, transform(layout_MAS_Business_Service_output, 	
-													self.B_InpAcct := if(TRIM(left.B_InpAcct) = '', left.P_InpAcct, left.B_InpAcct);
+													// self.B_InpAcct := if(TRIM(left.B_InpAcct) = '', left.P_InpAcct, left.B_InpAcct);
 													self := left;
 													));
 
@@ -389,7 +393,7 @@ OUTPUT( COUNT(Failed), NAMED('Failed_Cnt') );
 
 LayoutMaster_With_Extras := RECORD
     unsigned8 time_ms;
-	PublicRecords_KEL.ECL_Functions.Layouts.LayoutMaster;
+	PublicRecords_KEL.ECL_Functions.Layout_Business_NonFCRA;
 	STRING G_ProcErrorCode;
 	STRING ln_project_id;
 	STRING pf_fraud;
@@ -411,14 +415,14 @@ Passed_with_Extras :=
 		INNER, KEEP(1));
 	
 Error_Inputs := JOIN(DISTRIBUTE(inDataRecs, HASH64(AccountNumber)), DISTRIBUTE(Passed_with_Extras, HASH64(B_InpAcct)), LEFT.AccountNumber = RIGHT.B_InpAcct, TRANSFORM(prii_layout, SELF := LEFT), LEFT ONLY, LOCAL);  
-OUTPUT(Error_Inputs,,OutputFile+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, expire(45));
+OUTPUT(Error_Inputs,,OutputFile+counts_+'_' + ThorLib.wuid()+'_Error_Inputs', CSV(QUOTE('"')), OVERWRITE, expire(45));
   
   
-OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Master_Layout'));
+OUTPUT(CHOOSEN(Passed_with_Extras, eyeball), NAMED('Sample_Layout'));
 
-OUTPUT(Passed_with_Extras,,OutputFile +'_MasterLayout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
+OUTPUT(Passed_with_Extras,,OutputFile +counts_+'_' + ThorLib.wuid()+'_Layout.csv', CSV(HEADING(single), QUOTE('"')), expire(45));
 
-OUTPUT(Failed,,OutputFile+'errors', thor,  expire(20));
+OUTPUT(Failed,,OutputFile+ ThorLib.wuid()+'errors', thor,  expire(20));
 
 Output(ave(Passed, time_ms), named('average_time_ms')); 
 

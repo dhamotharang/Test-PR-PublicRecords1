@@ -39,7 +39,7 @@
 	//all risktable summary attributes	
 	
 	
-	FinalResultWithPullID := PublicRecords_KEL.FnRoxie_GetPullIDOverrides(pullidlexids, Options);
+	FinalResultWithPullID := PublicRecords_KEL.FnRoxie_GetPullIDOverrides(pullidlexids);
 
 	FinalResultWithBuildDates  := PublicRecords_KEL.FnRoxie_GetBuildDates(PersonAttributes, Options);
 

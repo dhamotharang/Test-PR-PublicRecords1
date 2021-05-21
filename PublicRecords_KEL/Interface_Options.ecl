@@ -16,7 +16,6 @@ EXPORT Interface_Options := INTERFACE
 	EXPORT BOOLEAN Override_Experian_Restriction := FALSE;
 	EXPORT STRING100 Allowed_Sources := '';
 	EXPORT INTEGER ScoreThreshold := 80;
-	EXPORT BOOLEAN ExcludeConsumerAttributes := FALSE;
 	EXPORT BOOLEAN isMarketing := FALSE; // When TRUE enables Marketing Restrictions
 	EXPORT BOOLEAN IsPrescreen := FALSE; // When TRUE enables Marketing Restrictions
 	EXPORT STRING5 IndustryClass := ''; // When set to UTILI or DRMKT this restricts Utility data

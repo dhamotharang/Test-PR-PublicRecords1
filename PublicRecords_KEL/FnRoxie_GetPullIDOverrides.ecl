@@ -1,8 +1,7 @@
 ﻿import ut;
 
 
-EXPORT FnRoxie_GetPullIDOverrides(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData,
-			PublicRecords_KEL.Interface_Options Options) := FUNCTION 
+EXPORT FnRoxie_GetPullIDOverrides(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) InputData) := FUNCTION 
 			
 		
 		

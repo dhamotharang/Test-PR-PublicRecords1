@@ -33,7 +33,7 @@ EXPORT FnRoxie_GetBusAttrs(DATASET(PublicRecords_KEL.ECL_Functions.Input_Bus_Lay
 	Prep_RepInput := Prep_RepInputPre(PullIDFlag = False);
 	pullidlexids := Prep_RepInputPre(PullIDFlag = true);
 	
-	FinalResultWithPullID := PublicRecords_KEL.FnRoxie_GetPullIDOverrides(pullidlexids, Options);
+	FinalResultWithPullID := PublicRecords_KEL.FnRoxie_GetPullIDOverrides(pullidlexids);
 
 	SlimPullID := dedup(sort(FinalResultWithPullID,G_ProcBusUID),G_ProcBusUID);
 	
