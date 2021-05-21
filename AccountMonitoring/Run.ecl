@@ -3,16 +3,16 @@
 IMPORT AccountMonitoring;
 
 EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring.types.productMask.allProducts, 
-						STRING           despray_ip_address = '',  // the IP address of the server receiving the completed file
-						STRING           despray_path = '',        // the /path including filename of the destination file
-						UNSIGNED1        pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT,
-						BOOLEAN          use_daily_file = FALSE,
-						SET OF UNSIGNED6 run_pids = [],
-           BOOLEAN          doUpdateSuperFiles = TRUE
+            STRING           despray_ip_address = '',  // the IP address of the server receiving the completed file
+            STRING           despray_path = '',        // the /path including filename of the destination file
+            UNSIGNED1        pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT,
+            BOOLEAN          use_daily_file = FALSE,
+            SET OF UNSIGNED6 run_pids = [],
+            BOOLEAN          doUpdateSuperFiles = TRUE
           ) :=	    
 	FUNCTION
 		 //We first create some of our own superfiles that match the Roxie super files. 
-     UpdateRoxieLikeSuperfiles:= if(doUpdateSuperFiles,AccountMonitoring.fn_UpdateSuperFiles(product_mask),-1);
+     UpdateRoxieLikeSuperfiles:= IF(doUpdateSuperFiles,AccountMonitoring.fn_UpdateSuperFiles(product_mask),-1);
     
 		// Get the already sorted and distributed main portfolio records and assign them to pf_AllRecords
 		// *** TODO *** Since we're saving the portfolio "already deduped", we don't need the -timestamp for: SORTED (because there is only one record for each pid/rid)
@@ -148,36 +148,40 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 		candidates_email      			:= AccountMonitoring.fn_monitor_for_candidates( product_config.email, timestamp ) : INDEPENDENT;
 		update_history_file_email 	:= AccountMonitoring.fn_update_history_file( candidates_email, product_config.email, timestamp );
 
+    // ***** Cortera *****
+    candidates_corteratradeline := AccountMonitoring.fn_monitor_for_candidates( product_config.corteratradeline, timestamp ) : INDEPENDENT;
+    update_history_file_corteratradeline := AccountMonitoring.fn_update_history_file( candidates_corteratradeline, product_config.corteratradeline, timestamp );
 
 
 		// Union all records, maintaining record order on each node ('&' -- ref. Lang. Guide, p. 26); then filter.
 		candidates_all := IF(product_config.bankruptcy.product_is_in_mask,candidates_bankruptcy)
-		                & IF(product_config.address.product_is_in_mask,candidates_address)
-		                & IF(product_config.phone.product_is_in_mask,candidates_phone)
-		                & IF(product_config.paw.product_is_in_mask,candidates_paw)
-		                & IF(product_config.property.product_is_in_mask,candidates_property)
-		                & IF(product_config.deceased.product_is_in_mask,candidates_deceased)
-		                & IF(product_config.litigiousdebtor.product_is_in_mask,candidates_litigiousdebtor)
-		                & IF(product_config.liens.product_is_in_mask,candidates_liens)
-									  & IF(product_config.criminal.product_is_in_mask,candidates_criminal)
-									  & IF(product_config.phonefeedback.product_is_in_mask,candidates_phonefeedback)
-									  & IF(product_config.foreclosure.product_is_in_mask,candidates_foreclosure)
-									  & IF(product_config.workplace.product_is_in_mask,candidates_workplace)
-									  & IF(product_config.reverseaddress.product_is_in_mask,candidates_reverseaddress)
-									  & IF(product_config.didupdate.product_is_in_mask,candidates_didupdate)
-									  & IF(product_config.bdidupdate.product_is_in_mask,candidates_bdidupdate)
-									  & IF(product_config.phoneownership.product_is_in_mask,candidates_phoneownership)
-										& IF(product_config.bipbestupdate.product_is_in_mask,candidates_bipbestupdate)
-										& IF(product_config.sbfe.product_is_in_mask,candidates_sbfe)
-										& IF(product_config.ucc.product_is_in_mask,candidates_ucc)
-										& IF(product_config.govtdebarred.product_is_in_mask,candidates_govtdebarred)
-										& IF(product_config.inquiry.product_is_in_mask,candidates_inquiry)
-										& IF(product_config.corp.product_is_in_mask,candidates_corp)
-										& IF(product_config.mvr.product_is_in_mask,candidates_mvr)
-										& IF(product_config.aircraft.product_is_in_mask,candidates_aircraft)
-										& IF(product_config.watercraft.product_is_in_mask,candidates_watercraft)
-										& IF(product_config.personheader.product_is_in_mask,candidates_personheader)
-										& IF(product_config.email.product_is_in_mask,candidates_email);
+                    & IF(product_config.address.product_is_in_mask,candidates_address)
+                    & IF(product_config.phone.product_is_in_mask,candidates_phone)
+                    & IF(product_config.paw.product_is_in_mask,candidates_paw)
+                    & IF(product_config.property.product_is_in_mask,candidates_property)
+                    & IF(product_config.deceased.product_is_in_mask,candidates_deceased)
+                    & IF(product_config.litigiousdebtor.product_is_in_mask,candidates_litigiousdebtor)
+                    & IF(product_config.liens.product_is_in_mask,candidates_liens)
+                    & IF(product_config.criminal.product_is_in_mask,candidates_criminal)
+                    & IF(product_config.phonefeedback.product_is_in_mask,candidates_phonefeedback)
+                    & IF(product_config.foreclosure.product_is_in_mask,candidates_foreclosure)
+                    & IF(product_config.workplace.product_is_in_mask,candidates_workplace)
+                    & IF(product_config.reverseaddress.product_is_in_mask,candidates_reverseaddress)
+                    & IF(product_config.didupdate.product_is_in_mask,candidates_didupdate)
+                    & IF(product_config.bdidupdate.product_is_in_mask,candidates_bdidupdate)
+                    & IF(product_config.phoneownership.product_is_in_mask,candidates_phoneownership)
+                    & IF(product_config.bipbestupdate.product_is_in_mask,candidates_bipbestupdate)
+                    & IF(product_config.sbfe.product_is_in_mask,candidates_sbfe)
+                    & IF(product_config.ucc.product_is_in_mask,candidates_ucc)
+                    & IF(product_config.govtdebarred.product_is_in_mask,candidates_govtdebarred)
+                    & IF(product_config.inquiry.product_is_in_mask,candidates_inquiry)
+                    & IF(product_config.corp.product_is_in_mask,candidates_corp)
+                    & IF(product_config.mvr.product_is_in_mask,candidates_mvr)
+                    & IF(product_config.aircraft.product_is_in_mask,candidates_aircraft)
+                    & IF(product_config.watercraft.product_is_in_mask,candidates_watercraft)
+                    & IF(product_config.personheader.product_is_in_mask,candidates_personheader)
+                    & IF(product_config.email.product_is_in_mask,candidates_email)
+                    & IF(product_config.corteratradeline.product_is_in_mask,candidates_corteratradeline);
 		
 		// We check for 0 hashvalue here because we don't want to return history records that simply reflect
 		// a deleted portfolio record.
@@ -192,33 +196,34 @@ EXPORT Run( AccountMonitoring.types.productMask product_mask = AccountMonitoring
 		output_results        := AccountMonitoring.proc_output_results(candidates_rolled, pseudo_environment, timestamp, despray_ip_address, despray_path); 
 		
 		update_history_files  := PARALLEL(IF(product_config.bankruptcy.product_is_in_mask AND NOT job_config.monitor_daily_file,update_history_file_bankruptcy), 
-													 IF(product_config.address.product_is_in_mask,update_history_file_address),
-													 IF(product_config.phone.product_is_in_mask,update_history_file_phone),
-													 IF(product_config.paw.product_is_in_mask,update_history_file_paw),
-													 IF(product_config.property.product_is_in_mask,update_history_file_property),
-													 IF(product_config.deceased.product_is_in_mask,update_history_file_deceased),
-													 IF(product_config.litigiousdebtor.product_is_in_mask,update_history_file_litigiousdebtor),
-													 IF(product_config.liens.product_is_in_mask,update_history_file_liens),
-													 IF(product_config.criminal.product_is_in_mask,update_history_file_criminal),
-													 IF(product_config.phonefeedback.product_is_in_mask,update_history_file_phonefeedback),
-													 IF(product_config.foreclosure.product_is_in_mask,update_history_file_foreclosure),
-													 IF(product_config.workplace.product_is_in_mask,update_history_file_workplace),
-													 IF(product_config.reverseaddress.product_is_in_mask,update_history_file_reverseaddress),
-													 IF(product_config.didupdate.product_is_in_mask,update_history_file_didupdate),
-													 IF(product_config.bdidupdate.product_is_in_mask,update_history_file_bdidupdate),
-													 IF(product_config.phoneownership.product_is_in_mask,update_history_file_phoneownership),
-													 IF(product_config.bipbestupdate.product_is_in_mask,update_history_file_bipbestupdate),
-													 IF(product_config.sbfe.product_is_in_mask,update_history_file_sbfe),
-													 IF(product_config.ucc.product_is_in_mask,update_history_file_ucc),
-													 IF(product_config.govtdebarred.product_is_in_mask,update_history_file_govtdebarred),
-													 IF(product_config.inquiry.product_is_in_mask,update_history_file_inquiry),
-													 IF(product_config.corp.product_is_in_mask,update_history_file_corp),
-													 IF(product_config.mvr.product_is_in_mask,update_history_file_mvr),
-													 IF(product_config.aircraft.product_is_in_mask,update_history_file_aircraft),
-													 IF(product_config.watercraft.product_is_in_mask,update_history_file_watercraft),
-													 IF(product_config.personheader.product_is_in_mask,update_history_file_personheader),
-													 IF(product_config.email.product_is_in_mask,update_history_file_email)
-													);
+                                      IF(product_config.address.product_is_in_mask,update_history_file_address),
+                                      IF(product_config.phone.product_is_in_mask,update_history_file_phone),
+                                      IF(product_config.paw.product_is_in_mask,update_history_file_paw),
+                                      IF(product_config.property.product_is_in_mask,update_history_file_property),
+                                      IF(product_config.deceased.product_is_in_mask,update_history_file_deceased),
+                                      IF(product_config.litigiousdebtor.product_is_in_mask,update_history_file_litigiousdebtor),
+                                      IF(product_config.liens.product_is_in_mask,update_history_file_liens),
+                                      IF(product_config.criminal.product_is_in_mask,update_history_file_criminal),
+                                      IF(product_config.phonefeedback.product_is_in_mask,update_history_file_phonefeedback),
+                                      IF(product_config.foreclosure.product_is_in_mask,update_history_file_foreclosure),
+                                      IF(product_config.workplace.product_is_in_mask,update_history_file_workplace),
+                                      IF(product_config.reverseaddress.product_is_in_mask,update_history_file_reverseaddress),
+                                      IF(product_config.didupdate.product_is_in_mask,update_history_file_didupdate),
+                                      IF(product_config.bdidupdate.product_is_in_mask,update_history_file_bdidupdate),
+                                      IF(product_config.phoneownership.product_is_in_mask,update_history_file_phoneownership),
+                                      IF(product_config.bipbestupdate.product_is_in_mask,update_history_file_bipbestupdate),
+                                      IF(product_config.sbfe.product_is_in_mask,update_history_file_sbfe),
+                                      IF(product_config.ucc.product_is_in_mask,update_history_file_ucc),
+                                      IF(product_config.govtdebarred.product_is_in_mask,update_history_file_govtdebarred),
+                                      IF(product_config.inquiry.product_is_in_mask,update_history_file_inquiry),
+                                      IF(product_config.corp.product_is_in_mask,update_history_file_corp),
+                                      IF(product_config.mvr.product_is_in_mask,update_history_file_mvr),
+                                      IF(product_config.aircraft.product_is_in_mask,update_history_file_aircraft),
+                                      IF(product_config.watercraft.product_is_in_mask,update_history_file_watercraft),
+                                      IF(product_config.personheader.product_is_in_mask,update_history_file_personheader),
+                                      IF(product_config.email.product_is_in_mask,update_history_file_email),
+                                      IF(product_config.corteratradeline.product_is_in_mask,update_history_file_corteratradeline)
+                                    );
 		
 		RETURN SEQUENTIAL(UpdateRoxieLikeSuperfiles,
 			IF(pseudo_environment = AccountMonitoring.constants.pseudo.DEFAULT OR pseudo_environment NOT IN AccountMonitoring.constants.all_pseudo,

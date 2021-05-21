@@ -90,5 +90,6 @@ EXPORT product_configs(
 	define_product_type_config(watercraft,fn_cgm_watercraft,product_mask,pseudo_environment);
 	define_product_type_config(personheader,fn_cgm_personheader,product_mask,pseudo_environment);
 	define_product_type_config(email,fn_cgm_email,product_mask,pseudo_environment);
+	define_product_type_config(corteratradeline,fn_cgm_corteratradeline,product_mask,pseudo_environment);
 	
 END;

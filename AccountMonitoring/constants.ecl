@@ -5,7 +5,7 @@ EXPORT constants := MODULE
 	EXPORT STRING SPRAY_GROUPNAME  := STD.System.Thorlib.Group();
 	EXPORT STRING DATA_LOCATION 	 := IF(SPRAY_GROUPNAME in ['thor400_30','thor400_20','thor400_44','thor400_198_a','thor400_198_eclcc'],
 																			 '~', 							// thor400_30 and thor400_20
-																			 // '~'); //(monitor testing) 
+																			//  '~'); //(monitor testing) 
 																			 Data_Services.foreign_prod); 	// thorwatch and thor_10_219 
 	//EXPORT STRING FILENAME_CLUSTER := '~' + SPRAY_GROUPNAME  + '::';
 	EXPORT STRING FILENAME_CLUSTER := '~' + IF(SPRAY_GROUPNAME in ['thor_10_219'], SPRAY_GROUPNAME, 'batchr3') + '::';	
@@ -54,9 +54,10 @@ EXPORT constants := MODULE
 	EXPORT UNSIGNED8 PM_MVR							:= AccountMonitoring.types.productMask.mvr;
 	EXPORT UNSIGNED8 PM_AIRCRAFT				:= AccountMonitoring.types.productMask.aircraft;
 	EXPORT UNSIGNED8 PM_WATERCRAFT			:= AccountMonitoring.types.productMask.watercraft;
-	EXPORT UNSIGNED8 PM_PERSONHEADER			:= AccountMonitoring.types.productMask.personheader;
+	EXPORT UNSIGNED8 PM_PERSONHEADER		:= AccountMonitoring.types.productMask.personheader;
 	EXPORT UNSIGNED8 PM_EMAIL     			:= AccountMonitoring.types.productMask.email;
-	
+	EXPORT UNSIGNED8 PM_CORTERATRADELINE := AccountMonitoring.types.productMask.corteratradeline;
+
 	// This special value provides the user with a shortcut for utilities to say ALL.
 	EXPORT UNSIGNED8 PM_ALL        := -1;
 	
@@ -86,7 +87,7 @@ EXPORT constants := MODULE
 		PSEUDO_ENVIRONMENT = PSEUDO.TEST1 => 'TEST1::',
 		PSEUDO_ENVIRONMENT = PSEUDO.TEST2 => 'TEST2::',
 		/* DEFAULT */                        '');
-	
+
 	// Vip for roxie cluster
 	// Note: currently defined in constants, once  _control.RoxieEnv is updated, should switch.	
 	EXPORT CERT_VIP := 'http://certstagingvip.hpcc.risk.regn.net:9876';

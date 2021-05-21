@@ -49,7 +49,7 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT criminal        := documents_template('criminal');
 		EXPORT phonefeedback   := documents_template('phonefeedback');
 		EXPORT foreclosure     := documents_template('foreclosure');
-	  EXPORT workplace       := documents_template('workplace');
+		EXPORT workplace       := documents_template('workplace');
 		EXPORT reverseaddress  := documents_template('reverseaddress');
 		EXPORT didupdate  		 := documents_template('didupdate');
 		EXPORT bdidupdate  		 := documents_template('bdidupdate');
@@ -63,42 +63,44 @@ EXPORT filenames(unsigned1 pseudo_environment) := MODULE
 		EXPORT mvr					 	 := documents_template('mvr');
 		EXPORT aircraft			 	 := documents_template('aircraft');
 		EXPORT watercraft		 	 := documents_template('watercraft');
-		EXPORT personheader		 	 := documents_template('personheader');
+		EXPORT personheader		 := documents_template('personheader');
 		EXPORT email    		 	 := documents_template('email');
+		EXPORT corteratradeline := documents_template('corteratradeline');
 	END;
 	
 	// The file name and location of the history files.  
 	// We maintain three versions of the results: current, father and grandfather for each product
 	EXPORT history := MODULE
 	
-		SHARED history_template(string var) := base_template + 'history::' + var;
-		EXPORT bankruptcy      := history_template('bankruptcy');
-		EXPORT deceased        := history_template('deceased');
-		EXPORT phone           := history_template('phone');
-		EXPORT address         := history_template('address');
-		EXPORT paw             := history_template('paw');
-		EXPORT property        := history_template('property');
-		EXPORT litigiousdebtor := history_template('litigiousdebtor');
-		EXPORT liens           := history_template('liens');
-		EXPORT criminal        := history_template('criminal');
-		EXPORT phonefeedback   := history_template('phonefeedback');
-		EXPORT foreclosure     := history_template('foreclosure');
-	  EXPORT workplace       := history_template('workplace');	
-		EXPORT reverseaddress  := history_template('reverseaddress');
-		EXPORT didupdate  		 := history_template('didupdate');
-		EXPORT bdidupdate  		 := history_template('bdidupdate');
-		EXPORT phoneownership	 := history_template('phoneownership');
-		EXPORT bipbestupdate	 := history_template('bipbestupdate');
-		EXPORT sbfe	 					 := history_template('sbfe');
-		EXPORT ucc	 					 := history_template('ucc');
-		EXPORT govtdebarred		 := history_template('govtdebarred');
-		EXPORT inquiry				 := history_template('inquiry');
-		EXPORT corp	 					 := history_template('corp');
-		EXPORT mvr	 					 := history_template('mvr');
-		EXPORT aircraft				 := history_template('aircraft');
-		EXPORT watercraft			 := history_template('watercraft');
-    EXPORT personheader		 	 := history_template('personheader');
+    SHARED history_template(string var) := base_template + 'history::' + var;
+    EXPORT bankruptcy      := history_template('bankruptcy');
+    EXPORT deceased        := history_template('deceased');
+    EXPORT phone           := history_template('phone');
+    EXPORT address         := history_template('address');
+    EXPORT paw             := history_template('paw');
+    EXPORT property        := history_template('property');
+    EXPORT litigiousdebtor := history_template('litigiousdebtor');
+    EXPORT liens           := history_template('liens');
+    EXPORT criminal        := history_template('criminal');
+    EXPORT phonefeedback   := history_template('phonefeedback');
+    EXPORT foreclosure     := history_template('foreclosure');
+    EXPORT workplace       := history_template('workplace');	
+    EXPORT reverseaddress  := history_template('reverseaddress');
+    EXPORT didupdate  		 := history_template('didupdate');
+    EXPORT bdidupdate  		 := history_template('bdidupdate');
+    EXPORT phoneownership	 := history_template('phoneownership');
+    EXPORT bipbestupdate	 := history_template('bipbestupdate');
+    EXPORT sbfe	 					 := history_template('sbfe');
+    EXPORT ucc	 					 := history_template('ucc');
+    EXPORT govtdebarred		 := history_template('govtdebarred');
+    EXPORT inquiry				 := history_template('inquiry');
+    EXPORT corp	 					 := history_template('corp');
+    EXPORT mvr	 					 := history_template('mvr');
+    EXPORT aircraft				 := history_template('aircraft');
+    EXPORT watercraft			 := history_template('watercraft');
+    EXPORT personheader		 := history_template('personheader');
     EXPORT email    		 	 := history_template('email');
+    EXPORT corteratradeline := history_template('corteratradeline');
 	END;
 	
 	// The file name and location of the Inquiry tracking files are used solely for auditing purposes
