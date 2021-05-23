@@ -1,4 +1,4 @@
-﻿import std, PromoteSupers;
+﻿import std, PromoteSupers,INQL_V2;
 
 export proc_BuildBases_post(boolean isFCRA = false) := function
 	
