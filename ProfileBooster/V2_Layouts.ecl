@@ -1005,8 +1005,12 @@ unsigned6	Seq;
 unsigned6	LexID;
 unsigned1 rec_type; //1=Prospect, 2=Household, 3=Relative/Associate
 unsigned6 DID2;
-ProfileBooster.Functions.buildNewLayout(Layout_ProfileBoosterV2);
+ProfileBooster.V2_Functions.buildNewLayout(Layout_ProfileBoosterV2);
 END;
 
+EXPORT tempAttributesLayout := RECORD
+  Layout_PB2_BatchOut;
+  STRING curr_sec_range;
+END;
 
 END;

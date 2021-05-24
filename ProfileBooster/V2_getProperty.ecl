@@ -672,7 +672,7 @@ prop_common_distr := distribute(prop_common, did);
 	end;
 	
 	finalSort 	:= sort(withEconTraj, seq, rec_type, did2);  //sort prospect record to the top (rec_type = 1)
-  finalRollup := rollup(finalSort, rollFinal(left,right), seq);
+
   //DEBUGGING
 //   lexidset := [1653020855,2659294463,599717915,1287522558,1952185820,719039845,2661278680,246971484,2643889651,952420953,1376746128];
 
@@ -705,5 +705,5 @@ prop_common_distr := distribute(prop_common, did);
   // OUTPUT(CHOOSEN(withAVMOwned, 100), NAMED('withAVMOwned'));
   // OUTPUT(CHOOSEN(rolledAVMOwned, 100), NAMED('rolledAVMOwned'));
   // OUTPUT(CHOOSEN(finalRollup, 100), NAMED('finalRollupProperty'));
-  RETURN finalRollup;
+  RETURN finalSort;
 END;
