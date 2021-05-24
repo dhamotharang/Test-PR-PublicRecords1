@@ -11,14 +11,7 @@ LayoutBIIAndPII := RECORD
 		DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) RepInput;
 	END;
 	
-	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
-																	0, // UltID
-																	0, // OrgID
-																	0, // SeleID
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII), 
-																	0, // ArchiveDate
-																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM	
+	LayoutBusinessSeleIDAttributes := BRM_Marketing_attributes.BRM_KEL.L_Compile.Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic_Res0_Layout;
 																	
 	BusinessSeleAttributesInput := DENORMALIZE(InputData, RepInput, 
 		LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,  GROUP,
@@ -30,7 +23,7 @@ LayoutBIIAndPII := RECORD
                                                     LEFT.InputData.G_ProcBusUID = RIGHT.G_ProcBusUID,
                                                             TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
                                                               SELF.G_ProcBusUID := LEFT.InputData.G_ProcBusUID;
-                                                              NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+                                                              NonFCRABusinessSeleIDResults := BRM_Marketing_attributes.BRM_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
                                                                 LEFT.InputData.B_LexIDUlt,
                                                                 LEFT.InputData.B_LexIDOrg,
                                                                 LEFT.InputData.B_LexIDLegal,

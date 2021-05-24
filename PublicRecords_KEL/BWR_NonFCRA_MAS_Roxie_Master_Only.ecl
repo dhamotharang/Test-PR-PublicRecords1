@@ -2,14 +2,14 @@
 IMPORT PublicRecords_KEL, RiskWise, salt38, Saltroutines, std, gateway, Business_Risk_BIP;
 
 /* PublicRecords_KEL.BWR_nonFCRA_MAS_Roxie */
-#workunit('name','MAS NonFCRA Consumer dev156 1 Thread-Testfile');
+#workunit('name','MAS NonFCRA Consumer dev156 2 Thread-Testfile');
 
-threads := 1;
+threads := 2;
 
 RoxieIP := RiskWise.shortcuts.Dev156;
 
-// InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
-InputFile := '~mas::uat::mas_nonfcra_10k_sample_20200707.csv';
+InputFile := '~mas::uatsamples::consumer_nonfcra_100k_07102019.csv ';
+// InputFile := '~mas::uat::mas_nonfcra_10k_sample_20200707.csv';
 //InputFile := '~mas::uatsamples::consumer_nonfcra_1m_07092019.csv';
 // InputFile := '~mas::uatsamples::consumer_nonfcra_iptest_04232020.csv';
 
@@ -55,6 +55,14 @@ Output_Master_Results := TRUE;
 // Toggle to include/exclude SALT profile of results file
 Output_SALT_Profile := FALSE;
 // Output_SALT_Profile := TRUE;
+
+// Use_Ingest_Date := TRUE; 
+Use_Ingest_Date := false;
+
+// TurnOffHouseHolds := TRUE;
+TurnOffHouseHolds := FALSE;
+// TurnOffRelatives := TRUE;
+TurnOffRelatives := FALSE;
 
 // Use default list of allowed sources
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
@@ -103,7 +111,7 @@ Input_Gateways := (DeltaBase_GW + NetAcuity_GW + OFAC_GW + Targus_GW + Insurance
 RecordsToRun := 0;
 eyeball := 25;
 
-OutputFile := '~akoenen::out::PersonNonFCRA_Roxie_100k_archive_KS6961_after_'+ ThorLib.wuid();
+OutputFile := '~akoenen::out::PersonNonFCRA_Roxie_100k_current_after'+ ThorLib.wuid();
 
 prii_layout := RECORD
     STRING Account             ;
@@ -153,7 +161,10 @@ soapLayout := RECORD
 	UNSIGNED1 DPPAPurpose;
 	BOOLEAN OutputMasterResults;
 	BOOLEAN IsMarketing;
+	BOOLEAN TurnOffHouseHolds;
+	BOOLEAN TurnOffRelatives;	
 	BOOLEAN IncludeMinors;
+	BOOLEAN UseIngestDate;
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	UNSIGNED1 LexIdSourceOptout;
@@ -178,6 +189,7 @@ Settings := MODULE(PublicRecords_KEL.Interface_BWR_Settings)
 	EXPORT STRING Data_Permission_Mask := DataPermissionMask;
 	EXPORT UNSIGNED GLBAPurpose := GLBA;
 	EXPORT UNSIGNED DPPAPurpose := DPPA;
+	EXPORT boolean UseIngestDate := Use_Ingest_Date;
 	EXPORT UNSIGNED LexIDThreshold := Score_threshold;
 	EXPORT BOOLEAN IncludeMinors := Include_Minors;
 	EXPORT BOOLEAN RetainInputLexid := Retain_Input_Lexid;
@@ -215,7 +227,10 @@ soapLayout trans (pp le):= TRANSFORM
 	SELF.GLBPurpose := Settings.GLBAPurpose;
 	SELF.DPPAPurpose := Settings.DPPAPurpose;
 	SELF.IncludeMinors := Settings.IncludeMinors;
+	SELF.UseIngestDate := Settings.UseIngestDate;
 	SELF.IsMarketing := FALSE;
+	SELF.TurnOffHouseHolds := TurnOffHouseHolds;
+	SELF.TurnOffRelatives := TurnOffRelatives;	
 	self.RetainInputLexid := Settings.RetainInputLexid;
 	self.appendpii := Settings.BestPIIAppend; //do not append best pii for running
 	SELF.AllowedSourcesDataset := AllowedSourcesDataset;
@@ -245,10 +260,10 @@ END;
 bwr_results := 
 				SOAPCALL(soap_in, 
 				RoxieIP,
-				'publicrecords_kel.MAS_nonFCRA_Service', 
+				'publicrecords_kel.MAS_nonFCRA_Service.208', 
 				{soap_in}, 
 				DATASET(layout_MAS_Test_Service_output),
-				XPATH('publicrecords_kel.MAS_nonFCRA_ServiceResponse/Results/Result/Dataset[@name=\'MasterResults\']/Row'),
+				XPATH('publicrecords_kel.MAS_nonFCRA_Service.208Response/Results/Result/Dataset[@name=\'MasterResults\']/Row'),
         RETRY(2), TIMEOUT(300),
 				PARALLEL(threads), 
         onFail(myFail(LEFT)));

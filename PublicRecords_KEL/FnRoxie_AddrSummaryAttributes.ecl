@@ -8,10 +8,10 @@ EXPORT FnRoxie_AddrSummaryAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Lay
 	RecordsWithInputParms := InputData(P_InpClnAddrPrimName <> '' AND P_InpClnAddrPrimRng <> '' AND P_InpClnAddrZip5 <> '');
 	RecordsWithoutInputParms := InputData(P_InpClnAddrPrimName = '' OR P_InpClnAddrPrimRng = '' OR P_InpClnAddrZip5 = '');																	
 	
-	LayoutAddressSummaryAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, RECORDOF(PublicRecords_KEL.Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic('', '', '', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0)};
-	
-	AddressSummaryAttributesRaw := NOCOMBINE(JOIN(RecordsWithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutAddressSummaryAttributes,
-		AddressSummaryAttrs := PublicRecords_KEL.Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic(
+		LayoutAddressSummaryAttributes := {UNSIGNED G_ProcUID, BOOLEAN ResultsFound, PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.L_Compile.Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic_Res0_Layout};
+
+		AddressSummaryAttributesRaw := NOCOMBINE(JOIN(RecordsWithInputParms, FDCDataset,  LEFT.G_ProcUID = RIGHT.G_ProcUID, TRANSFORM(LayoutAddressSummaryAttributes,
+				AddressSummaryAttrs := PublicRecords_KEL.KEL_Queries_MAS_NonFCRA.Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic(
 																		LEFT.P_InpClnAddrPrimName,
 																		LEFT.P_InpClnAddrPrimRng,
 																		LEFT.P_InpClnAddrZip5,

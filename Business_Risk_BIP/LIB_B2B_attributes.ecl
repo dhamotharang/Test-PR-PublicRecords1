@@ -54,21 +54,28 @@ EXPORT LIB_B2B_attributes (
             Options.OverrideExperianRestriction,
             '', /* IntendedPurpose - For FCRA Products Only */
             Options.industry_class,
-            PublicRecords_KEL.CFG_Compile,
+            PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile,
             FALSE, /*IsInsuranceProduct*/
             PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES_NONFCRA);
 
     EXPORT isMarketing := IF(Options.MarketingMode = 1, TRUE, FALSE);
 
-    //default options in PublicRecords_KEL.Interface_Options have been changed to FALSE
-    EXPORT BOOLEAN IncludeTradeline := TRUE;
 
   END;
 
+
+		//default setting for keys is false, turn on only what is needed for attributes		
+	JoinFlags := MODULE(PublicRecords_KEL.Join_Interface_Options);
+
+		EXPORT BOOLEAN DoFDCJoin_Tradeline_Files__Tradeline__Key_LinkIds := TRUE;
+		EXPORT BOOLEAN DoFDCJoin_Business_Files__Business__Key_BH_Linking_Ids := TRUE;
+	end;
+	
    // BusinessInput := PROJECT(Input,Transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII BS Input to ECL_Functions.Layouts.LayoutInputBII - pop seq# and bip IDs.
 
   FDCDataset := PublicRecords_KEL.Fn_MAS_FDC(DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
                   KEL_Options,
+                  JoinFlags,
                   BusinessInput);
 
   Common_Functions := PublicRecords_KEL.ECL_Functions.Common_Functions;
@@ -76,14 +83,7 @@ EXPORT LIB_B2B_attributes (
   RecordsWithSeleID := BusinessInput(B_LexIDLegal > 0);
   RecordsWithoutSeleID := BusinessInput(B_LexIDLegal <= 0);
 
-	LayoutBusinessSeleIDAttributes := RECORDOF(PublicRecords_KEL_Queries.B2B_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
-																	0, // UltID
-																	0, // OrgID
-																	0, // SeleID
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII),
-																	DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputBII),
-																	0, // ArchiveDate
-																	PublicRecords_KEL.CFG_Compile.Permit__NONE).res0); //DPM
+	LayoutBusinessSeleIDAttributes := PublicRecords_KEL_Queries.B2B_KEL.L_Compile.Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic_Res0_Layout; //DPM
 
   BusinessSeleAttributes_Results := NOCOMBINE(JOIN(BusinessInput, FDCDataset,
                                               LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,

@@ -1,7 +1,7 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile FROM PublicRecords_KEL_Queries.B2B_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT L_Compile := MODULE
   SHARED Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic_Res0_Internal_Layout := RECORD
     KEL.typ.nint B___Lex_I_D_Ult_;

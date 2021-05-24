@@ -31,6 +31,8 @@ EXPORT Layouts := MODULE
 		STRING20 P_InpClnNameFirst;
 		STRING20 P_InpClnNameMid;
 		STRING30 P_InpClnNameLast;
+		STRING30 P_InpClnSurname1;
+		STRING30 P_InpClnSurname2;
 		STRING6 P_InpClnNameSffx;
 		STRING10 P_InpClnAddrPrimRng;
 		STRING6 P_InpClnAddrPreDir;
@@ -53,6 +55,7 @@ EXPORT Layouts := MODULE
 		STRING7 P_InpClnAddrGeo;
 		STRING6 P_InpClnAddrType;
 		STRING6 P_InpClnAddrStatus;
+		STRING AddressGeoLink;
 		// INTEGER7 P_InpClnAddrLocID;
 		INTEGER7 P_InpClnAddrPropertyUID;
 		STRING9 P_InpClnSSN;
@@ -79,51 +82,62 @@ EXPORT Layouts := MODULE
 		STRING InsuranceSource;
 		BOOLEAN InsuranceDLDataUsed;
 		BOOLEAN PI_InpDOBAgeIsMinorFlag;
-		BOOLEAN BestDataAppended;
+		BOOLEAN PI_BestDataAppended;
+		BOOLEAN PL_PrescreenOptOutFlag;
+		BOOLEAN PL_BestSSNAppendFlag;
+		BOOLEAN PL_BestAddrAppendFlag;
+		BOOLEAN PL_BestDOBAppendFlag;
+		BOOLEAN PL_BestPhoneAppendFlag;
+		BOOLEAN PL_BestNameAppendFlag;
 		BOOLEAN PullIDFlag;
 	END;
 	
-EXPORT LayoutAppendedAddresses := RECORD
+	EXPORT LayoutAppendedAddresses := RECORD
 		//current
 		STRING10 CurrentAddrPrimRng;
 		STRING6 CurrentAddrPreDir;
 		STRING28 CurrentAddrPrimName;
 		STRING6 CurrentAddrSffx;
 		STRING6 CurrentAddrPostDir;
-		STRING10 CurrentAddrUnitDesig;
+		STRING10 CurrentAddrUnitDesignation;
 		STRING8 CurrentAddrSecRng;
 		STRING25 CurrentAddrCity;
 		STRING6 CurrentAddrState;
 		STRING6 CurrentAddrZip5;
-		// STRING6 CurrentAddrZip4;
+		STRING6 CurrentAddrZip4;
 		// STRING CurrentAddrSt;
-		// STRING10 CurrentAddrLat;
-		// STRING11 CurrentAddrLng;
+		STRING10 CurrentAddrLat;
+		STRING11 CurrentAddrLng;
 		STRING6 CurrentAddrStateCode;	
 		STRING6 CurrentAddrCnty;
 		STRING7 CurrentAddrGeo;
-		// STRING6 CurrentAddrType;
-		// STRING6 CurrentAddrStatus;		
-		//previous
+		STRING6 CurrentAddrType;
+		STRING6 CurrentAddrStatus;		
+		STRING8 CurrentAddrDateFirstSeen;
+		STRING8 CurrentAddrDateLastSeen;
+		STRING CurrentAddrFull;
 		STRING10 PreviousAddrPrimRng;
 		STRING6 PreviousAddrPreDir;
 		STRING28 PreviousAddrPrimName;
 		STRING6 PreviousAddrSffx;
 		STRING6 PreviousAddrPostDir;
-		STRING10 PreviousAddrUnitDesig;
+		STRING10 PreviousAddrUnitDesignation;
 		STRING8 PreviousAddrSecRng;
-		// STRING25 PreviousAddrCity;
+		STRING25 PreviousAddrCity;
 		STRING6 PreviousAddrState;
 		STRING6 PreviousAddrZip5;
-		// STRING6 PreviousAddrZip4;
+		STRING6 PreviousAddrZip4;
 		// STRING PreviousAddrSt;
-		// STRING10 PreviousAddrLat;
-		// STRING11 PreviousAddrLng;
-		STRING6 PreviousAddrStateCode;
+		STRING10 PreviousAddrLat;
+		STRING11 PreviousAddrLng;
+		STRING6 PreviousAddrStateCode;	
 		STRING6 PreviousAddrCnty;
 		STRING7 PreviousAddrGeo;
-		// STRING6 PreviousAddrType;
-		// STRING6 PreviousAddrStatus;
+		STRING6 PreviousAddrType;
+		STRING6 PreviousAddrStatus;
+		STRING8 PreviousAddrDateFirstSeen;
+		STRING8 PreviousAddrDateLastSeen;
+		STRING PreviousAddrFull;
 		//Emerging Address
 		STRING10 EmergingAddrPrimRng;
 		STRING6 EmergingAddrPreDir;
@@ -149,7 +163,6 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING20 BestNameLast;
 		STRING10 BestSSN;
 		STRING10 BestDOB;		
-		
 	END;		
 			
 	EXPORT LayoutInputPII := RECORD
@@ -284,11 +297,11 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING10 PI_InpSSNDeceasedDt;
 		STRING6 PI_InpAddrStateDLAvailFlag;
 		STRING6 PI_InpAddrStateVoterAvailFlag;
-		//STRING PI_InpPhoneSICCodeHRList;
-		//STRING PI_InpPhoneNAICSCodeHRList;
-		//STRING6 PI_InpPhoneIsHRCorrectFacFlag;
-		//STRING6 PI_InpPhoneType;
-		//STRING6 PI_InpPhoneIsBusPhoneFlag;
+		STRING PI_InpPhoneSICCodeHRList;
+		STRING PI_InpPhoneNAICSCodeHRList;
+		STRING6 PI_InpPhoneIsHRCorrectFacFlag;
+		STRING6 PI_InpPhoneType;
+		STRING6 PI_InpPhoneIsBusPhoneFlag;
 		INTEGER3 PI_SrchPerInpSSNCnt1Y;
 		INTEGER3 PI_SrchLexIDPerInpSSNCnt1Y;
 		INTEGER3 PI_SrchLNamePerInpSSNCnt1Y;
@@ -1212,9 +1225,9 @@ EXPORT LayoutAppendedAddresses := RECORD
 		STRING6 PL_DrgBkBusFlag10Y ;
 		STRING6 PL_DrgBkSeverityIndx10Y ;
 		STRING6 PL_ProfLicFlagEv;
-		STRING500 PL_ProfLicIssueDtListEv;
-		STRING500 PL_ProfLicExpDtListEv;
-		STRING100 PL_ProfLicIndxByLicListEv;
+		STRING PL_ProfLicIssueDtListEv;
+		STRING PL_ProfLicExpDtListEv;
+		STRING PL_ProfLicIndxByLicListEv;
 		STRING6 PL_ProfLicActvFlag;
 		STRING10 PL_ProfLicActvNewIssueDt;
 		STRING10 PL_ProfLicActvNewExpDt;
@@ -1297,7 +1310,7 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER4 PL_AstPropBusCurrTaxValTot;
 		//Utility
 		INTEGER3 PL_UtilCntEv;
-		STRING1000 PL_UtilOldDtListEv;
+		STRING PL_UtilOldDtListEv;
 		STRING8 PL_UtilOldDtEv;
 		INTEGER3 PL_UtilOldMsncEv;
 		//Email
@@ -1459,13 +1472,21 @@ EXPORT LayoutAppendedAddresses := RECORD
 		INTEGER PL_STLCnt5Y;
 		STRING PL_STLDtList5Y;
 		//Person Header Source Verification
-		// INTEGER PL_VerSrcCntEv;
-		// STRING100 PL_VerSrcListEv;
-		// STRING300 PL_VerSrcEmrgDtListEv;
-		// STRING300 PL_VerSrcLastDtListEv;
-		// STRING10 PL_VerSrcOldDtEv;
-		// STRING10 PL_VerSrcNewDtEv;
-		// STRING6 P_LexIDRstdOnlyFlag;
+		INTEGER PL_VerSrcCntEv;
+		STRING100 PL_VerSrcListEv;
+		STRING300 PL_VerSrcEmrgDtListEv;
+		STRING300 PL_VerSrcLastDtListEv;
+		STRING10 PL_VerSrcOldDtEv;
+		STRING10 PL_VerSrcNewDtEv;
+		STRING6 P_LexIDRstdOnlyFlag;
+		STRING100 PL_VerSSNSrcListEv;
+		STRING300 PL_VerSSNSrcEmrgDtListEv;
+		STRING300 PL_VerSSNSrcLastDtListEv;
+		INTEGER8 PL_VerSSNSrcCntEv;
+		INTEGER PL_VerNameFirstSrcCntEv;
+		STRING PL_VerNameFirstSrcListEv;
+		STRING PL_VerNameFirstSrcEmrgDtListEv;
+		STRING PL_VerNameFirstSrcLastDtListEv;
 		//consumer statements
 		string6 PL_AlrtCorrectedFlag;
 		string6 PL_AlrtConsStatementFlag;
@@ -1473,6 +1494,27 @@ EXPORT LayoutAppendedAddresses := RECORD
 		string6 PL_AlrtSecurityFreezeFlag;
 		string6 PL_AlrtSecurityAlertFlag;
 		string6 PL_AlrtIDTheftFlag;
+		Boolean P_SubjAppliedInCAFlag;
+		BOOLEAN PI_BestDataAppended;
+		BOOLEAN PL_PrescreenOptOutFlag;
+		BOOLEAN PL_BestSSNAppendFlag;
+		BOOLEAN PL_BestAddrAppendFlag;
+		BOOLEAN PL_BestDOBAppendFlag;
+		BOOLEAN PL_BestPhoneAppendFlag;
+		BOOLEAN PL_BestNameAppendFlag;
+		STRING6 PL_AstPropFlagEv;
+		STRING6 PL_AstPropCurrFlag;
+		STRING6 PL_AstPropOwnershipIndx;
+		INTEGER3 PL_AstPropCurrWMktValCnt;
+		STRING PL_AstPropCurrMktValList;
+		INTEGER3 PL_AstPropCurrWTaxValCnt;
+		STRING PL_AstPropCurrTaxValList;
+		INTEGER4 PL_AstPropCurrTaxValTot;
+		INTEGER3 PL_AstPropCurrWAVMValCnt;
+		STRING PL_AstPropCurrAVMValList;
+		INTEGER4 PL_AstPropCurrAVMValTot;
+		INTEGER4 PL_AstPropCurrAVMValAvg;		
+		
 	END;
 	
 	EXPORT LayoutPerson := RECORD

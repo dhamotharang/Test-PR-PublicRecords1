@@ -11,6 +11,8 @@ Export Fn_GetBRM_SeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 		
 	BusinessSeleIDAttributesRaw := KEL.Clean(BRM_Marketing_Attributes.BusinessSeleAttributes_Function(RecordsWithSeleID, RepInput, FDCDataset, Options), TRUE, TRUE, TRUE);
 	
+//to turn on any unsued attributes again just un comment them in graph and below.
+	
 	BusinessAttributesWithSeleID := JOIN(RecordsWithSeleID, BusinessSeleIDAttributesRaw, LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID, 
 		TRANSFORM(BRM_Marketing_Attributes.Layout_BRM_NonFCRA.LayoutBusinessSeleID,
 			ResultsFound := (INTEGER7)RIGHT.B_LexIDLegal > 0 AND RIGHT.B_LexIDLegalSeenFlag = '1';
@@ -31,11 +33,11 @@ Export Fn_GetBRM_SeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			//Asset
 			SELF.BE_AstVehAirCntEv := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAirCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_AstVehWtrCntEv := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehWtrCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AstVehAutoCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AstVehAutoPersCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoPersCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AstVehAutoCommCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoCommCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AstVehAutoOtherCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoOtherCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AstVehAutoEmrgNewMsncEv := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoEmrgNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AstVehAutoCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AstVehAutoPersCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoPersCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AstVehAutoCommCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoCommCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AstVehAutoOtherCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoOtherCnt2Y, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AstVehAutoEmrgNewMsncEv := IF(ResultsFound, (STRING8)RIGHT.BE_AstVehAutoEmrgNewMsncEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			//property
 			SELF.BE_AstPropCntEv := IF(ResultsFound, (STRING8)RIGHT.BE_AstPropCntEv, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
 			SELF.BE_AstPropCurrCnt := IF(ResultsFound, (STRING8)RIGHT.BE_AstPropCurrCnt, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
@@ -96,26 +98,26 @@ Export Fn_GetBRM_SeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			SELF.BE_B2BWorstPerfIndx2Y := IF(ResultsFound, (STRING)RIGHT.BE_B2BWorstPerfIndx2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			//assoc
 			SELF.BE_AssocCntEv := IF(ResultsFound, (STRING8)RIGHT.BE_AssocCntEv,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AssocCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AssocCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_AssocExecCntEv := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecCntEv,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AssocExecCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AssocExecCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
 			SELF.BE_AssocNexecCntEv := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecCntEv,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AssocNexecCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
-			SELF.BE_AssocAgeAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocAgeAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocExecAgeAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecAgeAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocNexecAgeAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecAgeAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocWEduCollCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocWEduCollCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocExecWEduCollCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecWEduCollCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocNexecWEduCollCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecWEduCollCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocEmrgMsncAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocEmrgMsncAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocExecEmrgMsncAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecEmrgMsncAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocNexecEmrgMsncAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecEmrgMsncAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocWDrgCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocWDrgCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocExecWDrgCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecWDrgCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocNexecWDrgCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecWDrgCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocBusCntAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocBusCntAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocExecBusCntAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecBusCntAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_AssocNexecBusCntAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecBusCntAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);			
+			// SELF.BE_AssocNexecCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
+			// SELF.BE_AssocAgeAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocAgeAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocExecAgeAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecAgeAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocNexecAgeAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecAgeAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocWEduCollCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocWEduCollCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocExecWEduCollCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecWEduCollCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocNexecWEduCollCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecWEduCollCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocEmrgMsncAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocEmrgMsncAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocExecEmrgMsncAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecEmrgMsncAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocNexecEmrgMsncAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecEmrgMsncAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocWDrgCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocWDrgCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocExecWDrgCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecWDrgCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocNexecWDrgCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecWDrgCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocBusCntAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocBusCntAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocExecBusCntAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocExecBusCntAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_AssocNexecBusCntAvg2Y := IF(ResultsFound, (STRING8)RIGHT.BE_AssocNexecBusCntAvg2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);			
 			//Firmographics	
 			SELF.BE_BusSICCode1 := IF(ResultsFound, (STRING6)RIGHT.BE_BusSICCode1,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA); 
 			SELF.BE_BusSICCode1Desc := IF(ResultsFound, (STRING150)RIGHT.BE_BusSICCode1Desc,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -143,10 +145,10 @@ Export Fn_GetBRM_SeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			SELF.BE_BusLocActvCnt := IF(ResultsFound, (STRING8)RIGHT.BE_BusLocActvCnt,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA); 		
 			//Ownership Attributes		
 			SELF.BE_BusInferFemaleOwnedFlag := IF(ResultsFound, (STRING6)RIGHT.BE_BusInferFemaleOwnedFlag,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
-			SELF.BE_BusInferFamilyOwnedFlag := IF(ResultsFound, (STRING6)RIGHT.BE_BusInferFamilyOwnedFlag,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
+			// SELF.BE_BusInferFamilyOwnedFlag := IF(ResultsFound, (STRING6)RIGHT.BE_BusInferFamilyOwnedFlag,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
 			SELF.BE_BusIsFemaleOwnedFlag := IF(ResultsFound, (STRING6)RIGHT.BE_BusIsFemaleOwnedFlag,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);		
 			SELF.BE_BusIsMinorityOwnedFlag := IF(ResultsFound, (STRING6)RIGHT.BE_BusIsMinorityOwnedFlag,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);						
-			SELF.BE_BusIsResidentialFlag := IF(ResultsFound, (STRING6)RIGHT.BE_BusIsResidentialFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);			
+			// SELF.BE_BusIsResidentialFlag := IF(ResultsFound, (STRING6)RIGHT.BE_BusIsResidentialFlag, PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);			
 			SELF.BE_DBANameCnt2Y := IF(ResultsFound, (STRING8)RIGHT.BE_DBANameCnt2Y,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);			
 			//verification
 			SELF.BE_VerSrcCntEv := IF(ResultsFound, (STRING20)RIGHT.BE_VerSrcCntEv,PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA);
@@ -195,11 +197,11 @@ Export Fn_GetBRM_SeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			//Assets
 			SELF.BE_AstVehAirCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_AstVehWtrCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AstVehAutoCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AstVehAutoPersCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AstVehAutoCommCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AstVehAutoOtherCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AstVehAutoEmrgNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;	
+			// SELF.BE_AstVehAutoCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_AstVehAutoPersCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_AstVehAutoCommCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_AstVehAutoOtherCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_AstVehAutoEmrgNewMsncEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;	
 			//Property
 			SELF.BE_AstPropCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
 			SELF.BE_AstPropCurrCnt := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
@@ -252,26 +254,26 @@ Export Fn_GetBRM_SeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			SELF.BE_UCCCreditorCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;	
 			//assoc
 			SELF.BE_AssocCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AssocCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_AssocCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_AssocExecCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AssocExecCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_AssocExecCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_AssocNexecCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AssocNexecCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
-			SELF.BE_AssocAgeAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocExecAgeAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocNexecAgeAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocWEduCollCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocExecWEduCollCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocNexecWEduCollCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocEmrgMsncAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocExecEmrgMsncAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocNexecEmrgMsncAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocWDrgCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocExecWDrgCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocNexecWDrgCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocBusCntAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocExecBusCntAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_AssocNexecBusCntAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;			
+			// SELF.BE_AssocNexecCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_AssocAgeAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocExecAgeAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocNexecAgeAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocWEduCollCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocExecWEduCollCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocNexecWEduCollCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocEmrgMsncAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocExecEmrgMsncAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocNexecEmrgMsncAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocWDrgCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocExecWDrgCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocNexecWDrgCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocBusCntAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocExecBusCntAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_AssocNexecBusCntAvg2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;			
 			//Firmographics	
 			SELF.BE_BusSICCode1 := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA; 
 			SELF.BE_BusSICCode1Desc := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
@@ -299,10 +301,10 @@ Export Fn_GetBRM_SeleIDAttributes(DATASET(PublicRecords_KEL.ECL_Functions.Layout
 			SELF.BE_BusLocActvCnt := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA; 		
 			//Ownership Attributes		
 			SELF.BE_BusInferFemaleOwnedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_BusInferFamilyOwnedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
+			// SELF.BE_BusInferFamilyOwnedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
 			SELF.BE_BusIsFemaleOwnedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
 			SELF.BE_BusIsMinorityOwnedFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;		
-			SELF.BE_BusIsResidentialFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
+			// SELF.BE_BusIsResidentialFlag := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;
 			SELF.BE_DBANameCnt2Y := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;			
 			//verification
 			SELF.BE_VerSrcCntEv := PublicRecords_KEL.ECL_Functions.Constants.MISSING_INPUT_DATA;

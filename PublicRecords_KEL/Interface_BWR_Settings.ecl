@@ -15,6 +15,7 @@
 	EXPORT UNSIGNED BusinessLexIDThreshold := 0;
 	EXPORT UNSIGNED BusinessLexIDWeightThreshold := 0;
 	EXPORT BOOLEAN BusinessLexIDPrimForce := FALSE;
+	EXPORT BOOLEAN useingestdate := FALSE;
 	EXPORT BOOLEAN BusinessLexIDReAppend := TRUE;
 	EXPORT BOOLEAN BusinessLexIDIncludeAuthRep := FALSE;
 		EXPORT BOOLEAN RetainInputLexid := False; //keep input lexid
