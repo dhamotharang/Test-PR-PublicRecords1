@@ -1,5 +1,5 @@
 ﻿	import address, Doxie, riskwise, ut, codes, Suppress, AutoStandardI, seed_files, iesp,
-			 IntlIID, gateway, Royalty, census_data, OFAC_XG5, STD, Models, Risk_Indicators;
+			   IntlIID, gateway, Royalty, census_data, OFAC_XG5, STD, Models, Risk_Indicators;
 // NOTE! If you make any logic changes here, please change also BusinessInstantID20_Services.fn_GetConsumerInstantIDRecs.
 
 Risk_indicators.MAC_unparsedfullname(title_val,fname_val,mname_val,lname_val,suffix_val,'FirstName','MiddleName','LastName','NameSuffix')
@@ -272,7 +272,7 @@ d := dataset([{(unsigned)account_value}],rec);
 //Check to see if new custom CVI field is populated with a valid value
 Custom_Model_Name := trim(STD.STR.ToUpperCase(In_CustomCVIModelName));
 
-Valid_CCVI := Custom_Model_Name in ['','CCVI1501_1','CCVI1609_1','CCVI1810_1', 'CCVI1909_1', 'CCVI2004_1'];
+Valid_CCVI := Custom_Model_Name in ['','CCVI1501_1','CCVI1609_1','CCVI1810_1', 'CCVI1909_1', 'CCVI2004_1', 'CCVI2105_1'];
 CustomCVIModelName := if(Valid_CCVI, Custom_Model_Name, error('Invalid Custom CVI model name.')):INDEPENDENT;
 ischase := if(CustomCVIModelName = 'CCVI1810_1', TRUE,FALSE);
 
@@ -676,16 +676,16 @@ OverrideOptions := MODULE(Risk_Indicators.iid_constants.IOverrideOptions)
 END;
 
     //chase wants their custom cvi mapped to the normal and custom cvi and reason codes. 
-     SELF.CVI :=                        map(CustomCVIModelName = 'CCVI1810_1' => Models.CVI1810_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
-                                                            actualIIDVersion=0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast, ,OverrideOptions),
-                                                            risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions));
+     SELF.CVI := MAP(CustomCVIModelName = 'CCVI1810_1' => Models.CVI1810_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                     actualIIDVersion = 0 => risk_indicators.cviScore(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast, ,OverrideOptions),
+                     risk_indicators.cviScoreV1(le.phoneverlevel,le.socsverlevel,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions));
 	
      // Chase custom score is calculated in SELF.CVI if it's requested, no need to call the attribute here too
      SELF.cviCustomScore := MAP(CustomCVIModelName = 'CCVI1909_1' => Models.CVI1909_1_0(NAP_summary1,NAS_summary1,SELF.CVI, SELF.verify_dob, le.addr_type, le.zipclass, (STRING)le.socsverlevel, le.ssn, le.ssnExists, le.lastssnmatch2),
-                                                            CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
-                                                            CustomCVIModelName = 'CCVI2004_1' => Models.CVI2004_1_0(le.prim_range, le.prim_name, le.st, le.p_city_name, le.z5, le.zip4,(REAL)le.lat, (REAL)le.long, best_address, best_city, best_state, best_zip5, best_zip4),
-                                                            CustomCVIModelName <> '' => SELF.CVI,
-                                                            '');
+                                CustomCVIModelName = 'CCVI1501_1' => Models.CVI1501_1_0(NAP_summary1,NAS_summary1,le,customCVIvalue,veraddr,verlast,OFAC,IncludeDOBinCVI,IncludeDriverLicenseInCVI,IncludeITIN,IncludeComplianceCap, OverrideOptions),
+                                CustomCVIModelName = 'CCVI2004_1' => Models.CVI2004_1_0(le.prim_range, le.prim_name, le.st, le.p_city_name, le.z5, le.zip4,(REAL)le.lat, (REAL)le.long, best_address, best_city, best_state, best_zip5, best_zip4),
+                                CustomCVIModelName <> '' => SELF.CVI,
+                                '');
 
 	self.SubjectSSNCount := if(risk_indicators.rcSet.isCodeMS(le.ssns_per_adl_seen_18months), (string)le.ssns_per_adl_seen_18months, '');
 	self.age := if (le.age = '***','',le.age);
@@ -733,17 +733,20 @@ END;
   
 	self.cviCustomScore_name := if(Valid_CCVI, CustomCVIModelName, '');
 	
-    noCustomRIorFUA := CustomCVIModelName IN ['', 'CCVI1909_1', 'CCVI2004_1'];
+  noCustomRIorFUA := CustomCVIModelName IN ['', 'CCVI1909_1', 'CCVI2004_1'];
+
+  getAdditionalRI := Risk_Indicators.setRiskIndicatorsForCCVI2105_1(reasons_with_seq, le.ssn);
     
 	self.cviCustomScore_ri  := MAP(ischase and chase_expressions => reason_with_seq_chase(hri<>''),
-                                                                    noCustomRIorFUA => empty_reasons_with_seq,
-																	CustomCVIModelName <> ''=>reasons_with_seq(hri<>''), 
-																	empty_reasons_with_seq);
+                                 noCustomRIorFUA => empty_reasons_with_seq,
+                                 CustomCVIModelName = 'CCVI2105_1' => getAdditionalRI(hri<>''),
+																 CustomCVIModelName <> '' => reasons_with_seq(hri<>''), 
+																 empty_reasons_with_seq);
 																	
 	SELF.cviCustomScore_fua := MAP(ischase and chase_expressions => risk_indicators.getActionCodes(le, 4, NAS_summary1, NAP_summary1, ac_settings := actioncode_settings),
-                                                                    noCustomRIorFUA => empty_reasons,
-																	CustomCVIModelName <> '' => risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings),
-																	empty_reasons);
+                                 noCustomRIorFUA => empty_reasons,
+																 CustomCVIModelName <> '' => risk_indicators.getActionCodes(le, 4, SELF.NAS_summary, SELF.NAP_summary, ac_settings := actioncode_settings),
+																 empty_reasons);
 		
 	self.verdl := if(IncludeDLverification,le.verified_dl,'');
   self.corrected_dl:= IF(self.verdl <>le.dl_number,le.verified_dl,'');
@@ -1146,7 +1149,7 @@ temp_output:= Project(post_dob_masking,minorsTransform(LEFT));
 final_output:=if(Excluded_Minor,temp_output,post_dob_masking);
 
 // output(age,named('age'));
-//output(excludeminors,named('excludeminors'));
+// output(excludeminors,named('excludeminors'));
 // output(tmx_model,named('tmx_model'));
 // output(doInquiries, named('IIDrecs_doInquiries'));	//ZZZ
 // output(BSoptions, named('IIDrecs_BSoptions'));	//ZZZ
