@@ -35,10 +35,16 @@ macro
 #uniquename(recSize)
 #uniquename(add_Clean_super)
 #uniquename(super_Clean_main)
+#uniquename(add_Deletes_super)
+#uniquename(super_Deletes_main)
 #uniquename(IfnotCreate_CleanSuper)
 #uniquename(Create_CleanSuper)
+#uniquename(IfnotCreate_DeletesSuper)
+#uniquename(Create_DeletesSuper)
 #uniquename(check_clean)
+#uniquename(check_deletes)
 #uniquename(cleaned_file)
+#uniquename(deletes_file)
 #uniquename(scrub_files)
 #uniquename(add_Raw_super)
 #uniquename(IfnotCreate_RawSuper)
@@ -83,9 +89,8 @@ macro
 					 %subname% = 'LA'        => 151,
 					//%subname% = 'MA'        => 227,
 					//%subname% = 'ME'        => 309,
-					 %subname% = 'ME_MEDCERT' => 519,
-					 //%subname% = 'MI'        => 211,
-			     %subname% = 'MI'        => 212,
+					 %subname% = 'ME_MEDCERT'=> 519,
+			     %subname% = 'MI'        => 311,
 					 %subname% = 'MN'        => 245,
 					// Removed "MO" data, to be compliant with the new state law(bug#37550; 20090309)
 					//re-instated MO per Jill Luber 20090716
@@ -100,7 +105,7 @@ macro
 					 %subname% = 'WI'        => 386,  //ebcdic
 					 %subname% = 'WV'        => 201,
 					 //%subname% = 'WY'        => 192,			
-					 %subname% = 'WY_MEDCERT' => 203,	
+					 %subname% = 'WY_MEDCERT'=> 203,	
 					 8192  //FL, MO,MO_MEDCERT, & TX is a varying length
 					);
 					
@@ -111,28 +116,28 @@ macro
 	%spray_raw% := if (%st% in ['LA','ME', 'MI', 'MN','NE','NV', 'TN', 'WI', 'WV', 'WY'] OR
 	                   %subname% = 'MO_BASIC' OR %subname% = 'MO_ICISSU',
 						FileServices.SprayFixed(Source_IP
-												,source_path + file_name
-												,%recSize%
-												,group_name
-												,DriversV2.Constants.cluster +'in::dl2::'+filedate+'::'+%subname%+'_Update_Raw'
-												,-1
-												,
-												,
-												,true
+																	 ,source_path + file_name
+																	 ,%recSize%
+																	 ,group_name
+																	 ,DriversV2.Constants.cluster +'in::dl2::'+filedate+'::'+%subname%+'_Update_Raw'
+																	 ,-1
+																	 ,
+																	 ,
+																	 ,true
 												,true),
 						FileServices.SprayVariable(Source_IP
-												   ,source_path + file_name
-												   ,
-												   ,%sourceCsvSeparater%
-												   ,
-												   ,%sourceCsvQuote%
-												   ,group_name
-												   ,DriversV2.Constants.cluster +'in::dl2::'+filedate+'::'+%subname%+'_Update_Raw'
-												  ,-1
-												   ,
-												   ,
-												   ,true
-												   ,
+																	 ,source_path + file_name
+																	 ,
+																	 ,%sourceCsvSeparater%
+																	 ,
+																	 ,%sourceCsvQuote%
+																	 ,group_name
+																	 ,DriversV2.Constants.cluster +'in::dl2::'+filedate+'::'+%subname%+'_Update_Raw'
+																	,-1
+																	 ,
+																	 ,
+																	 ,true
+																	 ,
 												   ,true));
     %check_raw%  :=if (not FileServices.FileExists(DriversV2.Constants.cluster + 'in::dl2::'+filedate+'::'+%subname%+'_Update_Raw'),%spray_raw%);
 
@@ -181,11 +186,18 @@ macro
 												 //New Layout for WY DL includes medical certification data               
 												 'WY_MEDCERT' => output(DriversV2.Cleaned_DL_WY_MEDCERT(process_dte, filedate),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',overwrite,__compressed__)				
 												);
-						  
+					  
 						  
 	
 	%check_clean% := if(not FileServices.FileExists(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned'),
 											  %cleaned_file%);
+												
+	%deletes_file% := case(%subname%,
+												 'MI' => output(DriversV2.Deletes_DL_MI(process_dte, filedate),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::deletes',overwrite,__compressed__)
+												);
+												
+	%check_deletes% := if(not FileServices.FileExists(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::deletes'),
+											  %deletes_file%);												
 												
 	%As_DL_mapper% := case(%subname%,
 													'CT' => output(DriversV2.CT_as_DL(dataset(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned',drivers.Layout_CT_Full,thor)),,DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'::'+filedate+'::As_DL',overwrite,__compressed__),
@@ -235,7 +247,8 @@ macro
 	                     ,'WI'             => DriversV2.Scrub_DL(filedate).WI
 	                     ,'WY_MEDCERT'     => DriversV2.Scrub_DL(filedate).WY_MEDCERT
                        );
-											  
+	
+	//*** Super file processing for Cleaned updates										  
 	%Create_CleanSuper% := FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_Clean_updates::Superfile',false);
 	
 	%IfnotCreate_CleanSuper% := if (not FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_Clean_updates::Superfile'),%Create_CleanSuper%); 										  
@@ -248,6 +261,20 @@ macro
 							FileServices.FinishSuperFileTransaction());
 
 	%add_Clean_super% := if(FileServices.FindSuperFileSubName(DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_Clean_updates::Superfile', DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::cleaned') = 0, %super_Clean_main%);
+
+	//*** Super file processing for Deletes updates	
+	%Create_DeletesSuper% := FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::Deletes::Superfile',false);
+	
+	%IfnotCreate_DeletesSuper% := if (not FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::Deletes::Superfile'),%Create_DeletesSuper%); 										  
+
+	%super_Deletes_main% := sequential(
+							FileServices.StartSuperFileTransaction(),
+					
+							FileServices.AddSuperFile(DriversV2.Constants.cluster + 'in::dl2::Deletes::Superfile', 
+											  DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::deletes'), 
+							FileServices.FinishSuperFileTransaction());
+
+	%add_Deletes_super% := if(FileServices.FindSuperFileSubName(DriversV2.Constants.cluster + 'in::dl2::Deletes::Superfile', DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'_update::'+filedate+'::deletes') = 0, %super_Deletes_main%);
 	
 	//*** Adding As_DL state mapper files to a common superfile.
 	%IfnotCreate_As_DL_Super% := sequential( if (not FileServices.SuperFileExists(DriversV2.Constants.cluster + 'in::dl2::As_DL_Mappers'),FileServices.CreateSuperFile(DriversV2.Constants.cluster + 'in::dl2::As_DL_Mappers',false)),
@@ -266,8 +293,9 @@ macro
 	%add_AS_Dl_super% := if(FileServices.FindSuperFileSubName(DriversV2.Constants.cluster + 'in::dl2::As_DL_Mappers', DriversV2.Constants.cluster + 'in::dl2::'+%subname%+'::'+filedate+'::As_DL') = 0, %super_As_DL%); 
 		
 	
-	sequential(%check_raw%, %IfnotCreate_RawSuper%, %add_Raw_super%, %check_clean%, %As_DL_mapper%, %scrub_files%, %IfnotCreate_CleanSuper%, %add_Clean_super%, %IfnotCreate_As_DL_Super%, %add_AS_Dl_super%
-						 ,NOTIFY((%st% + ' SPRAY COMPLETE FOR ' + filedate),'*'));
+  sequential(%check_raw%, %IfnotCreate_RawSuper%, %add_Raw_super%, %check_clean%, %check_deletes%, %As_DL_mapper%, %scrub_files%, %IfnotCreate_CleanSuper%, %add_Clean_super%, %IfnotCreate_DeletesSuper%, %add_Deletes_super%,%IfnotCreate_As_DL_Super%, %add_AS_Dl_super%
+   						 ,NOTIFY((%st% + ' SPRAY COMPLETE FOR ' + filedate),'*'));
+
 #else
 	ERROR('Job failed - STATE code passed is not a valid Drivers License state code. ' +
 	      'Please double check the state code passed - if you are sure, than need to modify ' +
