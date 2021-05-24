@@ -310,12 +310,13 @@ EXPORT GatewayData := MODULE
 
   SHARED VerifyDeliveryStatusEA(DATASET($.Layouts.email_final_rec) ds_email_in, $.IParams.EmailParams in_mod) := FUNCTION
 
+    is_EA_allowed := ~in_mod.isDirectMarketing();
     ds_email_fltr := ds_email_in(~$.Constants.isUndeliverableEmail(email_status)); // exclude non-deliverable emails based on email_status
     ds_email_srtd := $.Functions.SortResults(ds_email_fltr, in_mod);
     ds_email_chsn := UNGROUP(TOPN(GROUP(ds_email_srtd, acctno), in_mod.MaxEmailsForDeliveryCheck, acctno));
 
     ds_email_gw := PROJECT(ds_email_chsn, TRANSFORM($.Layouts.Gateway_Data.batch_in_gw_rec, SELF.email := TRIM(LEFT.cleaned.clean_email, ALL)));
-    ds_gw_data := IF(EXISTS(ds_email_gw), GetEAGatewayData(DEDUP(ds_email_gw, ALL), in_mod));
+    ds_gw_data := IF(is_EA_allowed AND EXISTS(ds_email_gw), GetEAGatewayData(DEDUP(ds_email_gw, ALL), in_mod));
 
     ds_email_res := JOIN(ds_email_in, ds_gw_data.EARecords,
                          LEFT.cleaned.clean_email = RIGHT.email,
@@ -357,6 +358,7 @@ EXPORT GatewayData := MODULE
 
     ds_validated := MAP(
       $.Constants.isBriteVerifyValidation(in_mod.EmailValidationType) => ds_bv_validated,
+      $.Constants.isEmailageValidation(in_mod.EmailValidationType) AND in_mod.isDirectMarketing() => ds_bv_validated,
       $.Constants.isEmailageValidation(in_mod.EmailValidationType) => ds_ea_validated,
       ROW([], $.Layouts.email_combined_rec)
     );
