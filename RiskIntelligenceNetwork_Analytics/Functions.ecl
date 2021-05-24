@@ -355,7 +355,8 @@ EXPORT Functions := MODULE
 																																									SELF := []));
 																																									
 						//append bank details
-						ds_in_w_bank := AppendBankDetails.macAppendBankDetails(ds_in,batchin_rec.bank_routing_number,'bankDetails_');
+						// ds_in_w_bank := AppendBankDetails.macAppendBankDetails(ds_in,batchin_rec.bank_routing_number,'bankDetails_');
+						ds_in_w_bank := ds_in;
 						
 						//append disposable email flag
 						ds_in_w_disposable_email := AppendDisposableEmailDomainFlag.macAppendDisposableEmailDomainFlag(ds_in_w_bank,batchin_rec.email_address);
@@ -537,7 +538,7 @@ EXPORT Functions := MODULE
 																																																																	SELF.entityhash := IF(LEFT.id_entity_context_uid = '_010','',LEFT.id_entity_context_uid) + '|' + LEFT.acctno,
 																																																																	SELF := []));
 																																																																		
-						EventStatsPrepWithKr := EventStatsPrep + KnownRiskElementProfileAttributes + SafeListProfileAttributes + MultiIdProfileAttributes + KnownRiskIDProfileAttributes;
+						EventStatsPrepWithKr := DEDUP(SORT(EventStatsPrep + KnownRiskElementProfileAttributes + SafeListProfileAttributes + MultiIdProfileAttributes + KnownRiskIDProfileAttributes,entityhash,field),entityhash,field);
 
 					WeightedResultDefault := JOIN(EventStatsPrepWithKr(Value != ''), FraudGovPlatform.Key_ConfigAttributes, 
 																	 LEFT.Field=RIGHT.Field AND ((INTEGER)LEFT.entitycontextuid[2..3] = RIGHT.EntityType OR (INTEGER)LEFT.entitycontextuid[2..3] = 1) AND
