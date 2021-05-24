@@ -111,7 +111,7 @@
 //////////////////////////////////////////////////////////////
 
 	fixFields_d := distribute(notSA, hash(phone));
-	fixFields_s := sort(fixFields_d, phone, -(integer)timestamp, carrier_name, -if(action_code in [PhonesInfo.TransactionCode.Deact], 1, 
+	fixFields_s := sort(fixFields_d, phone, -(integer)timestamp, -if(action_code in [PhonesInfo.TransactionCode.Deact], 1, 
 																																														if(action_code in [PhonesInfo.TransactionCode.Suspend, PhonesInfo.TransactionCode.SwapDelete], 2, 3)), local);
 	fixFields_g := group(fixFields_s, phone);
 	  
