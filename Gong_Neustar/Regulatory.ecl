@@ -2,7 +2,7 @@
 import gong_Neustar, Suppress ;
 
 export string_gong_layout := {
-						string3           bell_id := 'NEU';		// 
+						string3           bell_id := 'NEU';		//  
 						string11          filedate;						// Use the date we run (weekly or monthly)
 						string1           dual_name_flag := 'N';
 						string10          sequence_number;
@@ -69,9 +69,35 @@ export string_gong_layout := {
 						unsigned2 				disc_cnt6 := 0;
 						unsigned2 				disc_cnt12 := 0;
 						unsigned2 				disc_cnt18 := 0;
-						// CCPA-22 CCPA new fields should be watched if added
-						// unsigned4 global_sid := 0;
-						// unsigned8 record_sid := 0;
+	
+						// business fields linIDs
+						/*
+	 				  unsigned6 dotid;
+						unsigned2 dotscore;
+						unsigned2 dotweight;
+						unsigned6 empid;
+						unsigned2 empscore;
+						unsigned2 empweight;
+						unsigned6 powid;
+						unsigned2 powscore;
+						unsigned2 powweight;
+						unsigned6 proxid;
+						unsigned2 proxscore;
+						unsigned2 proxweight;
+						unsigned6 seleid;
+						unsigned2 selescore;
+						unsigned2 seleweight;
+						unsigned6 orgid;
+						unsigned2 orgscore;
+						unsigned2 orgweight;
+						unsigned6 ultid;
+						unsigned2 ultscore;
+						unsigned2 ultweight;
+            */
+						//
+						// CCPA-22 CCPA new fields added  
+						unsigned4 global_sid := 0;
+						unsigned8 record_sid := 0;
 						
 						string2  					eor := '';
 	};
@@ -86,17 +112,17 @@ export string_gong_layout := {
             local gong_in := PROJECT(gong_append_in, Transform(reformat,
 									self.Persistent_Record_id := (unsigned8)0x7FFFFFFFFFFFFFFF - COUNTER;
 									self := left;
-									self := [] ;));
+									self := [] ));
 									
 				    return baseIn + gong_in ;
 		endmacro ;	
 	
 	
-		export applyGongNeustarSup(baseIn) := 
+		export applyGongNeustarSup(baseIn) :=  
 				functionmacro
 						import suppress;
-	
-						local phone_hash(recordof(baseIn) L) := hashmd5(TRIM(l.phone10[1..10], left, right));
+	         
+						local phone_hash(recordof(baseIn) L) := hashmd5(TRIM(l.phone10[4..10]+ l.phone10[1..3], left, right));
 						local phone_Suppress := suppress.applyregulatory.simple_sup(baseIn,'gong_sup.txt', phone_hash);
 						
 						return phone_Suppress;
