@@ -1,0 +1,99 @@
+﻿#OPTION(keyfetchlimit, 10000) // Maximum number of rows to return for any key fetch. HPCC Defaults to 10,000
+#OPTION(keyfetchlimitaction, 'atmost') // Instead of using LIMIT(N) for ECL JOIN's, use ATMOST(N). The N is specified by the keyfetchlimit #OPTION above.
+
+// --- ENTITY Definitions Section --- 
+IMPORT KnowledgeUniverse.PublicRecords_KEL.Entities;
+
+// --- USE Statements Section ---
+IMPORT PublicRecords_KEL.Uses;
+
+// --- Attributes Section --- 
+IMPORT KnowledgeUniverse.PublicRecords_KEL.Attributes; 
+IMPORT KnowledgeUniverse.PublicRecords_KEL.MiniAttributes; 
+
+//Only put queries here if they are used by FCRA, nonFCRA and Business
+
+
+
+//high risk will be FCRA eventually
+					/* KS-6125			
+QUERY: AddressHighRiskDynamic(STRING InputStreetNumber, STRING InputStreetName, INTEGER InputZip, STRING InputPredirectional, STRING InputSuffix, STRING InputPostDirectional,
+							DATASET OF PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII InputPIIDataset,
+					DATE P_InpClnArchDt,
+					PERMITS DPM) <= AddressSlim(PrimaryRange = InputStreetNumber AND PrimaryName = InputStreetName AND ZIP5 = InputZip AND Predirectional = InputPredirectional AND Suffix = InputSuffix AND Postdirectional = InputPostDirectional){ // Grab the Pool of Address records not caring about Sec Range
+		PI_InpAddrSICCodeHRList,
+		PI_InpAddrNAICSCodeHRList,
+		PI_InpAddrIsHRCorrectFacFlag
+		}
+		ASOF DynamicArchive(P_InpClnArchDt) 
+		USING DPM
+		USE InputPIIDataset(FLAT,
+             InputPII(UID = G_ProcUID, Subject = P_LexID));	*/	 
+
+ QUERY: MiniAttributesV1RoxieDynamic(SET OF Person LexID_in, 
+					DATE P_InpClnArchDt, 
+					PERMITS DPM,
+					BOOLEAN IsFCRA) <= Person(UID IN LexID_in){
+		LexID := UID,
+		P_LexIDSeenFlag := IF(IsFCRA, P_LexIDSeenFlagFCRA, P_LexIDSeenFlag),
+		PrepCurrentAddrPrimRng := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrPrimRng),
+		PrepCurrentAddrPreDir := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrPreDir),
+		PrepCurrentAddrPrimName := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrPrimName),
+		PrepCurrentPostdirectional := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentPostdirectional),
+		PrepCurrentAddrSffx := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrSffx),
+		PrepCurrentAddrSecRng := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrSecRng),
+		PrepCurrentAddrState := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrState),
+		PrepCurrentAddrZip5 := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrZip5),
+		PrepCurrentAddrZip4 := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrZip4),
+		PrepCurrentAddrStateCode := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrStateCode),
+		PrepCurrentAddrCnty := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrCnty),
+		PrepCurrentAddrGeo := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrGeo),
+		PrepCurrentAddrCity  := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrCity ),
+		PrepCurrentAddrLat := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrLat),
+		PrepCurrentAddrLng := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrLng),
+		PrepCurrentAddrUnitDesignation := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrUnitDesignation),
+		PrepCurrentAddrType := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrType),
+		PrepCurrentAddrStatus := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrStatus),
+		PrepCurrentAddrDateFirstSeen := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrDateFirstSeen),
+		PrepCurrentAddrDateLastSeen := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrDateLastSeen),
+		PrepCurrentAddrFull  := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepCurrentAddrFull ),
+		PrepPreviousAddrPrimRng := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrPrimRng),
+		PrepPreviousAddrPreDir := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrPreDir),
+		PrepPreviousAddrPrimName := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrPrimName),
+		PrepPreviousPostdirectional := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousPostdirectional),
+		PrepPreviousAddrSffx := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrSffx),
+		PrepPreviousAddrSecRng := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrSecRng),
+		PrepPreviousAddrState := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrState),
+		PrepPreviousAddrZip5 := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrZip5),
+		PrepPreviousAddrZip4 := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrZip4),
+		PrepPreviousAddrStateCode := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrStateCode),
+		PrepPreviousAddrCnty := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrCnty),
+		PrepPreviousAddrGeo := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrGeo),
+		PrepPreviousAddrCity := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrCity),
+		PrepPreviousAddrLat := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrLat),
+		PrepPreviousAddrLng := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrLng),
+		PrepPreviousAddrUnitDesignation := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrUnitDesignation),
+		PrepPreviousAddrType := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrType),
+		PrepPreviousAddrStatus := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrStatus),
+		PrepPreviousAddrDateFirstSeen := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrDateFirstSeen),
+		PrepPreviousAddrDateLastSeen := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrDateLastSeen),
+		PrepPreviousAddrFull  := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', '', PrepPreviousAddrFull ),
+		EmergingAddrPrimRng,
+		EmergingAddrPreDir,
+		EmergingAddrPrimName,
+		EmergingPostdirectional,
+		EmergingAddrSffx,
+		EmergingAddrSecRng,
+		EmergingAddrState,
+		EmergingAddrZip5,
+		EmergingAddrStateCode,
+		EmergingAddrCnty,
+		EmergingAddrGeo,
+		PL_BestNameFirst := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_BestNameFirst),
+		PL_BestNameMid := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_BestNameMid),
+		PL_BestNameLast := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_BestNameLast),
+		PL_BestSSN := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_BestSSN),
+		PL_BestDOB := IF(IsFCRA AND P_LexIDSeenFlagFCRA = '0', MISSING_INPUT_DATA, PL_BestDOB)
+					} 
+		ASOF DynamicArchive(P_InpClnArchDt) 
+		USING DPM;

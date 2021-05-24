@@ -1,0 +1,5 @@
+EXPORT layouts := MODULE
+	EXPORT i_SSN := RECORD
+		STRING9 SSN; 
+	END;
+END;

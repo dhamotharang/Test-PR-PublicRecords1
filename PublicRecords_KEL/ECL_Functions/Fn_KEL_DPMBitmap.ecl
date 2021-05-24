@@ -9,7 +9,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 	// Marketing: Sources that are NOT marketing allowed have their marketing permission bit set to 1, so that in marketing mode, they are NOT allowed.
 	// Sources that ARE marketing allowed have marketing permission bit set to 0, since they do not need to be turned off when marketing mode is set.
 	// The watchdog person data permissions have a marketing bit that is ignored. After talking to the engineer in Boca who worked on those bits, we may change the code here.
-	EXPORT SetValue(STRING Source = '', BOOLEAN FCRA_Restricted = FALSE, BOOLEAN GLBA_Restricted = FALSE, BOOLEAN Pre_GLB_Restricted = FALSE, BOOLEAN DPPA_Restricted = FALSE, STRING DPPA_State = '', BOOLEAN Generic_Restriction = FALSE, BOOLEAN Is_Business_Header = FALSE, STRING Marketing_State = '', BOOLEAN Not_Restricted = FALSE, BOOLEAN Insurance_Product_Restricted = FALSE, UNSIGNED watchdogPermissionsColumn = 0, PublicRecords_KEL.CFG_Compile KELPermissions = PublicRecords_KEL.CFG_Compile, DATA57 BIPBitMask = PublicRecords_KEL.CFG_Compile.Permit__NONE, BOOLEAN Is_Consumer_Header = FALSE) := FUNCTION
+	EXPORT SetValue(STRING Source = '', BOOLEAN FCRA_Restricted = FALSE, BOOLEAN GLBA_Restricted = FALSE, BOOLEAN Pre_GLB_Restricted = FALSE, BOOLEAN DPPA_Restricted = FALSE, STRING DPPA_State = '', BOOLEAN Generic_Restriction = FALSE, BOOLEAN Is_Business_Header = FALSE, STRING Marketing_State = '', BOOLEAN Not_Restricted = FALSE, BOOLEAN Insurance_Product_Restricted = FALSE, UNSIGNED watchdogPermissionsColumn = 0, PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile KELPermissions = PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile, DATA57 BIPBitMask = PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile.Permit__NONE, BOOLEAN Is_Consumer_Header = FALSE) := FUNCTION
 		Permissions := 
 			BitOr(IF(FCRA_Restricted, IF(NOT Not_Restricted, KELPermissions.Permit_FCRA, KELPermissions.Permit__NONE), IF(NOT Not_Restricted, KELPermissions.Permit_NonFCRA, KELPermissions.Permit__NONE)) , // IF FCRA_Restricted is TRUE this record/file is FCRA Restricted, if FALSE it is assumed to be a NonFCRA record/file.  Not_Restricted is utilized for files that allowed for usage in both FCRA and NonFCRA
 			BitOr(IF(GLBA_Restricted, KELPermissions.Permit_GLBA, KELPermissions.Permit__NONE) , // This record/file is GLBA Restricted, you must have proper GLBA Permissions to use the data
@@ -642,7 +642,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 	END;
 	
 	/* Generates the KEL PERMITS Bitmask to pass to a KEL QUERY */
-	EXPORT Generate(STRING DataRestrictionMask, STRING DataPermissionMask, UNSIGNED1 GLBA, UNSIGNED1 DPPA, BOOLEAN isFCRA, BOOLEAN isMarketing = FALSE, BOOLEAN AllowDNBDMI = FALSE, BOOLEAN OverrideExperianRestriction = FALSE, STRING IntendedPurpose, STRING IndustryClass = '', PublicRecords_KEL.CFG_Compile KELPermissions = PublicRecords_KEL.CFG_Compile, BOOLEAN IsInsuranceProduct = FALSE, DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSources = PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES) := FUNCTION
+	EXPORT Generate(STRING DataRestrictionMask, STRING DataPermissionMask, UNSIGNED1 GLBA, UNSIGNED1 DPPA, BOOLEAN isFCRA, BOOLEAN isMarketing = FALSE, BOOLEAN AllowDNBDMI = FALSE, BOOLEAN OverrideExperianRestriction = FALSE, STRING IntendedPurpose, STRING IndustryClass = '', PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile KELPermissions = PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile, BOOLEAN IsInsuranceProduct = FALSE, DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSources = PublicRecords_KEL.ECL_Functions.Constants.DEFAULT_ALLOWED_SOURCES) := FUNCTION
 		Permissions := 
 			BitOr(IF(isFCRA, KELPermissions.Permit_FCRA, KELPermissions.Permit_NonFCRA) , // If isFCRA is TRUE allow FCRA Restricted data, else allow NonFCRA Restricted data in KEL
 			BitOr(IF(Risk_Indicators.iid_constants.glb_ok(GLBA, isFCRA), KELPermissions.Permit_GLBA, KELPermissions.Permit__NONE) , // Check to see if we have appropriate GLBA permissions before allowing use of GLBA Restricted data in KEL
@@ -1221,7 +1221,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 		 For example, if we have a best company name that comes from EBR and DNBDMI, we only need permissions to view EBR OR DNBDMI to view the record in the Best key.
 		 Instead of turning on both Permit_ExperianEBR and Permit_DNBDMI, we split this into two records, one with Permit_ExperianEBR set, and the other with Permit_DNBDMI set
 			so we will still return the best company name if either EBR OR DNBDMI is allowed. */
-	EXPORT ConvertAndNormalizeBIPPermits(InFile, InPermitsFieldName, KELPermissions = PublicRecords_KEL.CFG_Compile) := FUNCTIONMACRO
+	EXPORT ConvertAndNormalizeBIPPermits(InFile, InPermitsFieldName, KELPermissions = PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile) := FUNCTIONMACRO
 			IMPORT KEL13 AS KEL;
 			BitOr(DATA a, DATA b) := KEL.Permits.BitOr(a, b);
 			BitAnd(DATA a, DATA b) := KEL.Permits.BitAnd(a, b);
@@ -1255,7 +1255,7 @@ EXPORT Fn_KEL_DPMBitmap := MODULE
 		ENDMACRO;
 	
 	/* For debugging purposes converts a KEL PERMITS Bitmask into a dataset of TRUE/FALSE flags for if a PERMITS option is set/enabled */
-	EXPORT ConvertToDataset(DATA57 KELDPM, PublicRecords_KEL.CFG_Compile KELPermissions = PublicRecords_KEL.CFG_Compile) := FUNCTION
+	EXPORT ConvertToDataset(DATA57 KELDPM, PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile KELPermissions = PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile) := FUNCTION
 	
 		result := DATASET([
 			{'Permit_Restricted', BitAnd(KELDPM, KELPermissions.Permit_Restricted) <> KELPermissions.Permit__NONE},

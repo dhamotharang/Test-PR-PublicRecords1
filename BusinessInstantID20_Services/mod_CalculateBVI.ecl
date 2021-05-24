@@ -1,13 +1,12 @@
-﻿/*2017-03-29T03:32:00Z (Chris Albee_prod)
-Changes for CR5 (Alternate Company Name added to index calculations).
-*/
+﻿
 IMPORT BusinessInstantID20_Services, Business_Risk_BIP;
 
 
 EXPORT mod_CalculateBVI( Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = FALSE, DATASET(BusinessInstantID20_Services.Layouts.OFACAndWatchlistLayoutFlat) watchlist_results) :=
 	MODULE
 		
-		SHARED fein                          := le.input_echo.fein;
+		SHARED SEQ                           := le.SEQ;
+    SHARED fein                          := le.input_echo.fein;
 		SHARED rep_ssn                       := le.input_echo.rep_ssn;
 		SHARED fein_input_contradictory_in   := le.Verification.FEINAddrNameMismatch;
 		SHARED ver_name_src_count            := le.Verification.NameMatchSourceCount;
@@ -27,31 +26,31 @@ EXPORT mod_CalculateBVI( Business_Risk_BIP.Layouts.Shell le, BOOLEAN useSBFE = F
     
     OFACList:= ['OFAC', 'OFC'];
 		
-     BOOLEAN OFACHit := ((watchlist_results[1].bus_ofac_table_1 <> '' AND watchlist_results[1].bus_ofac_record_number_1[1..4] IN OFACList ) OR watchlist_results[1].bus_ofac_table_1='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_2 <> '' AND watchlist_results[1].bus_ofac_record_number_2[1..4] IN OFACList ) OR watchlist_results[1].bus_ofac_table_2='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_3 <> '' AND watchlist_results[1].bus_ofac_record_number_3[1..4] IN OFACList ) OR watchlist_results[1].bus_ofac_table_3='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_4 <> '' AND watchlist_results[1].bus_ofac_record_number_4[1..4] IN OFACList ) OR watchlist_results[1].bus_ofac_table_4='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_5 <> '' AND watchlist_results[1].bus_ofac_record_number_5[1..4] IN OFACList ) OR watchlist_results[1].bus_ofac_table_5='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_6 <> '' AND watchlist_results[1].bus_ofac_record_number_6[1..4] IN OFACList ) OR watchlist_results[1].bus_ofac_table_6='OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_7 <> '' AND watchlist_results[1].bus_ofac_record_number_7[1..4] IN OFACList) OR watchlist_results[1].bus_ofac_table_7='OFC' );
-    BOOLEAN OtherHit := ((watchlist_results[1].bus_ofac_table_1 <> '' AND watchlist_results[1].bus_ofac_record_number_1[1..4] NOT IN OFACList) AND watchlist_results[1].bus_ofac_table_1<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_2 <> '' AND watchlist_results[1].bus_ofac_record_number_2[1..4] NOT IN OFACList) AND watchlist_results[1].bus_ofac_table_2<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_3 <> '' AND watchlist_results[1].bus_ofac_record_number_3[1..4] NOT IN OFACList) AND watchlist_results[1].bus_ofac_table_3<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_4 <> '' AND watchlist_results[1].bus_ofac_record_number_4[1..4] NOT IN OFACList) AND watchlist_results[1].bus_ofac_table_4<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_5 <> '' AND watchlist_results[1].bus_ofac_record_number_5[1..4] NOT IN OFACList) AND watchlist_results[1].bus_ofac_table_5<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_6 <> '' AND watchlist_results[1].bus_ofac_record_number_6[1..4] NOT IN OFACList) AND watchlist_results[1].bus_ofac_table_6<>'OFC' )
-                     OR ((watchlist_results[1].bus_ofac_table_7 <> '' AND watchlist_results[1].bus_ofac_record_number_7[1..4] NOT IN OFACList) AND watchlist_results[1].bus_ofac_table_7<>'OFC' );
+    BOOLEAN OFACHit := ((watchlist_results[SEQ].bus_ofac_table_1 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_1[1..4] IN OFACList ) OR watchlist_results[SEQ].bus_ofac_table_1='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_2 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_2[1..4] IN OFACList ) OR watchlist_results[SEQ].bus_ofac_table_2='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_3 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_3[1..4] IN OFACList ) OR watchlist_results[SEQ].bus_ofac_table_3='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_4 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_4[1..4] IN OFACList ) OR watchlist_results[SEQ].bus_ofac_table_4='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_5 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_5[1..4] IN OFACList ) OR watchlist_results[SEQ].bus_ofac_table_5='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_6 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_6[1..4] IN OFACList ) OR watchlist_results[SEQ].bus_ofac_table_6='OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_7 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_7[1..4] IN OFACList) OR watchlist_results[SEQ].bus_ofac_table_7='OFC' );
+    BOOLEAN OtherHit := ((watchlist_results[SEQ].bus_ofac_table_1 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_1[1..4] NOT IN OFACList) AND watchlist_results[SEQ].bus_ofac_table_1<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_2 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_2[1..4] NOT IN OFACList) AND watchlist_results[SEQ].bus_ofac_table_2<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_3 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_3[1..4] NOT IN OFACList) AND watchlist_results[SEQ].bus_ofac_table_3<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_4 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_4[1..4] NOT IN OFACList) AND watchlist_results[SEQ].bus_ofac_table_4<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_5 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_5[1..4] NOT IN OFACList) AND watchlist_results[SEQ].bus_ofac_table_5<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_6 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_6[1..4] NOT IN OFACList) AND watchlist_results[SEQ].bus_ofac_table_6<>'OFC' )
+                     OR ((watchlist_results[SEQ].bus_ofac_table_7 <> '' AND watchlist_results[SEQ].bus_ofac_record_number_7[1..4] NOT IN OFACList) AND watchlist_results[SEQ].bus_ofac_table_7<>'OFC' );
     
-  shared  VerWatchlistNameMatch := MAP(TRIM(le.Clean_Input.CompanyName) = '' AND TRIM(le.Clean_Input.AltCompanyName) = ''                   => '-1',
-																									 NOT OFACHit AND NOT OtherHit 																											=> '0',
-																									 OtherHit AND NOT OFACHit 																													=> '1',
-																									 OFACHit AND NOT OtherHit 																													=> '2',
-																									 OFACHit AND OtherHit 																															=> '3',
-																																																																				 '0');
+    SHARED  VerWatchlistNameMatch := MAP(TRIM(le.Clean_Input.CompanyName) = '' AND TRIM(le.Clean_Input.AltCompanyName) = '' => '-1',
+                                          NOT OFACHit AND NOT OtherHit 																											=> '0',
+                                          OtherHit AND NOT OFACHit 																													=> '1',
+                                          OFACHit AND NOT OtherHit 																													=> '2',
+                                          OFACHit AND OtherHit 																															=> '3',
+                                          '0');
                                                                                                                                          
                                                                                                                                                                                                                                                                                 
     SHARED name_input_watchlist          := VerWatchlistNameMatch;
-		SHARED altnm_input_watchlist			   := VerWatchlistNameMatch;
+	  SHARED altnm_input_watchlist			   := VerWatchlistNameMatch;
 		SHARED addr_input_zipcode_ver        := le.Verification.AddrZipVerification;
 		SHARED sbfe_name_input_mth_since_ls  := le.SBFE.SBFENameMatchMonthsLastSeen;
 		SHARED sbfe_altnm_input_mth_since_ls := le.SBFE.SBFEAltNameMatchMonthsLastSeen;

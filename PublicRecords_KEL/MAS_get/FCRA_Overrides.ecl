@@ -1,21 +1,23 @@
-﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, doxie_files, std, SexOffender, dx_prof_license_mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView, AVM_V2;
+﻿import PublicRecords_KEL, risk_indicators, fcra, MDR, faa, fcra, doxie_files, std, SexOffender, dx_prof_license_mari, doxie, watercraft, bankruptcyv2, ln_propertyv2, RiskView, AVM_V2;
 IMPORT KEL13 AS KEL;
 
 //please note
 //FCRA overrides are NOT archivable
 
 
-EXPORT FCRA_Overrides(PublicRecords_KEL.Interface_Options Options) := MODULE 
+EXPORT FCRA_Overrides(PublicRecords_KEL.Interface_Options Options,
+											PublicRecords_KEL.Join_Interface_Options JoinFlags) := MODULE 
 
 SHARED Layouts_FDC  := PublicRecords_KEL.ECL_Functions.Layouts_FDC(Options);
 SHARED NotRegulated := PublicRecords_KEL.ECL_Functions.Constants.NotRegulated;
 SHARED BlankString  := PublicRecords_KEL.ECL_Functions.Constants.BlankString;
 SHARED SetDPMBitmap := PublicRecords_KEL.ECL_Functions.Fn_KEL_DPMBitmap.SetValue;
-SHARED CFG_File     := PublicRecords_KEL.CFG_Compile;
+SHARED CFG_File     := PublicRecords_KEL.KEL_Queries_MAS_Shared.C_Compile;
 SHARED GLBARegulatedDeathMasterRecord(STRING glb_flag) := glb_flag = 'Y';
 SHARED DPPARegulatedWaterCraftRecord(STRING dppa_flag) := IF(TRIM(dppa_flag, LEFT, RIGHT) = 'Y', TRUE, FALSE);	
 SHARED LN_PropertyV2_Src(STRING ln_fares_id) := MDR.sourceTools.fProperty(ln_fares_id);
-SHARED Common       := PublicRecords_KEL.ECL_Functions.Common(Options);
+SHARED Common       := PublicRecords_KEL.ECL_Functions.Common(Options, JoinFlags);
+SHARED restrictedStates := fcra.compliance.watercrafts.restricted_states;	// need consumer permission
 
 SHARED ArchiveDate(string datevalue_in1, string datevalue_in2 = '' ):= function
 	
@@ -42,7 +44,7 @@ return If(date1 = '', datechooser(datevalue2), date1);
 	
 end;	
 
-EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) shell, BOOLEAN FDCMiniPop = TRUE) := function
+EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII) shell) := function
 
 
 	PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides add_flags(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides le, PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII ri) := TRANSFORM
@@ -181,7 +183,7 @@ EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutIn
 	
 		in_context := project(shell,transform(PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII_Overrides, self := left; self :=[];));
 				
-		getPersonContext := if(options.isFCRA AND common.DoFDCJoin_Overrides AND FDCMiniPop, PublicRecords_KEL.MAS_get.checkPersonContext_MAS(GROUP(in_context,G_ProcUID), options.gateways, options.IntendedPurpose));
+		getPersonContext := if(options.isFCRA AND common.DoFDCJoin_Overrides, PublicRecords_KEL.MAS_get.checkPersonContext_MAS(GROUP(in_context,G_ProcUID), options.gateways, options.IntendedPurpose));
 		with_personcontext := ungroup(getPersonContext);
 		
 		final_FCRA := Join(with_personcontext, shell, 
@@ -189,7 +191,7 @@ EXPORT GetOverrideFlags(DATASET(PublicRecords_KEL.ECL_Functions.Layouts.LayoutIn
 						left.G_ProcUID = right.G_ProcUID,
 							add_flags (left,right), left outer);
 			
-	with_overrides := if((unsigned)shell[1].p_inpclnarchdt = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA AND common.DoFDCJoin_Overrides, final_FCRA, PROJECT(shell, add_flags_blanks(LEFT)));
+	with_overrides := if((unsigned)shell[1].p_inpclnarchdt[1..8] = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..8]) and Options.isFCRA AND common.DoFDCJoin_Overrides, final_FCRA, PROJECT(shell, add_flags_blanks(LEFT)));
 				
 	return with_overrides;	
 	
@@ -1050,8 +1052,9 @@ EXPORT GetOverrideWatercraft(DATASET( Layouts_FDC.Layout_FDC) shell) := function
 
 				
 	Watercraft_correct := join(shell, FCRA.Key_Override_Watercraft.sid,
-    keyed(right.flag_file_id in left.water_correct_ffid),
-												TRANSFORM(Watercraftlay,
+    keyed(right.flag_file_id in left.water_correct_ffid) and
+		((Options.IsPrescreen AND right.state_origin not in restrictedStates) or ~Options.IsPrescreen),
+											TRANSFORM(Watercraftlay,
 													SELF := right,
 													SELF := left,
 													SELF := []), 

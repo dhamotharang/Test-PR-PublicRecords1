@@ -9,11 +9,13 @@ EXPORT FnRoxie_GetHighRiskAddress (DATASET(PublicRecords_KEL.ECL_Functions.Layou
 	GoodInputOnly := InputData(NOT P_InpClnAddrPrimRng = '' AND NOT P_InpClnAddrPrimName = '' AND NOT P_InpClnAddrZip5 = '');
 	BadInputOnly := InputData(P_InpClnAddrPrimRng = '' OR P_InpClnAddrPrimName = '' OR P_InpClnAddrZip5 = '');																		
 
-	HighRiskAddressAttributesLayout := RECORDOF(PublicRecords_KEL.Q_Address_High_Risk_Dynamic('','',0,'','','', DATASET([], PublicRecords_KEL.ECL_Functions.Layouts.LayoutInputPII), 0, PublicRecords_KEL.CFG_Compile.Permit__NONE).res0);
+	HighRiskAddressAttributesLayout := PublicRecords_KEL.KEL_Queries_MAS_Shared.L_Compile.Address_High_Risk_Res0_Internal_Layout;
 			
-	RawResults := NOCOMBINE(PROJECT(GoodInputOnly, TRANSFORM({INTEGER G_ProcUID, BOOLEAN ResultsFound, HighRiskAddressAttributesLayout},
-		SELF.G_ProcUID := LEFT.G_ProcUID;
-		HighRiskResults := PublicRecords_KEL.Q_Address_High_Risk_Dynamic(
+	RawResults := NOCOMBINE(JOIN(GoodInputOnly, FDCDataset,
+		LEFT.G_ProcUID = RIGHT.G_ProcUID,
+		TRANSFORM({INTEGER G_ProcUID, BOOLEAN ResultsFound, HighRiskAddressAttributesLayout},
+			SELF.G_ProcUID := LEFT.G_ProcUID;
+			HighRiskResults := PublicRecords_KEL.KEL_Queries_MAS_Shared.Q_Address_High_Risk_Dynamic(
 																								(string)LEFT.P_InpClnAddrPrimRng,
 																								LEFT.P_InpClnAddrPrimName, 
 																								(INTEGER)LEFT.P_InpClnAddrZip5, 
@@ -23,9 +25,10 @@ EXPORT FnRoxie_GetHighRiskAddress (DATASET(PublicRecords_KEL.ECL_Functions.Layou
 																								DATASET(LEFT), 
 																								(INTEGER)(LEFT.P_InpClnArchDt[1..8]),
 																								Options.KEL_Permissions_Mask, 
-																								FDCDataset).res0;	
-		SELF := HighRiskResults[1];
-		SELF.ResultsFound := EXISTS(HighRiskResults))));	
+																								DATASET(RIGHT)).res0;	
+			SELF := HighRiskResults[1];
+			SELF.ResultsFound := EXISTS(HighRiskResults)), 
+		LEFT OUTER, ATMOST(100), KEEP(1)));
 	
 	
 		AttributeResults := KEL.Clean(RawResults, TRUE, TRUE, TRUE);

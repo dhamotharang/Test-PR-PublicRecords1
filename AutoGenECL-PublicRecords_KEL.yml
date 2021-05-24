@@ -1,6 +1,6 @@
 AutoGenECL-PublicRecords_KEL:
   image: 
-    name: openjdk:14-alpine # OpenJDK 14
+    name: gitlab.ins.risk.regn.net:4567/risk-engineering/vault/openjdk:14-alpine # OpenJDK 14
   before_script:
     # Install the required software/updates - For some reason the default versions are quite old, so specify the "edge" for latest and greatest
     - apk update --repository http://dl-cdn.alpinelinux.org/alpine/edge/main/
@@ -40,10 +40,30 @@ AutoGenECL-PublicRecords_KEL:
     - wget $CompilerURL
     - echo "Download Complete"
     - date +"%A, %b %d, %Y %H:%M:%S"
-    # Run the KEL Compiler .jar file - Compile PublicRecords/PublicRecords_KEL/Compile.kel and output the results to the PublicRecords/PublicRecords_KEL folder as individual .ecl files (--pack dir)
-    - echo "Executing KEL Compiler"
-    - java -Xmx16G -jar ./KEL$CompilerVersion.jar --output ./PublicRecords/PublicRecords_KEL --importdir ./PublicRecords -O modulename:PublicRecords_KEL --pack dir ./PublicRecords/PublicRecords_KEL/Compile.kel
-    - echo "Compile Process Complete"
+    # Run the KEL Compiler .jar file - Compile Compile.kel and output the results to the PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_FCRA folder as individual .ecl files (--pack dir)
+    - echo "Executing KEL Compiler for PublicRecords_KEL/KEL_Queries_MAS_FCRA/Compile.kel"
+    - java -Xmx16G -jar ./KEL$CompilerVersion.jar --output ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_FCRA --importdir ./PublicRecords -O modulename:PublicRecords_KEL.KEL_Queries_MAS_FCRA --pack dir ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_FCRA/Compile.kel
+    - echo "Compile Process Complete - PublicRecords_KEL/KEL_Queries_MAS_FCRA/Compile.kel"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Run the KEL Compiler .jar file - Compile Compile.kel and output the results to the PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Shared folder as individual .ecl files (--pack dir)
+    - echo "Executing KEL Compiler for PublicRecords_KEL/KEL_Queries_MAS_Shared/Compile.kel"
+    - java -Xmx16G -jar ./KEL$CompilerVersion.jar --output ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Shared --importdir ./PublicRecords -O modulename:PublicRecords_KEL.KEL_Queries_MAS_Shared --pack dir ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Shared/Compile.kel
+    - echo "Compile Process Complete - PublicRecords_KEL/KEL_Queries_MAS_Shared/Compile.kel"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Run the KEL Compiler .jar file - Compile Compile.kel and output the results to the PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_NonFCRA folder as individual .ecl files (--pack dir)
+    - echo "Executing KEL Compiler for PublicRecords_KEL/KEL_Queries_MAS_NonFCRA/Compile.kel"
+    - java -Xmx16G -jar ./KEL$CompilerVersion.jar --output ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_NonFCRA --importdir ./PublicRecords -O modulename:PublicRecords_KEL.KEL_Queries_MAS_NonFCRA --pack dir ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_NonFCRA/Compile.kel
+    - echo "Compile Process Complete - PublicRecords_KEL/KEL_Queries_MAS_NonFCRA/Compile.kel"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Run the KEL Compiler .jar file - Compile Compile.kel and output the results to the PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Consumer folder as individual .ecl files (--pack dir)
+    - echo "Executing KEL Compiler for PublicRecords_KEL/KEL_Queries_MAS_Consumer/Compile.kel"
+    - java -Xmx16G -jar ./KEL$CompilerVersion.jar --output ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Consumer --importdir ./PublicRecords -O modulename:PublicRecords_KEL.KEL_Queries_MAS_Consumer --pack dir ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Consumer/Compile.kel
+    - echo "Compile Process Complete - PublicRecords_KEL/KEL_Queries_MAS_Consumer/Compile.kel"
+    - date +"%A, %b %d, %Y %H:%M:%S"
+    # Run the KEL Compiler .jar file - Compile Compile.kel and output the results to the PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Business folder as individual .ecl files (--pack dir)
+    - echo "Executing KEL Compiler for PublicRecords_KEL/KEL_Queries_MAS_Business/Compile.kel"
+    - java -Xmx16G -jar ./KEL$CompilerVersion.jar --output ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Business --importdir ./PublicRecords -O modulename:PublicRecords_KEL.KEL_Queries_MAS_Business --pack dir ./PublicRecords/PublicRecords_KEL/KEL_Queries_MAS_Business/Compile.kel
+    - echo "Compile Process Complete - PublicRecords_KEL/KEL_Queries_MAS_Business/Compile.kel"
     - date +"%A, %b %d, %Y %H:%M:%S"
     - cd PublicRecords
     # Patch the resulting ECL code with small hotfixes that haven't yet made their way to the KEL Compiler properly, these should be temporary
@@ -74,7 +94,7 @@ AutoGenECL-PublicRecords_KEL:
     - date +"%A, %b %d, %Y %H:%M:%S"
     # Push the new GIT Branch back up into GitLab and create a new Merge Request
     - echo "Pushing to Branch $BranchName and Creating a New Merge Request"
-    - git push -o merge_request.create -o merge_request.target=$DestinationBranch -o merge_request.remove_source_branch -o merge_request.title="PublicRecords_KEL Generated ECL - KEL Compiler $CompilerVersion" -o merge_request.description="Merge Request containing Auto-Gen ECL from the latest PublicRecords_KEL Compile.kel code" origin $BranchName
+    - git push -o merge_request.create -o merge_request.target=$DestinationBranch -o merge_request.remove_source_branch -o merge_request.title="PublicRecords_KEL Generated ECL - KEL Compiler $CompilerVersion" -o merge_request.description="Merge Request containing Auto-Gen ECL from the latest PublicRecords_KEL various Compile.kel code locations" origin $BranchName
     - echo "Script Complete"
     - date +"%A, %b %d, %Y %H:%M:%S"
   only:
