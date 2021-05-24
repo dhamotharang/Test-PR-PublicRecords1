@@ -1339,6 +1339,8 @@
 		export string KEYWORD_NS_CCMC_EO13959				:= '1019';
 		export string KEYWORD_ROONJN								:= '1020';
 		export string KEYWORD_COBMC									:= '1021';
+		export string KEYWORD_CNMCA_USO							:= '1022';
+		export string KEYWORD_USSS_PD								:= '1023';
 		
 		//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 	end;

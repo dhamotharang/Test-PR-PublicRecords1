@@ -1442,6 +1442,8 @@
 				trim(kword, left, right) = 'NS-CCMC-EO13959' =>SubGroup_Constants.numKeywordsID.KEYWORD_NS_CCMC_EO13959,
 				trim(kword, left, right) = 'ROONJN' =>SubGroup_Constants.numKeywordsID.KEYWORD_ROONJN,
 				trim(kword, left, right) = 'COBMC' =>SubGroup_Constants.numKeywordsID.KEYWORD_COBMC,
+				trim(kword, left, right) = 'CNMCA-USO' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNMCA_USO,
+				trim(kword, left, right) = 'USSS-PD' =>SubGroup_Constants.numKeywordsID.KEYWORD_USSS_PD,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
