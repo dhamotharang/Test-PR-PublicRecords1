@@ -144,7 +144,8 @@ MODULE
 
   inputOptionCheck := tmpMod.IncludeInhousePhones OR tmpMod.IncludeTargus OR tmpMod.IncludeAccudataOCN OR
                       tmpMod.IncludeEquifax OR tmpMod.IncludeTransUnionIQ411 OR tmpMod.IncludeTransUnionPVS OR
-                      tmpMod.UseInHousePhoneMetadata OR tmpMod.IncludeOTP OR tmpMod.IncludePorting OR tmpMod.IncludeSpoofing OR tmpMod.InputZumigoOptions;
+                      tmpMod.UseInHousePhoneMetadata OR tmpMod.IncludeOTP OR tmpMod.IncludePorting OR 
+                      tmpMod.IncludeSpoofing OR tmpMod.InputZumigoOptions OR tmpMod.IncludePortingDetails;
 
   #IF(PhoneFinder_Services.Constants.Debug.Main)
     OUTPUT(dInPhone, NAMED('dInPhone'));

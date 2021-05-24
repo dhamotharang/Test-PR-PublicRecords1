@@ -235,7 +235,8 @@ MODULE
 		unsigned	count_otp_180;
 		unsigned	count_otp_365;
 		unsigned	count_otp_730;
-
+    string10  alt_spid;   // Added 2021-06-02 for the Phone Porting Data for LE project
+    string10  lalt_spid;  // Added 2021-06-02 for the Phone Porting Data for LE project
 	END;
 
 	EXPORT PhoneAttributes := MODULE
