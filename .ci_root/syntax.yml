@@ -45,7 +45,7 @@ syntax-fast:
       then checkres=0
       else checkres=1
       fi
-    - touch eclcc.log
+    - touch eclcc.log _syn_check_warnings.log
     - cat eclcc.log _syn_check_warnings.log > ../$WARN_FILE
     - exit $checkres
 
@@ -84,7 +84,7 @@ syntax-nofast:
       then checkres=0
       else checkres=1
       fi
-    - touch eclcc.log
+    - touch eclcc.log _syn_check_warnings.log
     - cat eclcc.log _syn_check_warnings.log > ../$WARN_FILE_NOFAST
     - exit $checkres
 

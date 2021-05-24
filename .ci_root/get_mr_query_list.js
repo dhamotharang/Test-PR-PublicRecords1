@@ -4,24 +4,13 @@ let arg = process.argv.slice(2);
 let use_mr = false;
 let use_dep = false;
 let verbose = false;
-let pid = '0';
 let mrid = '0';
-let tok = '';
 
-let argct = 0;
 for (let a of arg) {
   if (a.toLowerCase() == '-m') use_mr = true;
   else if (a.toLowerCase() == '-d') use_dep = true;
   else if (a.toLowerCase() == '-v') verbose = true;
-  else {
-    switch(argct) {
-      case 0: pid = a; break;
-      case 1: mrid = a; break;
-      case 2: tok = a; break;
-      default: break;
-    }
-    argct++;
-  }
+  else mrid = a;
 }
 
 const fs = require('fs');
@@ -59,15 +48,13 @@ let main = async function() {
   let ctrl = new LogControl();
   if (!verbose) ctrl.disable();
 
-  let info = await ut.getMergeRequest(pid, mrid, tok, true);
+  let info = await ut.getMergeRequestInfo(mrid);
 
   // if we're using merge request results, add to our set
   if (use_mr) {
     if (info) {
-      if (info.roxie_data && info.roxie_data.deploy_list) {
-        for (let item of info.roxie_data.deploy_list) {
-          out.add(item.toLowerCase());
-        }
+      for (let item of info.deploy_list) {
+        out.add(item.toLowerCase());
       }
       ok = true;
     }
@@ -75,8 +62,8 @@ let main = async function() {
 
   // if we're using dependency checking, also add to our set
   if (use_dep) {
-    if (info && info.roxie_data && info.roxie_data.change_list) {
-      let deps = await ut.findDependencies(info.roxie_data.change_list);
+    if (info) {
+      let deps = await ut.findDependencies(info.change_list);
       if (deps) {
         for (let item of deps) {
           out.add(item.toLowerCase());
@@ -98,9 +85,9 @@ let main = async function() {
 }
 
 // run the main function
-if (arg.length == 0 || pid.toLowerCase() == '--help') {
+if (arg.length == 0 || mrid.toLowerCase() == '--help') {
   console.log('Usage:');
-  console.log('get_mr_query_list.js <project_id> <merge_request_id> [gitlab_access_token] [-d/-m]');
+  console.log('get_mr_query_list.js <merge_request_id> [-d/-m]');
 }
 else main().then((ok) => { 
   process.exit((ok) ? 0 : 2);

@@ -220,6 +220,28 @@ let toAtt = function(path) {
   return out;
 }
 
+let getMergeRequestInfo = async function(mr_id) {
+  let url = "https://bctwpprroxie301.risk.regn.net/roxiedevapi/git/merge-request/" + mr_id;
+  let out = null;
+
+  let res = await apiCall(url);
+  if (res.status_ok) {
+    try {
+      let rr = JSON.parse(res.response);
+
+      out = { deploy_list: [], change_list: [] };
+      if (rr['query-deploy-list']) out.deploy_list = rr['query-deploy-list'];
+      if (rr['changed-attribute-list']) out.change_list = rr['changed-attribute-list'];
+    }
+    catch (error) {
+      console.log('Unable to parse Merge Request Info API response');
+    }
+  }
+  else console.log('Merge Request Merge Request Info API Call Failed');
+
+  return out;
+}
+
 let getMergeRequest = async function(proj_id, mr_id, token = '', 
   changes = false) {
   let url = "https://gitlab.ins.risk.regn.net/api/v4/projects/" + proj_id + 
@@ -315,7 +337,7 @@ let findDependencies = async function(attributes) {
 
     glib.clear_map(graph);
     for (let att of attributes) {
-      let aa = att.trim();
+      let aa = att.trim().toLowerCase();
       if (aa) glib.markup_services(graph, aa, deps);
     }
     console.log('Found ' + deps.length + ' Dependencies');
@@ -448,6 +470,7 @@ module.exports = {
   getServices: getServices, 
   getServicesFromFile: getServicesFromFile, 
   getMergeRequest: getMergeRequest, 
+  getMergeRequestInfo: getMergeRequestInfo, 
   getExceptions: getExceptions, 
   isLibrary: isLibrary, 
   findPath: findPath, 
