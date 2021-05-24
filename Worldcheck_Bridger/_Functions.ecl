@@ -364,6 +364,8 @@
 				trim(subcatname, left, right) = 'PEP NG-R' => WorldCheck_Bridger.SubGroup_Constants.numSubCategoryPrem.PEP_NG_R,
 				trim(subcatname, left, right) = 'PEP NG-A' => WorldCheck_Bridger.SubGroup_Constants.numSubCategoryPrem.PEP_NG_A,
 				trim(subcatname, left, right) = 'SOE' => WorldCheck_Bridger.SubGroup_Constants.numSubCategoryPrem.SOE,
+				trim(subcatname, left, right) = 'SIE' => WorldCheck_Bridger.SubGroup_Constants.numSubCategoryPrem.SIE,
+				trim(subcatname, left, right) = 'IOS' => WorldCheck_Bridger.SubGroup_Constants.numSubCategoryPrem.IOS,
 				trim(subcatname, left, right) in ['Non-PEP', ''] => WorldCheck_Bridger.SubGroup_Constants.numSubCategoryPrem.NON_PEP,
 				'');
 				
@@ -406,8 +408,8 @@
 				trim(subcatname, left, right) = 'PEP NG-R' 	=> 'PEP Non-Government - Immediate Relative',
 				trim(subcatname, left, right) = 'PEP NG-A' 	=> 'PEP Non-Government - Close Associate',
 				trim(subcatname, left, right) = 'SOE' 		=> 'PEP State Owned Entity',
-				trim(subcatname, left, right) = 'SIE' 		=> 'PEP State Invested Enterprise',
-				trim(subcatname, left, right) = 'IOS' 		=> 'PEP Instrumentality of State',
+				trim(subcatname, left, right) = 'SIE' 		=> 'State Invested Enterprise',
+				trim(subcatname, left, right) = 'IOS' 		=> 'Instrumentality of State',
 				trim(subcatname, left, right) in ['Non-PEP', ''] => 'Non-PEP',
 				'');
 				
@@ -1439,6 +1441,9 @@
 				trim(kword, left, right) = 'TWMPB-CV' =>SubGroup_Constants.numKeywordsID.KEYWORD_TWMPB_CV,
 				trim(kword, left, right) = 'NS-CCMC-EO13959' =>SubGroup_Constants.numKeywordsID.KEYWORD_NS_CCMC_EO13959,
 				trim(kword, left, right) = 'ROONJN' =>SubGroup_Constants.numKeywordsID.KEYWORD_ROONJN,
+				trim(kword, left, right) = 'COBMC' =>SubGroup_Constants.numKeywordsID.KEYWORD_COBMC,
+				trim(kword, left, right) = 'CNMCA-USO' =>SubGroup_Constants.numKeywordsID.KEYWORD_CNMCA_USO,
+				trim(kword, left, right) = 'USSS-PD' =>SubGroup_Constants.numKeywordsID.KEYWORD_USSS_PD,
 								
 				//When setting the keyword export use underscores for dashes (ex: For RBI-SANC, use RBI_SANC)	
 				
