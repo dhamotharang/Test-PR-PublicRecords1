@@ -2093,8 +2093,8 @@ EXPORT Transforms(BusinessInstantID20_Services.iOptions Options) := MODULE
 				  DATASET(BusinessInstantID20_Services.layouts.OFACAndWatchlistLayoutFlat) ri3 ) :=
 			TRANSFORM
 				bus_verification  := BusinessInstantID20_Services.mod_CalculateBVI( ri, Options.useSBFE, ri3 );
-				_risk_indicators  := BusinessInstantID20_Services.Mod_CalculateBusinessAdHocRiskIndicators( ri2, ri, Options, ri3,5).riBusiness;
-				sbfe_verification := BusinessInstantID20_Services.fn_CalculateSBFEVerification( ri, Options.useSBFE );
+        _risk_indicators  := BusinessInstantID20_Services.Mod_CalculateBusinessAdHocRiskIndicators( ri2, ri, Options, ri3, (INTEGER)le.SEQ, 5).riBusiness;				
+        sbfe_verification := BusinessInstantID20_Services.fn_CalculateSBFEVerification( ri, Options.useSBFE );
 				bus2exec_index    := BusinessInstantID20_Services.mod_CalculateBusiness2Exec( ri, Options.useSBFE ).rw_result;
 				resid_bus_info    := BusinessInstantID20_Services.mod_CalculateResidentialBusiness( ri, Options.useSBFE ).rw_result;
 				verif_summaries   := BusinessInstantID20_Services.mod_CalculateVerificationSummaries( ri, Options.useSBFE ).rw_result;
