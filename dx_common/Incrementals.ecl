@@ -190,4 +190,97 @@ EXPORT Incrementals := MODULE
     L.delta_ind := if(R.is_delta_delete, 0, R.delta_ind);
   ENDMACRO;
 
+  /* DO NOT CALL THIS MACRO DIRECTLY! A dx_<service>.Get interface should be created to access this macro.
+  **
+  ** Macro to fetch key records from an incremental key, and apply the necessary incremental rollup procedures.
+  ** If no KEEP, LIMIT, or ATMOST is provided the join will LIMIT(10000).
+  **
+  ** NOTE: This macro will UNGROUP the input dataset.
+  **
+  ** @param inf                    Input dataset.
+  ** @param inf_key                Key to join against.
+  ** @param inf_join_conditions    Join conditions to use for join.
+  ** @param inf_fetch_layout       Layout to use for returned key_rec.
+  ** @param inf_limit_number       LIMIT(n) in join. OPTIONAL, omitted if not supplied.
+  ** @param inf_skip_limit         Add SKIP to LIMIT(n). OPTIONAL, omitted if not supplied.
+  ** @param inf_atmost_number      ATMOST(n) in join. OPTIONAL, omitted if not supplied.
+  ** @param inf_keep_number        Number of matches to KEEP. OPTIONAL, omitted if not supplied.
+  ** @param inf_delta_keep_number  Max number of records to KEEP in join to account for deltas.
+  **                               OPTIONAL; If not supplied, defaults to 2x supplied inf_keep_number.
+  ** @param LEFT_OUTER_JOIN        Use LEFT OUTER when joining against provided key.
+  ** @returns                      DS of matching records from key in key layout.
+  **
+  */
+  EXPORT mac_Fetch(
+    inf,
+    inf_key,
+    inf_join_conditions,
+    inf_fetch_layout,
+    inf_limit_number = '',
+    inf_skip_limit = FALSE,
+    inf_atmost_number = '',
+    inf_keep_number = '',
+    inf_delta_keep_number = '',
+    LEFT_OUTER_JOIN = FALSE
+    ) := FUNCTIONMACRO
+    
+    LOCAL has_limit := #TEXT(inf_limit_number) != '';
+    LOCAL has_atmost := #TEXT(inf_atmost_number) != '';
+    LOCAL has_keep := #TEXT(inf_keep_number) != '';
+    LOCAL has_delta_keep := #TEXT(inf_delta_keep_number) != '';
+    LOCAL use_limit_safeguard := NOT has_limit AND NOT has_atmost AND NOT has_keep;
+    LOCAL join_keep_number := #IF(has_delta_keep)inf_delta_keep_number;#ELSEIF(has_keep)IF(inf_keep_number < 10, 20, inf_keep_number *2);#ELSE 20;#END 
+
+    LOCAL out_layout := RECORD
+      RECORDOF(inf);
+      RECORDOF(inf_fetch_layout) key_rec;
+    END;
+
+    LOCAL in_rec_seq := RECORD
+      UNSIGNED4 __SEQ__; // explicitly defined because we want to fail syntax check in (unlikely) case of conflict.
+      RECORDOF(inf); 
+    END;
+    LOCAL inf_seq := PROJECT(UNGROUP(inf), TRANSFORM(in_rec_seq, SELF.__SEQ__ := COUNTER; SELF := LEFT));
+    // layout below may overwrite incoming metadata (additional changes to rollup macro required if we want to avoid that)
+    LOCAL join_layout := out_layout OR dx_common.layout_metadata OR {{UNSIGNED4 __SEQ__}}; 
+    
+    LOCAL key_recs := JOIN(inf_seq, inf_key,
+      inf_join_conditions,
+      TRANSFORM(join_layout, 
+        dx_common.Incrementals.mac_CopyMetadata(SELF, RIGHT),
+        SELF.__SEQ__ := LEFT.__SEQ__; 
+        SELF.key_rec := RIGHT; 
+        SELF := LEFT)
+      #IF(has_limit), LIMIT(inf_limit_number #IF(inf_skip_limit),SKIP#END) #END
+      #IF(use_limit_safeguard), LIMIT(10000) #END
+      #IF(has_atmost), ATMOST(inf_atmost_number) #END
+      #IF(has_keep), KEEP(join_keep_number) #END
+      #IF(LEFT_OUTER_JOIN), LEFT OUTER #END
+    ); 
+
+    #IF(LEFT_OUTER_JOIN)
+    LOCAL rolled_recs_pre := dx_common.Incrementals.mac_Rollupv2(key_recs, flag_deletes := TRUE);
+    LOCAL rolled_recs := PROJECT(rolled_recs_pre, TRANSFORM(RECORDOF(LEFT),
+      SELF.key_rec := IF(NOT LEFT.is_delta_delete, LEFT.key_rec);
+      SELF := LEFT));
+    #ELSE
+    LOCAL rolled_recs := dx_common.Incrementals.mac_Rollupv2(key_recs);  
+    #END
+
+    #IF(has_keep)
+    // line below requires input dataset to be ungrouped.
+    LOCAL rolled_keep := DEDUP(SORT(rolled_recs, __SEQ__), __SEQ__, KEEP(inf_keep_number));
+    LOCAL out := PROJECT(rolled_keep, out_layout);
+    #ELSE
+    LOCAL out := PROJECT(rolled_recs, out_layout);
+    #END;
+
+    // OUTPUT(key_recs, NAMED('inc_mac_fetch_key_recs'), OVERWRITE);
+    // OUTPUT(rolled_recs_pre, NAMED('inc_mac_fetch_rolled_recs_pre'), OVERWRITE);
+    // OUTPUT(rolled_recs, NAMED('inc_mac_fetch_rolled_recs'), OVERWRITE);
+    // OUTPUT(out, NAMED('inc_mac_fetch_out'), OVERWRITE);
+    RETURN out;
+
+  ENDMACRO;
+
 END;
