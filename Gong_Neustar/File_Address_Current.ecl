@@ -46,30 +46,7 @@ rec_address addcn(g l) := transform
 	self := l;
 end;
 
-/////////////////////////////////////////////////////////////
-/*
-the injection is already in File_History_Full_Prepped_For_Keys
 
-layout_gong_inj := RECORD
- Layout_history ;
- string2 eor ;
-END;
-
-header_services.Supplemental_Data.mac_verify('file_gong_inj.txt', layout_gong_inj , attr);
-
-Base_File_Append_In := attr();
-
-
-Layout_bscurrent_raw  xTo_bscurrent_raw (Base_File_Append_In L ):= TRANSFORM
-
-	SELF := L ;
- 
-END ;
-
-File_Append_In:= project(Base_File_Append_In, xTo_bscurrent_raw(left)); // in Layout_bscurrent_raw format
-
-all_in := g + File_Append_In ;
-*/
 all_in := g;
 ////////////////////////////////////////////////////
 
