@@ -1,11 +1,11 @@
 IMPORT BancorpRCDList, VersionControl, STD, Orbit3, RoxieKeyBuild, dops, ut;
 
 EXPORT procBuildAll(
-	STRING  pVersion   = (STRING)STD.Date.Today(), boolean isDelta=true) := MODULE
-    //updateType = D for delta build and F for Full build
+	STRING  pVersion   = (STRING)STD.Date.Today(), boolean isDelta=true, string pServer=Constants().serverIP, string pDirectory=Constants().Directory.Main) := MODULE
+    //isDelta = true for delta build and false for refresh
     shared updateType := if( isDelta=false, 'F', 'D');
 	// Spray Files.
-	Export SprayFiles := BancorpRCDList.sprayfile(pversion);
+	Export SprayFiles := BancorpRCDList.sprayfile(pversion,pServer,pDirectory);
 			
 	shared dops_update := dops.updateversion('BancorpRCDListKeys', pVersion, 'david.dittman@lexisnexisrisk.com',,'N',,,,,, updateType);
 	
