@@ -24,9 +24,30 @@ zVerifyTXData	:=	if (count(zTXData(length(trim(dl_number)) = 10 and trim(dl_numb
 dl_nonRestricted	:= Driversv2.DL(source_code != MDR.sourceTools.src_MN_RESTRICTED_DL);
 dl_restricted 		:= Driversv2.DL(source_code = MDR.sourceTools.src_MN_RESTRICTED_DL);
 
+//----------------------------
+
+// DF-28878 Currently Michigan State's Vendor sending us DELETES
+// This can be modified later if deletes processing is needed for additional states !! ex: orig_state in ['MI','FL’, etc.]
+dl_nonRestric_Del_stOnly :=	distribute(dl_nonRestricted(orig_state='MI'),hash(dl_number)); 
+dl_nonRestric_Rest	     :=	dl_nonRestricted(orig_state<>'MI');
+
+// Superfile of Deletes!!
+dl_DeletesSuper       := DriversV2.File_Base_Deletes;
+dl_DedupSuper_Deletes := dedup(sort(distribute(dl_DeletesSuper,hash(dl_number)),dl_number,local),dl_number,local);
+
+//delete records are being filtered out from existing base file records !!
+dl_nonRestric_nonDeletes:= join(dl_nonRestric_Del_stOnly, dl_DedupSuper_Deletes,
+															  trim(left.dl_number,left,right) = trim(right.dl_number,left,right),
+															  transform(DriversV2.Layout_Base_withAID,
+																				  self := left; ),
+																				  left only, lookup);
+	 
+dl_nonRestricted_Patched := dl_nonRestric_Rest + dl_nonRestric_nonDeletes ;	
+//----------------------------
+
 // We need to work with just the WI data for opt out purposes. 
-dl_WIOnly	:=	distribute(dl_nonRestricted(orig_state='WI' and source_code = 'AD'),hash(dl_number));
-dl_Rest		:=	dl_nonRestricted(orig_state<>'WI' or (orig_state = 'WI' and source_code <> 'AD'));
+dl_WIOnly	:=	distribute(dl_nonRestricted_Patched(orig_state='WI' and source_code = 'AD'),hash(dl_number));
+dl_Rest		:=	dl_nonRestricted_Patched(orig_state<>'WI' or (orig_state = 'WI' and source_code <> 'AD'));
 
 // Determine the latest time a record was opted out. All records including and prior will be supressed.
 dl_WIOptOut		:=	dedup(sort(dl_WIOnly(Opt_Out	=	'S'),dl_number,-dateReceived,local),dl_number,local);
