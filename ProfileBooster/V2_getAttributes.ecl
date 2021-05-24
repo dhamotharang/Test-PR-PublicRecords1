@@ -2,8 +2,8 @@
 
 EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2Shell, 
                      string50 DataPermissionMask = risk_indicators.iid_constants.default_DataPermission) := FUNCTION
-
-  ProfileBooster.V2_Layouts.Layout_PB2_BatchOut getAttr(PB2Shell le) := TRANSFORM
+  
+  ProfileBooster.V2_Layouts.tempAttributesLayout getAttr(PB2Shell le) := TRANSFORM
     nines                                                 := 9999999;
     noDid                                                 := le.did = 0;
     isMinor                                               := (le.ProspectAge > 0 and le.ProspectAge < 18); //check to see if person is a minor
@@ -753,24 +753,33 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     HHSeniorMmbrCnt                                       := le.HHSeniorMmbrCnt + IF((integer)le.DemAge between 65 and 79, 1, 0);
     HHElderlyMmbrCnt                                      := le.HHElderlyMmbrCnt + IF((integer)le.DemAge > 79, 1, 0);
     // self.attributes.version2.HHTeenagerMmbrCnt              := IF(noDid or isMinor, -99999, MIN(HHTeenagerMmbrCnt,ProfileBooster.V2_Constants.Max255));
-    prospectDemAge := SELF.Attributes.Version2.DemAge;
+    prospectDemAge := IF(le.ProspectAge = 0 and NOT isMinor, -99997, le.ProspectAge);
     self.attributes.version2.HHTeenagerMmbrCnt            := IF((integer)prospectDemAge < 0, -99997, IF((integer)prospectDemAge between 13 and 19, 1, 0));
     self.attributes.version2.HHYoungAdultMmbrCnt          := IF((integer)prospectDemAge < 0, -99997, IF((integer)prospectDemAge between 20 and 39, 1, 0));
     self.attributes.version2.HHMiddleAgemmbrCnt           := IF((integer)prospectDemAge < 0, -99997, IF((integer)prospectDemAge between 40 and 64, 1, 0));
     self.attributes.version2.HHSeniorMmbrCnt              := IF((integer)prospectDemAge < 0, -99997, IF((integer)prospectDemAge between 65 and 79, 1, 0));
     self.attributes.version2.HHElderlyMmbrCnt             := IF((integer)prospectDemAge < 0, -99997, IF((integer)prospectDemAge > 79, 1, 0));
-    self.attributes.version2.HHMmbrCnt                    := (INTEGER)SELF.Attributes.Version2.VerProspectFoundFlag; //add 1 to include the prospect  
-    self.attributes.version2.HHComplexTotalCnt            := (INTEGER)SELF.Attributes.Version2.VerProspectFoundFlag; //add 1 to include the prospect  
-    self.attributes.version2.HHUnitsInComplexCnt          := (INTEGER)SELF.Attributes.Version2.VerProspectFoundFlag; //add 1 to include the prospect  
+    self.attributes.version2.HHMmbrCnt                    := 1; //add 1 to include the prospect  
+    self.attributes.version2.HHComplexTotalCnt            := MAP(le.curr_prim_range = le.prim_range OR le.rec_type = 1 => 1, 
+                                                                                                         le.curr_prim_range = '' OR le.prim_range = '' => -99997,
+                                                                                                         0); //add 1 to include the prospect  
+    self.attributes.version2.HHUnitsInComplexCnt          := 1; //add 1 to include the prospect  
     self.attributes.version2.HHMmbrAgeMed                 := (INTEGER)prospectDemAge; //add 1 to include the prospect  
     self.attributes.version2.HHMmbrAgeAvg                 := (INTEGER)prospectDemAge; //add 1 to include the prospect  
-    self.attributes.version2.HHEstimatedIncomeRange       := IF(noDid or isMinor, -99999, le.HHEstimatedIncomeRange);
+    self.attributes.version2.HHEstimatedIncomeRange       := IF((INTEGER)le.ProspectEstimatedIncomeRange < 0, -99997, (INTEGER)le.ProspectEstimatedIncomeRange);
     // self.attributes.version2.HHEstimatedIncomeAvg            := IF(noDid or isMinor, -99999, le.HHEstimatedIncomeAvg);
     self.attributes.version2.HHMmbrWEduCollCnt            := MIN(le.DemEduCollFlagEv,ProfileBooster.V2_Constants.Max255);
     self.attributes.version2.HHMmbrWEduCollEvidEvCnt      := MIN(le.DemEduCollEvidFlagEv,ProfileBooster.V2_Constants.Max255);
-    self.attributes.version2.HHMmbrWEduColl2YrCnt         := IF(le.DemEduCollLevelHighEv < 0, -99997, MIN(le.DemEduCollLevelHighEv,ProfileBooster.V2_Constants.Max255));
-    self.attributes.version2.HHMmbrWEduColl4YrCnt         := IF(le.DemEduCollLevelHighEv < 0, -99997, MIN(le.DemEduCollLevelHighEv,ProfileBooster.V2_Constants.Max255));
-    self.attributes.version2.HHMmbrWEduCollGradCnt        := IF(le.DemEduCollLevelHighEv < 0, -99997, MIN(le.DemEduCollLevelHighEv,ProfileBooster.V2_Constants.Max255));
+    // self.attributes.version2.HHMmbrWEduColl2YrCnt         := IF(le.DemEduCollLevelHighEv < 0, -99997, MIN(le.DemEduCollLevelHighEv,ProfileBooster.V2_Constants.Max255));
+    self.attributes.version2.HHMmbrWEduColl2YrCnt         := MAP(le.DemEduCollLevelHighEv < 0 => -99997,
+                                                                                                                le.DemEduCollLevelHighEv = 1 => 1,
+                                                                                                                0);
+    self.attributes.version2.HHMmbrWEduColl4YrCnt         := MAP(le.DemEduCollLevelHighEv < 0 => -99997,
+                                                                                                                le.DemEduCollLevelHighEv = 2 => 1,
+                                                                                                                0);
+    self.attributes.version2.HHMmbrWEduCollGradCnt        := MAP(le.DemEduCollLevelHighEv < 0 => -99997,
+                                                                                                                le.DemEduCollLevelHighEv = 3 => 1,
+                                                                                                                0);
     self.attributes.version2.HHMmbrWCollPvtCnt            := IF(le.DemEduCollInstPvtFlagEv < 0, -99997, MIN(le.DemEduCollInstPvtFlagEv,ProfileBooster.V2_Constants.Max255));
     self.attributes.version2.HHMmbrCollTierHighest        := MAP(le.DemEduCollTierHighEv < 0 => -99997, le.DemEduCollTierHighEv = 0 => -99998, le.DemEduCollTierHighEv);
     self.attributes.version2.HHMmbrCollTierAvg            := MAP(le.DemEduCollTierHighEv < 0 => -99997, le.DemEduCollTierHighEv = 0 => -99998, le.DemEduCollTierHighEv);
@@ -800,22 +809,31 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
     // self.attributes.version2.HHMmbrPropAVMMax                := 0;
     // self.attributes.version2.HHMmbrPropAVMAvg                    := 0;
     // self.attributes.version2.HHMmbrPropAVMTot                    := IF(le.AstPropCurrAVMTot <= 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max9999999999));        
-    self.attributes.version2.HHMmbrWAstPropCurrCnt        := IF(le.AstPropCntEv < 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max255));     
-    self.attributes.version2.HHAstPropCurrCnt             := IF(le.AstPropCurrCntEv < 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max255));     
-    self.attributes.version2.HHMmbrPropAVMMax             := IF(le.HHPropCurrAVMHighest <= 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max9999999));
-    self.attributes.version2.HHMmbrPropAVMAvg             := IF(le.HHPropCurrAVMHighest < 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max9999999));
-    self.attributes.version2.HHMmbrPropAVMTot             := IF(le.AstPropCurrAVMTot <= 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max9999999999));    
+    self.attributes.version2.HHMmbrWAstPropCurrCnt        := IF(le.AstPropCurrFlag < 0, -99997, MIN(le.AstPropCurrFlag,ProfileBooster.V2_Constants.Max255));     
+    self.attributes.version2.HHAstPropCurrCnt             := IF(le.AstPropCurrCntEv < 0, -99997, MIN(le.AstPropCurrCntEv,ProfileBooster.V2_Constants.Max255));     
+    self.attributes.version2.HHMmbrPropAVMMax             := IF(le.AstPropCurrAVMTot < 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max9999999));
+    self.attributes.version2.HHMmbrPropAVMAvg             := IF(le.AstPropCurrAVMTot < 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max9999999));
+    self.attributes.version2.HHMmbrPropAVMTot             := IF(le.AstPropCurrAVMTot < 0, -99997, MIN(le.AstPropCurrAVMTot,ProfileBooster.V2_Constants.Max9999999999));    
     self.attributes.version2.HHMmbrPropAVMTot1Y           := MAP((INTEGER)TimeOnRecord < 12 AND (INTEGER)TimeOnRecord >= 0 AND le.AstPropCurrAVMTot >= 0 => le.AstPropCurrAVMTot, 
-                                                                                                                           le.AstPropCurrAVMTot < 0 => -99997,
+                                                                                                                           le.AstPropCurrAVMTot < 0 OR (INTEGER)TimeOnRecord < 0 => -99997,
                                                                                                                            0);
     self.attributes.version2.HHMmbrPropAVMTot5Y           := MAP((INTEGER)TimeOnRecord < 60 AND (INTEGER)TimeOnRecord >= 0 AND le.AstPropCurrAVMTot >= 0 => le.AstPropCurrAVMTot, 
-                                                                                                                           le.AstPropCurrAVMTot < 0 => -99997,
+                                                                                                                           le.AstPropCurrAVMTot < 0 OR (INTEGER)TimeOnRecord < 0 => -99997,
                                                                                                                            0);
-    self.attributes.version2.HHVehicleOwnedCnt            := IF(le.AstPropCurrCntEv < 0, -99997, MIN(le.AstPropCurrCntEv,ProfileBooster.V2_Constants.Max255));
-    self.attributes.version2.HHAutoOwnedCnt               := IF(le.AstVehAutoCntEv < 0, -99997, MIN(le.AstVehAutoCntEv,ProfileBooster.V2_Constants.Max255));
-    self.attributes.version2.HHMotorcycleOwnedCnt         := IF(le.AstVehOtherMtrCntEv < 0, -99997, MIN(le.AstVehOtherMtrCntEv,ProfileBooster.V2_Constants.Max255));
-    self.attributes.version2.HHAircraftOwnedCnt           := IF(le.AstPropAirCrftCntEv < 0, -99997, MIN(le.AstPropAirCrftCntEv,ProfileBooster.V2_Constants.Max255));
-    self.attributes.version2.HHWatercraftOwnedCnt         := IF(le.AstPropWtrcrftCntEv < 0, -99997, MIN(le.AstPropWtrcrftCntEv,ProfileBooster.V2_Constants.Max255));
+                                                                                                                           
+    AutoOwnedCntHelper := IF(le.AstVehAutoCntEv < 0, -99997, MIN(le.AstVehAutoCntEv,ProfileBooster.V2_Constants.Max255));
+    MotorcycleOwnedCntHelper := IF(le.AstVehOtherMtrCntEv < 0, -99997, MIN(le.AstVehOtherMtrCntEv,ProfileBooster.V2_Constants.Max255));
+    AircraftOwnedCntHelper := IF(le.AstPropAirCrftCntEv < 0, -99997, MIN(le.AstPropAirCrftCntEv,ProfileBooster.V2_Constants.Max255));
+    WatercraftOwnedCntHelper := IF(le.AstPropWtrcrftCntEv < 0, -99997, MIN(le.AstPropWtrcrftCntEv,ProfileBooster.V2_Constants.Max255));
+    AllVehiclesTogetherHelper := MAX(AutoOwnedCntHelper, 0) + MAX(MotorcycleOwnedCntHelper, 0) + MAX(AircraftOwnedCntHelper, 0) + MAX(WatercraftOwnedCntHelper, 0);
+    
+    self.attributes.version2.HHVehicleOwnedCnt            := MAP(AllVehiclesTogetherHelper > 0 => AllVehiclesTogetherHelper,
+                                                                                                          AutoOwnedCntHelper < 0 OR MotorcycleOwnedCntHelper < 0 OR AircraftOwnedCntHelper < 0 OR WatercraftOwnedCntHelper < 0=> -99997,
+                                                                                                          0);
+    self.attributes.version2.HHAutoOwnedCnt               := AutoOwnedCntHelper;
+    self.attributes.version2.HHMotorcycleOwnedCnt         := MotorcycleOwnedCntHelper;
+    self.attributes.version2.HHAircraftOwnedCnt           := AircraftOwnedCntHelper;
+    self.attributes.version2.HHWatercraftOwnedCnt         := WatercraftOwnedCntHelper;
     
     self.attributes.version2.HHMmbrWDrgCnt7Y              := MAP(noDid or isMinor or noHHID              => -99999,
                                                                  DrgCnt7Y > 0                            => 1, 
@@ -1074,6 +1092,7 @@ EXPORT V2_getAttributes(DATASET(ProfileBooster.V2_Layouts.Layout_PB2_Shell) PB2S
 
   attr := project(PB2Shell, getAttr(left)); 
 
+  OUTPUT(CHOOSEN(PB2Shell, 100), NAMED('AttributesInput'));
   return attr;  
   
 END;

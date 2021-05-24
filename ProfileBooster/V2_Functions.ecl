@@ -1,6 +1,6 @@
 ﻿IMPORT STD;
 
-EXPORT Functions := MODULE
+EXPORT V2_Functions := MODULE
 
 EXPORT buildNewLayout(InLayout) := FUNCTIONMACRO
 
@@ -33,8 +33,6 @@ EXPORT projectUnscorables(inputDS, attributesToProject, inputLayout) := FUNCTION
 
   #EXPORTXML(records, inputDS)
 
-  #DECLARE(rollupCode)
-  #SET(rollupCode, '');  
   #DECLARE(projectionCode)
   #SET(projectionCode, '');
   
@@ -44,15 +42,18 @@ EXPORT projectUnscorables(inputDS, attributesToProject, inputLayout) := FUNCTION
           #APPEND(projectionCode, 'SELF.' + %'{@name}'% + '_count := IF(le.' + %'{@name}'% +' < 0, 0, le.' + %'{@name}'% + ');');
           #APPEND(projectionCode, 'SELF.' + %'{@name}'% + '_99997 := IF(le.' + %'{@name}'% +' = -99997, 1, 0);');
           #APPEND(projectionCode, 'SELF.' + %'{@name}'% + '_99998 := IF(le.' + %'{@name}'% +' = -99998, 1, 0);');
-          #APPEND(rollupCode, 'SELF.' + %'{@name}'% + '_count := le.' + %'{@name}'% + '_count + ri.' + %'{@name}'% + '_count;');
-          #APPEND(rollupCode, 'SELF.' + %'{@name}'% + '_99997 := le.' + %'{@name}'% + '_99997 + ri.' + %'{@name}'% + '_99997;');
-          #APPEND(rollupCode, 'SELF.' + %'{@name}'% + '_99998 := le.' + %'{@name}'% + '_99998 + ri.' + %'{@name}'% + '_99998;');
         #END
     #END
   #END
 
     inputLayout transformToUnscorables(inputLayout le) := TRANSFORM
 	#EXPAND(%'projectionCode'%)
+    SELF.HHMmbrCollTierHighest_Count := IF(le.HHMmbrCollTierHighest < 0, 0, le.HHMmbrCollTierHighest);
+    SELF.HHMmbrCollTierHighest_99997 := IF(le.HHMmbrCollTierHighest = -99997, 1, 0);
+    SELF.HHMmbrCollTierHighest_99998 := IF(le.HHMmbrCollTierHighest = -99998, 1, 0);    
+    SELF.HHMmbrPropAVMMax_Count := IF(le.HHMmbrPropAVMMax < 0, 0, le.HHMmbrPropAVMMax);
+    SELF.HHMmbrPropAVMMax_99997 := IF(le.HHMmbrPropAVMMax = -99997, 1, 0);
+    SELF.HHMmbrPropAVMMax_99998 := IF(le.HHMmbrPropAVMMax = -99998, 1, 0);
     SELF.HHMmbrDrgNewMsnc7Y_Count := le.HHMmbrDrgNewMsnc7Y;
     SELF.HHMmbrDrgNewMsnc7Y_99997 := IF(le.HHMmbrDrgNewMsnc7Y = -99997, 1, 0);
     SELF.HHMmbrDrgNewMsnc7Y_99998 := IF(le.HHMmbrDrgNewMsnc7Y = -99998, 1, 0);
@@ -75,6 +76,28 @@ EXPORT projectUnscorables(inputDS, attributesToProject, inputLayout) := FUNCTION
     END;    
      
     projDS := PROJECT(inputDS, transformToUnscorables(LEFT));
+
+RETURN projDS;
+// RETURN %'projectionCode'%;
+
+ENDMACRO;
+
+EXPORT rollupUnscorables(inputDS, attributesToProject, inputLayout) := FUNCTIONMACRO
+
+  #EXPORTXML(records, inputDS)
+
+  #DECLARE(rollupCode)
+  #SET(rollupCode, '');  
+  
+#FOR(records)
+  #FOR(Field)
+         #IF(STD.Str.ToUpperCase(%'{@name}'%) IN attributesToProject) // We have a date field we care to keep!
+          #APPEND(rollupCode, 'SELF.' + %'{@name}'% + '_count := le.' + %'{@name}'% + '_count + ri.' + %'{@name}'% + '_count;');
+          #APPEND(rollupCode, 'SELF.' + %'{@name}'% + '_99997 := le.' + %'{@name}'% + '_99997 + ri.' + %'{@name}'% + '_99997;');
+          #APPEND(rollupCode, 'SELF.' + %'{@name}'% + '_99998 := le.' + %'{@name}'% + '_99998 + ri.' + %'{@name}'% + '_99998;');
+        #END
+    #END
+  #END
     
     inputLayout unscorables(inputLayout le, inputLayout ri) := TRANSFORM
 		#EXPAND(%'rollupCode'%)
@@ -108,11 +131,10 @@ EXPORT projectUnscorables(inputDS, attributesToProject, inputLayout) := FUNCTION
 		SELF := [];
 END;
 
-rollupUnscorables := ROLLUP(projDS, unscorables(LEFT, RIGHT), seq);
+rollupUnscorables := ROLLUP(inputDS, unscorables(LEFT, RIGHT), seq);
 
 RETURN rollupUnscorables;
 // RETURN %'rollupCode'%;
-// RETURN %'projectionCode'%;
 
 ENDMACRO;
 

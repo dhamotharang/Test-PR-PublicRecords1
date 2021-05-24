@@ -341,306 +341,351 @@ EXPORT V2_Transforms := MODULE
 		SELF.prev_addr_rawaid := ri.prev_addr_rawaid;
 		self 								:= le;	
 		self 								:= [];
-	END;	
-	
-		 EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddHouseholdInfo(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_lexid ri) := TRANSFORM
-				notDid2 := le.did2 != ri.did;				
+	END;  
+  
+  /*
+     EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddHouseholdInfo(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_lexid ri) := TRANSFORM
+        isDid2 := le.did2 = ri.did;        
+        dob_val 		:= riskwise.cleandob(ri.PurchDOB);
+        dob 				:= if((unsigned)le.dob<=0, dob_val, le.dob);
+        SELF.dob 		:= dob;
+        fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+        SELF.ProspectAge 			:= if((unsigned)le.dob<=0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)dob), (unsigned)le.ProspectAge);
+        SELF.gender := if(le.gender='' AND ri.PurchGender<>'', ri.PurchGender, le.gender);
+        SELF.marital_status := if(le.marital_status='' and le.title='',IF(ri.PurchMarried='M','Y','N'),le.marital_status);
+        historydate := (unsigned3)fullhistorydate[1..6];    
+        PB20VehDtFirstSeen := if(ri.PL_VehicleMinDate<=0,(unsigned3)((STRING8)le.dt_first_seen)[1..6],(unsigned3)((STRING8)ri.PL_VehicleMinDate)[1..6]);
+        PB20DunnDtFirstSeen := if(ri.PL_PurchMinDate<=0,(unsigned3)((STRING8)le.dt_first_seen)[1..6],(unsigned3)((STRING8)ri.PL_PurchMinDate)[1..6]);
+        dt_first_seen 		    := MIN(IF(PB20VehDtFirstSeen<=0,999999,PB20VehDtFirstSeen),
+                                    IF(PB20DunnDtFirstSeen<=0,999999,PB20DunnDtFirstSeen),
+                                    IF((unsigned3)((STRING8)le.dt_first_seen)[1..6]<=0,999999,(unsigned3)((STRING8)le.dt_first_seen)[1..6]));
+        SELF.dt_first_seen 		:= IF(dt_first_seen=999999,0,dt_first_seen);
+        PB20VehDtLastSeen := if(ri.PL_VehicleMaxDate=-99997,(unsigned3)((STRING8)le.dt_last_seen)[1..6],(unsigned3)((STRING8)ri.PL_VehicleMaxDate)[1..6]);
+        PB20DunnDtLastSeen := if(ri.PL_PurchMaxDate=-99997,(unsigned3)((STRING8)le.dt_last_seen)[1..6],(unsigned3)((STRING8)ri.PL_PurchMaxDate)[1..6]);
+        SELF.dt_last_seen			:= MAX(PB20VehDtLastSeen,PB20DunnDtLastSeen,(unsigned3)((STRING8)le.dt_last_seen)[1..6]);
+        // SELF.DemEduCollCurrFlag := ri.DemEduCollCurrFlag;
+        // SELF.DemEduCollFlagEv := ri.DemEduCollFlagEv;
+        // SELF.DemEduCollNewLevelEv := ri.DemEduCollNewLevelEv;
+        // SELF.DemEduCollNewPvtFlag := ri.DemEduCollNewPvtFlag;
+        // SELF.DemEduCollNewTierIndx := ri.DemEduCollNewTierIndx;
+        // SELF.DemEduCollLevelHighEv := ri.DemEduCollLevelHighEv;
+        SELF.DemEduCollRecNewInstTypeEv := ri.DemEduCollRecNewInstTypeEv;
+        SELF.DemEduCollTierHighEv := ri.DemEduCollTierHighEv;
+        SELF.DemEduCollRecNewMajorTypeEv := ri.DemEduCollRecNewMajorTypeEv;
+        SELF.DemEduCollEvidFlagEv := ri.DemEduCollEvidFlagEv;  
+        SELF.DemEduCollSrcNewRecOldMsncEv := ri.DemEduCollSrcNewRecOldMsncEv;
+        SELF.DemEduCollSrcNewRecNewMsncEv := ri.DemEduCollSrcNewRecNewMsncEv;
+        SELF.DemEduCollRecSpanEv := ri.DemEduCollRecSpanEv;
+        SELF.DemEduCollRecNewClassEv := ri.DemEduCollRecNewClassEv;
+        SELF.DemEduCollSrcNewExpGradYr := ri.DemEduCollSrcNewExpGradYr;
+        SELF.DemEduCollInstPvtFlagEv := ri.DemEduCollInstPvtFlagEv;
+        SELF.DemEduCollMajorMedicalFlagEv := ri.DemEduCollMajorMedicalFlagEv;
+        SELF.DemEduCollMajorPhysSciFlagEv := ri.DemEduCollMajorPhysSciFlagEv;
+        SELF.DemEduCollMajorSocSciFlagEv := ri.DemEduCollMajorSocSciFlagEv;
+        SELF.DemEduCollMajorLibArtsFlagEv := ri.DemEduCollMajorLibArtsFlagEv;
+        SELF.DemEduCollMajorTechnicalFlagEv := ri.DemEduCollMajorTechnicalFlagEv;
+        SELF.DemEduCollMajorBusFlagEv := ri.DemEduCollMajorBusFlagEv;
+        SELF.DemEduCollMajorEduFlagEv := ri.DemEduCollMajorEduFlagEv;
+        SELF.DemEduCollMajorLawFlagEv := ri.DemEduCollMajorLawFlagEv;
+        // SELF.DemBankingIndx := ri.DemBankingIndx;
+        // SELF.PurchNewAmt := ri.PurchNewAmt;
+        // SELF.PurchTotEv := ri.PurchTotEv;
+        // SELF.PurchCntEv := ri.PurchCntEv;
+        // SELF.PurchNewMsnc := ri.PurchNewMsnc;
+        // SELF.PurchOldMsnc := ri.PurchOldMsnc;
+        // SELF.PurchItemCntEv := ri.PurchItemCntEv;
+        // SELF.PurchAmtAvg := (INTEGER3)ri.PurchAmtAvg;
+        SELF.AstVehAutoCntEv := IF(isDid2, ri.AstVehAutoCntEv, le.AstVehAutoCntEv);
+        SELF.AstVehAutoCarCntEv := ri.AstVehAutoCarCntEv;
+        SELF.AstVehAutoSUVCntEv := ri.AstVehAutoSUVCntEv;
+        SELF.AstVehAutoTruckCntEv := ri.AstVehAutoTruckCntEv;
+        SELF.AstVehAutoVanCntEv := ri.AstVehAutoVanCntEv;
+        SELF.AstVehAutoNewTypeIndx := (INTEGER3)ri.AstVehAutoNewTypeIndx;
+        SELF.AstVehAutoExpCntEv := ri.AstVehAutoExpCntEv;
+        SELF.AstVehAutoEliteCntEv := ri.AstVehAutoEliteCntEv;
+        SELF.AstVehAutoLuxuryCntEv := ri.AstVehAutoLuxuryCntEv;
+        SELF.AstVehAutoOrigOwnCntEv := ri.AstVehAutoOrigOwnCntEv;
+        SELF.AstVehAutoMakeCntEv := ri.AstVehAutoMakeCntEv;
+        SELF.AstVehAutoFreqMake := ri.AstVehAutoFreqMake;
+        SELF.AstVehAutoFreqMakeCntEv := ri.AstVehAutoFreqMakeCntEv;
+        SELF.AstVehAuto2ndFreqMake := ri.AstVehAuto2ndFreqMake;
+        SELF.AstVehAuto2ndFreqMakeCntEv := ri.AstVehAuto2ndFreqMakeCntEv;
+        SELF.AstVehAutoEmrgPriceAvg := ri.AstVehAutoEmrgPriceAvg;
+        SELF.AstVehAutoEmrgPriceMax := ri.AstVehAutoEmrgPriceMax;
+        SELF.AstVehAutoEmrgPriceMin := ri.AstVehAutoEmrgPriceMin;
+        SELF.AstVehAutoNewPrice := ri.AstVehAutoNewPrice;
+        SELF.AstVehAutoEmrgPriceDiff := ri.AstVehAutoEmrgPriceDiff;
+        SELF.AstVehAutoLastAgeAvg := ri.AstVehAutoLastAgeAvg;
+        SELF.AstVehAutoLastAgeMax := ri.AstVehAutoLastAgeMax;
+        SELF.AstVehAutoLastAgeMin := ri.AstVehAutoLastAgeMin;
+        SELF.AstVehAutoEmrgAgeAvg := ri.AstVehAutoEmrgAgeAvg;
+        SELF.AstVehAutoEmrgAgeMax := ri.AstVehAutoEmrgAgeMax;
+        SELF.AstVehAutoEmrgAgeMin := ri.AstVehAutoEmrgAgeMin;
+        SELF.AstVehAutoEmrgSpanAvg := ri.AstVehAutoEmrgSpanAvg;
+        SELF.AstVehAutoNewMsnc := ri.AstVehAutoNewMsnc;
+        SELF.AstVehAutoTimeOwnSpanAvg := ri.AstVehAutoTimeOwnSpanAvg;
+        SELF.AstVehOtherCntEv := ri.AstVehOtherCntEv;
+        SELF.AstVehOtherATVCntEv := ri.AstVehOtherATVCntEv;
+        SELF.AstVehOtherCamperCntEv := ri.AstVehOtherCamperCntEv;
+        SELF.AstVehOtherCommCntEv := ri.AstVehOtherCommCntEv;
+        SELF.AstVehOtherMtrCntEv := IF(isDid2, ri.AstVehOtherMtrCntEv, le.AstVehOtherMtrCntEv);
+        SELF.AstVehOtherScooterCntEv := ri.AstVehOtherScooterCntEv;
+        SELF.AstVehOtherNewTypeIndx := ri.AstVehOtherNewTypeIndx;
+        SELF.AstVehOtherOrigOwnCntEv := ri.AstVehOtherOrigOwnCntEv;
+        SELF.AstVehOtherNewMsnc := ri.AstVehOtherNewMsnc;
+        SELF.AstVehOtherPriceAvg := ri.AstVehOtherPriceAvg;
+        SELF.AstVehOtherPriceMax := ri.AstVehOtherPriceMax;
+        SELF.AstVehOtherPriceMin := ri.AstVehOtherPriceMin;
+        SELF.AstVehOtherNewPrice := ri.AstVehOtherNewPrice;	
+        SELF.IntSportPersonFlagEv := IF(isDid2, ri.IntSportPersonFlagEv, le.IntSportPersonFlagEv);
+        SELF.IntSportPersonFlag1Y := ri.IntSportPersonFlag1Y;
+        SELF.IntSportPersonFlag5Y := ri.IntSportPersonFlag5Y;
+        SELF.IntSportPersonTravelerFlagEv := ri.IntSportPersonTravelerFlagEv;
+        SELF.AstCurrFlag := ri.AstCurrFlag;
+        // SELF.AstPropCurrFlag := ri.AstPropCurrFlag;
+        // SELF.AstPropCurrCntEv := ri.AstPropCurrCntEv;
+        // SELF.AstPropCurrValTot := ri.AstPropCurrValTot;
+        // SELF.AstPropCurrAVMTot := ri.AstPropCurrAVMTot;
+        // SELF.AstPropSaleNewMsnc := ri.AstPropSaleNewMsnc;
+        // SELF.AstPropCntEv := ri.AstPropCntEv;
+        // SELF.AstPropSoldCntEv := ri.AstPropSoldCntEv;
+        // SELF.AstPropSoldCnt1Y := ri.AstPropSoldCnt1Y;
+        // SELF.AstPropSoldNewRatio := ri.AstPropSoldNewRatio;
+        // SELF.AstPropPurchCnt1Y := ri.AstPropPurchCnt1Y;
+        PPCurrOwnedCnt := le.PPCurrOwnedCnt+if(ri.AstVehAutoCntEv<=0,0,ri.AstVehAutoCntEv)
+                                                +if(ri.AstVehOtherCntEv<=0,0,ri.AstVehOtherCntEv)
+                                                +if(ri.AstPropAirCrftCntEv<=0,0,ri.AstPropAirCrftCntEv)
+                                                +if(ri.AstPropWtrcrftCntEv<=0,0,ri.AstPropWtrcrftCntEv);
+        SELF.PPCurrOwnedCnt := PPCurrOwnedCnt;    
+        SELF.AstPropAirCrftCntEv := IF(isDid2, ri.AstPropAirCrftCntEv, le.AstPropAirCrftCntEv);
+        SELF.AstPropWtrcrftCntEv := IF(isDid2, ri.AstPropWtrcrftCntEv, le.AstPropWtrcrftCntEv);
+        // SELF.LifeMoveNewMsnc := ri.LifeMoveNewMsnc; Calculated in Verification
+        SELF.LifeNameLastChngFlag := ri.LifeNameLastChngFlag;
+        SELF.LifeNameLastChngFlag1Y := ri.LifeNameLastChngFlag1Y;
+        SELF.LifeNameLastCntEv := ri.LifeNameLastCntEv;
+        SELF.LifeNameLastChngNewMsnc := ri.LifeNameLastChngNewMsnc;
+        SELF.LifeAstPurchOldMsnc := ri.LifeAstPurchOldMsnc;//MAX(ri.LifeAstPurchOldMsnc,le.LifeAstPurchOldMsnc);
+        SELF.LifeAstPurchNewMsnc := IF(ri.LifeAstPurchNewMsnc=99998,-99998,ri.LifeAstPurchNewMsnc);//MAP(le.LifeAstPurchNewMsnc < 0 => ri.LifeAstPurchNewMsnc,
+                                        // ri.LifeAstPurchNewMsnc < 0 => le.LifeAstPurchNewMsnc,
+                                                                      // MIN(ri.LifeAstPurchNewMsnc,le.LifeAstPurchNewMsnc));
+        SELF.LifeAddrCnt := ri.LifeAddrCnt;
+        // SELF.LifeAddrCurrToPrevValRatio5y := ri.LifeAddrCurrToPrevValRatio5y;
+        SELF.LifeAddrEconTrajType := ri.LifeAddrEconTrajType;
+        SELF.LifeAddrEconTrajIndx := ri.LifeAddrEconTrajIndx;
+        SELF.ProfLicFlagEv := ri.ProfLicFlagEv;
+        SELF.ProfLicActivNewIndx := ri.ProfLicActivNewIndx;
+        SELF.BusAssocFlagEv := ri.BusAssocFlagEv;
+        SELF.BusAssocOldMSnc := ri.BusAssocOldMSnc;
+        SELF.BusLeadershipTitleFlag := ri.BusLeadershipTitleFlag;
+        SELF.BusAssocCntEv := ri.BusAssocCntEv;
+        SELF.ProfLicActvNewTitleType := ri.ProfLicActvNewTitleType;
+        SELF.BusUCCFilingCntEv := ri.BusUCCFilingCntEv;
+        SELF.BusUCCFilingActiveCnt := ri.BusUCCFilingActiveCnt;
+        
+        OlderErmgRecord := ((UNSIGNED)ri.EmrgDt_first_seen <= (UNSIGNED)le.EmrgDt_first_seen 
+                            and (UNSIGNED)ri.EmrgDt_first_seen>0
+                           ) 
+                           or le.EmrgDt_first_seen<=0;
+        EmrgDt_first_seen        := IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
+        SELF.EmrgDt_first_seen   := EmrgDt_first_seen;
+        EmrgDob			             := MAX((unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.EmrgDob),
+                                        (unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDob),
+                                        (unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)dob));
+        SELF.EmrgDob			       := (STRING)EmrgDob;
+        EmrgAge                  := IF((UNSIGNED)EmrgDt_first_seen<=0 OR (UNSIGNED)EmrgDob<=0,
+                                    -99998,
+                                    risk_indicators.years_apart((UNSIGNED)EmrgDt_first_seen, (UNSIGNED)EmrgDob));
+        SELF.EmrgAge   			     := EmrgAge;
+        SELF.EmrgAtOrAfter21Flag := MAP(EmrgAge < 0          => -99998,
+                                        EmrgAge > 21         => 1,
+                                        EmrgAge > 0          => 0,
+                                                                -99998);
+        SELF.EmrgAge25to59Flag   := MAP(EmrgDt_first_seen<=0 => -99998,
+                                        EmrgAge <= 0         => -99998,
+                                        EmrgAge >= 25 AND EmrgAge < 60 => 1,
+                                                                0);
+
+        SELF.EmrgSrc             := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
+        SELF.EmrgPrimaryRange    := IF(OlderErmgRecord,ri.EmrgPrimaryRange,le.EmrgPrimaryRange);
+        SELF.EmrgPredirectional	 := IF(OlderErmgRecord,ri.EmrgPredirectional,le.EmrgPredirectional);
+        SELF.EmrgPrimaryName	   := IF(OlderErmgRecord,ri.EmrgPrimaryName,le.EmrgPrimaryName);
+        SELF.EmrgSuffix	         := IF(OlderErmgRecord,ri.EmrgSuffix,le.EmrgSuffix);	
+        SELF.EmrgPostdirectional := IF(OlderErmgRecord,ri.EmrgPostdirectional,le.EmrgPostdirectional);
+        SELF.EmrgUnitDesignation := IF(OlderErmgRecord,ri.EmrgUnitDesignation,le.EmrgUnitDesignation);
+        SELF.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.EmrgSecondaryRange,le.EmrgSecondaryRange);
+        SELF.EmrgCity_Name	     := IF(OlderErmgRecord,ri.EmrgCity_Name,le.EmrgCity_Name);	
+        SELF.EmrgSt			         := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
+        SELF.EmrgZIP5			       := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
+        SELF.EmrgZIP4		         := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
+          
+        SELF.EmrgRecordType      := IF(OlderErmgRecord,ri.EmrgRecordType,le.EmrgRecordType);
+        SELF.EmrgAddrType        := '-99998';
+        SELF.EmrgLexIDsAtEmrgAddrCnt1Y := -99998;
+        
+        SELF.DrgCnt7Y := ri.DrgCnt7Y;
+        SELF.DrgSeverityIndx7Y := ri.DrgSeverityIndx7Y;
+        SELF.DrgCnt1Y := ri.DrgCnt1Y;
+        SELF.DrgNewMsnc7Y := ri.DrgNewMsnc7Y;
+        SELF.DrgCrimFelCnt7Y := ri.DrgCrimFelCnt7Y;
+        SELF.DrgCrimFelCnt1Y := ri.DrgCrimFelCnt1Y;
+        SELF.DrgCrimFelNewMsnc7Y := ri.DrgCrimFelNewMsnc7Y;
+        SELF.DrgCrimNFelCnt7Y := ri.DrgCrimNFelCnt7Y;
+        SELF.DrgCrimNFelCnt1Y := ri.DrgCrimNFelCnt1Y;
+        SELF.DrgCrimNFelNewMsnc7Y := ri.DrgCrimNFelNewMsnc7Y;
+        SELF.DrgEvictCnt7Y := ri.DrgEvictCnt7Y;
+        SELF.DrgEvictCnt1Y := ri.DrgEvictCnt1Y;
+        SELF.DrgEvictNewMsnc7Y := ri.DrgEvictNewMsnc7Y;
+        SELF.DrgLnJCnt7Y := ri.DrgLnJCnt7Y;
+        SELF.DrgLnJCnt1Y := ri.DrgLnJCnt1Y;
+        SELF.DrgLnJNewMsnc7Y := ri.DrgLnJNewMsnc7Y;
+        SELF.DrgLnJAmtTot7Y := ri.DrgLnJAmtTot7Y;
+        SELF.DrgBkCnt10Y := ri.DrgBkCnt10Y;
+        SELF.DrgBkCnt1Y := ri.DrgBkCnt1Y;
+        SELF.DrgBkNewMsnc10Y := ri.DrgBkNewMsnc10Y;
+        // SELF.DrgFrClCnt7Y := ri.DrgFrClCnt7Y;
+        // SELF.DrgFrClCnt1Y := ri.DrgFrClCnt1Y;
+        // SELF.DrgFrClNewMsnc := ri.DrgFrClNewMsnc;
+        SELF.ShortTermShopNewMsnc := ri.ShortTermShopNewMsnc;
+        SELF.ShortTermShopOldMsnc := ri.ShortTermShopOldMsnc;
+        SELF.ShortTermShopCntEv := ri.ShortTermShopCntEv;
+        SELF.ShortTermShopCnt6M := ri.ShortTermShopCnt6M;
+        SELF.ShortTermShopCnt5Y := ri.ShortTermShopCnt5Y;
+        SELF.ShortTermShopCnt1Y := ri.ShortTermShopCnt1Y;
+        SELF.HHID := ri.HHID;
+
+        SELF.CurrAddrAVMVal := ri.CurrAddrAVMVal;
+        SELF.CurrAddrAVMValA1Y := ri.CurrAddrAVMValA1Y;
+        SELF.CurrAddrAVMRatio1Y := (STRING10)ri.CurrAddrAVMRatio1Y;
+        SELF.CurrAddrAVMValA5Y := ri.CurrAddrAVMValA5Y;
+        SELF.CurrAddrAVMRatio5Y := (STRING10)ri.CurrAddrAVMRatio5Y;
+        SELF.CurrAddrMedAVMCtyRatio := (STRING10)ri.CurrAddrMedAVMCtyRatio;
+        SELF.CurrAddrMedAVMCenTractRatio := (STRING10)ri.CurrAddrMedAVMCenTractRatio;
+        SELF.CurrAddrMedAVMCenBlockRatio := (STRING10)ri.CurrAddrMedAVMCenBlockRatio;
+        SELF.CurrAddrBusRegCnt := ri.CurrAddrBusRegCnt;
+        
+        SELF.AddrCurrFull := ri.AddrCurrFull;
+        SELF.curr_addr_rawaid := ri.curr_addr_rawaid;
+        SELF.AddrPrevFull := ri.AddrPrevFull;    
+        SELF.prev_addr_rawaid := ri.prev_addr_rawaid;
+        
+        //HOUSEHOLD
+        SELF.PurchNewAmt := IF(isDid2, ri.PurchNewAmt, le.PurchNewAmt);
+        SELF.PurchTotEv := IF(isDid2, ri.PurchTotEv, le.PurchTotEv);
+        SELF.PurchCntEv := IF(isDid2, ri.PurchCntEv, le.PurchCntEv);
+        SELF.PurchNewMsnc := IF(isDid2, ri.PurchNewMsnc, le.PurchNewMsnc);
+        SELF.PurchOldMsnc := IF(isDid2, ri.PurchOldMsnc, le.PurchOldMsnc);
+        SELF.PurchItemCntEv := IF(isDid2, ri.PurchItemCntEv, le.PurchItemCntEv);
+        SELF.PurchAmtAvg := IF(isDid2, ri.PurchAmtAvg, le.PurchAmtAvg);
+        SELF.AstPropCurrCntEv := IF(isDid2, ri.AstPropCurrCntEv, le.AstPropCurrCntEv);
+        SELF.DemEduCollCurrFlag := IF(isDid2, ri.DemEduCollCurrFlag, le.DemEduCollCurrFlag);
+        SELF.DemEduCollFlagEv :=IF(isDid2, ri.DemEduCollFlagEv, le.DemEduCollFlagEv);
+        SELF.DemEduCollNewLevelEv := IF(isDid2, ri.DemEduCollNewLevelEv, le.DemEduCollNewLevelEv);
+        SELF.DemEduCollNewPvtFlag := IF(isDid2, ri.DemEduCollNewPvtFlag, le.DemEduCollNewPvtFlag);
+        SELF.DemEduCollNewTierIndx := IF(isDid2, ri.DemEduCollNewTierIndx, le.DemEduCollNewTierIndx);
+        SELF.DemEduCollLevelHighEv := IF(isDid2, ri.DemEduCollLevelHighEv, le.DemEduCollLevelHighEv);
+        SELF := le;
+    END;*/
+    
+     EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddHouseholdInfo(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_lexid ri) := TRANSFORM
+				isProspectDid := le.did = ri.did and le.did2 = ri.did;
 				dob_val 		:= riskwise.cleandob(ri.PurchDOB);
 				dob 				:= if((unsigned)le.dob<=0, dob_val, le.dob);
-				SELF.dob 		:= dob;
 				fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
-				SELF.ProspectAge 			:= if((unsigned)le.dob<=0, risk_indicators.years_apart((unsigned)fullhistorydate, (unsigned)dob), (unsigned)le.ProspectAge);
-				SELF.gender := if(le.gender='' AND ri.PurchGender<>'', ri.PurchGender, le.gender);
-				SELF.marital_status := if(le.marital_status='' and le.title='',IF(ri.PurchMarried='M','Y','N'),le.marital_status);
-				historydate := (unsigned3)fullhistorydate[1..6];		
-				PB20VehDtFirstSeen := if(ri.PL_VehicleMinDate<=0,(unsigned3)((STRING8)le.dt_first_seen)[1..6],(unsigned3)((STRING8)ri.PL_VehicleMinDate)[1..6]);
-				PB20DunnDtFirstSeen := if(ri.PL_PurchMinDate<=0,(unsigned3)((STRING8)le.dt_first_seen)[1..6],(unsigned3)((STRING8)ri.PL_PurchMinDate)[1..6]);
-				dt_first_seen 				:= MIN(IF(PB20VehDtFirstSeen<=0,999999,PB20VehDtFirstSeen),
-																		IF(PB20DunnDtFirstSeen<=0,999999,PB20DunnDtFirstSeen),
-																		IF((unsigned3)((STRING8)le.dt_first_seen)[1..6]<=0,999999,(unsigned3)((STRING8)le.dt_first_seen)[1..6]));
-				SELF.dt_first_seen 		:= IF(dt_first_seen=999999,0,dt_first_seen);
-				PB20VehDtLastSeen := if(ri.PL_VehicleMaxDate=-99997,(unsigned3)((STRING8)le.dt_last_seen)[1..6],(unsigned3)((STRING8)ri.PL_VehicleMaxDate)[1..6]);
-				PB20DunnDtLastSeen := if(ri.PL_PurchMaxDate=-99997,(unsigned3)((STRING8)le.dt_last_seen)[1..6],(unsigned3)((STRING8)ri.PL_PurchMaxDate)[1..6]);
-				SELF.dt_last_seen			:= MAX(PB20VehDtLastSeen,PB20DunnDtLastSeen,(unsigned3)((STRING8)le.dt_last_seen)[1..6]);
-				SELF.DemEduCollCurrFlag := ri.DemEduCollCurrFlag;
-				SELF.DemEduCollFlagEv := ri.DemEduCollFlagEv;
-				SELF.DemEduCollNewLevelEv := ri.DemEduCollNewLevelEv;
-				SELF.DemEduCollNewPvtFlag := ri.DemEduCollNewPvtFlag;
-				SELF.DemEduCollNewTierIndx := ri.DemEduCollNewTierIndx;
-				SELF.DemEduCollLevelHighEv := ri.DemEduCollLevelHighEv;
-				SELF.DemEduCollRecNewInstTypeEv := ri.DemEduCollRecNewInstTypeEv;
-				SELF.DemEduCollTierHighEv := ri.DemEduCollTierHighEv;
-				SELF.DemEduCollRecNewMajorTypeEv := ri.DemEduCollRecNewMajorTypeEv;
-				SELF.DemEduCollEvidFlagEv := ri.DemEduCollEvidFlagEv;	
-				SELF.DemEduCollSrcNewRecOldMsncEv := ri.DemEduCollSrcNewRecOldMsncEv;
-				SELF.DemEduCollSrcNewRecNewMsncEv := ri.DemEduCollSrcNewRecNewMsncEv;
-				SELF.DemEduCollRecSpanEv := ri.DemEduCollRecSpanEv;
-				SELF.DemEduCollRecNewClassEv := ri.DemEduCollRecNewClassEv;
-				SELF.DemEduCollSrcNewExpGradYr := ri.DemEduCollSrcNewExpGradYr;
-				SELF.DemEduCollInstPvtFlagEv := ri.DemEduCollInstPvtFlagEv;
-				SELF.DemEduCollMajorMedicalFlagEv := ri.DemEduCollMajorMedicalFlagEv;
-				SELF.DemEduCollMajorPhysSciFlagEv := ri.DemEduCollMajorPhysSciFlagEv;
-				SELF.DemEduCollMajorSocSciFlagEv := ri.DemEduCollMajorSocSciFlagEv;
-				SELF.DemEduCollMajorLibArtsFlagEv := ri.DemEduCollMajorLibArtsFlagEv;
-				SELF.DemEduCollMajorTechnicalFlagEv := ri.DemEduCollMajorTechnicalFlagEv;
-				SELF.DemEduCollMajorBusFlagEv := ri.DemEduCollMajorBusFlagEv;
-				SELF.DemEduCollMajorEduFlagEv := ri.DemEduCollMajorEduFlagEv;
-				SELF.DemEduCollMajorLawFlagEv := ri.DemEduCollMajorLawFlagEv;
-				// SELF.DemBankingIndx := ri.DemBankingIndx;
-				// SELF.PurchNewAmt := ri.PurchNewAmt;
-				// SELF.PurchTotEv := ri.PurchTotEv;
-				// SELF.PurchCntEv := ri.PurchCntEv;
-				// SELF.PurchNewMsnc := ri.PurchNewMsnc;
-				// SELF.PurchOldMsnc := ri.PurchOldMsnc;
-				// SELF.PurchItemCntEv := ri.PurchItemCntEv;
-				// SELF.PurchAmtAvg := (INTEGER3)ri.PurchAmtAvg;
-				SELF.AstVehAutoCntEv := IF(notDid2, ri.AstVehAutoCntEv, le.AstVehAutoCntEv);
-				SELF.AstVehAutoCarCntEv := ri.AstVehAutoCarCntEv;
-				SELF.AstVehAutoSUVCntEv := ri.AstVehAutoSUVCntEv;
-				SELF.AstVehAutoTruckCntEv := ri.AstVehAutoTruckCntEv;
-				SELF.AstVehAutoVanCntEv := ri.AstVehAutoVanCntEv;
-				SELF.AstVehAutoNewTypeIndx := (INTEGER3)ri.AstVehAutoNewTypeIndx;
-				SELF.AstVehAutoExpCntEv := ri.AstVehAutoExpCntEv;
-				SELF.AstVehAutoEliteCntEv := ri.AstVehAutoEliteCntEv;
-				SELF.AstVehAutoLuxuryCntEv := ri.AstVehAutoLuxuryCntEv;
-				SELF.AstVehAutoOrigOwnCntEv := ri.AstVehAutoOrigOwnCntEv;
-				SELF.AstVehAutoMakeCntEv := ri.AstVehAutoMakeCntEv;
-				SELF.AstVehAutoFreqMake := ri.AstVehAutoFreqMake;
-				SELF.AstVehAutoFreqMakeCntEv := ri.AstVehAutoFreqMakeCntEv;
-				SELF.AstVehAuto2ndFreqMake := ri.AstVehAuto2ndFreqMake;
-				SELF.AstVehAuto2ndFreqMakeCntEv := ri.AstVehAuto2ndFreqMakeCntEv;
-				SELF.AstVehAutoEmrgPriceAvg := ri.AstVehAutoEmrgPriceAvg;
-				SELF.AstVehAutoEmrgPriceMax := ri.AstVehAutoEmrgPriceMax;
-				SELF.AstVehAutoEmrgPriceMin := ri.AstVehAutoEmrgPriceMin;
-				SELF.AstVehAutoNewPrice := ri.AstVehAutoNewPrice;
-				SELF.AstVehAutoEmrgPriceDiff := ri.AstVehAutoEmrgPriceDiff;
-				SELF.AstVehAutoLastAgeAvg := ri.AstVehAutoLastAgeAvg;
-				SELF.AstVehAutoLastAgeMax := ri.AstVehAutoLastAgeMax;
-				SELF.AstVehAutoLastAgeMin := ri.AstVehAutoLastAgeMin;
-				SELF.AstVehAutoEmrgAgeAvg := ri.AstVehAutoEmrgAgeAvg;
-				SELF.AstVehAutoEmrgAgeMax := ri.AstVehAutoEmrgAgeMax;
-				SELF.AstVehAutoEmrgAgeMin := ri.AstVehAutoEmrgAgeMin;
-				SELF.AstVehAutoEmrgSpanAvg := ri.AstVehAutoEmrgSpanAvg;
-				SELF.AstVehAutoNewMsnc := ri.AstVehAutoNewMsnc;
-				SELF.AstVehAutoTimeOwnSpanAvg := ri.AstVehAutoTimeOwnSpanAvg;
-				SELF.AstVehOtherCntEv := ri.AstVehOtherCntEv;
-				SELF.AstVehOtherATVCntEv := ri.AstVehOtherATVCntEv;
-				SELF.AstVehOtherCamperCntEv := ri.AstVehOtherCamperCntEv;
-				SELF.AstVehOtherCommCntEv := ri.AstVehOtherCommCntEv;
-				SELF.AstVehOtherMtrCntEv := IF(notDid2, ri.AstVehOtherMtrCntEv, le.AstVehOtherMtrCntEv);
-				SELF.AstVehOtherScooterCntEv := ri.AstVehOtherScooterCntEv;
-				SELF.AstVehOtherNewTypeIndx := ri.AstVehOtherNewTypeIndx;
-				SELF.AstVehOtherOrigOwnCntEv := ri.AstVehOtherOrigOwnCntEv;
-				SELF.AstVehOtherNewMsnc := ri.AstVehOtherNewMsnc;
-				SELF.AstVehOtherPriceAvg := ri.AstVehOtherPriceAvg;
-				SELF.AstVehOtherPriceMax := ri.AstVehOtherPriceMax;
-				SELF.AstVehOtherPriceMin := ri.AstVehOtherPriceMin;
-				SELF.AstVehOtherNewPrice := ri.AstVehOtherNewPrice;	
-				SELF.IntSportPersonFlagEv := IF(notDid2, ri.IntSportPersonFlagEv, le.IntSportPersonFlagEv);
-				SELF.IntSportPersonFlag1Y := ri.IntSportPersonFlag1Y;
-				SELF.IntSportPersonFlag5Y := ri.IntSportPersonFlag5Y;
-				SELF.IntSportPersonTravelerFlagEv := ri.IntSportPersonTravelerFlagEv;
-				SELF.AstCurrFlag := ri.AstCurrFlag;
-				// SELF.AstPropCurrFlag := ri.AstPropCurrFlag;
-				// SELF.AstPropCurrCntEv := ri.AstPropCurrCntEv;
-				// SELF.AstPropCurrValTot := ri.AstPropCurrValTot;
-				// SELF.AstPropCurrAVMTot := ri.AstPropCurrAVMTot;
-				// SELF.AstPropSaleNewMsnc := ri.AstPropSaleNewMsnc;
-				// SELF.AstPropCntEv := ri.AstPropCntEv;
-				// SELF.AstPropSoldCntEv := ri.AstPropSoldCntEv;
-				// SELF.AstPropSoldCnt1Y := ri.AstPropSoldCnt1Y;
-				// SELF.AstPropSoldNewRatio := ri.AstPropSoldNewRatio;
-				// SELF.AstPropPurchCnt1Y := ri.AstPropPurchCnt1Y;
-				PPCurrOwnedCnt := le.PPCurrOwnedCnt+if(ri.AstVehAutoCntEv<=0,0,ri.AstVehAutoCntEv)
-																								+if(ri.AstVehOtherCntEv<=0,0,ri.AstVehOtherCntEv)
-																								+if(ri.AstPropAirCrftCntEv<=0,0,ri.AstPropAirCrftCntEv)
-																								+if(ri.AstPropWtrcrftCntEv<=0,0,ri.AstPropWtrcrftCntEv);
-				SELF.PPCurrOwnedCnt := PPCurrOwnedCnt;		
-				SELF.AstPropAirCrftCntEv := IF(notDid2, ri.AstPropAirCrftCntEv, le.AstPropAirCrftCntEv);
-				SELF.AstPropWtrcrftCntEv := IF(notDid2, ri.AstPropWtrcrftCntEv, le.AstPropWtrcrftCntEv);
-				// SELF.LifeMoveNewMsnc := ri.LifeMoveNewMsnc; Calculated in Verification
-				SELF.LifeNameLastChngFlag := ri.LifeNameLastChngFlag;
-				SELF.LifeNameLastChngFlag1Y := ri.LifeNameLastChngFlag1Y;
-				SELF.LifeNameLastCntEv := ri.LifeNameLastCntEv;
-				SELF.LifeNameLastChngNewMsnc := ri.LifeNameLastChngNewMsnc;
-				SELF.LifeAstPurchOldMsnc := ri.LifeAstPurchOldMsnc;//MAX(ri.LifeAstPurchOldMsnc,le.LifeAstPurchOldMsnc);
-				SELF.LifeAstPurchNewMsnc := IF(ri.LifeAstPurchNewMsnc=99998,-99998,ri.LifeAstPurchNewMsnc);//MAP(le.LifeAstPurchNewMsnc < 0 => ri.LifeAstPurchNewMsnc,
-																				// ri.LifeAstPurchNewMsnc < 0 => le.LifeAstPurchNewMsnc,
-																																			// MIN(ri.LifeAstPurchNewMsnc,le.LifeAstPurchNewMsnc));
-				SELF.LifeAddrCnt := ri.LifeAddrCnt;
-				// SELF.LifeAddrCurrToPrevValRatio5y := ri.LifeAddrCurrToPrevValRatio5y;
-				SELF.LifeAddrEconTrajType := ri.LifeAddrEconTrajType;
-				SELF.LifeAddrEconTrajIndx := ri.LifeAddrEconTrajIndx;
-				SELF.ProfLicFlagEv := ri.ProfLicFlagEv;
-				SELF.ProfLicActivNewIndx := ri.ProfLicActivNewIndx;
-				SELF.BusAssocFlagEv := ri.BusAssocFlagEv;
-				SELF.BusAssocOldMSnc := ri.BusAssocOldMSnc;
-				SELF.BusLeadershipTitleFlag := ri.BusLeadershipTitleFlag;
-				SELF.BusAssocCntEv := ri.BusAssocCntEv;
-				SELF.ProfLicActvNewTitleType := ri.ProfLicActvNewTitleType;
-				SELF.BusUCCFilingCntEv := ri.BusUCCFilingCntEv;
-				SELF.BusUCCFilingActiveCnt := ri.BusUCCFilingActiveCnt;
-				
-				OlderErmgRecord := ((UNSIGNED)ri.EmrgDt_first_seen <= (UNSIGNED)le.EmrgDt_first_seen 
-														and (UNSIGNED)ri.EmrgDt_first_seen>0
-													 ) 
-													 or le.EmrgDt_first_seen<=0;
-				EmrgDt_first_seen				:= IF(OlderErmgRecord,ri.EmrgDt_first_seen,le.EmrgDt_first_seen);
-				SELF.EmrgDt_first_seen	 := EmrgDt_first_seen;
+
 				EmrgDob									 := MAX((unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)ri.EmrgDob),
 																				(unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)le.EmrgDob),
 																				(unsigned)ProfileBooster.V2_Common.convertDateTo8((STRING)dob));
-				SELF.EmrgDob						 := (STRING)EmrgDob;
-				EmrgAge									:= IF((UNSIGNED)EmrgDt_first_seen<=0 OR (UNSIGNED)EmrgDob<=0,
-																		-99998,
-																		risk_indicators.years_apart((UNSIGNED)EmrgDt_first_seen, (UNSIGNED)EmrgDob));
-				SELF.EmrgAge	 					 := EmrgAge;
-				SELF.EmrgAtOrAfter21Flag := MAP(EmrgAge < 0					=> -99998,
-																				EmrgAge > 21				 => 1,
-																				EmrgAge > 0					=> 0,
-																																-99998);
-				SELF.EmrgAge25to59Flag	 := MAP(EmrgDt_first_seen<=0 => -99998,
-																				EmrgAge <= 0				 => -99998,
-																				EmrgAge >= 25 AND EmrgAge < 60 => 1,
-																																0);
-
-				SELF.EmrgSrc						 := IF(OlderErmgRecord,ri.EmrgSrc,le.EmrgSrc);
-				SELF.EmrgPrimaryRange		:= IF(OlderErmgRecord,ri.EmrgPrimaryRange,le.EmrgPrimaryRange);
-				SELF.EmrgPredirectional	 := IF(OlderErmgRecord,ri.EmrgPredirectional,le.EmrgPredirectional);
-				SELF.EmrgPrimaryName		 := IF(OlderErmgRecord,ri.EmrgPrimaryName,le.EmrgPrimaryName);
-				SELF.EmrgSuffix					 := IF(OlderErmgRecord,ri.EmrgSuffix,le.EmrgSuffix);	
-				SELF.EmrgPostdirectional := IF(OlderErmgRecord,ri.EmrgPostdirectional,le.EmrgPostdirectional);
-				SELF.EmrgUnitDesignation := IF(OlderErmgRecord,ri.EmrgUnitDesignation,le.EmrgUnitDesignation);
-				SELF.EmrgSecondaryRange	 := IF(OlderErmgRecord,ri.EmrgSecondaryRange,le.EmrgSecondaryRange);
-				SELF.EmrgCity_Name			 := IF(OlderErmgRecord,ri.EmrgCity_Name,le.EmrgCity_Name);	
-				SELF.EmrgSt							 := IF(OlderErmgRecord,ri.EmrgSt,le.EmrgSt);
-				SELF.EmrgZIP5						 := IF(OlderErmgRecord,ri.EmrgZIP5,le.EmrgZIP5);
-				SELF.EmrgZIP4						 := IF(OlderErmgRecord,ri.EmrgZIP4,le.EmrgZIP4);
-					
-				SELF.EmrgRecordType			:= IF(OlderErmgRecord,ri.EmrgRecordType,le.EmrgRecordType);
-				SELF.EmrgAddrType				:= '-99998';
-				SELF.EmrgLexIDsAtEmrgAddrCnt1Y := -99998;
-				
-				SELF.DrgCnt7Y := ri.DrgCnt7Y;
-				SELF.DrgSeverityIndx7Y := ri.DrgSeverityIndx7Y;
-				SELF.DrgCnt1Y := ri.DrgCnt1Y;
-				SELF.DrgNewMsnc7Y := ri.DrgNewMsnc7Y;
-				SELF.DrgCrimFelCnt7Y := ri.DrgCrimFelCnt7Y;
-				SELF.DrgCrimFelCnt1Y := ri.DrgCrimFelCnt1Y;
-				SELF.DrgCrimFelNewMsnc7Y := ri.DrgCrimFelNewMsnc7Y;
-				SELF.DrgCrimNFelCnt7Y := ri.DrgCrimNFelCnt7Y;
-				SELF.DrgCrimNFelCnt1Y := ri.DrgCrimNFelCnt1Y;
-				SELF.DrgCrimNFelNewMsnc7Y := ri.DrgCrimNFelNewMsnc7Y;
-				SELF.DrgEvictCnt7Y := ri.DrgEvictCnt7Y;
-				SELF.DrgEvictCnt1Y := ri.DrgEvictCnt1Y;
-				SELF.DrgEvictNewMsnc7Y := ri.DrgEvictNewMsnc7Y;
-				SELF.DrgLnJCnt7Y := ri.DrgLnJCnt7Y;
-				SELF.DrgLnJCnt1Y := ri.DrgLnJCnt1Y;
-				SELF.DrgLnJNewMsnc7Y := ri.DrgLnJNewMsnc7Y;
-				SELF.DrgLnJAmtTot7Y := ri.DrgLnJAmtTot7Y;
-				SELF.DrgBkCnt10Y := ri.DrgBkCnt10Y;
-				SELF.DrgBkCnt1Y := ri.DrgBkCnt1Y;
-				SELF.DrgBkNewMsnc10Y := ri.DrgBkNewMsnc10Y;
-				// SELF.DrgFrClCnt7Y := ri.DrgFrClCnt7Y;
-				// SELF.DrgFrClCnt1Y := ri.DrgFrClCnt1Y;
-				// SELF.DrgFrClNewMsnc := ri.DrgFrClNewMsnc;
-				SELF.ShortTermShopNewMsnc := ri.ShortTermShopNewMsnc;
-				SELF.ShortTermShopOldMsnc := ri.ShortTermShopOldMsnc;
-				SELF.ShortTermShopCntEv := ri.ShortTermShopCntEv;
-				SELF.ShortTermShopCnt6M := ri.ShortTermShopCnt6M;
-				SELF.ShortTermShopCnt5Y := ri.ShortTermShopCnt5Y;
-				SELF.ShortTermShopCnt1Y := ri.ShortTermShopCnt1Y;
-				
-				SELF.CurrAddrAVMVal := ri.CurrAddrAVMVal;
-				SELF.CurrAddrAVMValA1Y := ri.CurrAddrAVMValA1Y;
-				SELF.CurrAddrAVMRatio1Y := (STRING10)ri.CurrAddrAVMRatio1Y;
-				SELF.CurrAddrAVMValA5Y := ri.CurrAddrAVMValA5Y;
-				SELF.CurrAddrAVMRatio5Y := (STRING10)ri.CurrAddrAVMRatio5Y;
-				SELF.CurrAddrMedAVMCtyRatio := (STRING10)ri.CurrAddrMedAVMCtyRatio;
-				SELF.CurrAddrMedAVMCenTractRatio := (STRING10)ri.CurrAddrMedAVMCenTractRatio;
-				SELF.CurrAddrMedAVMCenBlockRatio := (STRING10)ri.CurrAddrMedAVMCenBlockRatio;
-				SELF.CurrAddrBusRegCnt := ri.CurrAddrBusRegCnt;
-				
-				SELF.AddrCurrFull := ri.AddrCurrFull;
-				SELF.curr_addr_rawaid := ri.curr_addr_rawaid;
-				SELF.AddrPrevFull := ri.AddrPrevFull;		
-				SELF.prev_addr_rawaid := ri.prev_addr_rawaid;
-				
-				//HOUSEHOLD
 				SELF.HHID := IF(le.HHID<=0,ri.HHID,le.HHID);
-				SELF.PurchNewAmt := IF(notDid2, ri.PurchNewAmt, le.PurchNewAmt);
-				SELF.PurchTotEv := IF(notDid2, ri.PurchTotEv, le.PurchTotEv);
-				SELF.PurchCntEv := IF(notDid2, ri.PurchCntEv, le.PurchCntEv);
-				SELF.PurchNewMsnc := IF(notDid2, ri.PurchNewMsnc, le.PurchNewMsnc);
-				SELF.PurchOldMsnc := IF(notDid2, ri.PurchOldMsnc, le.PurchOldMsnc);
-				SELF.PurchItemCntEv := IF(notDid2, ri.PurchItemCntEv, le.PurchItemCntEv);
-				SELF.PurchAmtAvg := IF(notDid2, ri.PurchAmtAvg, le.PurchAmtAvg);
-				SELF.AstPropCurrCntEv := IF(notDid2, ri.AstPropCurrCntEv, le.AstPropCurrCntEv);
+                SELF.ProspectAge := IF(isProspectDid, le.ProspectAge, risk_indicators.years_apart((UNSIGNED)fullhistorydate, (UNSIGNED)EmrgDob));
+                SELF.PurchNewAmt := IF(isProspectDid, le.PurchNewAmt, ri.PurchNewAmt);
+                SELF.PurchTotEv := IF(isProspectDid, le.PurchTotEv, ri.PurchTotEv);
+                SELF.PurchCntEv := IF(isProspectDid, le.PurchCntEv, ri.PurchCntEv);
+                SELF.PurchNewMsnc := IF(isProspectDid, le.PurchNewMsnc, ri.PurchNewMsnc);
+                SELF.PurchOldMsnc := IF(isProspectDid, le.PurchOldMsnc, ri.PurchOldMsnc);
+                SELF.PurchItemCntEv := IF(isProspectDid, le.PurchItemCntEv, ri.PurchItemCntEv);
+                SELF.PurchAmtAvg := IF(isProspectDid, le.PurchAmtAvg, ri.PurchAmtAvg);
+                SELF.AstPropCurrFlag := IF(isProspectDid, le.AstPropCurrFlag, ri.AstPropCurrFlag);
+                SELF.AstPropCurrAVMTot := IF(isProspectDid, le.AstPropCurrAVMTot, ri.AstPropCurrAVMTot);
+                SELF.AstVehAutoCntEv := IF(isProspectDid, le.AstVehAutoCntEv, ri.AstVehAutoCntEv);
+                SELF.AstVehOtherMtrCntEv := IF(isProspectDid, le.AstVehOtherMtrCntEv, ri.AstVehOtherMtrCntEv);
+                SELF.AstPropAirCrftCntEv := IF(isProspectDid, le.AstPropAirCrftCntEv, ri.AstPropAirCrftCntEv);
+                SELF.AstPropWtrcrftCntEv := IF(isProspectDid, le.AstPropWtrcrftCntEv, ri.AstPropWtrcrftCntEv);
+                SELF.AstPropCurrCntEv := IF(isProspectDid, le.AstPropCurrCntEv, ri.AstPropCurrCntEv);
+                SELF.DemEduCollCurrFlag := IF(isProspectDid, le.DemEduCollCurrFlag, ri.DemEduCollCurrFlag);
+                SELF.DemEduCollFlagEv :=IF(isProspectDid, le.DemEduCollFlagEv, ri.DemEduCollFlagEv);
+                SELF.DemEduCollNewLevelEv := IF(isProspectDid, le.DemEduCollNewLevelEv, ri.DemEduCollNewLevelEv);
+                SELF.DemEduCollNewPvtFlag := IF(isProspectDid, le.DemEduCollNewPvtFlag, ri.DemEduCollNewPvtFlag);
+                SELF.DemEduCollNewTierIndx := IF(isProspectDid, le.DemEduCollNewTierIndx, ri.DemEduCollNewTierIndx);
+                SELF.DemEduCollLevelHighEv := IF(isProspectDid, le.DemEduCollLevelHighEv, ri.DemEduCollLevelHighEv);
+                SELF.IntSportPersonFlagEv := IF(isProspectDid, le.IntSportPersonFlagEv, ri.IntSportPersonFlagEv);
+				SELF.IntSportPersonFlag1Y := IF(isProspectDid, le.IntSportPersonFlag1Y, ri.IntSportPersonFlag1Y);
+				SELF.IntSportPersonFlag5Y := IF(isProspectDid, le.IntSportPersonFlag5Y, ri.IntSportPersonFlag5Y);
 				SELF := le;
 		END;
-					
-/*	 EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddCurrentAddressData(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_address ri ) := TRANSFORM
-	 		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
-	 		// SELF.CurrAddrOwnershipIndx := ri.AddrOwnershipIndx;
-			 SELF.CurrAddrHasPoolFlag := ri.AddrHasPoolFlag;
-			 SELF.CurrAddrIsMobileHomeFlag := ri.AddrIsMobileHomeFlag;
-			 SELF.CurrAddrBathCnt := ri.AddrBathCnt;
-			 SELF.CurrAddrParkingCnt := ri.AddrParkingCnt;
-			 SELF.CurrAddrBuildYr := ri.AddrBuildYr;
-			 SELF.CurrAddrBedCnt := ri.AddrBedCnt;
-			 SELF.CurrAddrBldgSize := ri.AddrBldgSize;
-			 SELF.CurrAddrLat := ri.AddrLat;
-			 SELF.CurrAddrLng := ri.AddrLng;
-			 SELF.CurrAddrIsCollegeFlag := ri.AddrIsCollegeFlag;
-			 // SELF.CurrAddrAVMVal := ri.AddrAVMVal;
-			 // SELF.CurrAddrAVMValA1Y := ri.AddrAVMValA1Y;
-			 // SELF.CurrAddrAVMRatio1Y := (STRING10)ri.AddrAVMRatio1Y;
-			 // SELF.CurrAddrAVMValA5Y := ri.AddrAVMValA5Y;
-			 // SELF.CurrAddrAVMRatio5Y := (STRING10)ri.AddrAVMRatio5Y;
-			 // SELF.CurrAddrMedAVMCtyRatio := (STRING10)ri.AddrMedAVMCtyRatio;
-			 // SELF.CurrAddrMedAVMCenTractRatio := (STRING10)ri.AddrMedAVMCenTractRatio;
-			 // SELF.CurrAddrMedAVMCenBlockRatio := (STRING10)ri.AddrMedAVMCenBlockRatio;
-			 SELF.CurrAddrType := ri.AddrType;
-			 SELF.CurrAddrTypeIndx := ri.AddrTypeIndx;
-			 SELF.CurrAddrBusRegCnt := ri.AddrBusRegCnt;
-			 SELF.CurrAddrIsVacantFlag := ri.AddrIsVacantFlag;
-			 SELF.CurrAddrStatus := ri.AddrStatus;
-			 SELF.CurrAddrIsAptFlag := ri.AddrIsAptFlag;
-			 self 								:= le;	
-	 		self 								:= [];
-	 	END;
-		 
-		 EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddInputAddressData(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_address ri ) := TRANSFORM
-	 		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
-	 		// SELF.InpAddrOwnershipIndx := ri.AddrOwnershipIndx;
-			 SELF.InpAddrHasPoolFlag := ri.AddrHasPoolFlag;
-			 SELF.InpAddrIsMobileHomeFlag := ri.AddrIsMobileHomeFlag;
-			 SELF.InpAddrBathCnt := ri.AddrBathCnt;
-			 SELF.InpAddrParkingCnt := ri.AddrParkingCnt;
-			 SELF.InpAddrBuildYr := ri.AddrBuildYr;
-			 SELF.InpAddrBedCnt := ri.AddrBedCnt;
-			 SELF.InpAddrBldgSize := ri.AddrBldgSize;
-			 SELF.InpAddrLat := ri.AddrLat;
-			 SELF.InpAddrLng := ri.AddrLng;
-			 SELF.InpAddrIsCollegeFlag := ri.AddrIsCollegeFlag;
-			 // SELF.InpAddrAVMVal := ri.AddrAVMVal;
-			 // SELF.InpAddrAVMValA1Y := ri.AddrAVMValA1Y;
-			 // SELF.InpAddrAVMRatio1Y := (STRING10)ri.AddrAVMRatio1Y;
-			 // SELF.InpAddrAVMValA5Y := ri.AddrAVMValA5Y;
-			 // SELF.InpAddrAVMRatio5Y := (STRING10)ri.AddrAVMRatio5Y;
-			 // SELF.InpAddrMedAVMCtyRatio := (STRING10)ri.AddrMedAVMCtyRatio;
-			 // SELF.InpAddrMedAVMCenTractRatio := (STRING10)ri.AddrMedAVMCenTractRatio;
-			 // SELF.InpAddrMedAVMCenBlockRatio := (STRING10)ri.AddrMedAVMCenBlockRatio;
-			 SELF.InpAddrType := ri.AddrType;
-			 SELF.InpAddrTypeIndex := ri.AddrTypeIndx;
-			 SELF.InpAddrBusRegCnt := ri.AddrBusRegCnt;
-			 SELF.InpAddrIsVacantFlag := ri.AddrIsVacantFlag;
-			 // SELF.InpAddrForeclosure := ri.AddrForeclosure;
-			 // SELF.InpAddrStatus := ri.AddrStatus;
-			 SELF.InpAddrIsAptFlag := ri.AddrIsAptFlag;
-			 self 								:= le;	
-	 		self 								:= [];
-	 	END;	
+
+          
+/*   EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddCurrentAddressData(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_address ri ) := TRANSFORM
+   		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+   		// SELF.CurrAddrOwnershipIndx := ri.AddrOwnershipIndx;
+       SELF.CurrAddrHasPoolFlag := ri.AddrHasPoolFlag;
+       SELF.CurrAddrIsMobileHomeFlag := ri.AddrIsMobileHomeFlag;
+       SELF.CurrAddrBathCnt := ri.AddrBathCnt;
+       SELF.CurrAddrParkingCnt := ri.AddrParkingCnt;
+       SELF.CurrAddrBuildYr := ri.AddrBuildYr;
+       SELF.CurrAddrBedCnt := ri.AddrBedCnt;
+       SELF.CurrAddrBldgSize := ri.AddrBldgSize;
+       SELF.CurrAddrLat := ri.AddrLat;
+       SELF.CurrAddrLng := ri.AddrLng;
+       SELF.CurrAddrIsCollegeFlag := ri.AddrIsCollegeFlag;
+       // SELF.CurrAddrAVMVal := ri.AddrAVMVal;
+       // SELF.CurrAddrAVMValA1Y := ri.AddrAVMValA1Y;
+       // SELF.CurrAddrAVMRatio1Y := (STRING10)ri.AddrAVMRatio1Y;
+       // SELF.CurrAddrAVMValA5Y := ri.AddrAVMValA5Y;
+       // SELF.CurrAddrAVMRatio5Y := (STRING10)ri.AddrAVMRatio5Y;
+       // SELF.CurrAddrMedAVMCtyRatio := (STRING10)ri.AddrMedAVMCtyRatio;
+       // SELF.CurrAddrMedAVMCenTractRatio := (STRING10)ri.AddrMedAVMCenTractRatio;
+       // SELF.CurrAddrMedAVMCenBlockRatio := (STRING10)ri.AddrMedAVMCenBlockRatio;
+       SELF.CurrAddrType := ri.AddrType;
+       SELF.CurrAddrTypeIndx := ri.AddrTypeIndx;
+       SELF.CurrAddrBusRegCnt := ri.AddrBusRegCnt;
+       SELF.CurrAddrIsVacantFlag := ri.AddrIsVacantFlag;
+       SELF.CurrAddrStatus := ri.AddrStatus;
+       SELF.CurrAddrIsAptFlag := ri.AddrIsAptFlag;
+       self 								:= le;  
+   		self 								:= [];
+   	END;
+     
+     EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell xfmAddInputAddressData(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, dx_ProfileBooster.Layouts.i_address ri ) := TRANSFORM
+   		fullhistorydate := risk_indicators.iid_constants.myGetDate(le.historydate);
+   		// SELF.InpAddrOwnershipIndx := ri.AddrOwnershipIndx;
+       SELF.InpAddrHasPoolFlag := ri.AddrHasPoolFlag;
+       SELF.InpAddrIsMobileHomeFlag := ri.AddrIsMobileHomeFlag;
+       SELF.InpAddrBathCnt := ri.AddrBathCnt;
+       SELF.InpAddrParkingCnt := ri.AddrParkingCnt;
+       SELF.InpAddrBuildYr := ri.AddrBuildYr;
+       SELF.InpAddrBedCnt := ri.AddrBedCnt;
+       SELF.InpAddrBldgSize := ri.AddrBldgSize;
+       SELF.InpAddrLat := ri.AddrLat;
+       SELF.InpAddrLng := ri.AddrLng;
+       SELF.InpAddrIsCollegeFlag := ri.AddrIsCollegeFlag;
+       // SELF.InpAddrAVMVal := ri.AddrAVMVal;
+       // SELF.InpAddrAVMValA1Y := ri.AddrAVMValA1Y;
+       // SELF.InpAddrAVMRatio1Y := (STRING10)ri.AddrAVMRatio1Y;
+       // SELF.InpAddrAVMValA5Y := ri.AddrAVMValA5Y;
+       // SELF.InpAddrAVMRatio5Y := (STRING10)ri.AddrAVMRatio5Y;
+       // SELF.InpAddrMedAVMCtyRatio := (STRING10)ri.AddrMedAVMCtyRatio;
+       // SELF.InpAddrMedAVMCenTractRatio := (STRING10)ri.AddrMedAVMCenTractRatio;
+       // SELF.InpAddrMedAVMCenBlockRatio := (STRING10)ri.AddrMedAVMCenBlockRatio;
+       SELF.InpAddrType := ri.AddrType;
+       SELF.InpAddrTypeIndex := ri.AddrTypeIndx;
+       SELF.InpAddrBusRegCnt := ri.AddrBusRegCnt;
+       SELF.InpAddrIsVacantFlag := ri.AddrIsVacantFlag;
+       // SELF.InpAddrForeclosure := ri.AddrForeclosure;
+       // SELF.InpAddrStatus := ri.AddrStatus;
+       SELF.InpAddrIsAptFlag := ri.AddrIsAptFlag;
+       self 								:= le;  
+   		self 								:= [];
+   	END;  
 */
 	
 	EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell getDeceasedDID(ProfileBooster.V2_Layouts.Layout_PB2_Shell le, Doxie.key_Death_masterV2_ssa_DID ri) := transform
@@ -822,7 +867,7 @@ EXPORT V2_Transforms := MODULE
 		SELF := le;
 	END;
 	
-	EXPORT ProfileBooster.V2_Layouts.Layout_PB2_BatchOut xfm_tfEmpty(ProfileBooster.V2_Layouts.Layout_PB2_In le) := transform
+	EXPORT ProfileBooster.V2_Layouts.tempAttributesLayout xfm_tfEmpty(ProfileBooster.V2_Layouts.Layout_PB2_In le) := transform
 		SELF.seq			:= le.seq;
 		SELF.AcctNo		:= le.AcctNo;
 		self 					:= [];
@@ -1235,7 +1280,7 @@ EXPORT V2_Transforms := MODULE
                                                             le.HHMmbrAgeMed_99997 > 0         => -99997,
                                                                                                  le.HHMmbrAgeMed_Count/le.HHMmbrCnt_Count);		
       SELF.attributes.version2.HHComplexTotalCnt	   := MAP(noDid OR isMinor OR noHHID        => -99999,
-                                                            le.HHComplexTotalCnt_Count > 0    => le.HHMmbrAgeMed_Count, 
+                                                            le.HHComplexTotalCnt_Count > 0    => le.HHComplexTotalCnt_Count, 
                                                             le.HHComplexTotalCnt_99998 > 0    => -99998,
                                                             le.HHComplexTotalCnt_99997 > 0    => -99997,
                                                                                                  le.HHComplexTotalCnt_Count);			 
@@ -1408,4 +1453,12 @@ EXPORT V2_Transforms := MODULE
       SELF := le;
       SELF := [];
 		END;
+
+    EXPORT ProfileBooster.V2_Layouts.Layout_PB2_Shell getAddressInfo(ProfileBooster.V2_Layouts.Layout_PB2_Shell le) := TRANSFORM
+    Cleaned_Addr := Address.CleanAddressOneLine(le.addrcurrfull);
+    SELF.curr_prim_range := Cleaned_Addr.prim_range;
+    SELF.curr_sec_range := Cleaned_Addr.sec_range;
+    SELF := le;
+    END;
+    
 END;
