@@ -509,12 +509,12 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 		STRING Archive_Date;
 	END;
 
-	SHARED Header__Key_Addr_Hist := dx_Header.key_addr_hist(iType);
+	SHARED Header__Key_Addr_Hist := dx_Header.Key_Addr_Unique_Expanded(iType);
 	EXPORT Layout_Header__Key_Addr_Hist_temp := RECORD
 		LayoutIDs;
-		RECORDOF(Header__Key_Addr_Hist)-date_first_seen;
-		unsigned date_first_seen;
-		STRING2 src;
+		RECORDOF(Header__Key_Addr_Hist)-dt_first_seen_pr-best_addr_ind-permissions_ds;
+		unsigned dt_first_seen_pr;
+		boolean best_addr_ind;
 		STRING Archive_Date;
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
@@ -522,24 +522,23 @@ SHARED unsigned1 iType := IF(Options.IsFCRA, data_services.data_env.iFCRA, data_
 	
 	EXPORT Layout_Header__Key_Addr_Hist := RECORD
 		LayoutIDs;
-		RECORDOF(Header__Key_Addr_Hist)- date_first_seen;
-		unsigned date_first_seen;
+		RECORDOF(Header__Key_Addr_Hist)-dt_first_seen_pr-best_addr_ind-permissions_ds;
+		RECORDOF(Doxie__Key_Header)-prim_range-predir-prim_name-suffix-postdir-sec_range-city_name-st;
+		boolean best_addr_ind;
+		unsigned dt_first_seen_pr;
 		STRING25 v_city_name;
-		STRING2 st;
-		string4 zip4;
 		string2 StateCode;
-		string3 county; 
-		string10 geo_lat; 
-		string11 geo_long; 
-		string7 geo_blk; 
-		string1 geo_match; 
+		string10 geo_lat;
+		string2 rec_type_aid;
+		string11 geo_long;
+		string1 geo_match;
 		String12 Geo_Link;
 		string4 err_stat;
-		STRING2 src;
 		STRING Archive_Date;
 		dpmtype;
 		PublicRecords_KEL.ECL_Functions.Layout_Overrides.header_correct_record_id;
 	END;
+
 
 
 	SHARED USPIS_HotList__key_addr_search_zip := USPIS_HotList.key_addr_search_zip;

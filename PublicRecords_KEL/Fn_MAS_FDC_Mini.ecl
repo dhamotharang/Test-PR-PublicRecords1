@@ -913,32 +913,49 @@ end;
 	
 	// Header: consumer only
 	Key_Header_Addr_Hist_temp := 
-			JOIN((Input_FDC_RelativesLexids_Business_Contact_LexIDs_Input6thRep), dx_Header.key_addr_hist(iType), 
-				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND 
+			JOIN((Input_FDC_RelativesLexids_Business_Contact_LexIDs_Input6thRep), dx_Header.Key_Addr_Unique_Expanded(iType), 
+				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  and //turn off for brm marketing
 				LEFT.P_LexID > 0 AND
-				KEYED(LEFT.P_LexID = RIGHT.s_did) and
-				ArchiveDate((string)right.date_first_seen) <= LEFT.P_InpClnArchDt[1..8],
+				KEYED(LEFT.P_LexID = RIGHT.did) and
+				ArchiveDate((string)right.dt_first_seen_pr) <= LEFT.P_InpClnArchDt[1..8],
 				TRANSFORM(Layouts_FDC.Layout_Header__Key_Addr_Hist_temp,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
-					self.date_first_seen :=  (integer)archivedate((string)right.date_first_seen);
+					self.dt_first_seen_pr :=  (integer)archivedate((string)right.dt_first_seen_pr);
+					self.archive_date := archivedate((string)right.dt_first_seen_pr, (string)right.dt_vendor_first_reported_pr);
+					self.best_addr_ind := if(TRIM(right.best_addr_ind, left, right) ='B',TRUE, FALSE);
 					SELF := RIGHT, 
 					SELF := LEFT,
 					SELF := []), 
 				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.Default_Atmost_1000));
 
 
+		AddrHistToHeader := join(Key_Header_Addr_Hist_temp, Doxie__Key_Header_Records_final,
+											LEFT.UIDAppend = RIGHT.UIDAppend and 
+											left.did<>0 and left.zip<>'' and left.prim_name<>'' and
+											left.did=right.did and 
+											left.zip=right.zip and
+											left.prim_range=right.prim_range and
+											left.prim_name=right.prim_name and
+											left.sec_range = right.sec_range,  // allow for NNEQ on sec range
+												TRANSFORM(Layouts_FDC.Layout_Header__Key_Addr_Hist,
+													SELF.Src := right.src,
+													SELF.DPMBitmap := SetDPMBitmap( Source := right.src, FCRA_Restricted := Options.isFCRA, GLBA_Restricted := NotRegulated, Pre_GLB_Restricted := PublicRecords_KEL.ECL_Functions.Constants.PreGLBRegulatedRecord(right.Src, right.dt_nonglb_last_seen, right.dt_first_seen), DPPA_Restricted := NotRegulated, DPPA_State := PublicRecords_KEL.ECL_Functions.Constants.GetDPPAState(right.src), Marketing_State := right.st, KELPermissions := CFG_file, Is_Consumer_Header := TRUE),													
+													self.Archive_Date :=  left.Archive_Date;
+													self := left,
+													self := right, 
+													self := []));
+
+
 	Key_Header_Addr_Hist := 
-			JOIN(Key_Header_Addr_Hist_temp, AID_Build.Key_AID_Base, 
-				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  AND 
+		JOIN(AddrHistToHeader, AID_Build.Key_AID_Base, 
+				Common.DoFDCJoin_Header__Key_Addr_Hist = TRUE  and //turn off for brm marketing
 				KEYED(LEFT.Rawaid = RIGHT.Rawaid),
 				TRANSFORM(Layouts_FDC.Layout_Header__Key_Addr_Hist,
 					SELF.UIDAppend := LEFT.UIDAppend,
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.P_LexID := LEFT.P_LexID,
-					self.date_first_seen :=  (integer)archivedate((string)left.date_first_seen);
-					SELF := LEFT,
 					SELF.v_city_name := RIGHT.v_city_name;
 					SELF.st := RIGHT.st;
 					SELF.zip4 := RIGHT.zip4;
@@ -948,31 +965,17 @@ end;
 					SELF.geo_long := RIGHT.geo_long;
 					SELF.geo_blk := RIGHT.geo_blk;
 					SELF.geo_match := RIGHT.geo_match;
-					SELF.Geo_Link := self.StateCode + self.county + self.geo_blk ;	
+					SELF.Geo_Link := TRIM(self.StateCode, right,left) + TRIM(SELF.county, right,left) + TRIM(self.geo_blk, right,left) ;	
+					SELF.err_stat := RIGHT.err_stat;
+					SELF.rec_type_aid := RIGHT.rec_type;
+					SELF := LEFT,
 					SELF := RIGHT, 
 					SELF := []), 
-				ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_SEARCH_FID_JOIN_LIMIT), KEEP(1));
-
-	AddrHistToHeader := join(Key_Header_Addr_Hist, (Header_6threp+Header_original),
-											LEFT.UIDAppend = RIGHT.UIDAppend  AND
-											left.s_did<>0 and left.zip<>'' and left.prim_name<>'' and
-											left.s_did=right.did and 
-											left.zip=right.zip and
-											left.prim_range=right.prim_range and
-											left.prim_name=right.prim_name and
-											ut.NNEQ(left.sec_range,right.sec_range),  // allow for NNEQ on sec range
-												TRANSFORM(Layouts_FDC.Layout_Header__Key_Addr_Hist,
-													SELF.Src := right.src,
-													SELF.DPMBitmap := right.DPMBitmap,//we already filtered header for permissions just need to join the left overs
-													self.Archive_Date :=  ArchiveDate((string)left.date_first_seen);
-													self.date_first_seen :=  (integer)archivedate((string)left.date_first_seen);
-													self := left),		
-													left outer);
-
-	AddrHistToHeaderSlim 	:= Dedup(sort(AddrHistToHeader, WHOLE RECORD));
+			ATMOST(PublicRecords_KEL.ECL_Functions.Constants.PROPERTY_SEARCH_FID_JOIN_LIMIT));
 
 
-	With_Header_Addr_Hist_Records_original := DENORMALIZE(With_Doxie__Key_Header_original, AddrHistToHeaderSlim,
+
+	With_Header_Addr_Hist_Records_original := DENORMALIZE(With_Doxie__Key_Header_original, Key_Header_Addr_Hist,
 		LEFT.UIDAppend = RIGHT.UIDAppend and 
 				left.g_procuid = right.g_procuid, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
@@ -980,7 +983,7 @@ end;
 					SELF := LEFT,
 					SELF := []));	
 
-	With_Header_Addr_Hist_Records_6threp := DENORMALIZE(With_Doxie__Key_Header_6threp, AddrHistToHeaderSlim,
+	With_Header_Addr_Hist_Records_6threp := DENORMALIZE(With_Doxie__Key_Header_6threp, Key_Header_Addr_Hist,
 		LEFT.UIDAppend = RIGHT.UIDAppend and 
 				left.g_procuid = right.g_procuid, GROUP,
 			TRANSFORM(Layouts_FDC.Layout_FDC,
