@@ -1,86 +1,41 @@
-export Layouts_DL_MI_In := module
+﻿export Layouts_DL_MI_In := module
 
 	export Layout_MI_Update := record
-		string1	 orig_RecCode; 
-		string10 orig_ClientIDNum; 
-		string13 orig_DLNum; 
-		string13 orig_PersonalIDNum; 
-		string36 orig_Name; 
-		string36 orig_Street;
-		string19 orig_City; 
-		string2	 orig_State; 
-		string5	 orig_Zip; 
-		string8	 orig_DOB; 
-		string1	 orig_Sex; 
-		string2	 orig_County; 
-		string1	 orig_DLNorPIDIndicator; 
-		string36 orig_MailingStreet; 
-		string19 orig_MailingCity;
-		string2	 orig_MailingState; 
-		string5	 orig_MailingZip; 
-		string1	 orig_OptOutIndicator;
-		string2  orig_LF;
-	end;
-	
-	export Layout_MI_With_ProcessDte := record
-		string8 process_date;
-		Layout_MI_Update;
+		string1  Code;
+   	string13 Customer_DLN_PID;
+   	string50 Last_Name;
+   	string50 First_Name;
+   	string50 Middle_Name;
+   	string6  Name_Suffix;
+   	string36 Street_Address;
+   	string19 City;
+   	string2  State;
+   	string5  Zipcode;
+   	string8  Date_of_Birth;
+   	string1  Gender;
+   	string2  County;
+   	string1  DLN_PID_Indicator;
+   	string36 Mailing_Street_address;
+   	string19 Mailing_City;
+   	string2  Mailing_State;
+   	string5  Mailing_Zipcode;
+		string5  blob;
 	end;
 	
 	export Layout_MI_Cleaned := record
-		string8 append_process_date;
-		string1 orig_reccode;
-		string10 orig_clientidnum;
-		string13 orig_dlnum;
-		string13 orig_personalidnum;
-		string36 orig_name;
-		string36 orig_street;
-		string19 orig_city;
-		string2 orig_state;
-		string5 orig_zip;
-		string8 orig_dob;
-		string1 orig_sex;
-		string2 orig_county;
-		string1 orig_dlnorpidindicator;
-		string36 orig_mailingstreet;
-		string19 orig_mailingcity;
-		string2 orig_mailingstate;
-		string5 orig_mailingzip;
-		string1 orig_optoutindicator;
-		string1 orig_lf;
-		string5 clean_name_prefix;
-		string20 clean_name_first;
-		string20 clean_name_middle;
-		string20 clean_name_last;
-		string5 clean_name_suffix;
-		string3 clean_name_score;
-		string10 clean_prim_range;
-		string2 clean_predir;
-		string28 clean_prim_name;
-		string4 clean_addr_suffix;
-		string2 clean_postdir;
-		string10 clean_unit_desig;
-		string8 clean_sec_range;
-		string25 clean_p_city_name;
-		string25 clean_v_city_name;
-		string2 clean_st;
-		string5 clean_zip;
-		string4 clean_zip4;
-		string4 clean_cart;
-		string1 clean_cr_sort_sz;
-		string4 clean_lot;
-		string1 clean_lot_order;
-		string2 clean_dpbc;
-		string1 clean_chk_digit;
-		string2 clean_record_type;
-		string2 clean_ace_fips_st;
-		string3 clean_fipscounty;
-		string10 clean_geo_lat;
-		string11 clean_geo_long;
-		string4 clean_msa;
-		string7 clean_geo_blk;
-		string1 clean_geo_match;
-		string4 clean_err_stat;
+		string8   process_date;
+		Layout_MI_Update;
+		string5   clean_name_prefix;
+		string20  clean_fname;
+		string20  clean_mname;
+		string20  clean_lname;
+		string5   clean_name_suffix;
+		string3   clean_name_score;
+	end;
+	
+	export Layout_MI_Cleaned_Ext := record
+	  Layout_MI_Cleaned;
 		string1 addr_type;
 	end;
+
 end;
