@@ -1282,7 +1282,8 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 	
 	// Search advo by all address hierarchy records that are tied to the input LexID. Since we also search address hierarchy by business contacts, we need to do some special filtering here.
 	addr_hist_addresses_for_advo_pre := NORMALIZE(FDCDataset_Mini(RepNumber <> 6), LEFT.Dataset_Header__Key_Addr_Hist, TRANSFORM(RECORDOF(RIGHT), SELF.P_LexID := LEFT.P_LexID, SELF := RIGHT));
-	addr_hist_addresses_for_advo_filtered := addr_hist_addresses_for_advo_pre(P_LexID = s_did);
+	addr_hist_addresses_for_advo_filtered := addr_hist_addresses_for_advo_pre(P_LexID = did);
+
 
 	addr_hist_addresses_for_advo := 
 		PROJECT( addr_hist_addresses_for_advo_filtered(zip <> '' AND prim_name <> ''),  //cleaning up garbage
@@ -1290,7 +1291,7 @@ BIPV2.IDAppendLayouts.AppendInput PrepBIPInputprox(Layouts_FDC.Layout_FDC le) :=
 				SELF.UIDAppend       := LEFT.UIDAppend,
 				SELF.PrimaryRange    := LEFT.prim_range,
 				SELF.PrimaryName     := LEFT.prim_name,
-				SELF.AddrSuffix      := LEFT.suffix,
+				SELF.AddrSuffix      := LEFT.addr_suffix,
 				SELF.Predirectional  := LEFT.predir,
 				SELF.Postdirectional := LEFT.postdir,
 				SELF.ZIP5            := LEFT.zip,
