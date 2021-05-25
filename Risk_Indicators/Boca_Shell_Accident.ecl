@@ -1,4 +1,4 @@
-﻿IMPORT FLAccidents_eCrash, ut, riskwise, Accident_Services, risk_indicators;	
+﻿IMPORT FLAccidents_eCrash, ut, riskwise, Accident_Services, risk_indicators, _control;	
 
 EXPORT Boca_Shell_Accident (GROUPED DATASET(risk_indicators.layout_bocashell_neutral) bs,INTEGER bsversion=3) := FUNCTION
 
@@ -162,6 +162,10 @@ recsAccRolled := ROLLUP(recsWithNumAcc,TRUE,rollAccidentData(LEFT,RIGHT));
 with_accident := join(bs, recsAccRolled, left.seq=right.seq, transform(layout_bocashell_neutral, 
 self.Accident_Data := right.Accident_Data, self := left), left outer, keep(1));
 
-RETURN group(with_accident, seq);
+#IF(_CONTROL.Environment.onThor_LeadIntegrity)	
+	return bs;
+#ELSE
+	RETURN group(with_accident, seq);
+#END
 
 END;

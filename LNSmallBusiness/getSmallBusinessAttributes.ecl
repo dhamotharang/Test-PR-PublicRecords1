@@ -1,4 +1,4 @@
-﻿IMPORT Business_Risk_BIP,LNSmallBusiness;
+﻿IMPORT Business_Risk_BIP, LNSmallBusiness;
 
 EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusShell, UNSIGNED BusShellVersion) := FUNCTION
 
@@ -398,23 +398,6 @@ EXPORT getSmallBusinessAttributes(DATASET(Business_Risk_BIP.Layouts.Shell) BusSh
 		SELF.Version2.UCCRoles := attr.UCCRoles;
 		SELF.Version2.UCCRolesActive := attr.UCCRolesActive;
 		SELF.Version2.GovernmentDebarred := attr.GovernmentDebarred;
-		SELF.Version2.B2BProviderAvg12M := attr.B2BProviderAvg12M;
-		SELF.Version2.B2BProviderDelta12M := attr.B2BProviderDelta12M;
-		SELF.Version2.B2BProviderDelta24M := attr.B2BProviderDelta24M;
-		SELF.Version2.B2BSpendCategories12M := attr.B2BSpendCategories12M;
-		SELF.Version2.B2BSpendTotal12M := attr.B2BSpendTotal12M;
-		SELF.Version2.B2BSpendDelta12M := attr.B2BSpendDelta12M;
-		SELF.Version2.B2BSpendDelta24M := attr.B2BSpendDelta24M;
-		SELF.Version2.B2BDBTAvg03 := attr.B2BDBTAvg03;
-		SELF.Version2.B2B30DBT12MInd := attr.B2B30DBT12MInd;
-		SELF.Version2.B2B60DBT12MInd := attr.B2B60DBT12MInd;
-		SELF.Version2.B2B90DBT12Ind := attr.B2B90DBT12Ind;
-		SELF.Version2.B2BDBT30Delta12M := attr.B2BDBT30Delta12M;
-		SELF.Version2.B2BDBT30Delta24M := attr.B2BDBT30Delta24M;
-		SELF.Version2.B2BDBT60Delta12M := attr.B2BDBT60Delta12M;
-		SELF.Version2.B2BDBT60Delta24M := attr.B2BDBT60Delta24M;
-		SELF.Version2.B2BPaid12M := attr.B2BPaid12M;
-		SELF.Version2.B2BBalanceAvg03M := attr.B2BBalanceAvg03M;
 		SELF.Version2.InquiryCount := attr.InquiryCount;
 		SELF.Version2.InquiryCount03M := attr.InquiryCount03M;
 		SELF.Version2.InquiryCount06M := attr.InquiryCount06M;

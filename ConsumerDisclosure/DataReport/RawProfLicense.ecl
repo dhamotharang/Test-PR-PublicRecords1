@@ -4,9 +4,9 @@
   * be used/shared by any service other than ConsumerDisclosure.FCRADataService.
   ***********************************************************************************************************
 */
-IMPORT $, ConsumerDisclosure, doxie, FCRA, FFD, Prof_LicenseV2, Prof_License_Mari;
+IMPORT $, ConsumerDisclosure, data_services, doxie, dx_prof_License_Mari, FCRA, FFD, Prof_LicenseV2;
 
-BOOLEAN IsFCRA := TRUE;
+BOOLEAN isFCRA := TRUE;
 
 layout_ProfLicense_raw := RECORD
   UNSIGNED6 did;
@@ -17,15 +17,9 @@ layout_ProfLicense_rawrec := RECORD(layout_ProfLicense_raw)
   $.Layouts.InternalMetadata;
 END;
 
-layout_ProfLicenseMari_raw := RECORD
-  UNSIGNED6 s_did;
-  Prof_License_Mari.layouts.final  -[enh_did_src];
-END;
-
-layout_ProfLicenseMari_rawrec := RECORD(layout_ProfLicenseMari_raw)
+layout_ProfLicenseMari_rawrec := RECORD(dx_prof_License_Mari.layouts.i_did)
   $.Layouts.InternalMetadata;
 END;
-
 
 EXPORT RawProfLicense := MODULE
 
@@ -34,7 +28,7 @@ EXPORT RawProfLicense := MODULE
   END;
 
   EXPORT layout_ProfLicenseMari_out := RECORD($.Layouts.Metadata)
-    layout_ProfLicenseMari_raw;
+    dx_prof_License_Mari.layouts.i_did;
   END;
 
   EXPORT GetV2Data(DATASET(doxie.layout_references) in_dids,
@@ -70,7 +64,7 @@ EXPORT RawProfLicense := MODULE
     override_ids := SET(override_recs, combined_record_id);
     suppressed_ids := SET(suppressed_recs, combined_record_id);
 
-    main_recs := JOIN(in_dids, Prof_LicenseV2.Key_Proflic_Did(IsFCRA),
+    main_recs := JOIN(in_dids, Prof_LicenseV2.Key_Proflic_Did(data_services.data_env.GetEnvFCRA(isFCRA)),
                           KEYED(LEFT.did = RIGHT.did),
                           TRANSFORM(layout_ProfLicense_rawrec,
                                     SELF.compliance_flags.IsOverwritten :=
@@ -159,7 +153,7 @@ EXPORT RawProfLicense := MODULE
     override_ids := SET(override_recs, combined_record_id);
     suppressed_ids := SET(suppressed_recs, combined_record_id);
 
-    main_recs := JOIN(in_dids, Prof_License_Mari.key_did(IsFCRA),
+    main_recs := JOIN(in_dids, dx_prof_license_mari.key_did(data_services.data_env.GetEnvFCRA(isFCRA)),
                           KEYED(LEFT.did = RIGHT.s_did),
                           TRANSFORM(layout_ProfLicenseMari_rawrec,
                                     SELF.compliance_flags.IsOverwritten :=

@@ -1,5 +1,6 @@
-﻿import risk_indicators, easi;
+﻿import risk_indicators, easi, _Control;
 // wealth indicator model that accepts the clam
+onThor := _Control.Environment.OnThor;
 
 export WIN704_0_0(GROUPED dataset(Risk_Indicators.Layout_Boca_Shell) clam ,
                   dataset(easi.layout_census) easi, 
@@ -47,6 +48,26 @@ debug := false;
 		// input fields
 			C_MED_HVAL := (INTEGER)ri.MED_HVAL;
 
+#IF(_CONTROL.Environment.onThor_LeadIntegrity)
+      // clam values
+        ADD1_ASSESSED_AMOUNT          := le.Address_Verification.Input_Address_Information.assessed_amount;
+        ADD1_NAPROP                   := le.Address_Verification.Input_Address_Information.naprop;
+        ADD1_PURCHASE_AMOUNT          := le.Address_Verification.Input_Address_Information.purchase_amount;
+        ADD2_ASSESSED_AMOUNT          := le.Address_Verification.Address_History_1.assessed_amount;
+        ADD2_NAPROP                   := le.Address_Verification.Address_History_1.naprop;
+        ADD2_PURCHASE_AMOUNT          := le.Address_Verification.Address_History_1.purchase_amount;
+        ADD3_ASSESSED_AMOUNT          := le.Address_Verification.Address_History_2.assessed_amount;
+        ADD3_NAPROP                   := le.Address_Verification.Address_History_2.naprop;
+        ADD3_PURCHASE_AMOUNT          := le.Address_Verification.Address_History_2.purchase_amount;
+        PROPERTY_AMBIG_TOTAL          := le.Address_Verification.ambiguous.property_total;
+        PROPERTY_OWNED_ASSESSED_TOTAL := le.Address_Verification.owned.property_owned_assessed_total;
+        PROPERTY_OWNED_PURCHASE_TOTAL := le.Address_Verification.owned.property_owned_purchase_total;
+        PROPERTY_OWNED_TOTAL          := le.Address_Verification.owned.property_total;
+        PROPERTY_SOLD_PURCHASE_COUNT  := le.Address_Verification.sold.property_owned_purchase_count;
+        PROPERTY_SOLD_PURCHASE_TOTAL  := le.Address_Verification.sold.property_owned_purchase_total;
+        PROPERTY_SOLD_TOTAL           := le.Address_Verification.sold.property_total;
+      //
+#ELSE
       // clam values
         ADD1_ASSESSED_AMOUNT          := IF(IsFIS, le.FIS.add1_assessed_amount, le.Address_Verification.Input_Address_Information.assessed_amount);
         ADD1_NAPROP                   := IF(IsFIS, le.FIS.add1_naprop, le.Address_Verification.Input_Address_Information.naprop);
@@ -65,6 +86,8 @@ debug := false;
         PROPERTY_SOLD_PURCHASE_TOTAL  := IF(IsFIS, le.FIS.sold_property_purchase_total, le.Address_Verification.sold.property_owned_purchase_total);
         PROPERTY_SOLD_TOTAL           := IF(IsFIS, le.FIS.sold_property_total, le.Address_Verification.sold.property_total);
       //
+#END			
+			
 
 			sMIN( a, b ) := MACRO if( a < b, a, b ) ENDMACRO;
 			sMAX( a, b ) := MACRO if( a > b, a, b ) ENDMACRO;
@@ -274,9 +297,20 @@ debug := false;
 	END;
 	
 
-	resu := join(clam, easi, 
-						right.geolink = left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk,
-						doModel(LEFT,RIGHT), left outer , lookup);
+	resu_roxie := join(clam, easi, 
+                      right.geolink = left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk,
+                      doModel(LEFT,RIGHT), left outer , lookup);
+            
+  resu_thor := join(DISTRIBUTE(clam, HASH64(shell_input.st+shell_input.county+shell_input.geo_blk)),
+                    DISTRIBUTE(easi, HASH64(geolink)), 
+                    right.geolink = left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk,
+                    doModel(LEFT,RIGHT), left outer , LOCAL);
+                    
+  #IF(onThor)
+    resu := resu_thor;
+  #ELSE
+    resu := resu_roxie;
+  #END
 
 	
 	RETURN resu;

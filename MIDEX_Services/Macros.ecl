@@ -180,10 +180,10 @@
       
       EXPORT MAC_GetProfLic_MidexLayout_withRid (inDataset, outDataset, searchType) :=
       MACRO
-       IMPORT MIDEX_Services, Prof_License_Mari, ut;
+       IMPORT MIDEX_Services, dx_Prof_License_Mari, ut;
        outDataset :=
          JOIN(inDataset,
-               Prof_License_Mari.key_mari_payload,
+               dx_Prof_License_Mari.key_mari_payload,
                KEYED(LEFT.mari_rid = RIGHT.mari_rid) AND
                   IF( searchType = MIDEX_Services.Constants.COMP_SEARCH,
                   RIGHT.affil_type_cd = MIDEX_Services.Constants.AFFILIATE_TYPES.COMPANY OR

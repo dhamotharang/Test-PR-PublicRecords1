@@ -1,4 +1,6 @@
-﻿import risk_indicators, riskwise, header, relationship, std, dx_header;
+﻿import risk_indicators, riskwise, header, relationship, std, dx_header, _Control;
+onThor := _Control.Environment.OnThor;
+
 
 export iid_getFraudVelocity(
 	grouped 	dataset(risk_indicators.iid_constants.layout_outx) all_header,
@@ -19,13 +21,10 @@ HighConfidenceRelatives_Value :=  isKBA;
 HighConfidenceAssociates_Value := isKBA;
 RelLookbackMonths_Value := if(isKBA,60,0); 
 
-//get data from new Risk Correlation keys that were created for shell 5.3 
 
-with_ssn_name_summary := join(rolled_header, Risk_Indicators.Correlation_Risk.key_ssn_name_summary,
-	left.ssn<>'' and left.fname<>'' and left.lname<>'' and
-	keyed(left.ssn=right.ssn) and keyed(left.lname=right.lname) and keyed(left.fname=right.fname),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+//get data from new Risk Correlation keys that were created for shell 5.3 
+risk_indicators.layout_output add_ssn_name_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_ssn_name_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		self.header_summary.ssn_name_source_count := count(rolledSummary);
 		setSources 			:= set(rolledSummary,src);
@@ -40,13 +39,31 @@ with_ssn_name_summary := join(rolled_header, Risk_Indicators.Correlation_Risk.ke
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corrssnname_source_cnt := if(BSversion <= 51, '', trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', ''));
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self := le;
+end;
 
-with_ssn_addr_summary := join(with_ssn_name_summary, Risk_Indicators.Correlation_Risk.key_ssn_addr_summary,
-	left.ssn<>'' and left.prim_name<>'' and left.z5<>'' and
-	keyed(left.ssn=right.ssn) and keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and keyed(left.z5=right.zip),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+with_ssn_name_summary_roxie := join(rolled_header, Risk_Indicators.Correlation_Risk.key_ssn_name_summary,
+	left.ssn<>'' and left.fname<>'' and left.lname<>'' and
+	keyed(left.ssn=right.ssn) and keyed(left.lname=right.lname) and keyed(left.fname=right.fname),
+	add_ssn_name_summary(left, right),		
+		left outer, atmost(riskwise.max_atmost), keep(1));
+
+with_ssn_name_summary_thor := join(
+	distribute(rolled_header(ssn<>'' and fname<>'' and lname<>''), hash64(ssn, lname, fname)),
+	distribute(pull(Risk_Indicators.Correlation_Risk.key_ssn_name_summary), hash64(ssn, lname, fname)),
+	(left.ssn=right.ssn) and (left.lname=right.lname) and (left.fname=right.fname),
+	add_ssn_name_summary(left, right),		
+		left outer, local) + 
+	rolled_header(ssn='' or fname='' or lname=''); // add back the records that have any of these elements missing;
+
+#IF(onThor)
+	with_ssn_name_summary := with_ssn_name_summary_thor;
+#ELSE
+	with_ssn_name_summary := with_ssn_name_summary_roxie;
+#END 
+		
+risk_indicators.layout_output add_ssn_addr_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_ssn_addr_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		self.header_summary.ssn_addr_source_count := count(rolledSummary);
 		setSources 			 := set(rolledSummary,src);
@@ -61,14 +78,31 @@ with_ssn_addr_summary := join(with_ssn_name_summary, Risk_Indicators.Correlation
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corrssnaddr_source_cnt := if(BSversion <= 51, '', trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', ''));
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self := le;
+end; 
+		
+with_ssn_addr_summary_roxie := join(with_ssn_name_summary, Risk_Indicators.Correlation_Risk.key_ssn_addr_summary,
+	left.ssn<>'' and left.prim_name<>'' and left.z5<>'' and
+	keyed(left.ssn=right.ssn) and keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and keyed(left.z5=right.zip),
+add_ssn_addr_summary(left, right),		
+		left outer, atmost(riskwise.max_atmost), keep(1));
+		
+with_ssn_addr_summary_thor := join(
+distribute(with_ssn_name_summary(ssn<>'' and prim_name<>'' and z5<>''), hash64(ssn, prim_name, z5)), 
+distribute(pull(Risk_Indicators.Correlation_Risk.key_ssn_addr_summary), hash64(ssn, prim_name, zip)),
+	(left.ssn=right.ssn) and (left.prim_name=right.prim_name) and (left.prim_range=right.prim_range) and (left.z5=right.zip),
+add_ssn_addr_summary(left, right),		
+		left outer, local) + 
+	with_ssn_name_summary(ssn='' or prim_name='' or z5=''); // add back the records that have any of these elements missing;
+	
+#IF(onThor)
+	with_ssn_addr_summary := with_ssn_addr_summary_thor;
+#ELSE
+	with_ssn_addr_summary := with_ssn_addr_summary_roxie;
+#END 
 
-with_addr_name_summary := join(with_ssn_addr_summary, Risk_Indicators.Correlation_Risk.key_addr_name_summary,
-	left.prim_name<>'' and left.z5<>'' and left.fname<>'' and left.lname<>'' and
-	keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and keyed(left.z5=right.zip) and
-	keyed(left.fname=right.fname) and keyed(left.lname=right.lname),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+risk_indicators.layout_output add_addr_name_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_addr_name_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		self.header_summary.addr_name_source_count := count(rolledSummary);
 		setSources 			:= set(rolledSummary,src);
@@ -83,24 +117,59 @@ with_addr_name_summary := join(with_ssn_addr_summary, Risk_Indicators.Correlatio
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corraddrname_source_cnt := if(BSversion <= 51, '', trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', ''));
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self := le;		
+end;
 
-//this join to populate the existing field 'phone_addr_source_count' based off of phone/utility sources (WP, Infutor, Utilities, Gong)
-with_phone_addr_summary := join(with_addr_name_summary, Risk_Indicators.Correlation_Risk.key_phone_addr_summary,
-	left.phone10<>'' and left.prim_name<>'' and left.z5<>'' and
-	keyed(left.phone10=right.phone10) and keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and keyed(left.z5=right.zip),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.Summary, left.historydate, dppa, ln_branded, isFCRA,
+with_addr_name_summary_roxie := join(with_ssn_addr_summary, Risk_Indicators.Correlation_Risk.key_addr_name_summary,
+	left.prim_name<>'' and left.z5<>'' and left.fname<>'' and left.lname<>'' and
+	keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and keyed(left.z5=right.zip) and
+	keyed(left.fname=right.fname) and keyed(left.lname=right.lname),
+	add_addr_name_summary(left,right), 
+	left outer, atmost(riskwise.max_atmost), keep(1));
+	
+with_addr_name_summary_thor := join(
+distribute(with_ssn_addr_summary(prim_name<>'' and z5<>'' and fname<>'' and lname<>''), hash64(prim_name, prim_range, z5, fname, lname)), 
+distribute(pull(Risk_Indicators.Correlation_Risk.key_addr_name_summary), hash64(prim_name, prim_range, zip, fname, lname)),
+	(left.prim_name=right.prim_name) and (left.prim_range=right.prim_range) and (left.z5=right.zip) and
+	(left.fname=right.fname) and (left.lname=right.lname),
+	add_addr_name_summary(left,right), 
+	left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_ssn_addr_summary(prim_name='' or z5='' or fname='' or lname=''); // add back the records that have any of these elements missing;
+
+#IF(onThor)
+	with_addr_name_summary := with_addr_name_summary_thor;
+#ELSE
+	with_addr_name_summary := with_addr_name_summary_roxie;
+#END 
+
+risk_indicators.Layout_Output add_phone_addr_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_phone_addr_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.Summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		self.header_summary.phone_addr_source_count := count(rolledSummary);
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self := le;
+end;
 
-//this join for BS 5.2 and higher to populate the new phone/addr correlation fields based off of header sources
-with_phone_addr_header_summary := join(with_phone_addr_summary, Risk_Indicators.Correlation_Risk.key_phone_addr_header_summary,
+//this join to populate the existing field 'phone_addr_source_count' based off of phone/utility sources (WP, Infutor, Utilities, Gong)
+with_phone_addr_summary_roxie := join(with_addr_name_summary, Risk_Indicators.Correlation_Risk.key_phone_addr_summary,
 	left.phone10<>'' and left.prim_name<>'' and left.z5<>'' and
 	keyed(left.phone10=right.phone10) and keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and keyed(left.z5=right.zip),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.Summary, left.historydate, dppa, ln_branded, isFCRA,
+	add_phone_addr_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1));
+
+with_phone_addr_summary_thor := join(
+distribute(with_addr_name_summary(phone10<>'' and prim_name<>'' and z5<>''), hash64(phone10, prim_name, prim_range, z5)), 
+distribute(pull(Risk_Indicators.Correlation_Risk.key_phone_addr_summary),hash64(phone10, prim_name, prim_range, zip)), 
+	(left.phone10=right.phone10) and (left.prim_name=right.prim_name) and (left.prim_range=right.prim_range) and (left.z5=right.zip),
+	add_phone_addr_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_addr_name_summary(phone10='' or prim_name='' or z5=''); // add back the records that have any of these elements missing;
+
+#IF(onThor)
+	with_phone_addr_summary := with_phone_addr_summary_thor;
+#ELSE
+	with_phone_addr_summary := with_phone_addr_summary_roxie;
+#END 
+
+risk_indicators.layout_output add_phone_addr_header_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_phone_addr_header_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.Summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
@@ -114,24 +183,60 @@ with_phone_addr_header_summary := join(with_phone_addr_summary, Risk_Indicators.
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corraddrphone_source_cnt := if(BSversion <= 51, '', trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', ''));
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self := le;
+end;
+//this join for BS 5.2 and higher to populate the new phone/addr correlation fields based off of header sources
+with_phone_addr_header_summary_roxie := join(with_phone_addr_summary, Risk_Indicators.Correlation_Risk.key_phone_addr_header_summary,
+	left.phone10<>'' and left.prim_name<>'' and left.z5<>'' and
+	keyed(left.phone10=right.phone10) and keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and keyed(left.z5=right.zip),
+	add_phone_addr_header_summary(left, right), 
+	left outer, atmost(riskwise.max_atmost), keep(1));
 
-//this join to populate the existing field 'phone_lname_source_count' based off of phone/utility sources (WP, Infutor, Utilities, Gong)
-with_phone_lname_summary := join(with_phone_addr_header_summary, Risk_Indicators.Correlation_Risk.key_phone_lname_summary,
-	left.phone10<>'' and left.lname<>'' and
-	keyed(left.phone10=right.phone10) and keyed(left.lname=right.lname),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+with_phone_addr_header_summary_thor := join(
+distribute(with_phone_addr_summary(phone10<>'' and prim_name<>'' and z5<>''), hash64(phone10, prim_name, z5)),
+distribute(pull(Risk_Indicators.Correlation_Risk.key_phone_addr_header_summary), hash64(phone10, prim_name, zip)),
+		(left.phone10=right.phone10) and (left.prim_name=right.prim_name) and (left.prim_range=right.prim_range) and (left.z5=right.zip),
+	add_phone_addr_header_summary(left, right), 
+	left outer, atmost(riskwise.max_atmost), keep(1), local) + 
+	with_phone_addr_summary(phone10='' or prim_name='' or z5='');  // add back the records that have any of these elements missing;
+
+#IF(onThor)
+	with_phone_addr_header_summary := with_phone_addr_header_summary_thor;
+#ELSE
+	with_phone_addr_header_summary := with_phone_addr_header_summary_roxie;
+#END 
+	
+risk_indicators.layout_output add_phone_lname_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_phone_lname_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		self.header_summary.phone_lname_source_count := count(rolledSummary);
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self := le;
+end;
 
-//this join for BS 5.3 and higher to populate the new phone/addr correlation fields based off of header sources
-with_phone_lname_header_summary := join(with_phone_lname_summary, Risk_Indicators.Correlation_Risk.key_phone_lname_header_summary,
+//this join to populate the existing field 'phone_lname_source_count' based off of phone/utility sources (WP, Infutor, Utilities, Gong)
+with_phone_lname_summary_roxie := join(with_phone_addr_header_summary, Risk_Indicators.Correlation_Risk.key_phone_lname_summary,
 	left.phone10<>'' and left.lname<>'' and
 	keyed(left.phone10=right.phone10) and keyed(left.lname=right.lname),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+	add_phone_lname_summary(left, right), 
+	left outer, atmost(riskwise.max_atmost), keep(1));
+
+with_phone_lname_summary_thor := join(
+distribute(with_phone_addr_header_summary(phone10<>'' and lname<>''), hash64(phone10, lname)), 
+distribute(pull(Risk_Indicators.Correlation_Risk.key_phone_lname_summary), hash64(phone10, lname)),
+	(left.phone10=right.phone10) and (left.lname=right.lname),
+	add_phone_lname_summary(left, right), 
+	left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_phone_addr_header_summary(phone10='' or lname=''); // add back the records that have any of these elements missing;
+	
+#IF(onThor)
+	with_phone_lname_summary := with_phone_lname_summary_thor;
+#ELSE
+	with_phone_lname_summary := with_phone_lname_summary_roxie;
+#END 
+
+	
+risk_indicators.layout_output add_phone_lname_header_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_phone_lname_header_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
@@ -145,13 +250,30 @@ with_phone_lname_header_summary := join(with_phone_lname_summary, Risk_Indicator
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corrphonelastname_source_cnt := if(BSversion <= 51, '', trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', ''));
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
-		
-with_name_dob_summary := join(with_phone_lname_header_summary, Risk_Indicators.Correlation_Risk.key_name_dob_summary,
-	left.lname<>'' and left.fname<>'' and left.dob<>'' and 
-	keyed(left.lname=right.lname) and keyed(left.fname=right.fname) and keyed(left.dob=(string)right.dob),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+		self := le;
+end;
+
+//this join for BS 5.3 and higher to populate the new phone/addr correlation fields based off of header sources
+with_phone_lname_header_summary_roxie := join(with_phone_lname_summary, Risk_Indicators.Correlation_Risk.key_phone_lname_header_summary,
+	left.phone10<>'' and left.lname<>'' and
+	keyed(left.phone10=right.phone10) and keyed(left.lname=right.lname),
+	add_phone_lname_header_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1));
+
+with_phone_lname_header_summary_thor := join(
+distribute(with_phone_lname_summary(phone10<>'' and lname<>''), hash64(phone10, lname)),
+distribute(Risk_Indicators.Correlation_Risk.key_phone_lname_header_summary, hash64(phone10, lname)),
+	(left.phone10=right.phone10) and (left.lname=right.lname),
+	add_phone_lname_header_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_phone_lname_summary(phone10='' or lname='');  // add back the records that have any of these elements missing;
+
+#IF(onThor)
+	with_phone_lname_header_summary := with_phone_lname_header_summary_thor;
+#ELSE
+	with_phone_lname_header_summary := with_phone_lname_header_summary_roxie;
+#END 	
+	
+risk_indicators.layout_output add_name_dob_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_name_dob_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
@@ -165,14 +287,28 @@ with_name_dob_summary := join(with_phone_lname_header_summary, Risk_Indicators.C
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corrnamedob_source_cnt := trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', '');
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));		
+		self := le;
+end;		
+with_name_dob_summary_roxie := join(with_phone_lname_header_summary, Risk_Indicators.Correlation_Risk.key_name_dob_summary,
+	left.lname<>'' and left.fname<>'' and left.dob<>'' and 
+	keyed(left.lname=right.lname) and keyed(left.fname=right.fname) and keyed(left.dob=(string)right.dob),
+	add_name_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1));		
 
-with_addr_dob_summary := join(with_name_dob_summary, Risk_Indicators.Correlation_Risk.key_addr_dob_summary,
-	left.prim_name<>'' and left.prim_range<>'' and left.z5<>'' and left.dob<>'' and 
-	keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and 
-	keyed(left.z5=right.zip) and keyed(left.dob=(string)right.dob),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+with_name_dob_summary_thor := join(
+distribute(with_phone_lname_header_summary(lname<>'' and fname<>'' and dob<>''), hash64(lname, fname, dob)), 
+distribute(pull(Risk_Indicators.Correlation_Risk.key_name_dob_summary), hash64(lname, fname, dob)),
+	(left.lname=right.lname) and (left.fname=right.fname) and (left.dob=(string)right.dob),
+	add_name_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_phone_lname_header_summary(lname='' or fname='' or dob='');  // add back the records that have any of these elements missing;		
+	
+#IF(onThor)
+	with_name_dob_summary := with_name_dob_summary_thor;
+#ELSE
+	with_name_dob_summary := with_name_dob_summary_roxie;
+#END
+	
+risk_indicators.layout_output add_addr_dob_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_addr_dob_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
@@ -186,13 +322,30 @@ with_addr_dob_summary := join(with_name_dob_summary, Risk_Indicators.Correlation
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corraddrdob_source_cnt := trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', '');
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));		
-		
-with_ssn_dob_summary := join(with_addr_dob_summary, Risk_Indicators.Correlation_Risk.key_ssn_dob_summary,
-	left.ssn<>'' and left.dob<>'' and 
-	keyed(left.ssn=right.ssn) and keyed(left.dob=(string)right.dob),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+		self := le;
+end;
+with_addr_dob_summary_roxie := join(with_name_dob_summary, Risk_Indicators.Correlation_Risk.key_addr_dob_summary,
+	left.prim_name<>'' and left.prim_range<>'' and left.z5<>'' and left.dob<>'' and 
+	keyed(left.prim_name=right.prim_name) and keyed(left.prim_range=right.prim_range) and 
+	keyed(left.z5=right.zip) and keyed(left.dob=(string)right.dob),
+	add_addr_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1));		
+
+with_addr_dob_summary_thor := join(
+distribute(with_name_dob_summary(prim_name<>'' and prim_range<>'' and z5<>'' and dob<>''), hash64(prim_name, prim_range, z5, dob)), 
+distribute(pull(Risk_Indicators.Correlation_Risk.key_addr_dob_summary),hash64(prim_name, prim_range, zip, dob)),
+	(left.prim_name=right.prim_name) and (left.prim_range=right.prim_range) and 
+	(left.z5=right.zip) and (left.dob=(string)right.dob),
+	add_addr_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_name_dob_summary(prim_name='' or prim_range='' or z5='' or dob='');		// add back the records that have any of these elements missing;	
+
+#IF(onThor)
+	with_addr_dob_summary := with_addr_dob_summary_thor;
+#ELSE
+	with_addr_dob_summary := with_addr_dob_summary_roxie;
+#END	
+	
+risk_indicators.layout_output add_ssn_dob_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_ssn_dob_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
@@ -206,13 +359,29 @@ with_ssn_dob_summary := join(with_addr_dob_summary, Risk_Indicators.Correlation_
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corrssndob_source_cnt := trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', '');
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));		
-		
-with_ssn_phone_summary := join(with_ssn_dob_summary, Risk_Indicators.Correlation_Risk.key_ssn_phone_summary,
-	left.ssn<>'' and left.phone10<>'' and 
-	keyed(left.ssn=right.ssn) and keyed(left.phone10=right.phone),
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+		self := le;
+end;
+
+with_ssn_dob_summary_roxie := join(with_addr_dob_summary, Risk_Indicators.Correlation_Risk.key_ssn_dob_summary,
+	left.ssn<>'' and left.dob<>'' and 
+	keyed(left.ssn=right.ssn) and keyed(left.dob=(string)right.dob),
+	add_ssn_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1));		
+
+with_ssn_dob_summary_thor := join(
+distribute(with_addr_dob_summary(ssn<>'' and dob<>''), hash64(ssn, dob)),
+distribute(pull(Risk_Indicators.Correlation_Risk.key_ssn_dob_summary), hash64(ssn, dob)),
+	(left.ssn=right.ssn) and (left.dob=(string)right.dob),
+	add_ssn_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_addr_dob_summary(ssn='' or dob='');	// add back the records that have any of these elements missing;	
+
+#IF(onThor)
+	with_ssn_dob_summary := with_ssn_dob_summary_thor;
+#ELSE
+	with_ssn_dob_summary := with_ssn_dob_summary_roxie;
+#END		
+	
+risk_indicators.layout_output add_ssn_phone_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_ssn_phone_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
@@ -226,13 +395,29 @@ with_ssn_phone_summary := join(with_ssn_dob_summary, Risk_Indicators.Correlation
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corrssnphone_source_cnt := trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', '');
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+		self := le;
+end;
 
-with_correlation_summary52 := join(with_ssn_phone_summary, Risk_Indicators.Correlation_Risk.key_phone_dob_summary,
-	left.phone10<>'' and left.dob<>'' and  
-	keyed(left.phone10=right.phone) and keyed(left.dob=(string)right.dob), 
-	transform(risk_indicators.layout_output,
-		rolledSummary := Risk_Indicators.rollCorrRiskSummary(right.summary, left.historydate, dppa, ln_branded, isFCRA,
+with_ssn_phone_summary_roxie := join(with_ssn_dob_summary, Risk_Indicators.Correlation_Risk.key_ssn_phone_summary,
+	left.ssn<>'' and left.phone10<>'' and 
+	keyed(left.ssn=right.ssn) and keyed(left.phone10=right.phone),
+	add_ssn_phone_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1));
+
+with_ssn_phone_summary_thor := join(
+distribute(with_ssn_dob_summary(ssn<>'' and phone10<>''), hash64(ssn, phone10)),
+distribute(pull(Risk_Indicators.Correlation_Risk.key_ssn_phone_summary), hash64(ssn, phone)),
+	(left.ssn=right.ssn) and (left.phone10=right.phone),
+	add_ssn_phone_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_ssn_dob_summary(ssn='' or phone10='');// add back the records that have any of these elements missing;
+	
+#IF(onThor)
+	with_ssn_phone_summary := with_ssn_phone_summary_thor;
+#ELSE
+	with_ssn_phone_summary := with_ssn_phone_summary_roxie;
+#END		
+	
+risk_indicators.layout_output add_phone_dob_summary(risk_indicators.layout_output le, Risk_Indicators.Correlation_Risk.key_phone_dob_summary rt) := transform
+		rolledSummary := Risk_Indicators.rollCorrRiskSummary(rt.summary, le.historydate, dppa, ln_branded, isFCRA,
 																												 BSversion, DataRestriction, CustomDataFilter, BSOptions, glb);
 		setSources 			:= set(rolledSummary,src);
 		stringSources 	:= STD.Str.CombineWords(setSources, ',');
@@ -246,8 +431,27 @@ with_correlation_summary52 := join(with_ssn_phone_summary, Risk_Indicators.Corre
 		setSource_cnt		 := set(rolledSummary,(string)record_count);
 		stringSource_cnt := STD.Str.CombineWords(setSource_cnt, ',');
 		self.header_summary.corrdobphone_source_cnt := trim(stringSource_cnt, left, right) + if(trim(stringSource_cnt, left, right) <> '', ',', '');
-		self := left), left outer, atmost(riskwise.max_atmost), keep(1));		
+		self := le;
+end;
+with_correlation_summary52_roxie := join(with_ssn_phone_summary, Risk_Indicators.Correlation_Risk.key_phone_dob_summary,
+	left.phone10<>'' and left.dob<>'' and  
+	keyed(left.phone10=right.phone) and keyed(left.dob=(string)right.dob), 
+	add_phone_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1));		
 
+with_correlation_summary52_thor := join(
+distribute(with_ssn_phone_summary(phone10<>'' and dob<>''), hash64(phone10, dob)),
+distribute(pull(Risk_Indicators.Correlation_Risk.key_phone_dob_summary), hash64(phone, dob)),
+	(left.phone10=right.phone) and (left.dob=(string)right.dob), 
+	add_phone_dob_summary(left, right), left outer, atmost(riskwise.max_atmost), keep(1), local) +
+	with_ssn_phone_summary(phone10='' or dob='');	// add back the records that have any of these elements missing;
+	
+#IF(onThor)
+	with_correlation_summary52 := with_correlation_summary52_thor;
+#ELSE
+	with_correlation_summary52 := with_correlation_summary52_roxie;
+#END		
+
+	
 with_correlation_summary := if(bsversion <= 51, with_phone_lname_summary, with_correlation_summary52);  //don't do unnecessary joins if BS version <= 51
 
 // hang on to datasets of PII information that was found on file at the time of application
@@ -384,25 +588,43 @@ temprec3 := record
 	boolean TN_ssn_nlr;
 end;
 
-// for any records that have SSN on input we found it on
-with_NLR := JOIN (
+temprec3 append_NLR(all_header le, header.key_nlr_payload rt) := transform
+		Self.not_in_bureau := rt.not_in_bureau, 
+		
+		self.EQ_did_nlr := rt.not_in_bureau = header.constants.no_longer_reported.did_not_in_eq;
+		self.EN_did_nlr := rt.not_in_bureau = header.constants.no_longer_reported.did_not_in_en;
+		self.TN_did_nlr := rt.not_in_bureau = header.constants.no_longer_reported.did_not_in_tn;
+		self.EQ_ssn_nlr := le.ssn=le.h.ssn and rt.not_in_bureau = header.constants.no_longer_reported.ssn_not_in_eq;
+		self.EN_ssn_nlr := le.ssn=le.h.ssn and rt.not_in_bureau = header.constants.no_longer_reported.ssn_not_in_en;
+		self.TN_ssn_nlr := le.ssn=le.h.ssn and rt.not_in_bureau = header.constants.no_longer_reported.ssn_not_in_tn;
+		
+		self := le;
+end;
+
+// for any records that have SSN on input we found it on 
+with_NLR_roxie := JOIN (
 	all_header(h.src in risk_indicators.iid_constants.bureau_sources),
 	header.key_nlr_payload,
 	keyed (Left.h.did = Right.did) and
 	keyed (Left.h.rid = Right.rid),
-	transform (temprec3, 
-		Self.not_in_bureau := Right.not_in_bureau, 
-		
-		self.EQ_did_nlr := right.not_in_bureau = header.constants.no_longer_reported.did_not_in_eq;
-		self.EN_did_nlr := right.not_in_bureau = header.constants.no_longer_reported.did_not_in_en;
-		self.TN_did_nlr := right.not_in_bureau = header.constants.no_longer_reported.did_not_in_tn;
-		self.EQ_ssn_nlr := left.ssn=left.h.ssn and right.not_in_bureau = header.constants.no_longer_reported.ssn_not_in_eq;
-		self.EN_ssn_nlr := left.ssn=left.h.ssn and right.not_in_bureau = header.constants.no_longer_reported.ssn_not_in_en;
-		self.TN_ssn_nlr := left.ssn=left.h.ssn and right.not_in_bureau = header.constants.no_longer_reported.ssn_not_in_tn;
-		
-		self := Left),
+	append_NLR(left, right),
 		left outer,
 	atmost(riskwise.max_atmost), keep(1));
+  
+with_NLR_thor := JOIN (
+	DISTRIBUTE(all_header(h.src in risk_indicators.iid_constants.bureau_sources), HASH64(h.did, h.rid)),
+	DISTRIBUTE(PULL(header.key_nlr_payload), HASH64(did, rid)),
+	Left.h.did = Right.did and
+	Left.h.rid = Right.rid,
+	append_NLR(left, right),
+		left outer,
+	atmost(riskwise.max_atmost), keep(1), LOCAL);
+  
+#IF(onThor)
+	with_NLR := with_NLR_thor;
+#ELSE
+	with_NLR := with_NLR_roxie;
+#END
 											
 // output(with_NLR, named('with_NLR'));
 
@@ -419,7 +641,7 @@ end;
 rolled_NLR := rollup(group(sort(with_NLR, did, h.rid), did), true, roll_nlr(left, right));
 // output(rolled_NLR, named('rolled_NLR'));
 
-with_NLR_flags := join(with_pii_on_file, rolled_NLR, left.did=right.did,
+with_NLR_flags_roxie := join(with_pii_on_file, rolled_NLR, left.did=right.did,
 	transform(risk_indicators.layout_output,
 		self.header_summary.EQ_did_nlr := right.EQ_did_nlr;
 		self.header_summary.EN_did_nlr := right.EN_did_nlr;
@@ -428,6 +650,24 @@ with_NLR_flags := join(with_pii_on_file, rolled_NLR, left.did=right.did,
 		self.header_summary.EN_ssn_nlr := right.EN_ssn_nlr;
 		self.header_summary.TN_ssn_nlr := right.TN_ssn_nlr;
 		self := left), left outer, keep(1));
+    
+with_NLR_flags_thor := join(DISTRIBUTE(with_pii_on_file, HASH64(did)), 
+                            DISTRIBUTE(rolled_NLR, HASH64(did)), 
+                            left.did=right.did,
+                            transform(risk_indicators.layout_output,
+                              self.header_summary.EQ_did_nlr := right.EQ_did_nlr;
+                              self.header_summary.EN_did_nlr := right.EN_did_nlr;
+                              self.header_summary.TN_did_nlr := right.TN_did_nlr;
+                              self.header_summary.EQ_ssn_nlr := right.EQ_ssn_nlr;
+                              self.header_summary.EN_ssn_nlr := right.EN_ssn_nlr;
+                              self.header_summary.TN_ssn_nlr := right.TN_ssn_nlr;
+                              self := left), left outer, keep(1), LOCAL);
+                              
+#IF(onThor)
+	with_NLR_flags := with_NLR_flags_thor;
+#ELSE
+	with_NLR_flags := with_NLR_flags_roxie;
+#END                              
 // output(with_NLR_flags, named('with_NLR_flags'));
 
 
@@ -470,7 +710,8 @@ with_NLR_flags := join(with_pii_on_file, rolled_NLR, left.did=right.did,
 	  RelativeFlag :=TRUE,AssociateFlag:=TRUE,doAtmost:=TRUE,MaxCount:=RiskWise.max_atmost,
 		HighConfidenceRelatives := HighConfidenceRelatives_Value,
 		HighConfidenceAssociates := HighConfidenceAssociates_Value,
-		RelLookbackMonths := RelLookbackMonths_Value).result;
+		RelLookbackMonths := RelLookbackMonths_Value,
+		doThor:=onThor).result;
 
 		multiple_use_ssn_with_relative_flag := join(multiple_use_ssns_with_wildcard_did, rellyids, 
 			left.did<>0 and
@@ -526,9 +767,11 @@ with_fraud_velocity := join(with_NLR_flags, rolled_ssns_dobs,
 		self.ssns_per_adl_multiple_use_non_relative := if(left.ssns_per_adl < right.ssns_per_adl_multiple_use_non_relative, left.ssns_per_adl, right.ssns_per_adl_multiple_use_non_relative) ;													
 		self := left), left outer);	
 
-// output(sorted_dobs, named('sorted_dobs'));
-// output(rolled_dobs, named('rolled_dobs'));
 
-return group(with_fraud_velocity, seq);
-				
+#if(_control.Environment.onThor_LeadIntegrity)
+	return group(with_NLR_flags, seq);  // don't need the fraud velocity work if just running leadintegrity
+#else
+	return group(with_fraud_velocity, seq);
+#end
+
 end;

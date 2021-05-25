@@ -267,6 +267,46 @@ EXPORT compliance := MODULE
   // ==============================================================================================
   //          Restrictions based on DPM.
   // ==============================================================================================
+  // NOTE: These are all the DPM bit positions definitions, as of 02/10/2021 per Sam Mathe in MBS Engineering, with Roxie 
+  //       engineer's comment added as to which ones are used in Roxie by below or by AutoStandardI.DataPermissionI
+  // BIT  1 => qsent    // in-house(not gateway) qsent data
+  // BIT  2 => targus   // targus gateway
+  // BIT  3 => confirm  // confirm if phone is active (typically, through gateway call)
+  // BIT  4 => PVS
+  // BIT  5 => LE
+  // BIT  6 => LastResort
+  // BIT  7 => Polk
+  // BIT  8 => MidexNonpublic
+  // BIT  9 => MidexFreddieMac
+  // BIT 10 => DeathMasterSSAUpdates
+  // BIT 11 => FDNContributoryData  //Contributory Fraud and Test Fraud
+  // BIT 12 => SBFEData
+  // BIT 13 => InsuranceDLData
+  // BIT 14 => ABMS                                 // In MBS, but not used in Roxie
+  // BIT 15 => DMD Email                            // In MBS, but not used in Roxie
+  // BIT 16 => HIBCC                                // In MBS, but not used in Roxie
+  // BIT 17 => StateLicenseAddress                  // In MBS, but not used in Roxie
+  // BIT 18 => StateLicenseLicNbr                   // In MBS, but not used in Roxie
+  // BIT 19 => Surescripts                          // In MBS, but not used in Roxie
+  // BIT 20 => TrisContributoryData
+	// BIT 21 => ZumigoIdentity
+  // BIT 22 => reserved for HealthLinkDimensions    // In MBS, but not used in Roxie
+  // BIT 23 => EquifaxAcctDecisioning
+  // BIT 24 => AccuityBankData
+  // BIT 25 => DMD MeNbr                            // In MBS, but not used in Roxie
+  // BIT 26 => Symphony                             // In MBS, but not used in Roxie
+  // BIT 27 => SKA                                  // In MBS, but not used in Roxie
+  // BIT 28 => DnB
+  // BIT 29 => DHC                                  // In MBS, but not used in Roxie
+  // BIT 30 => Strenuus                             // In MBS, but not used in Roxie
+  // BIT 31 => StrenuusHIX                          // In MBS, but not used in Roxie
+  // BIT 32 => NCPDPFull                            // In MBS, but not used in Roxie
+  // BIT 33 => AHAFull                              // In MBS, but not used in Roxie
+  // BIT 34 => FedExData
+  // BIT 35 => GS1                                  // In MBS, but not used in Roxie
+  // BIT 36 => CitizenshipScore, but now deprecated // In MBS, but not used in Roxie
+  // BIT 37 => iConectiv PortData Comply
+  // BIT 38 => iConectiv PortData Validate
   EXPORT boolean use_qsent(string dpm)               := dpm [1] NOT IN restrictedSet; // use in-house(not gateway) qsent data
   EXPORT boolean use_targus(string dpm)              := dpm [2] NOT IN restrictedSet; // use targus gateway
   EXPORT boolean use_confirm(string dpm)             := dpm [3] NOT IN restrictedSet; // confirm if phone is active (typically, thorugh gateway call)
@@ -279,6 +319,7 @@ EXPORT compliance := MODULE
   EXPORT boolean use_AccuityBankData(string dpm)     := dpm[24] NOT IN restrictedSet;
   EXPORT boolean use_DnB(string dpm)                 := dpm[28] NOT IN restrictedSet;
   EXPORT boolean use_WDNC(string dpm)                 := dpm[37] NOT IN restrictedSet;
+  EXPORT boolean use_IconectivPortDataValidate(string dpm) := dpm[38] NOT IN restrictedSet;  // iconectiv phone porting data for Law Enforcement(LE)
 
   // ----------------------------------------------------------------------------------------------
   EXPORT boolean isBusHeaderSourceAllowed (string src, string dpm, string drm) := MAP (

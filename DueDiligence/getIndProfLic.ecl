@@ -1,11 +1,11 @@
-﻿IMPORT BIPv2, prof_licenseV2, risk_indicators, Prof_License_Mari, STD, Doxie, Suppress;
+﻿IMPORT BIPv2, prof_licenseV2, risk_indicators, dx_prof_license_mari, STD, Doxie, Suppress;
 
 /*
   This module is used by both Business and Person products.
 
   Following Keys being used:
       Prof_licenseV2.Key_Proflic_Did
-      Prof_License_Mari.key_did
+      dx_prof_license_mari.key_did
 */
 
 EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
@@ -69,7 +69,7 @@ EXPORT getIndProfLic(DATASET(DueDiligence.LayoutsInternal.RelatedParty) indiv,
 
 
 
-  mariLicenseRaw_unsuppressed := JOIN(indiv, Prof_License_Mari.key_did(),
+  mariLicenseRaw_unsuppressed := JOIN(indiv, dx_prof_license_mari.key_did(),
                           KEYED(LEFT.party.did = RIGHT.s_did) AND
                           RIGHT.std_source_upd NOT IN risk_indicators.iid_constants.restricted_Mari_vendor_set,
                           TRANSFORM({UNSIGNED4 seq, UNSIGNED6 parentUltID, UNSIGNED6 parentOrgID, UNSIGNED6 parentSeleID, UNSIGNED4 historyDate, RECORDOF(RIGHT)},

@@ -585,8 +585,8 @@ END;
 // patch the flags for nonfcra prior to the rollup
 temp clean_flags(risk_indicators.layout_output le, integer c) := transform
 	self.version := c;
-	SELF.veh_correct_vin                	:= if(isFCRA, le.veh_correct_vin                	, [] );
-	SELF.veh_correct_ffid               	:= if(isFCRA, le.veh_correct_ffid               	, [] );
+	// SELF.veh_correct_vin                	:= if(isFCRA, le.veh_correct_vin                	, [] );
+	// SELF.veh_correct_ffid               	:= if(isFCRA, le.veh_correct_ffid               	, [] );
 	SELF.bankrupt_correct_cccn          	:= if(isFCRA, le.bankrupt_correct_cccn          	, [] );
 	SELF.bankrupt_correct_ffid          	:= if(isFCRA, le.bankrupt_correct_ffid          	, [] );
 	SELF.lien_correct_tmsid_rmsid       	:= if(isFCRA, le.lien_correct_tmsid_rmsid       	, [] );
@@ -622,8 +622,7 @@ temp clean_flags(risk_indicators.layout_output le, integer c) := transform
 	SELF.ssn_correct_ffid               	:= if(isFCRA, le.ssn_correct_ffid               	, [] );
 	SELF.ssn_correct_record_id          	:= if(isFCRA, le.ssn_correct_record_id          	, [] );
 	SELF.header_correct_record_id       	:= if(isFCRA, le.header_correct_record_id       	, [] );
-	SELF.ibehavior_correct_ffid	:= if(isFCRA, le.ibehavior_correct_ffid	, [] );
-	SELF.ibehavior_correct_record_id	:= if(isFCRA, le.ibehavior_correct_record_id	, [] );
+
 	self := le;
 end;
 
@@ -1153,7 +1152,17 @@ with_hotlist_thor :=
 		(left.postdir=right.postdir) and
 		(ut.NNEQ(left.sec_range, right.sec_range)),
 			get_hotlist(LEFT,RIGHT),
-			left outer, atmost(riskwise.max_atmost),keep(10), LOCAL);
+			left outer, 
+      atmost(
+              (left.z5=right.zip) and
+              (left.prim_range=right.prim_range) and
+              (left.prim_name=right.prim_name) and
+              (left.addr_suffix=right.addr_suffix) and
+              (left.predir=right.predir) and
+              (left.postdir=right.postdir),
+              // (ut.NNEQ(left.sec_range, right.sec_range)),
+              riskwise.max_atmost),
+      keep(10), LOCAL);
 
 #IF(onThor)
 	with_hotlist := group(sort(with_hotlist_thor, seq), seq);
@@ -1196,7 +1205,15 @@ with_advo_temp_thor := join(distribute(with_hotlist, hash64(z5, prim_range, prim
 					(left.postdir = right.postdir) and
 					(ut.NNEQ(left.sec_range, right.sec_range)), 
 					get_Advo(LEFT,RIGHT), left outer,
-					atmost(riskwise.max_atmost), keep(10), LOCAL);
+					atmost(
+                  (left.z5 = right.zip) and
+                  (left.prim_range = right.prim_range) and
+                  (left.prim_name = right.prim_name) and
+                  (left.addr_suffix = right.addr_suffix) and
+                  (left.predir = right.predir) and
+                  (left.postdir = right.postdir),
+                  riskwise.max_atmost), 
+          keep(10), LOCAL);
 
 #IF(onThor)
 	with_advo_temp := group(sort(distribute(with_advo_temp_thor, hash64(seq)), seq, LOCAL), seq, LOCAL);

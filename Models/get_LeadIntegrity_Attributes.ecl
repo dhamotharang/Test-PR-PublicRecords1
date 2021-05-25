@@ -1,5 +1,5 @@
-﻿
-import risk_indicators, ut, easi, riskwise, MDR, STD;
+﻿import risk_indicators, ut, easi, riskwise, MDR, STD, _Control;
+onThor := _Control.Environment.OnThor;
 
 export get_LeadIntegrity_Attributes(grouped dataset(risk_indicators.Layout_Boca_Shell) clam, integer1 version=1) := function
 
@@ -31,19 +31,34 @@ export get_LeadIntegrity_Attributes(grouped dataset(risk_indicators.Layout_Boca_
 	Layout_EasiSeq := record
 		unsigned seq := 0;
 		used_census easi;
-	ENd;
-	easi_census := join(e_address, Easi.Key_Easi_Census,
-		keyed(right.geolink=left.st+left.county+left.geo_blk),
-		transform(Layout_EasiSeq, 
-			self.seq := left.seq,
-			self.easi.state := left.st,
-			self.easi.tract := left.geo_blk[1..6],
-			self.easi.blkgrp := left.geo_blk[7],
-			self.easi.county :=  left.county,
-			self.easi.geo_blk := left.geo_blk,
-			self.easi := right
-		), 
-		ATMOST(keyed(right.geolink=left.st+left.county+left.geo_blk), Riskwise.max_atmost), KEEP(1));
+	END;
+  
+  Layout_EasiSeq easi_census_transform(e_address le, Easi.Key_Easi_Census ri) := TRANSFORM
+    self.seq := le.seq;
+    self.easi.state := le.st;
+    self.easi.tract := le.geo_blk[1..6];
+    self.easi.blkgrp := le.geo_blk[7];
+    self.easi.county :=  le.county;
+    self.easi.geo_blk := le.geo_blk;
+    self.easi := ri;
+  END;
+  
+	easi_census_roxie := join(e_address, Easi.Key_Easi_Census,
+                            keyed(left.st+left.county+left.geo_blk = right.geolink),
+                            easi_census_transform(LEFT, RIGHT), 
+                            ATMOST(keyed(left.st+left.county+left.geo_blk = right.geolink), Riskwise.max_atmost), KEEP(1));
+                            
+	easi_census_thor := join(DISTRIBUTE(e_address, HASH64(st+county+geo_blk)), 
+                            DISTRIBUTE(PULL(Easi.Key_Easi_Census), HASH64(geolink)),
+                            left.st+left.county+left.geo_blk = right.geolink,
+                            easi_census_transform(LEFT, RIGHT), 
+                            ATMOST(left.st+left.county+left.geo_blk = right.geolink, Riskwise.max_atmost), KEEP(1), LOCAL);
+    
+#IF(onThor)
+	easi_census := easi_census_thor;
+#ELSE
+	easi_census := easi_census_roxie;
+#END
 																						
 	layout_bseasi := record, maxlength(100000)
 		Risk_Indicators.Layout_Boca_Shell;
@@ -2335,5 +2350,10 @@ working_return := case( version,
 
 attr := project( working_return, models.layouts.layout_LeadIntegrity_attributes_batch );
 
-return group(sort(attr,seq),seq);
+#if(_control.Environment.OnThor)
+	return attr;
+#else
+	return group(sort(attr,seq),seq);
+#end
+
 end;

@@ -1360,7 +1360,11 @@ EXPORT Constants := MODULE
 		export unsigned1 MaxAlerts := 100;
 		export unsigned1 MaxAlertMessages := 100;
 		export unsigned1 MaxSources := 20;
+    export unsigned1 MaxIcElepGwHistory      := 5;   //Added for 06/02/2021 Phone Porting Data for LE project; The "IcElepGw" part of the name = Iconectiv ELEP gateway
+    export unsigned1 MaxIcElepGwPhoneNumbers := 100; //Added for 06/02/2021 Phone Porting Data for LE project
+    export unsigned1 MaxIcElepGwPortingRecs  := 100; //Added for 06/02/2021 Phone Porting Data for LE project
 	end;
+
   // Phone History Report
 	export unsigned2 PhoneHistoryMaxRecords :=500;
   export unsigned2 PhoneInfoMessages := 1;

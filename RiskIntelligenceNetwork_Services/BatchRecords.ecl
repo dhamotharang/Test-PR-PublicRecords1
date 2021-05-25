@@ -63,10 +63,7 @@ EXPORT BatchRecords(DATASET(RiskIntelligenceNetwork_Services.Layouts.BatchIn_rec
  ds_auto_out := RiskIntelligenceNetwork_Services.fn_postautokey_joins(ds_batch_in_without_did_proj, in_params.FraudPlatform);
  ds_payload_recs := RiskIntelligenceNetwork_Services.fn_GetPayloadRecords(ds_auto_out, in_params, fraud_platform := in_params.FraudPlatform);
  
- ds_batch_in_without_did_w_min_pii := ds_batch_in_without_did(name_last != '' AND name_first != '' AND dob != '' AND
-                                                              (ssn != '' OR ((prim_range != '' OR prim_name != '') AND ((p_city_name != '' AND st != '') OR z5 != ''))));
- 
- ds_payload_recs_filtered := JOIN(ds_batch_in_without_did_w_min_pii, ds_payload_recs,
+ ds_payload_recs_filtered := JOIN(ds_batch_in_without_did, ds_payload_recs,
                               LEFT.acctno = RIGHT.acctno AND
                               (~hasValue(LEFT.name_last) OR (TRIM(LEFT.name_last, left, right) = TRIM(RIGHT.cleaned_name.lname, left, right))) AND
                               (~hasValue(LEFT.name_first) OR (TRIM(LEFT.name_first) = trim(RIGHT.cleaned_name.fname, left, right)[1..length(trim(LEFT.name_first, left, right))])) AND
@@ -104,29 +101,25 @@ EXPORT BatchRecords(DATASET(RiskIntelligenceNetwork_Services.Layouts.BatchIn_rec
  
  ds_no_of_dids_per_acctno := TABLE(ds_dids_combined_dedup, Rec_no_of_dids_per_acctno, acctno);
  
- ds_batch_in_with_appended_did := JOIN(ds_batch_in, ds_dids_combined_dedup,
-                                    LEFT.acctno = RIGHT.acctno,
-                                    TRANSFORM(FraudShared_Services.Layouts.BatchInExtended_rec,
-                                      isMultipleDidResolved := ds_no_of_dids_per_acctno(acctno = LEFT.acctno)[1].NO_OF_DIDs_FOUND > 1;
-                                      SELF.seq := (UNSIGNED)LEFT.acctno,
-                                      SELF.did := MAP(LEFT.did != 0 => LEFT.did,
-                                                      LEFT.did = 0 AND ~isMultipleDidResolved => RIGHT.did,
-                                                      0);
-                                      SELF := LEFT,
-                                      SELF := []),
-                                    LEFT OUTER);
-                                    
  Rec_Appended_Dids_W_Source := RECORD
   FraudShared_Services.Layouts.BatchInExtended_rec;
   STRING30 RecordSource;
  END;
  
- ds_batch_in_with_appended_did_w_source := JOIN(ds_batch_in_with_appended_did, ds_dids_combined_dedup,
-                                            LEFT.acctno = RIGHT.acctno,
-                                            TRANSFORM(Rec_Appended_Dids_W_Source,
-                                              SELF.RecordSource := RIGHT.RecordSource,
-                                              SELF := LEFT), 
-                                            LEFT OUTER); 
+ ds_batch_in_with_appended_did := JOIN(ds_batch_in, ds_dids_combined_dedup,
+                                    LEFT.acctno = RIGHT.acctno,
+                                    TRANSFORM(Rec_Appended_Dids_W_Source,
+                                      isMultipleDidResolved := ds_no_of_dids_per_acctno(acctno = LEFT.acctno)[1].NO_OF_DIDs_FOUND > 1;
+                                      SELF.seq := (UNSIGNED)LEFT.acctno,
+                                      SELF.did := MAP(LEFT.did != 0 => LEFT.did,
+                                                      LEFT.did = 0 AND ~isMultipleDidResolved => RIGHT.did,
+                                                      0);
+                                      SELF.RecordSource := RIGHT.RecordSource,
+                                      SELF := LEFT,
+                                      SELF := []),
+                                    LEFT OUTER);
+                                            
+ ds_appended_did_dedup := dedup(sort(ds_batch_in_with_appended_did, acctno), acctno);
               
  // Call appends for identities found in order to get risk scores from KEL analytics.
  ds_best_in := PROJECT(ds_batch_in_with_appended_did, 
@@ -146,20 +139,30 @@ EXPORT BatchRecords(DATASET(RiskIntelligenceNetwork_Services.Layouts.BatchIn_rec
  ds_pr_best := RiskIntelligenceNetwork_Services.Functions.getGovernmentBest(ds_best_in, in_params);
  ds_pr_best_ungrp := UNGROUP(ds_pr_best);
 
- ds_pr_appends := RiskIntelligenceNetwork_Services.Functions.getPublicRecordsAppends(ds_batch_in_with_appended_did, ds_pr_best_ungrp, in_params);
+ ds_appends_in := PROJECT(ds_batch_in_with_appended_did, FraudShared_Services.Layouts.BatchInExtended_rec);
+ ds_pr_appends := RiskIntelligenceNetwork_Services.Functions.getPublicRecordsAppends(ds_appends_in, ds_pr_best_ungrp, in_params);
  ds_live_assessment := RiskIntelligenceNetwork_Analytics.Functions.GetAPILiveAssessment(ds_pr_appends, in_params);
  
- ds_batch_records := JOIN(ds_batch_in_with_appended_did_w_source, ds_live_assessment, 
+ //Leaving the below comment for faster deployment of roxie query when performing debugging for roxie portion.
+ // ds_live_assessment := dataset([], RiskIntelligenceNetwork_analytics.Layouts.LiveAssessmentScores);
+ 
+ ds_batch_records := JOIN(ds_appended_did_dedup, ds_live_assessment, 
                       LEFT.acctno = (STRING) RIGHT.record_id,
                       TRANSFORM(_Layout.BatchOut_rec,
                        hasMinimunInputForRINID := hasValue(LEFT.name_last) AND hasValue(LEFT.name_first) AND
                                                   (hasValue(LEFT.ssn) OR ((hasValue(LEFT.Addr) OR (hasValue(LEFT.prim_range) AND hasValue(LEFT.prim_name))) AND
                                                                          ((hasValue(LEFT.p_city_name) AND hasValue(LEFT.st)) OR hasValue(LEFT.z5)))) AND 
-                                                  hasValue(LEFT.dob);                      
-                       SELF.identity_resolved := MAP(LEFT.did <> 0 AND LEFT.RecordSource = _Constant.RECORD_SOURCE.CONTRIBUTED => _Constant.IDENTITY_FLAGS.IDENTITY_IN_CONTRIB,
-                                                     LEFT.did <> 0 AND LEFT.RecordSource = _Constant.RECORD_SOURCE.REALTIME => _Constant.IDENTITY_FLAGS.REALTIME_IDENTITY,
-                                                     LEFT.did = 0 AND ~hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.UNSCORABLE_IDENTITY,
-                                                     LEFT.did = 0 AND hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.IDENTITY_NOT_FOUND,
+                                                  hasValue(LEFT.dob);
+                                                  
+                       isMultipleDidResolved := ds_no_of_dids_per_acctno(acctno = LEFT.acctno)[1].NO_OF_DIDs_FOUND > 1;
+                       InputDidFoundInCR := LEFT.RecordSource = _Constant.RECORD_SOURCE.CONTRIBUTED;
+                       InputDidFoundInPR := LEFT.RecordSource = _Constant.RECORD_SOURCE.REALTIME;
+                       
+                       SELF.identity_resolved := MAP(~isMultipleDidResolved AND InputDidFoundInCR => _Constant.IDENTITY_FLAGS.IDENTITY_IN_CONTRIB,
+                                                     ~isMultipleDidResolved AND InputDidFoundInPR => _Constant.IDENTITY_FLAGS.REALTIME_IDENTITY,
+                                                     ~isMultipleDidResolved AND ~InputDidFoundInCR AND ~InputDidFoundInPR AND ~hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.UNSCORABLE_IDENTITY,
+                                                     ~isMultipleDidResolved AND ~InputDidFoundInCR AND ~InputDidFoundInPR AND hasMinimunInputForRINID => _Constant.IDENTITY_FLAGS.IDENTITY_NOT_FOUND,
+                                                     isMultipleDidResolved => _Constant.IDENTITY_FLAGS.MULTIPLE_IDENTITY,
                                                      '');
                        SELF.risk_level := RiskIntelligenceNetwork_Services.Functions.GetRiskLevel(RIGHT.p1_idriskindx),
                        SELF.Most_Recent_Activity_Date := (string) RIGHT.MostRecentActivityDate,
@@ -223,15 +226,17 @@ EXPORT BatchRecords(DATASET(RiskIntelligenceNetwork_Services.Layouts.BatchIn_rec
  ds_batch_records_w_kr := DENORMALIZE(ds_batch_records_w_ra, ds_knownRisks_sorted, LEFT.acctno = RIGHT.acctno,trans_denorm_kr(LEFT, RIGHT, COUNTER));
               
  // OUTPUT(ds_batch_in, named('ds_batch_in'));
+ // OUTPUT(ds_batch_in_with_did, named('ds_batch_in_with_did'));
+ // OUTPUT(ds_batch_in_without_did, named('ds_batch_in_without_did'));
  // OUTPUT(ds_in_did_found_in_cr, named('ds_in_did_found_in_cr')); 
  // OUTPUT(ds_dids_not_in_cr, named('ds_dids_not_in_cr'));
+ // OUTPUT(ds_batch_in_didValidation, named('ds_batch_in_didValidation'));
  // OUTPUT(ds_in_did_found_in_pr, named('ds_in_did_found_in_pr'));
  // OUTPUT(ds_no_did_pii, named('ds_no_did_pii'));
  // OUTPUT(ds_append_did_to_in_pii_pr, named('ds_append_did_to_in_pii_pr'));
  // OUTPUT(ds_appended_did_to_in_pii_pr, named('ds_appended_did_to_in_pii_pr'));
  // OUTPUT(ds_auto_out, named('ds_auto_out'));
  // OUTPUT(ds_payload_recs, named('ds_payload_recs'));
- // OUTPUT(ds_batch_in_without_did_w_min_pii, named('ds_batch_in_without_did_w_min_pii'));
  // OUTPUT(ds_payload_recs_filtered, named('ds_payload_recs_filtered'));
  // OUTPUT(ds_PayloadRecs_w_did, named('ds_PayloadRecs_w_did'));
  // OUTPUT(ds_appended_did_to_in_pii_cr, named('ds_appended_did_to_in_pii_cr'));
@@ -239,7 +244,7 @@ EXPORT BatchRecords(DATASET(RiskIntelligenceNetwork_Services.Layouts.BatchIn_rec
  // OUTPUT(ds_dids_combined_dedup, named('ds_dids_combined_dedup'));
  // OUTPUT(ds_no_of_dids_per_acctno, named('ds_no_of_dids_per_acctno'));
  // OUTPUT(ds_batch_in_with_appended_did, named('ds_batch_in_with_appended_did'));
- // OUTPUT(ds_batch_in_with_appended_did_w_source, named('ds_batch_in_with_appended_did_w_source'));
+ // OUTPUT(ds_appended_did_dedup, named('ds_appended_did_dedup'));
  // OUTPUT(ds_best_in, named('ds_best_in'));
  // OUTPUT(ds_pr_best, named('ds_pr_best'));
  // OUTPUT(ds_pr_appends, named('ds_pr_appends'));

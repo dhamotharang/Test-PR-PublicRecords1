@@ -164,8 +164,10 @@ export dataset(l_out) fn_get_parties_2(
 #IF(_Control.Environment.OnThor)
 	ds_value4_distributed := distribute(ds_value4, hash64(ln_fares_id));
 	eroll1 := sort(ds_value4_distributed, ln_fares_id, search_did, party_type, if(input_mod.TwoPartySearch,penalt_1 + penalt_2,penalt_1), if(input_mod.TwoPartySearch,cPenalt_1 + cPenalt_2,cPenalt_1), -dt_last_seen, -prim_name, record, local); // added prim_name to ensure not getting a blank addr based on NonSubject Suppression.
-	eroll2_temp := dedup(eroll1,ln_fares_id,search_did,party_type,keep(consts.max_entities), local);
-  eroll2 := group(eroll2_temp, ln_fares_id, search_did, party_type);
+	// eroll2 := dedup(group(eroll1, ln_fares_id, search_did, party_type),ln_fares_id,search_did,party_type,keep(consts.max_entities), local);
+  
+  //is this right? group LOCAL, not dedup
+	eroll2 := dedup(group(eroll1, ln_fares_id, search_did, party_type, local),ln_fares_id,search_did,party_type,keep(consts.max_entities));
 #ELSE
 	ds_value4_distributed := ds_value4;
 	eroll1 := sort(ds_value4_distributed, ln_fares_id, search_did, party_type, if(input_mod.TwoPartySearch,penalt_1 + penalt_2,penalt_1), if(input_mod.TwoPartySearch,cPenalt_1 + cPenalt_2,cPenalt_1), -dt_last_seen, -prim_name, record); // added prim_name to ensure not getting a blank addr based on NonSubject Suppression.

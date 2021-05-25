@@ -1,4 +1,5 @@
-﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, STD, doxie, suppress;
+﻿import Risk_indicators, inquiry_acclogs, ut, did_add, riskwise, gateway, inquiry_deltabase, Death_Master, STD, doxie, suppress, _Control;
+onThor := _Control.Environment.OnThor;
 
 isFCRA := false;
 
@@ -2439,13 +2440,37 @@ suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identi
 
 
 // if realtime production mode, search just the suspicious Identities key instead
-suspicious_identities_realtime := join(adls_from_address, Risk_Indicators.Key_Suspicious_Identities,
-	keyed(left.did=right.did),
-		transform(risk_indicators.Boca_Shell_Fraud.layout_identities_output,
-			self.did := left.did;
-			self.historydate := left.historydate;
-			self := right), atmost(riskwise.max_atmost), keep(1));
+// suspicious_identities_realtime := join(adls_from_address, Risk_Indicators.Key_Suspicious_Identities,
+                                      // keyed(left.did=right.did),
+                                        // transform(risk_indicators.Boca_Shell_Fraud.layout_identities_output,
+                                          // self.did := left.did;
+                                          // self.historydate := left.historydate;
+                                          // self := right), atmost(riskwise.max_atmost), keep(1));
+risk_indicators.Boca_Shell_Fraud.layout_identities_output SIR_Transform(adls_from_address le, Risk_Indicators.Key_Suspicious_Identities ri) := TRANSFORM
+  self.did := le.did;
+  self.historydate := le.historydate;
+  self := ri;
+END;
+suspicious_identities_realtime_roxie := join(adls_from_address, Risk_Indicators.Key_Suspicious_Identities,
+                                             keyed(left.did=right.did),
+                                             SIR_Transform(LEFT, RIGHT), 
+                                             atmost(riskwise.max_atmost), 
+                                             keep(1));
+                                             
+suspicious_identities_realtime_thor := join(DISTRIBUTE(adls_from_address, HASH64(did)), 
+                                            DISTRIBUTE(PULL(Risk_Indicators.Key_Suspicious_Identities), HASH64(did)),
+                                            left.did=right.did,
+                                            SIR_Transform(LEFT, RIGHT), 
+                                            atmost(riskwise.max_atmost), 
+                                            keep(1), LOCAL);
+                                            
+#IF(onThor)
+	suspicious_identities_realtime := suspicious_identities_realtime_thor;
+#ELSE
+	suspicious_identities_realtime := suspicious_identities_realtime_roxie;
+#END
 			
+      
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 // if the record is default_history_date or same month as today's date, run production_realtime_mode
 production_realtime_mode := adls_from_address[1].historydate=risk_indicators.iid_constants.default_history_date
@@ -2455,11 +2480,24 @@ production_realtime_mode := adls_from_address[1].historydate=risk_indicators.iid
 suspicious_identities := if(production_realtime_mode, suspicious_identities_realtime, suspicious_identities_hist);
 
 
-with_suspcious_ids := join(addr_raw, suspicious_identities, 
-															left.inquiryADLsFromAddr=right.did, 
-															transform(layout_temp,
-															self.inquirySuspciousADLsperAddr := if(right.did<>0, 1, 0);
-															self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+with_suspcious_ids_roxie := join(addr_raw, suspicious_identities, 
+                                 left.inquiryADLsFromAddr=right.did, 
+                                 transform(layout_temp,
+                                 self.inquirySuspciousADLsperAddr := if(right.did<>0, 1, 0);
+                                 self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+                              
+with_suspcious_ids_thor := join(DISTRIBUTE(addr_raw, HASH64(inquiryADLsFromAddr)), 
+                                DISTRIBUTE(suspicious_identities, HASH64(did)), 
+                                left.inquiryADLsFromAddr=right.did, 
+                                transform(layout_temp,
+                                self.inquirySuspciousADLsperAddr := if(right.did<>0, 1, 0);
+                                self := left), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
+                                
+#IF(onThor)
+	with_suspcious_ids := with_suspcious_ids_thor;
+#ELSE
+	with_suspcious_ids := with_suspcious_ids_roxie;
+#END
 
 // only do the suspicious identity searching in fraudpoint
 isFraudpoint :=  (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity) > 0;
@@ -2938,8 +2976,12 @@ with_billgroups := join(with_inquiries, billgroup_key,
 		self := left), 
 		left outer, atmost(riskwise.max_atmost), keep(1));
 
-// skip the billgroups search if bsversion is prior to 50
-inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inquiries, seq) );
+#if(_control.Environment.onThor_LeadIntegrity)
+	inquiry_summary := project(clam_pre_Inquiries, transform(risk_indicators.layout_boca_shell, self := left));
+#else
+	// skip the billgroups search if bsversion is prior to 50
+	inquiry_summary := if(bsversion>=50, group(with_billgroups, seq), group(with_inquiries, seq) );
+#end
 
 
 	return inquiry_summary;

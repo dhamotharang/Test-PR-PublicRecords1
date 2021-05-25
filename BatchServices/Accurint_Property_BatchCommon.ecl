@@ -24,6 +24,7 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     BOOLEAN dobMatch_value :=     FALSE :STORED('Match_DOB');
     BOOLEAN ssnMatch_value :=     FALSE :STORED('Match_SSN');
     BOOLEAN didMatch_value :=     FALSE :STORED('Match_LinkID');
+    BOOLEAN IncludeAssignmentsAndReleases := FALSE : STORED('IncludeAssignmentsAndReleases');
     
     UNSIGNED PARTY_TYPE := BatchServices.Functions.LN_Property.return_party_types;
     
@@ -75,7 +76,7 @@ EXPORT Accurint_Property_BatchCommon(boolean isFCRA, unsigned1 nss, boolean useC
     ds_best := project(ds_ready, transform(doxie.layout_best, self.did := left.did, self:=[]));
     ds_flags := if(isFCRA, FFD.GetFlagFile(ds_best, pc_recs));
 
-    p_mod := BatchServices.Property_BatchService_Records(ds_ready, record_types, party_type, nss, isFCRA, , slim_pc_recs, inFFDOptionsMask, ds_flags);
+    p_mod := BatchServices.Property_BatchService_Records(ds_ready, record_types, party_type, nss, isFCRA, , slim_pc_recs, inFFDOptionsMask, ds_flags, batch_params.isConsumer(), IncludeAssignmentsAndReleases AND ~isFCRA);
     
     // Get the top N records for each acctno here. Note: we DON'T want to just get the top N ln_fares_ids for
     // each acctno and then match those against the property records, because many of those ln_fares_ids might be 

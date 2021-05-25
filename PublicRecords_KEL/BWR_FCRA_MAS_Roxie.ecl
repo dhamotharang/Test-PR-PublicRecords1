@@ -89,7 +89,6 @@ eyeball := 100;
 
 name := STD.System.Job.User();
 archivemode := if(histDate = (STRING)STD.Date.Today(), 'Current', 'Archive');
-
 OutputFile := '~'+name+'::out::PersonFCRA_MAS_Roxie_'+ archivemode +'_';
 
 prii_layout := RECORD
@@ -145,8 +144,7 @@ soapLayout := RECORD
 	BOOLEAN RetainInputLexid;
 	BOOLEAN appendpii;
 	BOOLEAN isprescreen;
-	BOOLEAN OverwriteRedactedSSN;
-	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
+	BOOLEAN OverwriteRedactedSSN;	DATASET(Gateway.Layouts.Config) gateways := DATASET([], Gateway.Layouts.Config);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) AllowedSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	DATASET(PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources) ExcludeSourcesDataset := DATASET([], PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 	BOOLEAN AllowInferredPerformance;
