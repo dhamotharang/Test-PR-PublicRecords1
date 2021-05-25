@@ -1,4 +1,5 @@
 variables:
+  DEP_FILE: "_query_list.txt"
   RES_FILE: "syntax_fast.txt"
   RES_FILE_NOFAST: "syntax_nofast.txt"
   WARN_FILE: "syntax_warnings_fast.txt"
@@ -27,13 +28,24 @@ syntax-fast:
     - cd .ci_root
     - npm install
     - eclcc --version || true
+    - echo "Fetching Dependency List"
+    - |
+      if node get_mr_query_list.js -m -d $CI_MERGE_REQUEST_IID > $DEP_FILE
+      then
+      echo "Found $(cat $DEP_FILE | wc -l) Dependencies"
+      querylist=$DEP_FILE
+      else
+      echo "Error Loading Dependencies - Default to All Services"
+      querylist=
+      fi
     - echo "Run Script"
     #-n option is to skip "slow" queries
     - |
-      if node full_syntax_check.js -n | tee ../$RES_FILE
+      if node full_syntax_check.js -n $querylist | tee ../$RES_FILE
       then checkres=0
       else checkres=1
       fi
+    - touch eclcc.log _syn_check_warnings.log
     - cat eclcc.log _syn_check_warnings.log > ../$WARN_FILE
     - exit $checkres
 
@@ -55,12 +67,24 @@ syntax-nofast:
     - cd .ci_root
     - npm install
     - eclcc --version || true
-    - echo "Run Script"
+    - echo "Fetching Dependency List"
     - |
-      if node full_syntax_check.js nofast_queries.txt | tee ../$RES_FILE_NOFAST
+      if node get_mr_query_list.js -m -d $CI_MERGE_REQUEST_IID > $DEP_FILE
+      then
+      echo "Found $(cat $DEP_FILE | wc -l) Dependencies"
+      querylist=$DEP_FILE
+      else
+      echo "Error Loading Dependencies - Default to All Services"
+      querylist=
+      fi
+    - echo "Run Script"
+    #-o option is to check only "slow" queries
+    - |
+      if node full_syntax_check.js -o $querylist | tee ../$RES_FILE_NOFAST
       then checkres=0
       else checkres=1
       fi
+    - touch eclcc.log _syn_check_warnings.log
     - cat eclcc.log _syn_check_warnings.log > ../$WARN_FILE_NOFAST
     - exit $checkres
 
