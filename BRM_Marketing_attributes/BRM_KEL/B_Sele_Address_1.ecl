@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT B_Sele_Address_2,B_Sele_Address_3,CFG_Compile,E_Address,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Geo_Link,E_Sele_Address,E_Zip_Code FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Address_2(__in,__cfg).__ENH_Sele_Address_2) __ENH_Sele_Address_2 := B_Sele_Address_2(__in,__cfg).__ENH_Sele_Address_2;
-  SHARED __EE1378450 := __ENH_Sele_Address_2;
-  EXPORT __ST143060_Layout := RECORD
+  SHARED __EE1382383 := __ENH_Sele_Address_2;
+  EXPORT __ST154047_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Address().Typ) Location_;
     KEL.typ.nstr Primary_Range_;
@@ -21,7 +21,7 @@ EXPORT B_Sele_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).S_I_C_Codes_Layout) S_I_C_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).N_A_I_C_S_Codes_Layout) N_A_I_C_S_Codes_;
     KEL.typ.ndataset(E_Sele_Address(__in,__cfg).Best_Addresses_Layout) Best_Addresses_;
-    KEL.typ.ndataset(B_Sele_Address_2(__in,__cfg).__ST146925_Layout) Data_Sources_;
+    KEL.typ.ndataset(B_Sele_Address_2(__in,__cfg).__ST157894_Layout) Data_Sources_;
     KEL.typ.bool Is_P_O_Box_B_I_P_ := FALSE;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -30,10 +30,10 @@ EXPORT B_Sele_Address_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST143060_Layout __ND1378675__Project(B_Sele_Address_2(__in,__cfg).__ST146869_Layout __PP1378451) := TRANSFORM
-    __BS1378544 := __T(__PP1378451.Address_Record_Type_);
-    SELF.Is_P_O_Box_B_I_P_ := EXISTS(__BS1378544(__T(__OP2(__T(__PP1378451.Address_Record_Type_).Rec_Type_,=,__CN('P')))));
-    SELF := __PP1378451;
+  SHARED __ST154047_Layout __ND1382608__Project(B_Sele_Address_2(__in,__cfg).__ST157838_Layout __PP1382384) := TRANSFORM
+    __BS1382477 := __T(__PP1382384.Address_Record_Type_);
+    SELF.Is_P_O_Box_B_I_P_ := EXISTS(__BS1382477(__T(__OP2(__T(__PP1382384.Address_Record_Type_).Rec_Type_,=,__CN('P')))));
+    SELF := __PP1382384;
   END;
-  EXPORT __ENH_Sele_Address_1 := PROJECT(__EE1378450,__ND1378675__Project(LEFT));
+  EXPORT __ENH_Sele_Address_1 := PROJECT(__EE1382383,__ND1382608__Project(LEFT));
 END;

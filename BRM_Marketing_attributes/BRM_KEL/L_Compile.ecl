@@ -1,7 +1,7 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT L_Compile := MODULE
   SHARED Input_Bus_Attributes_V1_Dynamic_Res0_Internal_Layout := RECORD
     KEL.typ.nuid G___Proc_Bus_U_I_D_;

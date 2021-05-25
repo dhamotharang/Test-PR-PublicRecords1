@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT B_Sele_U_C_C_6,B_Sele_U_C_C_9,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Sele_U_C_C,E_U_C_C FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_U_C_C_6(__in,__cfg).__ENH_Sele_U_C_C_6) __ENH_Sele_U_C_C_6 := B_Sele_U_C_C_6(__in,__cfg).__ENH_Sele_U_C_C_6;
-  SHARED __EE876836 := __ENH_Sele_U_C_C_6;
-  EXPORT __ST158264_Layout := RECORD
+  SHARED __EE883016 := __ENH_Sele_U_C_C_6;
+  EXPORT __ST169175_Layout := RECORD
     KEL.typ.nstr R_M_S_I_D_;
     KEL.typ.nstr Party_Type_;
     KEL.typ.int Party_Sort_List_ := 0;
@@ -16,16 +16,16 @@ EXPORT B_Sele_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST158256_Layout := RECORD
+  EXPORT __ST169167_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nstr T_M_S_I_D_;
     KEL.typ.ntyp(E_U_C_C().Typ) Filing_;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
     KEL.typ.nint Sele_I_D_;
-    KEL.typ.ndataset(__ST158264_Layout) Sub_Filing_;
+    KEL.typ.ndataset(__ST169175_Layout) Sub_Filing_;
     KEL.typ.ndataset(E_Sele_U_C_C(__in,__cfg).Data_Sources_Layout) Data_Sources_;
-    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST163574_Layout) Best_Party_Types_;
+    KEL.typ.ndataset(B_Sele_U_C_C_9(__in,__cfg).__ST174485_Layout) Best_Party_Types_;
     KEL.typ.nstr Filtered_Party_Type_;
     KEL.typ.bool Is_Creditor_ := FALSE;
     KEL.typ.bool Is_Debtor_ := FALSE;
@@ -37,12 +37,12 @@ EXPORT B_Sele_U_C_C_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST158256_Layout __ND876954__Project(B_Sele_U_C_C_6(__in,__cfg).__ST160362_Layout __PP876837) := TRANSFORM
-    __EE876874 := __PP876837.Sub_Filing_;
-    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE876874),__ST158264_Layout),__NL(__EE876874));
-    SELF.Is_Creditor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP876837.Filtered_Party_Type_)),IN,__CN(['S','C','A']))),TRUE,FALSE);
-    SELF.Is_Debtor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP876837.Filtered_Party_Type_)),=,__CN('D'))),TRUE,FALSE);
-    SELF := __PP876837;
+  SHARED __ST169167_Layout __ND883134__Project(B_Sele_U_C_C_6(__in,__cfg).__ST171273_Layout __PP883017) := TRANSFORM
+    __EE883054 := __PP883017.Sub_Filing_;
+    SELF.Sub_Filing_ := __BN(PROJECT(__T(__EE883054),__ST169175_Layout),__NL(__EE883054));
+    SELF.Is_Creditor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP883017.Filtered_Party_Type_)),IN,__CN(['S','C','A']))),TRUE,FALSE);
+    SELF.Is_Debtor_ := IF(__T(__OP2(__FN1(KEL.Routines.ToUpperCase,__FN1(TRIM,__PP883017.Filtered_Party_Type_)),=,__CN('D'))),TRUE,FALSE);
+    SELF := __PP883017;
   END;
-  EXPORT __ENH_Sele_U_C_C_5 := PROJECT(__EE876836,__ND876954__Project(LEFT));
+  EXPORT __ENH_Sele_U_C_C_5 := PROJECT(__EE883016,__ND883134__Project(LEFT));
 END;

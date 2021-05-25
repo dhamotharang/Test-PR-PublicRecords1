@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT B_Address_5,CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Address_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Address_5(__in,__cfg).__ENH_Address_5) __ENH_Address_5 := B_Address_5(__in,__cfg).__ENH_Address_5;
-  SHARED __EE878594 := __ENH_Address_5;
-  EXPORT __ST152051_Layout := RECORD
+  SHARED __EE884691 := __ENH_Address_5;
+  EXPORT __ST162999_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -17,8 +17,6 @@ EXPORT B_Address_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.ndataset(E_Address(__in,__cfg).Address_Components_Layout) Address_Components_;
     KEL.typ.ndataset(E_Address(__in,__cfg).College_Layout) College_;
     KEL.typ.ndataset(E_Address(__in,__cfg).A_D_V_O_Date_Summary_Layout) A_D_V_O_Date_Summary_;
-    KEL.typ.ndataset(E_Address(__in,__cfg).Business_Characteristics_Layout) Business_Characteristics_;
-    KEL.typ.ndataset(E_Address(__in,__cfg).B_I_P_V2_Best_Layout) B_I_P_V2_Best_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Do_Not_Deliver_Layout) Do_Not_Deliver_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Do_Not_Mail_Layout) Do_Not_Mail_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Dead_C_O_Layout) Dead_C_O_;
@@ -36,7 +34,6 @@ EXPORT B_Address_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.ndataset(E_Address(__in,__cfg).Vacancy_Layout) Vacancy_;
     KEL.typ.ndataset(E_Address(__in,__cfg).A_D_V_O_Summary_Layout) A_D_V_O_Summary_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Vacation_Layout) Vacation_;
-    KEL.typ.ndataset(E_Address(__in,__cfg).High_Risk_Address_Layout) High_Risk_Address_;
     KEL.typ.ndataset(E_Address(__in,__cfg).Data_Sources_Layout) Data_Sources_;
     KEL.typ.ndataset(E_Address(__in,__cfg).A_D_V_O_Summary_Layout) Bestchild_Advo_;
     KEL.typ.nstr Res_Bus_Flag_;
@@ -48,12 +45,12 @@ EXPORT B_Address_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST152051_Layout __ND878428__Project(B_Address_5(__in,__cfg).__ST155750_Layout __PP877741) := TRANSFORM
-    __EE878423 := __PP877741.Bestchild_Advo_;
-    SELF.Res_Bus_Flag_ := (__T(__EE878423))[1].Residential_Or_Business_Indicator_;
-    __EE878438 := __PP877741.Bestchild_Advo_;
-    SELF.Vacant_Flag_ := (__T(__EE878438))[1].Vacancy_Indicator_;
-    SELF := __PP877741;
+  SHARED __ST162999_Layout __ND884541__Project(B_Address_5(__in,__cfg).__ST166680_Layout __PP883921) := TRANSFORM
+    __EE884536 := __PP883921.Bestchild_Advo_;
+    SELF.Res_Bus_Flag_ := (__T(__EE884536))[1].Residential_Or_Business_Indicator_;
+    __EE884551 := __PP883921.Bestchild_Advo_;
+    SELF.Vacant_Flag_ := (__T(__EE884551))[1].Vacancy_Indicator_;
+    SELF := __PP883921;
   END;
-  EXPORT __ENH_Address_4 := PROJECT(__EE878594,__ND878428__Project(LEFT));
+  EXPORT __ENH_Address_4 := PROJECT(__EE884691,__ND884541__Project(LEFT));
 END;

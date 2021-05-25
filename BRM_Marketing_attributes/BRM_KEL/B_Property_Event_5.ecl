@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile,E_Property,E_Property_Event,E_Zip_Code,FN_Compile FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Property_Event(__in,__cfg).__Result) __E_Property_Event := E_Property_Event(__in,__cfg).__Result;
-  SHARED __EE300336 := __E_Property_Event;
-  EXPORT __ST157793_Layout := RECORD
+  SHARED __EE310331 := __E_Property_Event;
+  EXPORT __ST168704_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr L_N_Fares_I_D_;
     KEL.typ.nstr Primary_Range_;
@@ -76,10 +76,10 @@ EXPORT B_Property_Event_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, 
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST157793_Layout __ND875888__Project(E_Property_Event(__in,__cfg).Layout __PP299994) := TRANSFORM
-    __CC13330 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Is_Current_Assessment_Record_ := __AND(__PP299994.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP299994.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13330)),<=,__CN(1)));
-    SELF := __PP299994;
+  SHARED __ST168704_Layout __ND882068__Project(E_Property_Event(__in,__cfg).Layout __PP309989) := TRANSFORM
+    __CC13202 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('property_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Is_Current_Assessment_Record_ := __AND(__PP309989.Is_Assessment_,__OP2(FN_Compile(__cfg).FN_A_B_S_Y_E_A_R_S_B_E_T_W_E_E_N(__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP309989.Date_First_Seen_)),__ECAST(KEL.typ.nkdate,__CC13202)),<=,__CN(1)));
+    SELF := __PP309989;
   END;
-  EXPORT __ENH_Property_Event_5 := PROJECT(__EE300336,__ND875888__Project(LEFT));
+  EXPORT __ENH_Property_Event_5 := PROJECT(__EE310331,__ND882068__Project(LEFT));
 END;
