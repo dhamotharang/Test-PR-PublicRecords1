@@ -461,7 +461,7 @@ thrive_main  := join(clean_a2, thrive.keys().did_fcra.qa,
 												KEEP(100), atmost(10000));
 if(include_thrive or Include_All_Files, output(thrive_main, named('thrive')));
 
-mari_key := Prof_License_Mari.key_did(true);
+mari_key := dx_prof_license_mari.key_did(data_services.data_env.iFCRA);
 mari_main  := join(clean_a2, mari_key,
 												left.did<>0 and keyed(left.did=right.s_did),
 												transform(recordof(mari_key), self := right),

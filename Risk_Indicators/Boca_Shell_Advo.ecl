@@ -57,7 +57,15 @@ with_advo1_thor := join(distribute(clam_pre_ADVO, hash64(Address_Verification.In
 					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)), 
 					getAdvo1(LEFT,RIGHT), 
 					left outer,
-					atmost(riskwise.max_atmost), LOCAL);
+					atmost(
+                  left.Address_Verification.Input_Address_Information.zip5 = right.zip and
+                  left.Address_Verification.Input_Address_Information.prim_range = right.prim_range and
+                  left.Address_Verification.Input_Address_Information.prim_name = right.prim_name and
+                  left.Address_Verification.Input_Address_Information.addr_suffix = right.addr_suffix and
+                  left.Address_Verification.Input_Address_Information.predir = right.predir and
+                  left.Address_Verification.Input_Address_Information.postdir = right.postdir and
+                  left.Address_Verification.Input_Address_Information.sec_range = right.sec_range,
+                  riskwise.max_atmost), LOCAL);
 					
 #IF(onThor)
 	with_advo1 := group(sort(with_advo1_thor, seq), seq);
@@ -113,7 +121,15 @@ with_advo2_thor := join(distribute(with_advo1_deduped, hash64(Address_Verificati
 					left.Address_Verification.Address_History_1.sec_range = right.sec_range  and
 					((unsigned)RIGHT.date_first_seen < (unsigned)Risk_Indicators.iid_constants.full_history_date(left.historydate)), 
 					getAdvo2(LEFT,RIGHT), left outer,
-					atmost(riskwise.max_atmost), LOCAL);
+					atmost(
+                  left.Address_Verification.Address_History_1.zip5 = right.zip and
+                  left.Address_Verification.Address_History_1.prim_range = right.prim_range and
+                  left.Address_Verification.Address_History_1.prim_name = right.prim_name and
+                  left.Address_Verification.Address_History_1.addr_suffix = right.addr_suffix and
+                  left.Address_Verification.Address_History_1.predir = right.predir and
+                  left.Address_Verification.Address_History_1.postdir = right.postdir and
+                  left.Address_Verification.Address_History_1.sec_range = right.sec_range,
+                  riskwise.max_atmost), LOCAL);
 
 #IF(onThor)
 	with_advo2 := group(sort(with_advo2_thor,seq),seq);

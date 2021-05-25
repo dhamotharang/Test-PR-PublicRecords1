@@ -27,6 +27,10 @@ MODULE
   EXPORT UNSIGNED1 gatewayRetries       := 0;
   EXPORT UNSIGNED1 NoPenalty            := 0;
   EXPORT UNSIGNED1 LERG6_LastActivityThreshold := 30;
+  EXPORT UNSIGNED1 MaxIconectivElepGwHistBatch := 2; // Added for the 2021-06-02 Phone Porting Date for LE project
+  EXPORT UNSIGNED1 MaxIconectivElepPortHist    := 5; // Added for the 2021-06-02 Phone Porting Date for LE project
+  EXPORT STRING1   CarrierKey_Arec             := 'A'; // Added for the 2021-06-02 Phone Porting Date for LE project
+  EXPORT STRING1   CarrierKey_Brec             := 'B'; // Added for the 2021-06-02 Phone Porting Date for LE project
 
   // Enum for TransactionType and Phone source
   EXPORT TransType   := ENUM(Basic = 0,Premium = 1,Ultimate = 2, PhoneRiskAssessment = 3, Blank = 255);

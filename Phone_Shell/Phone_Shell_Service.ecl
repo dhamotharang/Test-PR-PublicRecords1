@@ -139,7 +139,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
  #STORED('GLBPurpose',0);
  #STORED('DataRestrictionMask', Phone_Shell.Constants.Default_DataRestriction);
  #STORED('DataPermissionMask', Phone_Shell.Constants.Default_DataPermission);
-    #WEBSERVICE(FIELDS(
+ #WEBSERVICE(FIELDS(
                 'AcctNo',
                 'DID',
                 'FullName_In',
@@ -217,7 +217,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
                 '_TransactionId',
                 '_BatchUID',
                 '_GCID'
-                ));
+            ));
 
 
  /* ************************************************************************
@@ -304,7 +304,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
  INTEGER  BocaShell_DOB_Radius   := -1 : STORED('BocaShell_DOB_Radius');
  REAL     BocaShell_Watchlist_Threshold := 0.84 : STORED('BocaShell_Watchlist_Threshold');
  STRING25 Phone_Score_Model_Temp  := '' : STORED('Phone_Score_Model');
- STRING2  ModelVersion_Temp       := '' : STORED('ModelVersion');
+ STRING10 ModelVersion_Temp       := '' : STORED('ModelVersion');
  BOOLEAN  BlankOutDuplicatePhones := FALSE :STORED('BlankOutDuplicatePhones');
 	
  BOOLEAN UsePremiumSource_A    := FALSE :STORED('UsePremiumSource_A');
@@ -423,8 +423,10 @@ EXPORT Phone_Shell_Service() := FUNCTION
                       // ModelVersion = V3 above calls the old v3 split models for Phone Shell v1.0. This is the ONLY way to call the v3 models.
                       ModelVersion IN ['COMBO_V21']                                   => Phone_Shell.PhoneModel_V21_1(results, Score_Threshold), // default score threshold for v2.1 was 387
                       // ModelVersion = COMBO_V21 above calls the first combo model, intended for Phone Shell v2.1
+                      ModelVersion IN ['COMBO_V30']                                   => Phone_Shell.PhoneModel_V30_1(results, Score_Threshold), // default score threshold for v3.0 was 387
+                      // ModelVersion = COMBO_V30 above calls the v3.0 combo model (for Phone Shell 3.0)
                       // Anything else in ModelVersion (blank, V4, XYZ, etc) will call the latest combined model (below).
-                                                                                         Phone_Shell.PhoneModel_V30_1(results, Score_Threshold) // default score threshold for v3.0 was 387
+                                                                                         Phone_Shell.Luci_Get_Phone_Model(results, Score_Threshold) // default score threshold for v3.1 was 387
                      ); 
 
  // for debug, pick model
@@ -432,6 +434,7 @@ EXPORT Phone_Shell_Service() := FUNCTION
  // model_results := Phone_Shell.PhoneScore_wf8_v3(results, Score_Threshold); // default score_threshold was 217
  // model_results := Phone_Shell.PhoneModel_V21_1(results, Score_Threshold);  // default score_threshold was 387
  // model_results := Phone_Shell.PhoneModel_V30_1(results, Score_Threshold);  // default score_threshold was 387
+ // model_results := Phone_Shell.Luci_Get_Phone_Model(results, Score_Threshold);  // default score_threshold was 387
 
  // for debug, comment out the rest (start comment-out section) (this is because models in debug return a different layout)
 

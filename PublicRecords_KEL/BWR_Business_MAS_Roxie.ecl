@@ -70,6 +70,14 @@ TurnOffHouseHolds := FALSE;
 // TurnOffRelatives := TRUE;
 TurnOffRelatives := FALSE;
 
+// Use_Ingest_Date := TRUE; 
+Use_Ingest_Date := false;
+
+// TurnOffHouseHolds := TRUE;
+TurnOffHouseHolds := FALSE;
+// TurnOffRelatives := TRUE;
+TurnOffRelatives := FALSE;
+
 // Use default list of allowed sources
 AllowedSourcesDataset := DATASET([],PublicRecords_KEL.ECL_Functions.Constants.Layout_Allowed_Sources);
 // Do not exclude any additional sources from allowed sources dataset.

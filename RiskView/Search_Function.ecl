@@ -89,7 +89,19 @@ Risk_Indicators.Layout_Input cleanup(riskview_input le) := TRANSFORM
 	self.suffix := STD.Str.touppercase(if(le.Name_Suffix ='' AND valid_cleaned, address.cleanNameFields(cleaned_name).name_suffix, le.Name_Suffix));	
 	self.title := STD.Str.touppercase(if(valid_cleaned, address.cleanNameFields(cleaned_name).title,''));
 
-	street_address := risk_indicators.MOD_AddressClean.street_address(le.street_addr, le.prim_range, le.predir, le.prim_name, le.suffix, le.postdir, le.unit_desig, le.sec_range);
+// Cap One submits # with their addresses and that skews the results of the address cleaner,  so we are checking for their company id and filtering out the hastags.  
+  Street_Addy := if(CompanyID = '106896', std.str.filterout(le.street_addr, '#'), le.street_addr);
+  prim_range := if(CompanyID = '106896', std.str.filterout(le.prim_range, '#'), le.prim_range);
+  predir := if(CompanyID = '106896', std.str.filterout(le.predir, '#'), le.predir);
+  prim_name := if(CompanyID = '106896', std.str.filterout(le.prim_name, '#'), le.prim_name);
+  suffix := if(CompanyID = '106896', std.str.filterout(le.suffix, '#'), le.suffix);
+  postdir := if(CompanyID = '106896', std.str.filterout(le.postdir, '#'), le.postdir);
+  unit_desig := if(CompanyID = '106896', std.str.filterout(le.unit_desig, '#'), le.unit_desig);
+  sec_range := if(CompanyID = '106896', std.str.filterout(le.sec_range, '#'), le.sec_range);
+
+
+	street_address := risk_indicators.MOD_AddressClean.street_address(Street_Addy, prim_range, predir, prim_name, suffix, postdir, unit_desig, sec_range);
+  
 	clean_addr := risk_indicators.MOD_AddressClean.clean_addr( street_address, le.p_City_name, le.St, le.Z5 ) ;											
 
 	SELF.in_streetAddress := street_address;

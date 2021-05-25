@@ -1,4 +1,5 @@
-﻿IMPORT AutoHeaderI, AutoStandardI, BatchServices, Doxie, iesp, STD;
+﻿// 05/19, after 4:45pm deploy and test, remove vers1 commented out coding???
+IMPORT AutoHeaderI, AutoStandardI, BatchServices, Doxie, iesp, STD;
 
 EXPORT iParam :=
 MODULE
@@ -115,6 +116,7 @@ MODULE
     EXPORT BOOLEAN UseInHousePhoneMetadataOnly := FALSE;
     EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus := FALSE;
     EXPORT BOOLEAN AllowPortingData := FALSE;
+    EXPORT UNSIGNED1 IconectivElepGwMaxHistories := 0; //Added for the 2021-06-02 Phone Porting Data for LE project
   END;
 
   EXPORT PhoneVerificationParams :=
@@ -146,6 +148,10 @@ MODULE
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
     drm := mod_access.DataRestrictionMask;
     dpm := mod_access.DataPermissionMask;
+
+    // v---- Added the next 1 line for the 2021-06-02 Phone Porting Data for LE project, 
+    //       to set a boolean based on new DPM bit 38 to be used in multiple places below.
+    //BOOLEAN PortingDataIsPermitted := doxie.compliance.use_IconectivPortDataValidate(dpm); //vers1??? 
 
     in_params := MODULE(PROJECT(mod_access, SearchParams, OPT))
       STRING vTransactionType            := pfOptions._Type;
@@ -197,7 +203,6 @@ MODULE
       SHARED displayAll := TransactionType in [$.Constants.TransType.PREMIUM,
                                               $.Constants.TransType.ULTIMATE,
                                               $.Constants.TransType.PHONERISKASSESSMENT];
-
       EXPORT BOOLEAN IncludePorting           := pfOptions.IncludePorting;
       EXPORT BOOLEAN ReturnPortingInfo        := (IncludePhoneMetadata AND displayAll) OR IncludePorting;
 
@@ -292,9 +297,13 @@ MODULE
       EXPORT BOOLEAN hasActivePhoneTransactionCountRule := IncludeRiskIndicators AND EXISTS(RiskIndicators(RiskId = $.Constants.RiskRules.PhoneTransactionCount AND ACTIVE));
       EXPORT BOOLEAN IsGovsearch := application_type in AutoStandardI.Constants.GOV_TYPES;
       EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus            :=  pfOptions.SuppressRiskIndicatorWarnStatus : STORED('SuppressRiskIndicatorWarnStatus'); // Need to read from stored for options defined in MBS for API transactions as they would come under the root tag;
-      EXPORT BOOLEAN IncludePortingDetails            := pfOptions.IncludePortingDetails : STORED('IncludePortingDetails');
+      // v--- Revised the next line for the 2021-06-02 Phone Porting Data for LE project, since 'Porting Details' related
+      //      data (for LE) will now be based upon new DPM bit 38, not a passed in include option.
+      EXPORT BOOLEAN IncludePortingDetails            := //PortingDataIsPermitted; //vers1???
+                                                         doxie.compliance.use_IconectivPortDataValidate(dpm); 
       EXPORT BOOLEAN AllowPortingData := TRUE; //To get Iconnective data from Phones.GetPhoneMetadata_wLERG6
-    END;
+      EXPORT UNSIGNED1 IconectivElepGwMaxHistories  := pfOptions.IconectivElepMaxPortHistories; // Added for the 2021-06-02 Phone Porting Data for LE project
+   END;
 
     RETURN in_params;
   END;
@@ -315,6 +324,10 @@ MODULE
     mod_access := doxie.compliance.GetGlobalDataAccessModuleTranslated(globalMod);
     drm := mod_access.DataRestrictionMask;
     dpm := mod_access.DataPermissionMask;
+
+    // v---- Added the next 1 line for the 2021-06-02 Phone Porting Data for LE project, 
+    //       to set boolean based on the new DPM bit 38 to be used in multiple places below.
+    //EXPORT BOOLEAN PortingDataIsPermitted := doxie.compliance.use_IconectivPortDataValidate(dpm); //vers1???
 
 	  // Report module
     input_Mod := MODULE(PROJECT(mod_access, SearchParams, OPT))
@@ -365,8 +378,13 @@ MODULE
                                                 $.Constants.TransType.ULTIMATE,
                                                 $.Constants.TransType.PHONERISKASSESSMENT];
 
-      EXPORT BOOLEAN ReturnPortingInfo        := IncludePhoneMetadata AND displayAll;
-
+      // v--- Moved and revised the next line for the 2021-06-02 Phone Porting Data for LE project, since 'Porting Details' related
+      //      data (for LE) will now be based upon new DPM bit 38, not passed in include option.
+      EXPORT BOOLEAN IncludePortingDetails    := //PortingDataIsPermitted;//vers1???
+                                                 doxie.compliance.use_IconectivPortDataValidate(dpm); // v--- Revised the next line for the 2021-06-02 Phone Porting Data for LE project
+      EXPORT BOOLEAN ReturnPortingInfo        := (IncludePhoneMetadata AND displayAll) OR //PortingDataIsPermitted; //vers1???
+                                                                                          IncludePortingDetails;
+      
       EXPORT BOOLEAN ReturnSpoofingInfo       := IncludePhoneMetadata AND TransactionType IN [$.Constants.TransType.ULTIMATE,$.Constants.TransType.PHONERISKASSESSMENT];
 
       EXPORT BOOLEAN ReturnOTPInfo            := IncludePhoneMetadata AND displayAll;
@@ -410,8 +428,9 @@ MODULE
       EXPORT BOOLEAN UseZumigoIdentity	          := IncludeZumigoOptions AND BillingId <>'' AND doxie.compliance.use_ZumigoIdentity(dpm);
       EXPORT BOOLEAN IsGovsearch := mod_access.application_type in AutoStandardI.Constants.GOV_TYPES;
       EXPORT BOOLEAN SuppressRiskIndicatorWarnStatus :=  FALSE : STORED('SuppressRiskIndicatorWarnStatus');
-      EXPORT BOOLEAN IncludePortingDetails               := FALSE : STORED('IncludePortingDetails');
       EXPORT BOOLEAN AllowPortingData := TRUE;
+      // v--- Added the next line for the 2021-06-02 Phone Porting Data for LE project
+      EXPORT UNSIGNED1 IconectivElepGwMaxHistories := PhoneFinder_Services.Constants.MaxIconectivElepGwHistBatch; //=2, the max value for the batch service
     END;
 
     RETURN input_Mod;

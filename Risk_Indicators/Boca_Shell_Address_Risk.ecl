@@ -1,8 +1,10 @@
-﻿import riskwise, AddrFraud, Risk_Indicators;
+﻿import riskwise, AddrFraud, Risk_Indicators, _control;
 
 export Boca_Shell_Address_Risk(grouped dataset(Risk_Indicators.Layout_Boca_Shell) clam, integer bsversion) := FUNCTION
+
+onThor := _control.Environment.OnThor;
 					
-with_addrfraud_geolink := join(clam, AddrFraud.Key_AddrFraud_GeoLink,
+with_addrfraud_geolink_roxie := join(clam, AddrFraud.Key_AddrFraud_GeoLink,
 												left.shell_input.st<>'' and left.shell_input.county <>'' and left.shell_input.geo_blk <> '' and
 												keyed(right.geolink=left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk),
 		transform(risk_indicators.Layout_Boca_Shell, 
@@ -11,6 +13,24 @@ with_addrfraud_geolink := join(clam, AddrFraud.Key_AddrFraud_GeoLink,
 							self.addr_risk_summary.turnover_1yr_out := right.turnover_1yr_out;
 							self := left),
 		atmost(riskwise.max_atmost), left outer, keep(1));
+		
+with_addrfraud_geolink_thor := join(
+	distribute(clam, hash64(shell_input.st + shell_input.county + shell_input.geo_blk)), 
+	distribute(pull(AddrFraud.Key_AddrFraud_GeoLink), hash64(geolink)),
+												left.shell_input.st<>'' and left.shell_input.county <>'' and left.shell_input.geo_blk <> '' and
+												(right.geolink=left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk),
+		transform(risk_indicators.Layout_Boca_Shell, 
+							self.addr_risk_summary.occupants_1yr := right.occupants_1yr;
+							self.addr_risk_summary.turnover_1yr_in := right.turnover_1yr_in;
+							self.addr_risk_summary.turnover_1yr_out := right.turnover_1yr_out;
+							self := left),
+		atmost(riskwise.max_atmost), left outer, keep(1), local);
+
+#IF(onThor) 
+	with_addrfraud_geolink := with_addrfraud_geolink_thor;
+#ELSE
+	with_addrfraud_geolink := with_addrfraud_geolink_roxie;
+#END;
 
 
 risk_indicators.layout_boca_shell getNeighborhoodStats(risk_indicators.layout_boca_shell l, Risk_Indicators.Key_Neighborhood_Stats_geolink r) := TRANSFORM
@@ -31,15 +51,29 @@ risk_indicators.layout_boca_shell getNeighborhoodStats(risk_indicators.layout_bo
 	self := l;
 End;
 
-with_Neighborhood_stats1 := join(with_addrfraud_geolink, 
+with_Neighborhood_stats1_roxie := join(with_addrfraud_geolink, 
 																Risk_Indicators.Key_Neighborhood_Stats_geolink, 
 	left.shell_input.st<>'' and left.shell_input.county <>'' and left.shell_input.geo_blk <> '' and
 	keyed(right.geolink=left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk),
 	getNeighborhoodStats(left, right),
 	atmost(riskwise.max_atmost), keep(1), left Outer);
 						
+with_Neighborhood_stats1_thor := join(
+	with_addrfraud_geolink, // this is already distributed by geolink from the with_addrfraud_geolink join
+	distribute(pull(Risk_Indicators.Key_Neighborhood_Stats_geolink), hash64(geolink)), 
+	left.shell_input.st<>'' and left.shell_input.county <>'' and left.shell_input.geo_blk <> '' and
+	(right.geolink=left.shell_input.st+left.shell_input.county+left.shell_input.geo_blk),
+	getNeighborhoodStats(left, right),
+	atmost(riskwise.max_atmost), keep(1), left Outer, local);
 
-with_addrfraud_geolink2 := join(with_Neighborhood_stats1, AddrFraud.Key_AddrFraud_GeoLink,
+#IF(onThor) 
+	with_Neighborhood_stats1 := with_Neighborhood_stats1_thor;
+#ELSE
+	with_Neighborhood_stats1 := with_Neighborhood_stats1_roxie;
+#END;
+	
+
+with_addrfraud_geolink2_roxie := join(with_Neighborhood_stats1, AddrFraud.Key_AddrFraud_GeoLink,
 												left.Address_Verification.Address_History_1.st<>'' and left.Address_Verification.Address_History_1.county <>'' and left.Address_Verification.Address_History_1.geo_blk <> '' and
 												keyed(right.geolink=left.Address_Verification.Address_History_1.st+left.Address_Verification.Address_History_1.county+left.Address_Verification.Address_History_1.geo_blk),
 		transform(risk_indicators.Layout_Boca_Shell, 
@@ -48,6 +82,24 @@ with_addrfraud_geolink2 := join(with_Neighborhood_stats1, AddrFraud.Key_AddrFrau
 							self.addr_risk_summary2.turnover_1yr_out := right.turnover_1yr_out;
 							self := left),
 		atmost(riskwise.max_atmost), left outer, keep(1));
+		
+with_addrfraud_geolink2_thor := join(
+	distribute(with_Neighborhood_stats1, hash64(Address_Verification.Address_History_1.st + Address_Verification.Address_History_1.county + Address_Verification.Address_History_1.geo_blk)), 
+	distribute(pull(AddrFraud.Key_AddrFraud_GeoLink), hash64(geolink)),
+												left.Address_Verification.Address_History_1.st<>'' and left.Address_Verification.Address_History_1.county <>'' and left.Address_Verification.Address_History_1.geo_blk <> '' and
+												(right.geolink=left.Address_Verification.Address_History_1.st+left.Address_Verification.Address_History_1.county+left.Address_Verification.Address_History_1.geo_blk),
+		transform(risk_indicators.Layout_Boca_Shell, 
+							self.addr_risk_summary2.occupants_1yr := right.occupants_1yr;
+							self.addr_risk_summary2.turnover_1yr_in := right.turnover_1yr_in;
+							self.addr_risk_summary2.turnover_1yr_out := right.turnover_1yr_out;
+							self := left),
+		atmost(riskwise.max_atmost), left outer, keep(1), local);
+
+#IF(onThor) 
+	with_addrfraud_geolink2 := with_addrfraud_geolink2_thor;
+#ELSE
+	with_addrfraud_geolink2 := with_addrfraud_geolink2_roxie;
+#END;
 
 
 risk_indicators.layout_boca_shell getNeighborhoodStats2(risk_indicators.layout_boca_shell l, Risk_Indicators.Key_Neighborhood_Stats_geolink  r) := TRANSFORM
@@ -68,14 +120,27 @@ risk_indicators.layout_boca_shell getNeighborhoodStats2(risk_indicators.layout_b
 	self := l;
 End;
 
-with_Neighborhood_stats2 := join(with_addrfraud_geolink2, Risk_Indicators.Key_Neighborhood_Stats_geolink,
+with_Neighborhood_stats2_roxie := join(with_addrfraud_geolink2, Risk_Indicators.Key_Neighborhood_Stats_geolink,
 	left.Address_Verification.Address_History_1.st<>'' and left.Address_Verification.Address_History_1.county <>'' and left.Address_Verification.Address_History_1.geo_blk <> '' and
 	keyed(right.geolink=left.Address_Verification.Address_History_1.st+left.Address_Verification.Address_History_1.county+left.Address_Verification.Address_History_1.geo_blk),
 	getNeighborhoodStats2(left, right),
 	atmost(riskwise.max_atmost), keep(1), left Outer);
 	
+with_Neighborhood_stats2_thor := join(
+	with_addrfraud_geolink2, // this is already distributed by geolink from the with_addrfraud_geolink2 join
+	distribute(pull(Risk_Indicators.Key_Neighborhood_Stats_geolink), hash64(geolink)), 
+	left.Address_Verification.Address_History_1.st<>'' and left.Address_Verification.Address_History_1.county <>'' and left.Address_Verification.Address_History_1.geo_blk <> '' and
+	(right.geolink=left.Address_Verification.Address_History_1.st+left.Address_Verification.Address_History_1.county+left.Address_Verification.Address_History_1.geo_blk),
+	getNeighborhoodStats2(left, right),
+	atmost(riskwise.max_atmost), keep(1), left Outer, local);
+
+#IF(onThor) 
+	with_Neighborhood_stats2 := with_Neighborhood_stats2_thor;
+#ELSE
+	with_Neighborhood_stats2 := with_Neighborhood_stats2_roxie;
+#END;	
 	
-with_addrfraud_geolink3 := join(with_Neighborhood_stats2, AddrFraud.Key_AddrFraud_GeoLink,
+with_addrfraud_geolink3_roxie := join(with_Neighborhood_stats2, AddrFraud.Key_AddrFraud_GeoLink,
 												left.Address_Verification.Address_history_2.st<>'' and left.Address_Verification.Address_history_2.county <>'' and left.Address_Verification.Address_history_2.geo_blk <> '' and
 												keyed(right.geolink=left.Address_Verification.Address_history_2.st+left.Address_Verification.Address_history_2.county+left.Address_Verification.Address_history_2.geo_blk),
 		transform(risk_indicators.Layout_Boca_Shell, 
@@ -84,6 +149,24 @@ with_addrfraud_geolink3 := join(with_Neighborhood_stats2, AddrFraud.Key_AddrFrau
 							self.addr_risk_summary3.turnover_1yr_out := right.turnover_1yr_out;
 							self := left),
 		atmost(riskwise.max_atmost), left outer, keep(1));
+		
+with_addrfraud_geolink3_thor := join(
+	distribute(with_Neighborhood_stats2, hash64(Address_Verification.Address_History_2.st + Address_Verification.Address_History_2.county + Address_Verification.Address_History_2.geo_blk)), 
+	distribute(pull(AddrFraud.Key_AddrFraud_GeoLink), hash64(geolink)),
+												left.Address_Verification.Address_history_2.st<>'' and left.Address_Verification.Address_history_2.county <>'' and left.Address_Verification.Address_history_2.geo_blk <> '' and
+												keyed(right.geolink=left.Address_Verification.Address_history_2.st+left.Address_Verification.Address_history_2.county+left.Address_Verification.Address_history_2.geo_blk),
+		transform(risk_indicators.Layout_Boca_Shell, 
+							self.addr_risk_summary3.occupants_1yr := right.occupants_1yr;
+							self.addr_risk_summary3.turnover_1yr_in := right.turnover_1yr_in;
+							self.addr_risk_summary3.turnover_1yr_out := right.turnover_1yr_out;
+							self := left),
+		atmost(riskwise.max_atmost), left outer, keep(1), local);
+
+#IF(onThor) 
+	with_addrfraud_geolink3 := with_addrfraud_geolink3_thor;
+#ELSE
+	with_addrfraud_geolink3 := with_addrfraud_geolink3_roxie;
+#END;
 
 
 risk_indicators.layout_boca_shell getNeighborhoodStats3(risk_indicators.layout_boca_shell l, Risk_Indicators.Key_Neighborhood_Stats_geolink  r) := TRANSFORM
@@ -104,18 +187,35 @@ risk_indicators.layout_boca_shell getNeighborhoodStats3(risk_indicators.layout_b
 	self := l;
 End;
 
-with_Neighborhood_stats3 := join(with_addrfraud_geolink3, Risk_Indicators.Key_Neighborhood_Stats_geolink,
+with_Neighborhood_stats3_roxie := join(with_addrfraud_geolink3, Risk_Indicators.Key_Neighborhood_Stats_geolink,
 	left.Address_Verification.Address_history_2.st<>'' and left.Address_Verification.Address_history_2.county <>'' and left.Address_Verification.Address_history_2.geo_blk <> '' and
 	keyed(right.geolink=left.Address_Verification.Address_history_2.st+left.Address_Verification.Address_history_2.county+left.Address_Verification.Address_history_2.geo_blk),
 	getNeighborhoodStats3(left, right),
 	atmost(riskwise.max_atmost), keep(1), left Outer);	
-// output(clam);
-// output(with_law_enforcement2);
+
+with_Neighborhood_stats3_thor := join(
+	with_addrfraud_geolink3, // this is already distributed by geolink from the with_addrfraud_geolink3 join
+	distribute(pull(Risk_Indicators.Key_Neighborhood_Stats_geolink), hash64(geolink)), 
+	left.Address_Verification.Address_history_2.st<>'' and left.Address_Verification.Address_history_2.county <>'' and left.Address_Verification.Address_history_2.geo_blk <> '' and
+	(right.geolink=left.Address_Verification.Address_history_2.st+left.Address_Verification.Address_history_2.county+left.Address_Verification.Address_history_2.geo_blk),
+	getNeighborhoodStats3(left, right),
+	atmost(riskwise.max_atmost), keep(1), left Outer, local);	
 
 
-// shell version 5.0 added the extra search for addr_risk_summary3
-shell_address_risk := if(bsversion>=50, with_neighborhood_stats3, with_neighborhood_stats2);
+#IF(onThor) 
+	with_Neighborhood_stats3 := with_Neighborhood_stats3_thor;
+#ELSE
+	with_Neighborhood_stats3 := with_Neighborhood_stats3_roxie;
+#END;
+
+#if(_control.Environment.onThor_LeadIntegrity)
+	shell_address_risk := clam;  // for initial trending attributes, we don't need this function, so we can skip all of this code and make it run faster
+#else
+	// shell version 5.0 added the extra search for addr_risk_summary3
+	shell_address_risk := if(bsversion>=50, with_neighborhood_stats3, with_neighborhood_stats2);
+#end
+
 	
-return shell_address_risk;   
+return group(shell_address_risk, seq);   
 
 end;

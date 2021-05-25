@@ -300,12 +300,37 @@ adls_from_address := project(counts_per_adl(DID_from_srch<>0),
 suspicious_identities_hist := risk_indicators.Boca_Shell_Fraud.suspicious_identities_function_hist(adls_from_address, mod_access);
 
 // if realtime production mode, search just the suspicious Identities key instead
-suspicious_identities_realtime := join(adls_from_address, Risk_Indicators.Key_Suspicious_Identities,
-	keyed(left.did=right.did),
-		transform(risk_indicators.Boca_Shell_Fraud.layout_identities_output,
-			self.did := left.did;
-			self.historydate := left.historydate;
-			self := right), atmost(riskwise.max_atmost), keep(1));
+risk_indicators.Boca_Shell_Fraud.layout_identities_output SIR_Transform(adls_from_address le, Risk_Indicators.Key_Suspicious_Identities ri) := TRANSFORM
+  self.did := le.did;
+  self.historydate := le.historydate;
+  self := ri;
+END;
+
+suspicious_identities_realtime_roxie := join(adls_from_address, Risk_Indicators.Key_Suspicious_Identities,
+                                             keyed(left.did=right.did),
+                                             SIR_Transform(LEFT, RIGHT), 
+                                             atmost(riskwise.max_atmost), 
+                                             keep(1));
+                                             
+suspicious_identities_realtime_thor := join(DISTRIBUTE(adls_from_address, HASH64(did)), 
+                                            DISTRIBUTE(PULL(Risk_Indicators.Key_Suspicious_Identities), HASH64(did)),
+                                            left.did=right.did,
+                                            SIR_Transform(LEFT, RIGHT), 
+                                            atmost(riskwise.max_atmost), 
+                                            keep(1), LOCAL);
+                                            
+#IF(onThor)
+	suspicious_identities_realtime := suspicious_identities_realtime_thor;
+#ELSE
+	suspicious_identities_realtime := suspicious_identities_realtime_roxie;
+#END
+
+// suspicious_identities_realtime := join(adls_from_address, Risk_Indicators.Key_Suspicious_Identities,
+                                        // keyed(left.did=right.did),
+                                          // transform(risk_indicators.Boca_Shell_Fraud.layout_identities_output,
+                                            // self.did := left.did;
+                                            // self.historydate := left.historydate;
+                                            // self := right), atmost(riskwise.max_atmost), keep(1));
 
 // check the first record in the batch to determine if this a realtime transaction or an archive test
 // if the record is default_history_date or same month as today's date, run production_realtime_mode
@@ -314,12 +339,25 @@ production_realtime_mode := adls_from_address[1].historydate=risk_indicators.iid
 														suspicious_identities := if(production_realtime_mode, suspicious_identities_realtime, suspicious_identities_hist);
 
 
-with_suspcious_ids := join(counts_per_adl, suspicious_identities,
+with_suspcious_ids_roxie := join(counts_per_adl, suspicious_identities,
 															left.DID_from_srch=right.did,
 															transform(recordof(counts_per_adl),
 															self.SuspciousADLsperAddr := if(right.did<>0, 1, 0);
 															self := left), left outer, atmost(riskwise.max_atmost), keep(1));
 
+with_suspcious_ids_thor := join(DISTRIBUTE(counts_per_adl, HASH64(DID_from_srch)), 
+                                DISTRIBUTE(suspicious_identities, HASH64(did)),
+                                left.DID_from_srch=right.did,
+                                transform(recordof(counts_per_adl),
+                                self.SuspciousADLsperAddr := if(right.did<>0, 1, 0);
+                                self := left), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
+                                
+#IF(onThor)
+	with_suspcious_ids := with_suspcious_ids_thor;
+#ELSE
+	with_suspcious_ids := with_suspcious_ids_roxie;
+#END
+                              
 // only do the suspicious identity searching in fraudpoint
 isFraudpoint :=  (BSOptions & iid_constants.BSOptions.IncludeFraudVelocity) > 0;
 address_velocity_raw := if(isFCRA, counts_per_adl, if(isFraudpoint or bsversion>=41, with_suspcious_ids, counts_per_adl));

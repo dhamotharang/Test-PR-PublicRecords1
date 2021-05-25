@@ -485,13 +485,15 @@ TRANSFORM
 	
 	SELF.reported_dob := le.reported_dob;
 	SELF.inferred_age := le.inferred_age;
-	
+
+#IF(_CONTROL.Environment.onThor_LeadIntegrity=false)	
   //FIS fields for FIS custom attributes
   self.FIS.trueDID := le.FIS_trueDID;
   self.FIS.num_nonderogs := le.FIS_num_nonderogs;
   self.FIS.addrs_last12 := le.FIS_addrs_last12;
   self.FIS.addrs_last60 := le.FIS_addrs_last60;
-	
+#END;	
+
 	SELF.dobmatchlevel := le.dobmatchlevel;	// now calculated in iid portion for use in iid
 														
 	SELF.gong_ADL_dt_first_seen := le.gong_ADL_dt_first_seen;  
@@ -688,7 +690,8 @@ wAptCount_thor := group(sort(wAptCount_thor_addr + wDwell(trim(shell_input.prim_
 // get infutor by phone for bocashell 3
 infutor_phone := if(BSversion>2, Risk_Indicators.Boca_Shell_Infutor_phone(wAptCount, isFCRA, BSVersion), wAptCount);	
 
-												
+	
+
 // get accident data for boca shell 3 - not for FCRA
 acc := Risk_Indicators.Boca_Shell_Accident(infutor_phone, BSversion);
 
@@ -713,51 +716,186 @@ relrec getFIfips(relrec le, Risk_Indicators.Key_FI_Module.key_fi_fips ri, unsign
 	self := le;
 end;
 // get input address foreclosure indices
-wPropGeo12 := join(acc, Risk_Indicators.Key_FI_Module.key_fi_geo12, 	
+wPropGeo12_roxie := join(acc, Risk_Indicators.Key_FI_Module.key_fi_geo12, 	
 											left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and left.address_verification.input_address_information.geo_blk<>'' and
 											keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county+left.address_verification.input_address_information.geo_blk=right.geo12),
 											getFI12(left,right,1), left outer, atmost(riskwise.max_atmost), keep(1));
+                      
+wPropGeo12_thor := join(DISTRIBUTE(acc(address_verification.input_address_information.st<>'' and address_verification.input_address_information.county<>'' and address_verification.input_address_information.geo_blk<>''), 
+                          HASH64(address_verification.input_address_information.st + address_verification.input_address_information.county + address_verification.input_address_information.geo_blk)),
+                        DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_geo12), HASH64(geo12)),
+                        // left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and left.address_verification.input_address_information.geo_blk<>'' and
+                        left.address_verification.input_address_information.st+left.address_verification.input_address_information.county+left.address_verification.input_address_information.geo_blk=right.geo12,
+                        getFI12(left,right,1), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                        +
+                        PROJECT(acc(address_verification.input_address_information.st='' or address_verification.input_address_information.county='' or address_verification.input_address_information.geo_blk=''), 
+                                TRANSFORM(relrec,
+                                          self.Address_Verification.Input_Address_Information.geo12_fc_index := 0,
+                                          SELF := LEFT));
+                                // SELF := []));
 
-wPropGeo11 := join(wPropGeo12, Risk_Indicators.Key_FI_Module.key_fi_geo11, 
-											left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and left.address_verification.input_address_information.geo_blk<>'' and
-											keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county+left.address_verification.input_address_information.geo_blk[1..6]=right.geo11),
-											getFI11(left,right,2), left outer, atmost(riskwise.max_atmost), keep(1));
+wPropGeo11_roxie := join(wPropGeo12_roxie, Risk_Indicators.Key_FI_Module.key_fi_geo11, 
+                        left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and left.address_verification.input_address_information.geo_blk<>'' and
+                        keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county+left.address_verification.input_address_information.geo_blk[1..6]=right.geo11),
+                        getFI11(left,right,2), left outer, atmost(riskwise.max_atmost), keep(1));
+                        
+wPropGeo11_thor := join(DISTRIBUTE(wPropGeo12_thor(address_verification.input_address_information.st<>'' and address_verification.input_address_information.county<>'' and address_verification.input_address_information.geo_blk<>''),
+                          HASH64(address_verification.input_address_information.st+address_verification.input_address_information.county+address_verification.input_address_information.geo_blk[1..6])),
+                        DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_geo11), HASH64(geo11)),
+                        // left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and left.address_verification.input_address_information.geo_blk<>'' and
+                        left.address_verification.input_address_information.st+left.address_verification.input_address_information.county+left.address_verification.input_address_information.geo_blk[1..6]=right.geo11,
+                        getFI11(left,right,2), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                        +
+                        PROJECT(wPropGeo12_thor(address_verification.input_address_information.st='' or address_verification.input_address_information.county='' or address_verification.input_address_information.geo_blk=''), 
+                                TRANSFORM(relrec,
+                                          self.Address_Verification.Input_Address_Information.geo11_fc_index := 0,
+                                          SELF := LEFT));
 
-wPropfips := join(wPropGeo11, Risk_Indicators.Key_FI_Module.key_fi_fips, 
-											left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and
-											keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county=right.fips),
-											getFIfips(left,right,3), left outer, atmost(riskwise.max_atmost), keep(1));
+wPropfips_roxie := join(wPropGeo11_roxie, Risk_Indicators.Key_FI_Module.key_fi_fips, 
+                        left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and
+                        keyed(left.address_verification.input_address_information.st+left.address_verification.input_address_information.county=right.fips),
+                        getFIfips(left,right,3), left outer, atmost(riskwise.max_atmost), keep(1));
+                      
+wPropfips_thor := join(DISTRIBUTE(wPropGeo11_thor(address_verification.input_address_information.st<>'' and address_verification.input_address_information.county<>''),
+                          HASH64(address_verification.input_address_information.st+address_verification.input_address_information.county)), 
+                        DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_fips), HASH64(fips)),
+                        // left.address_verification.input_address_information.st<>'' and left.address_verification.input_address_information.county<>'' and
+                        left.address_verification.input_address_information.st+left.address_verification.input_address_information.county=right.fips,
+                        getFIfips(left,right,3), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                        +
+                        PROJECT(wPropGeo11_thor(address_verification.input_address_information.st='' or address_verification.input_address_information.county=''), 
+                                TRANSFORM(relrec,
+                                          self.Address_Verification.Input_Address_Information.fips_fc_index := 0,
+                                          SELF := LEFT));
 											
 // get address history 1 foreclosure indices										
-wPropGeo12_2 := join(wPropfips, Risk_Indicators.Key_FI_Module.key_fi_geo12, 
-											left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
-											keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk=right.geo12),
-											getFI12(left,right,4), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropGeo11_2 := join(wPropGeo12_2, Risk_Indicators.Key_FI_Module.key_fi_geo11, 
-											left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
-											keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk[1..6]=right.geo11),
-											getFI11(left,right,5), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropfips_2 := join(wPropGeo11_2, Risk_Indicators.Key_FI_Module.key_fi_fips, 
-											left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and
-											keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county=right.fips),
-											getFIfips(left,right,6), left outer, atmost(riskwise.max_atmost), keep(1));
+wPropGeo12_2_roxie := join(wPropfips_roxie, Risk_Indicators.Key_FI_Module.key_fi_geo12, 
+                          left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
+                          keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk=right.geo12),
+                          getFI12(left,right,4), left outer, atmost(riskwise.max_atmost), keep(1));
+                      
+wPropGeo12_2_thor := join(DISTRIBUTE(wPropfips_thor(address_verification.address_history_1.st<>'' and address_verification.address_history_1.county<>'' and address_verification.address_history_1.geo_blk<>''), 
+                            HASH64(address_verification.address_history_1.st+address_verification.address_history_1.county+address_verification.address_history_1.geo_blk)),
+                          DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_geo12), HASH64(geo12)),
+                          // left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
+                          left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk=right.geo12,
+                          getFI12(left,right,4), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                          +
+                          PROJECT(wPropfips_thor(address_verification.address_history_1.st='' or address_verification.address_history_1.county='' or address_verification.address_history_1.geo_blk=''), 
+                                  TRANSFORM(relrec,
+                                            self.Address_Verification.Address_History_1.geo12_fc_index := 0,
+                                            SELF := LEFT));
+                      
+wPropGeo11_2_roxie := join(wPropGeo12_2_roxie, Risk_Indicators.Key_FI_Module.key_fi_geo11, 
+                            left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
+                            keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk[1..6]=right.geo11),
+                            getFI11(left,right,5), left outer, atmost(riskwise.max_atmost), keep(1));
+                            
+wPropGeo11_2_thor := join(DISTRIBUTE(wPropGeo12_2_thor(address_verification.address_history_1.st<>'' and address_verification.address_history_1.county<>'' and address_verification.address_history_1.geo_blk<>''),
+                              HASH64(address_verification.address_history_1.st+address_verification.address_history_1.county+address_verification.address_history_1.geo_blk[1..6])), 
+                            DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_geo11), HASH64(geo11)),
+                            // left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and left.address_verification.address_history_1.geo_blk<>'' and
+                            left.address_verification.address_history_1.st+left.address_verification.address_history_1.county+left.address_verification.address_history_1.geo_blk[1..6]=right.geo11,
+                            getFI11(left,right,5), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                            +
+                            PROJECT(wPropGeo12_2_thor(address_verification.address_history_1.st='' or address_verification.address_history_1.county='' or address_verification.address_history_1.geo_blk=''), 
+                                    TRANSFORM(relrec,
+                                              self.Address_Verification.Address_History_1.geo12_fc_index := 0,
+                                              SELF := LEFT));
+                            
+wPropfips_2_roxie := join(wPropGeo11_2_roxie, Risk_Indicators.Key_FI_Module.key_fi_fips, 
+                          left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and
+                          keyed(left.address_verification.address_history_1.st+left.address_verification.address_history_1.county=right.fips),
+                          getFIfips(left,right,6), left outer, atmost(riskwise.max_atmost), keep(1));
+                          
+wPropfips_2_thor := join(DISTRIBUTE(wPropGeo11_2_thor(address_verification.address_history_1.st<>'' and address_verification.address_history_1.county<>''), 
+                            HASH64(address_verification.address_history_1.st+address_verification.address_history_1.county)),
+                          DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_fips), HASH64(fips)),
+                          // left.address_verification.address_history_1.st<>'' and left.address_verification.address_history_1.county<>'' and
+                          left.address_verification.address_history_1.st+left.address_verification.address_history_1.county=right.fips,
+                          getFIfips(left,right,6), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                          +
+                          PROJECT(wPropGeo11_2_thor(address_verification.address_history_1.st='' or address_verification.address_history_1.county=''), 
+                                  TRANSFORM(relrec,
+                                            self.Address_Verification.Address_History_1.geo12_fc_index := 0,
+                                            SELF := LEFT));
 
 // get address history 2 foreclosure indices
-wPropGeo12_3 := join(wPropfips_2, Risk_Indicators.Key_FI_Module.key_fi_geo12, 
-											left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
-											keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk=right.geo12),
-											getFI12(left,right,7), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropGeo11_3 := join(wPropGeo12_3, Risk_Indicators.Key_FI_Module.key_fi_geo11, 
-											left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
-											keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk[1..6]=right.geo11),
-											getFI11(left,right,8), left outer, atmost(riskwise.max_atmost), keep(1));
-wPropfips_3 := join(wPropGeo11_3, Risk_Indicators.Key_FI_Module.key_fi_fips, 
-											left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and
-											keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county=right.fips),
-											getFIfips(left,right,9), left outer, atmost(riskwise.max_atmost), keep(1));
-											
+wPropGeo12_3_roxie := join(wPropfips_2_roxie, Risk_Indicators.Key_FI_Module.key_fi_geo12, 
+                          left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
+                          keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk=right.geo12),
+                          getFI12(left,right,7), left outer, atmost(riskwise.max_atmost), keep(1));
+                          
+wPropGeo12_3_thor := join(DISTRIBUTE(wPropfips_2_thor(address_verification.address_history_2.st<>'' and address_verification.address_history_2.county<>'' and address_verification.address_history_2.geo_blk<>''), 
+                            HASH64(address_verification.address_history_2.st+address_verification.address_history_2.county+address_verification.address_history_2.geo_blk)),
+                          DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_geo12), HASH64(geo12)), 
+                          // left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
+                          left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk=right.geo12,
+                          getFI12(left,right,7), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                          +
+                          PROJECT(wPropfips_2_thor(address_verification.address_history_2.st='' or address_verification.address_history_2.county='' or address_verification.address_history_2.geo_blk=''), 
+                                  TRANSFORM(relrec,
+                                            self.Address_Verification.Address_History_2.geo12_fc_index := 0,
+                                            SELF := LEFT));
+                          
+wPropGeo11_3_roxie := join(wPropGeo12_3_roxie, Risk_Indicators.Key_FI_Module.key_fi_geo11, 
+                          left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
+                          keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk[1..6]=right.geo11),
+                          getFI11(left,right,8), left outer, atmost(riskwise.max_atmost), keep(1));
+                          
+wPropGeo11_3_thor := join(DISTRIBUTE(wPropGeo12_3_thor(address_verification.address_history_2.st<>'' and address_verification.address_history_2.county<>'' and address_verification.address_history_2.geo_blk<>''), 
+                            HASH64(address_verification.address_history_2.st+address_verification.address_history_2.county+address_verification.address_history_2.geo_blk[1..6])), 
+                          DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_geo11), HASH64(geo11)),
+                          // left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and left.address_verification.address_history_2.geo_blk<>'' and
+                          left.address_verification.address_history_2.st+left.address_verification.address_history_2.county+left.address_verification.address_history_2.geo_blk[1..6]=right.geo11,
+                          getFI11(left,right,8), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                          +
+                          PROJECT(wPropGeo12_3_thor(address_verification.address_history_2.st='' or address_verification.address_history_2.county='' or address_verification.address_history_2.geo_blk=''), 
+                                  TRANSFORM(relrec,
+                                            self.Address_Verification.Address_History_2.geo12_fc_index := 0,
+                                            SELF := LEFT));
+                          
+wPropfips_3_roxie := join(wPropGeo11_3_roxie, Risk_Indicators.Key_FI_Module.key_fi_fips, 
+                          left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and
+                          keyed(left.address_verification.address_history_2.st+left.address_verification.address_history_2.county=right.fips),
+                          getFIfips(left,right,9), left outer, atmost(riskwise.max_atmost), keep(1));
+                         
+wPropfips_3_thor := join(DISTRIBUTE(wPropGeo11_3_thor(address_verification.address_history_2.st<>'' and address_verification.address_history_2.county<>''), 
+                            HASH64(address_verification.address_history_2.st+address_verification.address_history_2.county)),
+                          DISTRIBUTE(PULL(Risk_Indicators.Key_FI_Module.key_fi_fips), HASH64(fips)),
+                          // left.address_verification.address_history_2.st<>'' and left.address_verification.address_history_2.county<>'' and
+                          left.address_verification.address_history_2.st+left.address_verification.address_history_2.county=right.fips,
+                          getFIfips(left,right,9), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL)
+                          +
+                          PROJECT(wPropGeo11_3_thor(address_verification.address_history_2.st='' or address_verification.address_history_2.county=''), 
+                                  TRANSFORM(relrec,
+                                            self.Address_Verification.Address_History_2.geo12_fc_index := 0,
+                                            SELF := LEFT));
+                          
+#IF(onThor)
+	wPropGeo12    := wPropGeo12_thor;
+  wPropGeo11    := wPropGeo11_thor;
+  wPropfips     := wPropfips_thor;
+  wPropGeo12_2  := wPropGeo12_2_thor;
+  wPropGeo11_2  := wPropGeo11_2_thor;
+  wPropfips_2   := wPropfips_2_thor;
+  wPropGeo12_3  := wPropGeo12_3_thor;
+  wPropGeo11_3  := wPropGeo11_3_thor;
+  wPropfips_3   := wPropfips_3_thor;
+#ELSE
+	wPropGeo12    := wPropGeo12_roxie;
+  wPropGeo11    := wPropGeo11_roxie;
+  wPropfips     := wPropfips_roxie;
+  wPropGeo12_2  := wPropGeo12_2_roxie;
+  wPropGeo11_2  := wPropGeo11_2_roxie;
+  wPropfips_2   := wPropfips_2_roxie;
+  wPropGeo12_3  := wPropGeo12_3_roxie;
+  wPropGeo11_3  := wPropGeo11_3_roxie;
+  wPropfips_3   := wPropfips_3_roxie;
+#END
 
-wPropFip := if(isFCRA or BSversion<=2, infutor_phone, wPropfips_3);	// dont use foreclosure index or acc for FCRA	or bocashell versions <= 2													
+// wPropFip := if(isFCRA or BSversion<=2, infutor_phone, wPropfips_3);	// dont use foreclosure index or acc for FCRA	or bocashell versions <= 2													
+wPropFip := if(isFCRA or BSversion<=2, infutor_phone, GROUP(wPropfips_3, seq));	// dont use foreclosure index or acc for FCRA	or bocashell versions <= 2													
 
 
 
@@ -783,10 +921,11 @@ pre_relatives_thor := group(sort(join(distribute(wUtil, hash64(seq)),
 													 left.seq = right.seq, combo_p_and_id(LEFT,RIGHT), left outer, local), seq, local), seq, local);
 
 #IF(onThor)
-	pre_relatives := pre_relatives_thor;
+  pre_relatives := pre_relatives_thor;
 #ELSE
-	pre_relatives := pre_relatives_roxie;
+  pre_relatives := pre_relatives_roxie;
 #END
+
 
 // slimmed down the layout to reduce the memory usage in this bit of code, don't need full bocashell layout to calculate the relatives flags
 relatives_slim := record
@@ -858,7 +997,7 @@ idheader1_roxie :=  JOIN(pre_relatives(isrelat), index_header,
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
 														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
 														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID));
-
+/*
 idheader1_thor :=  group(sort(JOIN(distribute(pre_relatives(isrelat), hash64(did)), 
 														distribute(pull(index_header), hash64(s_did)), 
 														LEFT.did=RIGHT.s_did AND
@@ -874,10 +1013,30 @@ idheader1_thor :=  group(sort(JOIN(distribute(pre_relatives(isrelat), hash64(did
 															(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
 														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
 														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
-														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID), LOCAL),seq),seq);
+														// get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID), LOCAL),seq),seq);
+														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30), LOCAL),seq),seq);
+*/
 
+idheader1_thor :=  JOIN(distribute(pre_relatives(isrelat), hash64(did)), 
+														distribute(pull(index_header), hash64(s_did)), 
+														LEFT.did=RIGHT.s_did AND
+														right.src not in risk_indicators.iid_constants.masked_header_sources(DataRestriction, isFCRA) AND 
+														RIGHT.dt_first_seen < left.historydate AND
+														// check permissions	
+														(~mdr.Source_is_Utility(RIGHT.src) OR ~isUtility)	AND
+														(header.isPreGLB_LIB(RIGHT.dt_nonglb_last_seen, 
+																								 RIGHT.dt_first_seen, 
+																								 RIGHT.src, 
+																								 DataRestriction) OR glb_ok) AND
+														(~mdr.Source_is_DPPA(RIGHT.src) OR
+															(dppa_ok AND drivers.state_dppa_ok(dx_header.functions.translateSource(RIGHT.src),dppa,RIGHT.src))) AND
+														~risk_indicators.iid_constants.filtered_source(right.src, right.st) AND
+														(ut.DaysApart(((STRING6)RIGHT.dt_last_seen)+'01',risk_indicators.iid_constants.myGetDate(left.historydate))<=365 OR RIGHT.dt_last_seen >= left.historydate), 
+														// get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30),atmost(ut.limits.HEADER_PER_DID), LOCAL),seq),seq);
+														get_relat_info(LEFT,RIGHT), LEFT OUTER, KEEP(30), atmost(LEFT.did=RIGHT.s_did, ut.limits.HEADER_PER_DID), LOCAL);
 #IF(onThor)
-	idheader1 := idheader1_thor;
+	// idheader1 := GROUP(SORT(idheader1_thor, seq), seq);
+  idheader1 := idheader1_thor;
 #ELSE
 	idheader1 := idheader1_roxie;
 #END
@@ -933,14 +1092,29 @@ suspicious_identities_realtime_thor := group(sort(join(distribute(relative_adls,
 production_realtime_mode := relative_adls[1].historydate=risk_indicators.iid_constants.default_history_date or
 	relative_adls[1].historydate = (unsigned)(((string)risk_indicators.iid_constants.todaydate)[1..6]);	suspicious_identities := if(production_realtime_mode, ungroup(suspicious_identities_realtime), suspicious_identities_hist);
 
-relatives_with_suspcious_ids := join(idroll_slim, suspicious_identities, 
-															left.did=right.did, 
-															transform(relatives_slim,
-															self.relative_suspicious_identities_count := if(right.did<>0, 1, 0);
-															self.relative_bureau_only_count := if(right.bureau_only, 1, 0);
-															self.relative_bureau_only_count_created_1month := if(right.bureau_only_last_1month, 1, 0);
-															self.relative_bureau_only_count_created_6months := if(right.bureau_only_last_6months, 1, 0);	
-															self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+relatives_with_suspcious_ids_roxie := join(idroll_slim, suspicious_identities, 
+                                            left.did=right.did, 
+                                            transform(relatives_slim,
+                                            self.relative_suspicious_identities_count := if(right.did<>0, 1, 0);
+                                            self.relative_bureau_only_count := if(right.bureau_only, 1, 0);
+                                            self.relative_bureau_only_count_created_1month := if(right.bureau_only_last_1month, 1, 0);
+                                            self.relative_bureau_only_count_created_6months := if(right.bureau_only_last_6months, 1, 0);	
+                                            self := left), left outer, atmost(riskwise.max_atmost), keep(1));
+                              
+relatives_with_suspcious_ids_thor := join(DISTRIBUTE(idroll_slim, HASH64(did)), DISTRIBUTE(suspicious_identities, HASH64(did)), 
+                                          left.did=right.did, 
+                                          transform(relatives_slim,
+                                          self.relative_suspicious_identities_count := if(right.did<>0, 1, 0);
+                                          self.relative_bureau_only_count := if(right.bureau_only, 1, 0);
+                                          self.relative_bureau_only_count_created_1month := if(right.bureau_only_last_1month, 1, 0);
+                                          self.relative_bureau_only_count_created_6months := if(right.bureau_only_last_6months, 1, 0);	
+                                          self := left), left outer, atmost(riskwise.max_atmost), keep(1), LOCAL);
+                                          
+#IF(onThor)
+  relatives_with_suspcious_ids := relatives_with_suspcious_ids_thor;
+#ELSE
+  relatives_with_suspcious_ids := relatives_with_suspcious_ids_roxie;
+#END
 
 isFraudpoint :=  (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeFraudVelocity) > 0;
 
@@ -997,13 +1171,34 @@ TRANSFORM
 	self := [];
 END;
 
-idcensus := JOIN(idroll, 
-			  Census_Data.Key_Smart_Jury, 	
-				keyed(LEFT.state = RIGHT.stusab) and 
-				keyed(left.county = right.county) and
-				keyed(left.geo_blk[1..6] = right.tract) and 
-				keyed(left.geo_blk[7] = right.blkgrp),
-			   get_census(LEFT,RIGHT), KEEP(1), LEFT OUTER) + pre_relatives(~isrelat);
+Dist_Smart_Jury := distribute(pull(Census_Data.Key_Smart_Jury), hash64(stusab, county, tract[1..4]));
+// Dist_Smart_Jury := distribute(pull(Census_Data.Key_Smart_Jury), hash64(stusab, county, tract, blkgrp));
+
+idcensus_roxie := JOIN(idroll, 
+                      Census_Data.Key_Smart_Jury, 	
+                      keyed(LEFT.state = RIGHT.stusab) and 
+                      keyed(left.county = right.county) and
+                      keyed(left.geo_blk[1..6] = right.tract) and 
+                      keyed(left.geo_blk[7] = right.blkgrp),
+                       get_census(LEFT,RIGHT), KEEP(1), LEFT OUTER) + pre_relatives(~isrelat);
+                       
+idcensus_thor := JOIN(DISTRIBUTE(idroll(state <> '' AND county <> '' AND geo_blk[1..4] <> ''), HASH64(state, county, geo_blk[1..4])), 
+                      Dist_Smart_Jury, 	
+                      LEFT.state = RIGHT.stusab and 
+                      left.county = right.county and
+                      left.geo_blk[1..6] = right.tract and 
+                      left.geo_blk[7] = right.blkgrp,
+                       get_census(LEFT,RIGHT), KEEP(1), LEFT OUTER, LOCAL) 
+                      + pre_relatives(~isrelat)
+                      + PROJECT((idroll(state = '' OR county = '' OR geo_blk[1..4] = '')), TRANSFORM(relrec, SELF := LEFT, SELF := []));
+                       
+// idcensus_thor := pre_relatives(~isrelat);
+                       
+#IF(onThor)
+	idcensus := idcensus_thor;
+#ELSE
+	idcensus := idcensus_roxie;
+#END
 											
 
 JustIds :=  group(project(idcensus,  transform(doxie.layout_references,
@@ -1016,7 +1211,7 @@ idsPosIncar :=  group(join(idcensus, PossIncarceration,
 										 transform(relrec,
 										          self.AMLPossIncarceration := if((string)right.incarceration_flag='', '0', right.incarceration_flag) ,
 															self := left),
-										left outer), seq);
+										left outer, SKEW(0.5)), seq);
 																		
 
 
@@ -1081,7 +1276,7 @@ TRANSFORM
 	SELF := le;
 END;
 
-Dist_Smart_Jury := distribute(pull(Census_Data.Key_Smart_Jury), hash64(stusab, county, tract[1..4]));
+// Dist_Smart_Jury := distribute(pull(Census_Data.Key_Smart_Jury), hash64(stusab, county, tract[1..4]));
 
 Property_with_census1a_roxie := JOIN(idsPosIncar, Census_Data.Key_Smart_Jury, 
 							keyed(LEFT.Address_Verification.Input_Address_Information.st = RIGHT.stusab) and 
@@ -1090,15 +1285,23 @@ Property_with_census1a_roxie := JOIN(idsPosIncar, Census_Data.Key_Smart_Jury,
 							keyed(left.Address_Verification.Input_Address_Information.geo_blk[7] = right.blkgrp), 
 					    get_property_census(LEFT,RIGHT,1,false), LEFT OUTER, keep(1));
 
-Property_with_census1a_thor := JOIN(distribute(idsPosIncar, hash64(Address_Verification.Input_Address_Information.st, 
-																																	 Address_Verification.Input_Address_Information.county,
-																																	 Address_Verification.Input_Address_Information.geo_blk[1..4])), 
+Property_with_census1a_thor := JOIN(distribute(idsPosIncar(Address_Verification.Input_Address_Information.st <> '' AND 
+                                                           Address_Verification.Input_Address_Information.county <> '' AND 
+                                                           Address_Verification.Input_Address_Information.geo_blk[1..4] <> ''), 
+                                               hash64(Address_Verification.Input_Address_Information.st, 
+																											Address_Verification.Input_Address_Information.county,
+																											Address_Verification.Input_Address_Information.geo_blk[1..4])), 
 							Dist_Smart_Jury, 
 							(LEFT.Address_Verification.Input_Address_Information.st = RIGHT.stusab) and 
 							(left.Address_Verification.Input_Address_Information.county = right.county) and
 							(left.Address_Verification.Input_Address_Information.geo_blk[1..6] = right.tract) and 
 							(left.Address_Verification.Input_Address_Information.geo_blk[7] = right.blkgrp), 
-					    get_property_census(LEFT,RIGHT,1,false), LEFT OUTER, keep(1), LOCAL);
+					    get_property_census(LEFT,RIGHT,1,false), LEFT OUTER, keep(1), LOCAL)
+              +
+              PROJECT(idsPosIncar(Address_Verification.Input_Address_Information.st = '' OR 
+                                  Address_Verification.Input_Address_Information.county = '' OR 
+                                  Address_Verification.Input_Address_Information.geo_blk[1..4] = ''),
+                      TRANSFORM(relrec, SELF := LEFT, SELF := []));
 							
 Property_with_census1b_roxie := JOIN(Property_with_census1a_roxie, Census_Data.Key_Smart_Jury,
 							LEFT.census_loose1 AND
@@ -1107,12 +1310,13 @@ Property_with_census1b_roxie := JOIN(Property_with_census1a_roxie, Census_Data.K
 							keyed(left.Address_Verification.Input_Address_Information.geo_blk[1..4] = right.tract[1..4]), 
 						get_property_census(LEFT,RIGHT,1,true), LEFT OUTER, keep(1));
 
-Property_with_census1b_thor := JOIN(Property_with_census1a_thor, Dist_Smart_Jury,
-							LEFT.census_loose1 AND
+Property_with_census1b_thor := JOIN(Property_with_census1a_thor(census_loose1), Dist_Smart_Jury,
+							// LEFT.census_loose1 AND
 							(LEFT.Address_Verification.Input_Address_Information.st = RIGHT.stusab) and 
 							(left.Address_Verification.Input_Address_Information.county = right.county) and
 							(left.Address_Verification.Input_Address_Information.geo_blk[1..4] = right.tract[1..4]), 
-						get_property_census(LEFT,RIGHT,1,true), LEFT OUTER, keep(1), LOCAL);
+						get_property_census(LEFT,RIGHT,1,true), LEFT OUTER, keep(1), LOCAL)
+            + PROJECT(Property_with_census1a_thor(~census_loose1), TRANSFORM(relrec, SELF := LEFT, SELF := []));
 
 Property_with_census2a_roxie := JOIN(property_with_census1b_roxie, Census_Data.Key_Smart_Jury, 
 							keyed(LEFT.Address_Verification.Address_History_1.st = RIGHT.stusab) and 
@@ -1121,15 +1325,24 @@ Property_with_census2a_roxie := JOIN(property_with_census1b_roxie, Census_Data.K
 							keyed(left.Address_Verification.Address_History_1.geo_blk[7] = right.blkgrp), 
 					    get_property_census(LEFT,RIGHT,2,false), LEFT OUTER, keep(1));
 
-Property_with_census2a_thor := JOIN(distribute(property_with_census1b_thor, hash64(Address_Verification.Address_History_1.st,
-																																						Address_Verification.Address_History_1.county,
-																																						Address_Verification.Address_History_1.geo_blk[1..4])), 
+Property_with_census2a_thor := JOIN(distribute(property_with_census1b_thor(Address_Verification.Address_History_1.st <> '' AND
+                                                                           Address_Verification.Address_History_1.county <> '' AND
+                                                                           Address_Verification.Address_History_1.geo_blk[1..4] <> ''),
+                                    hash64(Address_Verification.Address_History_1.st,
+                                           Address_Verification.Address_History_1.county,
+                                           Address_Verification.Address_History_1.geo_blk[1..4])), 
 							Dist_Smart_Jury, 
 							(LEFT.Address_Verification.Address_History_1.st = RIGHT.stusab) and 
 							(left.Address_Verification.Address_History_1.county = right.county) and
 							(left.Address_Verification.Address_History_1.geo_blk[1..6] = right.tract) and 
 							(left.Address_Verification.Address_History_1.geo_blk[7] = right.blkgrp), 
-					    get_property_census(LEFT,RIGHT,2,false), LEFT OUTER, keep(1), LOCAL);
+					    get_property_census(LEFT,RIGHT,2,false), LEFT OUTER, keep(1), LOCAL)
+              + 
+              PROJECT(property_with_census1b_thor(Address_Verification.Address_History_1.st = '' OR
+                                                  Address_Verification.Address_History_1.county = '' OR
+                                                  Address_Verification.Address_History_1.geo_blk[1..4] = ''),
+                      TRANSFORM(relrec, SELF := LEFT, SELF := []));
+              
 							
 Property_with_census2b_roxie := JOIN(Property_with_census2a_roxie, Census_Data.Key_Smart_Jury,
 							LEFT.census_loose2 AND
@@ -1138,12 +1351,14 @@ Property_with_census2b_roxie := JOIN(Property_with_census2a_roxie, Census_Data.K
 							keyed(left.Address_Verification.Address_History_1.geo_blk[1..4] = right.tract[1..4]), 
 						get_property_census(LEFT,RIGHT,2,true), LEFT OUTER, keep(1));
 
-Property_with_census2b_thor := JOIN(Property_with_census2a_thor, Dist_Smart_Jury,
-							LEFT.census_loose2 AND
+Property_with_census2b_thor := JOIN(Property_with_census2a_thor(census_loose2), Dist_Smart_Jury,
+							// LEFT.census_loose2 AND
 							(LEFT.Address_Verification.Address_History_1.st = RIGHT.stusab) and 
 							(left.Address_Verification.Address_History_1.county = right.county) and
 							(left.Address_Verification.Address_History_1.geo_blk[1..4] = right.tract[1..4]), 
-						get_property_census(LEFT,RIGHT,2,true), LEFT OUTER, keep(1), LOCAL);
+						get_property_census(LEFT,RIGHT,2,true), LEFT OUTER, keep(1), LOCAL)
+            +
+            PROJECT(Property_with_census2a_thor(~census_loose2), TRANSFORM(relrec, SELF := LEFT, SELF := []));
 						
 Property_with_census3a_roxie := JOIN(Property_with_census2b_roxie, Census_Data.Key_Smart_Jury, 
 							keyed(LEFT.Address_Verification.Address_History_2.st = RIGHT.stusab) and 
@@ -1152,15 +1367,23 @@ Property_with_census3a_roxie := JOIN(Property_with_census2b_roxie, Census_Data.K
 							keyed(left.Address_Verification.Address_History_2.geo_blk[7] = right.blkgrp), 
 					    get_property_census(LEFT,RIGHT,3,false), LEFT OUTER, keep(1));
 
-Property_with_census3a_thor := JOIN(distribute(Property_with_census2b_thor, hash64(Address_Verification.Address_History_2.st,
-																																									 Address_Verification.Address_History_2.county,
-																																									 Address_Verification.Address_History_2.geo_blk[1..4])), 
+Property_with_census3a_thor := JOIN(distribute(Property_with_census2b_thor(Address_Verification.Address_History_2.st <> '' AND
+                                                                           Address_Verification.Address_History_2.county <> '' AND
+                                                                           Address_Verification.Address_History_2.geo_blk[1..4] <> ''),
+                                               hash64(Address_Verification.Address_History_2.st,
+                                                      Address_Verification.Address_History_2.county,
+                                                      Address_Verification.Address_History_2.geo_blk[1..4])), 
 							Dist_Smart_Jury, 
 							(LEFT.Address_Verification.Address_History_2.st = RIGHT.stusab) and 
 							(left.Address_Verification.Address_History_2.county = right.county) and
 							(left.Address_Verification.Address_History_2.geo_blk[1..6] = right.tract) and 
 							(left.Address_Verification.Address_History_2.geo_blk[7] = right.blkgrp), 
-					    get_property_census(LEFT,RIGHT,3,false), LEFT OUTER, keep(1), LOCAL);
+					    get_property_census(LEFT,RIGHT,3,false), LEFT OUTER, keep(1), LOCAL)
+              +
+              PROJECT(Property_with_census2b_thor(Address_Verification.Address_History_2.st = '' OR
+                                                  Address_Verification.Address_History_2.county = '' OR
+                                                  Address_Verification.Address_History_2.geo_blk[1..4] = ''),
+                      TRANSFORM(relrec, SELF := LEFT, SELF := []));
 							
 Property_with_census3b_roxie := JOIN(Property_with_census3a_roxie, Census_Data.Key_Smart_Jury,
 							LEFT.census_loose3 AND
@@ -1169,15 +1392,24 @@ Property_with_census3b_roxie := JOIN(Property_with_census3a_roxie, Census_Data.K
 							keyed(left.Address_Verification.Address_History_2.geo_blk[1..4] = right.tract[1..4]), 
 						get_property_census(LEFT,RIGHT,3,true), LEFT OUTER, keep(1));
 
-Property_with_census3b_thor := group(sort(JOIN(Property_with_census3a_thor, Dist_Smart_Jury,
-							LEFT.census_loose3 AND
+// Property_with_census3b_thor := group(sort(JOIN(Property_with_census3a_thor, Dist_Smart_Jury,
+							// LEFT.census_loose3 AND
+							// (LEFT.Address_Verification.Address_History_2.st = RIGHT.stusab) and 
+							// (left.Address_Verification.Address_History_2.county = right.county) and
+							// (left.Address_Verification.Address_History_2.geo_blk[1..4] = right.tract[1..4]), 
+						// get_property_census(LEFT,RIGHT,3,true), LEFT OUTER, keep(1), LOCAL), seq), seq);
+            
+Property_with_census3b_thor := JOIN(Property_with_census3a_thor(census_loose3), Dist_Smart_Jury,
+							// LEFT.census_loose3 AND
 							(LEFT.Address_Verification.Address_History_2.st = RIGHT.stusab) and 
 							(left.Address_Verification.Address_History_2.county = right.county) and
 							(left.Address_Verification.Address_History_2.geo_blk[1..4] = right.tract[1..4]), 
-						get_property_census(LEFT,RIGHT,3,true), LEFT OUTER, keep(1), LOCAL), seq), seq);
+						get_property_census(LEFT,RIGHT,3,true), LEFT OUTER, keep(1), LOCAL)
+            +
+            PROJECT(Property_with_census3a_thor(~census_loose3), TRANSFORM(relrec, SELF := LEFT, SELF := []));
 
 #IF(onThor)
-	Property_with_census3b := Property_with_census3b_thor;
+	Property_with_census3b := GROUP(SORT(Property_with_census3b_thor, seq), seq);
 #ELSE
 	Property_with_census3b := Property_with_census3b_roxie;
 #END
@@ -1188,9 +1420,6 @@ Risk_Indicators.MAC_testHRIAddress (With_or_without_census, Input_Address_Inform
 Risk_Indicators.MAC_testHRIAddress (Prop_HRI_InputAddress, Address_History_1, Prop_HRI_AddressHistory_1, IsFCRA);
 Risk_Indicators.MAC_testHRIAddress (Prop_HRI_AddressHistory_1, Address_History_2, Prop_HRI_AddressHistory_2, IsFCRA);
 
-// output(iid, named('iid'));
-// output(p, named('p'));
-// output(p_tmp);
 return Prop_HRI_AddressHistory_2;
 
 end;

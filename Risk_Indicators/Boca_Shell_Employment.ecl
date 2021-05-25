@@ -53,7 +53,8 @@ with_paw_did_roxie := join(clam_pre_employment, paw.Key_Did,
 with_paw_did_thor := join(distribute(clam_pre_employment, hash64(did)), 
 						distribute(pull(paw.Key_Did), hash64(did)),
 						left.did<>0 and 
-						keyed(left.did=right.did), 
+						// keyed(left.did=right.did), 
+						left.did=right.did, 
 						getPawDid(LEFT,RIGHT),
 						left outer, atmost(riskwise.max_atmost), keep(1000), LOCAL);
 						
@@ -120,7 +121,7 @@ pawfile_full_nonfcra_thor_unsuppressed := join(distribute(with_paw_did, hash64(c
 						and (unsigned)right.dt_first_seen[1..6] < left.historydate,
 						getPawFull(LEFT,RIGHT),
 						left outer,
-						atmost(riskwise.max_atmost), keep(1000), LOCAL);
+						atmost(left.contact_id=right.contact_id, riskwise.max_atmost), keep(1000), LOCAL);
 																						
 pawfile_full_nonfcra_thor_flagged := Suppress.CheckSuppression(pawfile_full_nonfcra_thor_unsuppressed, mod_access, data_env := data_environment);
 
@@ -292,10 +293,17 @@ with_dead_business_counts := join(rolled_paw, dead_business_ct_per_seq, left.seq
 	transform(patw,
 	self.dead_business_ct:= right.dead_business_ct;
 	self := left));
-	
-with_paw := group(join(clam_pre_employment, with_dead_business_counts, left.seq=right.seq,
+
+
+#if(_control.Environment.onThor_LeadIntegrity)
+	with_paw := project(clam_pre_employment, transform(risk_indicators.Layout_Boca_Shell, self := left, self := []));  // for initial trending attributes, we don't need this function, so we can skip all of this code and make it run faster
+#else
+	with_paw := group(join(clam_pre_employment, with_dead_business_counts, left.seq=right.seq,
 									transform(risk_indicators.Layout_Boca_Shell, self.employment := right, self := left), 
 									left outer, keep(1)), seq);			
+#end
+	
+
 												
 // output(sorted_pawfile_full, named('sorted_pawfile_full'));               
 // output(dead_business_ct_per_bdid, named('dead_business_ct_per_bdid'));

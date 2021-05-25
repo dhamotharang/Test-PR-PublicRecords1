@@ -49,7 +49,7 @@ EXPORT EquifaxEms_Records(dataset(iesp.mergedcreditreport_fcra.t_FcraMergedCredi
   no_of_bureaus_locked := COUNT(ems_soap_response.EmsResponse.CreditReports(LockFound or FreezeFound));
 
   // check if all bureaus has credit freeze or lock
-  isCompleteFreeze := no_of_bureaus = no_of_bureaus_locked;
+  isCompleteFreeze := no_of_bureaus = no_of_bureaus_locked AND no_of_bureaus > 0;
 
   // number of bureaus with no lock/freeze
   no_lf_bureaus_count := COUNT(ems_soap_response.EmsResponse.CreditReports(~LockFound AND ~FreezeFound));

@@ -1,4 +1,4 @@
-﻿import riskwise, AML, VerificationOfOccupancy, iesp, risk_indicators;
+﻿import riskwise, AML, VerificationOfOccupancy, iesp, risk_indicators, _Control;
 
 Layout_Address_Validation :=
 RECORD
@@ -970,7 +970,8 @@ RECORD
 	string2 phone_ver_bureau; //replacement for Experian
 	
   boolean skip_opt_out := false;  // short circuit for opt out suppression, if we know the DID is not on the list, doesn't pay to search it for all records.
-	
+
+#IF(_CONTROL.Environment.onThor_LeadIntegrity=false)  // REMOVE THESE SECTIONS OF THE LAYOUT IN THE onThor_LeadIntegrity version to slim it down	
   risk_indicators.layouts.layout_threatmetrix_shell_internal_results ThreatMetrix;
   
   layout_custom_FIS_attributes FIS; //Fields needed to support FIS custom RV attributes
@@ -978,5 +979,7 @@ RECORD
 	//these are child sets...LEAVE as last item in Boca Shell - nothing after them:)
 	Risk_Indicators.Layouts_Derog_Info.LJ_DataSets LnJ_datasets;
 	dataset(Risk_Indicators.Layouts.tmp_Consumer_Statements) ConsumerStatements {xpath('ConsumerStatements/ConsumerStatement'), MAXCOUNT(iesp.Constants.MAX_CONSUMER_STATEMENTS)};
+#END
+
   DATASET(Risk_Indicators.Layouts_Derog_Info.layout_bk_chapter) bk_chapters {MAXCOUNT(10)};
 END;

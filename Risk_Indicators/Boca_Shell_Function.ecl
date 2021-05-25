@@ -1,9 +1,7 @@
-﻿/*2016-06-29T00:08:38Z (Andrea Koenen)
-RR-10396: officially removing the relatives V2 key
-*/
-import _control, Gateway, risk_indicators;
+﻿import _control, Gateway, risk_indicators;
 
 USE_BOCA_SHELL_LIBRARY := not _Control.LibraryUse.ForceOff_Risk_Indicators__LIB_Boca_Shell_Function;
+OnThor := _control.Environment.OnThor;
 
 
 EXPORT Boca_Shell_Function (GROUPED DATASET (risk_indicators.Layout_output) iid1,
@@ -27,7 +25,7 @@ FUNCTION
 iid_deduped := dedup(sort(ungroup(iid1), 
 	historydate, fname, mname, lname, suffix, ssn, dob, phone10, wphone10, in_streetAddress, in_city, in_state, in_zipcode, dl_number, dl_state, email_address, did, seq),
 	historydate, fname, mname, lname, suffix, ssn, dob, phone10, wphone10, in_streetAddress, in_city, in_state, in_zipcode, dl_number, dl_state, email_address, did);
-
+  
 seq_map := join( iid1, iid_deduped,
 	left.historydate=right.historydate
 		and left.fname=right.fname
@@ -47,8 +45,38 @@ seq_map := join( iid1, iid_deduped,
 		and left.email_address=right.email_address
 		and left.did=right.did,
 	transform( {unsigned input_seq, unsigned deduped_seq}, self.input_seq := left.seq, self.deduped_seq := right.seq ), keep(1), ALL);
-  
-iid := group(iid_deduped, seq);
+
+iid_distr := distribute(iid1, hash64(seq));
+iid_deduped_thor := dedup(sort(ungroup(iid_distr), 
+	historydate, fname, mname, lname, suffix, ssn, dob, phone10, wphone10, in_streetAddress, in_city, in_state, in_zipcode, dl_number, dl_state, email_address, did, seq, local),
+	historydate, fname, mname, lname, suffix, ssn, dob, phone10, wphone10, in_streetAddress, in_city, in_state, in_zipcode, dl_number, dl_state, email_address, did, local);
+
+seq_map_thor := join( iid_distr, iid_deduped_thor,
+	left.historydate=right.historydate
+		and left.fname=right.fname
+		and left.mname=right.mname
+		and left.lname=right.lname
+		and left.suffix=right.suffix
+		and left.ssn=right.ssn
+		and left.dob=right.dob
+		and left.phone10=right.phone10
+		and left.wphone10=right.wphone10
+		and left.in_streetAddress=right.in_streetAddress
+		and left.in_city=right.in_city
+		and left.in_state=right.in_state
+		and left.in_zipcode=right.in_zipcode
+		and left.dl_number=right.dl_number
+		and left.dl_state=right.dl_state
+		and left.email_address=right.email_address
+		and left.did=right.did,
+	transform( {unsigned input_seq, unsigned deduped_seq}, self.input_seq := left.seq, self.deduped_seq := right.seq ), keep(1), ALL, local);
+
+#if(OnThor)
+    iid := group(iid_deduped_thor, seq);
+#else
+    iid := group(iid_deduped, seq);
+#end
+
 	
 #if(USE_BOCA_SHELL_LIBRARY)
 	args := MODULE(risk_indicators.BS_LIBIN)
@@ -82,8 +110,12 @@ iid := group(iid_deduped, seq);
                                                 isUtility, isLN, includeRelativeInfo, false, BSversion, nugen := nugen, 
 																								DataRestriction:=DataRestriction, BSOptions := BSOptions);
  	
-  p := dedup(group(sort(project(ids_wide(~isrelat), transform (risk_indicators.Layout_Boca_Shell, self := LEFT)), seq), seq), seq);
-
+#if(OnThor)
+  p := dedup(group(sort(project(distribute(ids_wide(~isrelat), hash64(seq)), transform (risk_indicators.Layout_Boca_Shell, self := LEFT)), seq, local), seq, LOCAL), seq);
+#else
+  p := dedup(group(sort(project(ids_wide(~isrelat), transform (risk_indicators.Layout_Boca_Shell, self := LEFT)), seq), seq), seq);    
+#end
+  
   dppa_ok := dppa > 0 and dppa < 8;
   per_prop := getAllBocaShellData (iid, ids_wide, p,
                                    FALSE, isLN, dppa, dppa_ok,
@@ -99,7 +131,13 @@ iid := group(iid_deduped, seq);
 #end
 
 // join the results back to the original input so that every record on input has a response populated
-full_response := join( seq_map, shell_results, left.deduped_seq=right.seq, transform( risk_indicators.Layout_Boca_Shell, self.seq := left.input_seq, self.shell_input.seq := left.input_seq, self := right ), keep(1) );
+#if(OnThor)
+  full_response := join( distribute(seq_map_thor, hash64(deduped_seq)), 
+                         distribute(shell_results, hash64(seq)), 
+                         left.deduped_seq=right.seq, transform( risk_indicators.Layout_Boca_Shell, self.seq := left.input_seq, self.shell_input.seq := left.input_seq, self := right ), keep(1), local );
+#else
+  full_response := join( seq_map, shell_results, left.deduped_seq=right.seq, transform( risk_indicators.Layout_Boca_Shell, self.seq := left.input_seq, self.shell_input.seq := left.input_seq, self := right ), keep(1) );
+#end
 
 return group(full_response, seq);
   

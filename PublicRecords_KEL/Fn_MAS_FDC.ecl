@@ -1,7 +1,7 @@
 ﻿IMPORT AID_Build, ADVO, AlloyMedia_student_list,  American_student_list, AutoKey, AVM_V2, BankruptcyV3, BBB2, BIPV2, BIPV2_Best, BIPV2_Build, Business_Risk_BIP, BusReg, CalBus, CellPhone, Certegy, Corp2, 
 		Cortera_Tradeline, Data_Services, DCAV2, Death_Master,  Doxie, Doxie_Files, DriversV2, DMA, dx_BestRecords, dx_ConsumerFinancialProtectionBureau, dx_Cortera, dx_DataBridge, DX_Email, 
-		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus,dx_property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, fcra, FAA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
-		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, Prof_License_Mari, 
+		dx_Cortera_Tradeline, dx_Equifax_Business_Data, dx_Gong, dx_Header, dx_Infutor_NARB, dx_PhonesInfo, dx_PhonesPlus,dx_property, dx_Relatives_v3, EBR, Email_Data, emerges, Experian_CRDB, FAA, FCRA, FBNv2, FLAccidents_Ecrash, Fraudpoint3, Gong, 
+		GovData, Header, Header_Quick, InfoUSA, IRS5500, InfutorCID, Inquiry_AccLogs, LiensV2, LN_PropertyV2, MDR, OSHAIR, Phonesplus_v2, dx_prof_license_mari, 
 		Prof_LicenseV2, Relationship, Risk_Indicators, RiskView, RiskWise, SAM, SexOffender, STD, Suppress, Targus, thrive, USPIS_HotList, Utilfile, ut,
 		VehicleV2, Watercraft, Watchdog, UCCV2, YellowPages, dx_OSHAIR, drivers;
 
@@ -573,13 +573,11 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 
   HHIDLexids := PROJECT(HHIDs_ADLs_Good_Lexids, TRANSFORM(Layouts_FDC.Layout_FDC, SELF.P_LexID := LEFT.did; SELF := LEFT; SELF := []));
 
-	HHIDLexids_noInput := HHIDLexids(P_LexID NOT IN InputLexids);
-
+HHIDLexids_noInput := HHIDLexids(P_LexID NOT IN InputLexids);
   Input_HHIDLexids := DEDUP(SORT((Input_FDC + HHIDLexids)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 	Input_FDC_RelativesLexids_HHIDLexids_LexIDs := DEDUP(SORT((RelativesLexids + Input_HHIDLexids )(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
 
 	Input_FDC_RelativesLexids_HHIDLexids_Business_Contact_LexIDs := DEDUP(SORT((Input_FDC_RelativesLexids_HHIDLexids_LexIDs + Business_Contact_LexIDs)(P_LexID > 0), UIDAppend, P_LexID), UIDAppend, P_LexID);
-
 	//special search for avm
 	//need to use did from fid key instead of plexid in case input address is valid but not tied to P_lexid				
 	InputRelativesHHIDTrans := project(Input_FDC + RelativesLexids + HHIDLexids, transform({unsigned6 did;}, self.did := left.P_LexID, self := []));
@@ -611,6 +609,8 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 																				self.g_procuid := left.g_procuid, 
 																				self := left, 
 																				self := []));
+/*************************************************************************************************************/
+	
  	
 		Overwrite_Redacted_SSNs_NonFCRA := JOIN(Input_FDC, Best_SSN_NonFCRA,
 							LEFT.UIDAppend = RIGHT.UIDAppend
@@ -636,9 +636,7 @@ Current_Address_Consumer_recs_Contacts := join(Current_Address_Consumer_recs, Cu
 	Input_Best_SSN_FCRA := Dedup(Sort((Best_SSN_FCRA+Overwrite_Redacted_SSNs_FCRA)((integer)P_InpClnSSN>0), UIDAppend, P_InpClnSSN),UIDAppend, P_InpClnSSN);
 /*************************************************************************************************************/
 
-	
-	
-BIPV2.IDAppendLayouts.AppendInput PrepBIPInputsele(Layouts_FDC.Layout_FDC le) := TRANSFORM
+	BIPV2.IDAppendLayouts.AppendInput PrepBIPInputsele(Layouts_FDC.Layout_FDC le) := TRANSFORM
 		SELF.request_id := le.UIDAppend;
 		SELF.seleid := le.B_LexIDLegal;
 		SELF := [];
@@ -1920,10 +1918,10 @@ Bankruptcy_Files__Key_Search_Records_pre	:= Bankruptcy_Files__Key_Search_Records
           SELF := LEFT,
           SELF := []));	
 
-	// Prof_License_Mari.Key_Did has a parameter to say if FCRA or nonFCRA - same file layout		
+	// dx_prof_license_mari.Key_Did has a parameter to say if FCRA or nonFCRA - same file layout		
 	Prof_License_Mari__Key_Did_Records_unsuppressed := 
-		JOIN(Input_FDC_RelativesLexids_HHIDLexids_LexIDs, Prof_License_Mari.Key_Did(Options.IsFCRA),
-				Common.DoFDCJoin_Prof_License_Mari__Key_Did = TRUE AND NOT Options.IsPrescreen AND
+	JOIN(Input_FDC_RelativesLexids_HHIDLexids_LexIDs, dx_Prof_License_Mari.Key_Did(iType),	
+			Common.DoFDCJoin_Prof_License_Mari__Key_Did = TRUE AND NOT Options.IsPrescreen AND
 				LEFT.P_LexID > 0 AND
 				KEYED(LEFT.P_LexID = RIGHT.s_did) and
 				right.std_source_upd not in PublicRecords_KEL.ECL_Functions.Constants.restricted_Mari_vendor_set and 
@@ -3673,10 +3671,10 @@ Risk_Indicators__Correlation_Risk__key_addr_dob_summary_Denorm :=
 	Key_Vehicle_Party_Records := Suppress.MAC_SuppressSource(Key_Vehicle_Party_Records_unsuppressed, mod_access, did_field := append_did, data_env := Environment);
 
 	Key_Vehicle_Main_Records_unsuppressed :=  
-		JOIN(Vehicle_all, VehicleV2.Key_Vehicle_Main_Key,
+		JOIN(Vehicle_all, VehicleV2.Key_Vehicle_Main_Key,	
 		Common.DoFDCJoin_Vehicle_Files__VehicleV2__Vehicle_Main_Party = TRUE AND
-				KEYED(LEFT.vehicle_key = RIGHT.vehicle_key AND 
-					LEFT.iteration_key = RIGHT.iteration_key),
+			KEYED(LEFT.vehicle_key = RIGHT.vehicle_key AND					
+			LEFT.iteration_key = RIGHT.iteration_key),
 				TRANSFORM({Layouts_FDC.Layout_VehicleV2__Key_Vehicle_Main_Key},
 					SELF.G_ProcUID := LEFT.G_ProcUID,
 					SELF.UIDAppend := LEFT.UIDAppend,

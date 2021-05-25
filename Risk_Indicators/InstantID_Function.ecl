@@ -47,6 +47,9 @@ in_BSOptions_override := if(in_bsversion >= 50 and in_isFCRA=false,
  in_BSOptions,
  in_BSOptions);
 
+#if(_control.Environment.OnThor)
+	indata := indata1;
+#else
 // for batch queries, dedup the input to reduce searching
 indata := dedup(sort(indata1,
 	historydate, fname, mname, lname, suffix, ssn, dob, phone10, wphone10, in_streetAddress, in_city, in_state, in_zipcode, dl_number, dl_state, email_address, did, seq),
@@ -71,7 +74,7 @@ seq_map := join( indata1, indata,
 		and left.email_address=right.email_address
 		and left.did=right.did,
 	transform( {unsigned input_seq, unsigned deduped_seq}, self.input_seq := left.seq, self.deduped_seq := right.seq ), keep(1)/*, ALL*/);
-
+#end
 
 	// Pack arguments
 	args := module(risk_indicators.LIBIN)
@@ -132,10 +135,15 @@ seq_map := join( indata1, indata,
 
 #end
 
+
+#if(_control.Environment.OnThor)
+	valid_full_response := iid_results;
+#else
 	// join the results back to the original input so that every record on input has a response populated
 	full_response := join( seq_map, iid_results, left.deduped_seq=right.seq, transform( risk_indicators.layout_output, self.seq := left.input_seq, self := right ), keep(1) );
 
   valid_full_response := IF(in_isFCRA, full_response, full_response(IF(watchlist_table = 'ERR', ERROR('Bridger Gateway Error'), true)));
+#end;
 
 
 // output(	indata1	, named('indata1')	);

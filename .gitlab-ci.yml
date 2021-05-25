@@ -22,3 +22,4 @@ include:
   # Run the KEL Compiler to generate new ECL code, and submit that code via new Merge Request
   - local: 'AutoGenECL-PublicRecords_KEL.yml'
   - local: 'RoxieDev_Query_CI.yml'
+  - local: '.ci_root/syntax.yml'

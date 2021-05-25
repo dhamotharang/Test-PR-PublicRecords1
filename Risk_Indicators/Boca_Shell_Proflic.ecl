@@ -1,4 +1,5 @@
-﻿import prof_licenseV2, riskwise, ut, Prof_License_Mari, risk_indicators, doxie, Suppress;
+import prof_licenseV2, riskwise, ut, risk_indicators, doxie, Suppress, _Control;
+onThor := _Control.Environment.OnThor;
 
 export Boca_Shell_Proflic(GROUPED DATASET(risk_indicators.Layout_Boca_Shell_ids) ids_only, 
 integer bsVersion, 
@@ -75,12 +76,26 @@ PL_Plus_temp_CCPA PL_nonFCRA(ids_only le, key_did rt) := transform
 	self := le;
 	self := [];  // setting sanctions to blank
 end;
-license_recs_original_join := join(ids_only, key_did,
-											left.did!=0 and keyed(right.did = left.did) and
-											(unsigned)right.date_first_seen[1..6] < left.historydate,
-											PL_nonFCRA(left,right), atmost(right.did = left.did, riskwise.max_atmost));
+
+license_recs_original_join_roxie := join(ids_only, key_did,
+                                         left.did!=0 and keyed(right.did = left.did) and
+                                         (unsigned)right.date_first_seen[1..6] < left.historydate,
+                                         PL_nonFCRA(left,right), atmost(right.did = left.did, riskwise.max_atmost));
                       
-license_recs_original_suppressed := Suppress.MAC_SuppressSource(license_recs_original_join, mod_access);
+license_recs_original_join_thor := join(DISTRIBUTE(ids_only(did!=0), HASH64(did)), 
+                                        DISTRIBUTE(PULL(key_did), HASH64(did)),
+                                        right.did = left.did and
+                                        (unsigned)right.date_first_seen[1..6] < left.historydate,
+                                        PL_nonFCRA(left,right), atmost(right.did = left.did, riskwise.max_atmost), LOCAL);
+                      
+                      
+#IF(onThor)
+	license_recs_original_join_correct := license_recs_original_join_thor;
+#ELSE
+	license_recs_original_join_correct := license_recs_original_join_roxie;
+#END
+                      
+license_recs_original_suppressed := Suppress.MAC_SuppressSource(license_recs_original_join_correct, mod_access);
 
 license_recs_original_pre := PROJECT(license_recs_original_suppressed, TRANSFORM(PL_Plus_temp,
                                                   SELF := LEFT));
@@ -146,16 +161,48 @@ ingenix_recs := join (ids_only, ingenix_data,
 license_recs_original := map(
 										bsversion>=50 => ungroup(license_recs_original_pre) + ungroup(mari_recs) + ungroup(ingenix_recs),
 										ungroup(license_recs_original_pre));
-	
-with_category_v5 := join(license_recs_original, Prof_LicenseV2.Key_LicenseType_lookup(false), 
-		left.license_type<>'' and
-		keyed(left.license_type=right.license_type), 	
-			transform(PL_Plus_temp, 
-			self.jobCategory := right.occupation;  
-			self.PLcategory := if(trim(right.category) != '', right.category, '0');
-			self := left), left outer, atmost(100), keep(1));
 
-license_recs := if(bsversion >= 4, with_category_v5, ungroup(license_recs_original_pre));
+klt := Prof_LicenseV2.Key_LicenseType_lookup(false);
+
+PL_Plus_temp with_category_v5_transform(license_recs_original le, klt ri) := TRANSFORM
+  self.jobCategory := ri.occupation;  
+  self.PLcategory := if(trim(ri.category) != '', ri.category, '0');
+  self := le;
+END;
+
+with_category_v5_roxie := JOIN(license_recs_original, klt, 
+                               LEFT.license_type <> '' AND
+                               KEYED(LEFT.license_type = RIGHT.license_type), 	
+                               with_category_v5_transform(LEFT, RIGHT), 
+                               LEFT OUTER, 
+                               ATMOST(100), 
+                               KEEP(1));
+
+//10-8 remove filter from dataset                               
+with_category_v5_thor := JOIN(DISTRIBUTE(license_recs_original, HASH64(license_type)), 
+                              DISTRIBUTE(PULL(klt), HASH64(license_type)),
+                              LEFT.license_type <> '' AND
+                              LEFT.license_type = RIGHT.license_type, 	
+                              with_category_v5_transform(LEFT, RIGHT), 
+                              LEFT OUTER, 
+                              ATMOST(100), 
+                              KEEP(1), LOCAL);
+
+#IF(onThor)
+	with_category_v5_correct := with_category_v5_thor;
+#ELSE
+	with_category_v5_correct := with_category_v5_roxie;
+#END
+
+// with_category_v5 := join(license_recs_original, Prof_LicenseV2.Key_LicenseType_lookup(false), 
+		// left.license_type<>'' and
+		// keyed(left.license_type=right.license_type), 	
+			// transform(PL_Plus_temp, 
+			// self.jobCategory := right.occupation;  
+			// self.PLcategory := if(trim(right.category) != '', right.category, '0');
+			// self := left), left outer, atmost(100), keep(1));
+
+license_recs := if(bsversion >= 4, with_category_v5_correct, ungroup(license_recs_original_pre));
 			
 PL_Plus_temp roll_licenses(PL_Plus_temp le, PL_Plus_temp rt) := transform
 	self.professional_license_flag := le.professional_license_flag or rt.professional_license_flag;
@@ -220,6 +267,25 @@ rolled_licenses_final := project(rolled_licenses, transform(RiskWise.Layouts.Lay
 // output(license_recs_original, named('license_recs_orig_old'));	
 	// output(with_category_v5_wBlanks, named('with_category_v5_wBlanks'));
 	// output(with_category_v5, named('with_category_v5'));
+
+
+eyeball := 100;
+// OUTPUT(COUNT(license_recs_original_join_correct), NAMED('Count_license_recs_original_join_correct'));
+// OUTPUT(COUNT(with_category_v5_correct), NAMED('Count_with_category_v5_correct'));
+
+// OUTPUT(license_recs_original_join_correct, NAMED('license_recs_original_join_correct'));
+// OUTPUT(with_category_v5_correct, NAMED('with_category_v5_correct'));
+
+// OUTPUT(bsversion, NAMED('bsversion'));
+// OUTPUT(, NAMED(''));
+// OUTPUT(with_category_v5_roxie, NAMED('with_category_v5_roxie'));
+// OUTPUT(with_category_v5_thor, NAMED('with_category_v5_thor'));
+// OUTPUT(license_recs, NAMED('license_recs'));
+// OUTPUT(license_recs_dates, NAMED('license_recs_dates'));
+// OUTPUT(sorted_licenses, NAMED('sorted_licenses'));
+// OUTPUT(rolled_licenses, NAMED('rolled_licenses'));
+// OUTPUT(rolled_licenses_final, NAMED('rolled_licenses_final'));
+  
 return rolled_licenses_final;
 
 end;

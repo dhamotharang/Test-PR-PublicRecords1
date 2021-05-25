@@ -28,7 +28,7 @@ EXPORT getAllBocaShellData (
   dataset(iesp.share.t_StringArrayItem) ExcludeReportingSources = dataset([], iesp.share.t_StringArrayItem)
   ) := FUNCTION
 
-  //MS-71: add BIP header information to the shell
+ //MS-71: add BIP header information to the shell
   options := MODULE(Business_Risk_BIP.LIB_Business_Shell_LIBIN)
     EXPORT UNSIGNED1  dppa                              := ^.dppa;
     EXPORT UNSIGNED1  glb                               := ^.glb;
@@ -65,7 +65,7 @@ EXPORT getAllBocaShellData (
   checkDays(string8 d1, string8 d2, unsigned2 days) := ut.DaysApart(d1,d2) <= days and d1>d2;
   IsAML  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsAML) > 0;
   IsFIS  := (BSOptions & risk_indicators.iid_constants.BSOptions.IsFISattributes) > 0;
-
+  
   // =============== Get Property Info ===============
   risk_indicators.layout_PropertyRecord get_addresses(p le, integer c) := TRANSFORM
     SELF.fname := le.Shell_Input.fname;
@@ -189,7 +189,7 @@ includeRelativeInfoProperty := includeRelativeInfo and ~TurnOffRelativeProperty;
   #ELSE
     prop_common := prop_common_roxie;
   #END
-
+  
   //*** MS-158: take the owned/sold properties and search ADVO by address to identify if an address is a business address so they can be counted and rolled up seperately in new shell fields.
 
   Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd tf_pre_ADVO(prop_common l, p r) := transform
@@ -272,7 +272,7 @@ includeRelativeInfoProperty := includeRelativeInfo and ~TurnOffRelativeProperty;
         BSversion >= 50             => prop_common,
                                        IF(production_realtime_mode, prop, prop_hist)
        );
-
+       
  single_property_fis := IF(IsFIS, IF(production_realtime_mode, prop, prop_hist), group(Dataset([],Risk_Indicators.Layouts.Layout_Relat_Prop_Plus_BusInd),seq));
 
 // AML
@@ -335,7 +335,7 @@ RelatRecProp := join(ids_wide,   single_property_relat,
   // Generate the totals
   Rel_Property_Rolled := Risk_Indicators.Roll_Relative_Property(Single_Property(property_status_family<>' '));
   Per_Property_Rolled := Risk_Indicators.Roll_Applicant_Property(Single_Property(property_status_applicant<>' '));
-
+  
   Per_Property_Rolled_FIS := Risk_Indicators.Roll_Applicant_Property(single_property_fis(property_status_applicant<>' '));
 
   // Apply the address specific information
@@ -512,9 +512,9 @@ RelatRecProp := join(ids_wide,   single_property_relat,
   History_2_Property_Added_a :=
     group (sort (denormalize (p2, single_property,  left.seq = right.seq, check_best (LEFT,RIGHT)),
                  seq), seq);
-
+         
   History_2_Property_added := History_2_Property_Added_a + group(sort(pullid_recs, seq),seq);
-
+   
   History_2_Property_Added_1_fis :=
     group (sort (denormalize (p2, single_property_fis,  left.seq = right.seq, check_best (LEFT,RIGHT)),
                  seq), seq);
@@ -528,7 +528,6 @@ vehicles_hist := IF(dppa_ok, Risk_Indicators.Boca_Shell_Vehicles_Hist(ids_only, 
 vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
 
   // =============== Derogs ===============
-
   derogs := IF (IsFCRA,
                 Risk_Indicators.Boca_Shell_Derogs_FCRA (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), bsversion, BSOptions, IncludeLnJ, iid, ReportingPeriod, MinimumAmount, ExcludeStates, ExcludeReportingSources),
                 Risk_Indicators.Boca_Shell_Derogs      (if(BSversion>2,ids_only_mult_dids, ids_only_derogs), BSversion, mod_access));
@@ -551,7 +550,7 @@ vehicles_rolled := if (production_realtime_mode, vehicles, vehicles_hist);
 	watercraft_hist := IF(IsFCRA,
 										Risk_Indicators.Boca_Shell_Watercraft_Hist_FCRA (ids_only(~isrelat), isPreScreen, bsversion),
 										Risk_Indicators.Boca_Shell_Watercraft      (ids_only, bsVersion/*(~isrelat)*/, mod_access));
-
+										
 	watercraft_rolled := if (production_realtime_mode, watercraft, watercraft_hist);
 
   watercraft_relat := watercraft_rolled(isrelat);
@@ -748,61 +747,124 @@ relatHeader :=  AML.AMLGetHeader(group(RelatInput,seq), mod_access, isFCRA);
 
 //AML   relates parents
 
-RelatInfo :=  join(withSSNFlags, pre_ids_only(isrelat),
-                    left.seq = right.seq and
-                    left.did = right.did,
-                    transform(AML.Layouts.RelativeParentLayout,
-                              self.seq := left.seq,
-                              self.did := right.shell_input.did,
-                              self.relatDid := left.did,
-                              self.fname  := left.fname,
-                              self.lname := left.lname,
-                              self.historydate := right.historydate,
-                              self.isrelat := right.isrelat,
-                              self.RelatParentPubRec10yrs := 0;
-                              self := []));
+RelatInfo_Roxie :=  join(withSSNFlags, pre_ids_only(isrelat),
+                          left.seq = right.seq and
+                          left.did = right.did,
+                          transform(AML.Layouts.RelativeParentLayout,
+                                    self.seq := left.seq,
+                                    self.did := right.shell_input.did,
+                                    self.relatDid := left.did,
+                                    self.fname  := left.fname,
+                                    self.lname := left.lname,
+                                    self.historydate := right.historydate,
+                                    self.isrelat := right.isrelat,
+                                    self.RelatParentPubRec10yrs := 0;
+                                    self := []));
+                                    
+RelatInfo_Thor :=  join(DISTRIBUTE(withSSNFlags, HASH64(seq)), 
+                        DISTRIBUTE(pre_ids_only(isrelat), HASH64(seq)),
+                        left.seq = right.seq and
+                        left.did = right.did,
+                        transform(AML.Layouts.RelativeParentLayout,
+                                  self.seq := left.seq,
+                                  self.did := right.shell_input.did,
+                                  self.relatDid := left.did,
+                                  self.fname  := left.fname,
+                                  self.lname := left.lname,
+                                  self.historydate := right.historydate,
+                                  self.isrelat := right.isrelat,
+                                  self.RelatParentPubRec10yrs := 0;
+                                  self := []), LOCAL);
+                                  
+#IF(onThor)
+  // RelatInfo := GROUP(SORT(RelatInfo_Thor, seq), seq);
+  RelatInfo := RelatInfo_Thor;
+#ELSE
+  RelatInfo := RelatInfo_Roxie;
+#END
 
-relatParentPubRec := AML.AMLRelativesAssocs(group(RelatInfo, seq), mod_access, isFCRA);
+relatParentPubRec_roxie := AML.AMLRelativesAssocs(group(RelatInfo, seq), mod_access, isFCRA);
+relatParentPubRec_thor := AML.AMLRelativesAssocs(GROUP(SORT(RelatInfo_Thor, seq), seq), mod_access, isFCRA);
+
+#IF(onThor)
+  relatParentPubRec := relatParentPubRec_thor;
+#ELSE
+  relatParentPubRec := relatParentPubRec_roxie;
+#END
+
+// =============== Relative Aggregates ===============
+relrec :=risk_indicators.layout_bocashell_neutral_ids;
+
+cntrelrec := TABLE(ids_only(isrelat), {seq, cnt := COUNT(GROUP)}, seq);
+
+relrec join_relat(p le, ids_full ri) := TRANSFORM
+  SELF.dist := ut.zip_Dist(le.Address_Verification.Input_Address_Information.zip5,ri.zip5);
+  SELF.relative_within25miles_count := (INTEGER)(SELF.dist < 25);
+  SELF.relative_within100miles_count := (INTEGER)(SELF.dist BETWEEN 25 AND 100 AND SELF.dist<>100);
+  SELF.relative_within500miles_count := (INTEGER)(SELF.dist BETWEEN 100 AND 500 AND SELF.dist<>500);
+  SELF.relative_withinOther_count := (INTEGER)(SELF.dist >= 500);
+  SELF.relat_did := ri.did;
+  SELF := ri;
+END;
+
+relat_joined_roxie := JOIN(p, ids_full(isrelat),LEFT.seq=RIGHT.seq, join_relat(LEFT,RIGHT), MANY LOOKUP);
+
+relat_joined_thor := JOIN(DISTRIBUTE(p, HASH64(seq)), 
+                          DISTRIBUTE(ids_full(isrelat), HASH64(seq)),
+                          LEFT.seq=RIGHT.seq, join_relat(LEFT,RIGHT), LOCAL);
+                            
+#IF(onThor)
+  relat_joined := relat_joined_thor;
+#ELSE
+  relat_joined := relat_joined_roxie;
+#END
+  
+relat_sorted_roxie := DEDUP(SORT(relat_joined,seq,relat_did,dist,-relatives_at_input_address),seq,relat_did);
+
+relat_sorted_thor := DEDUP(SORT(GROUP(relat_joined, seq),seq,relat_did,dist,-relatives_at_input_address),seq,relat_did);
+
+#IF(onThor)
+  relat_sorted := relat_sorted_thor;
+#ELSE
+  relat_sorted := relat_sorted_roxie;
+#END
+
+// get a table of the counts per relat_did to get rid of indeterminate results in the relative counters that aren't tied to distance
+relative_snapshot_table := table(relat_joined,
+  {seq, relat_did,
+  _relatives_at_input_address := count(group, relatives_at_input_address > 0),
+  _relative_suspicious_identities_count := if(count(group, relative_suspicious_identities_count > 0) > 0, 1, 0),
+  _relative_bureau_only_count := if(count(group, relative_bureau_only_count > 0) > 0, 1, 0),
+  _relative_bureau_only_count_created_1month := if(count(group, relative_bureau_only_count_created_1month > 0) > 0, 1, 0),
+  _relative_bureau_only_count_created_6months := if(count(group, relative_bureau_only_count_created_6months > 0) > 0, 1, 0),
+}, seq, relat_did);
 
 
+relat_sorted2_roxie := join(relat_sorted, relative_snapshot_table, left.seq=right.seq and left.relat_did=right.relat_did,
+                            transform(relrec,
+                            SELF.relatives_at_input_address := right._relatives_at_input_address;
+                            SELF.relative_suspicious_identities_count := right._relative_suspicious_identities_count;
+                            SELF.relative_bureau_only_count := right._relative_bureau_only_count;
+                            SELF.relative_bureau_only_count_created_1month := right._relative_bureau_only_count_created_1month;
+                            SELF.relative_bureau_only_count_created_6months := right._relative_bureau_only_count_created_6months;
+                            self := left));
 
-  // =============== Relative Aggregates ===============
-  relrec :=risk_indicators.layout_bocashell_neutral_ids;
-
-  cntrelrec := TABLE(ids_only(isrelat), {seq, cnt := COUNT(GROUP)}, seq);
-
-  relrec join_relat(p le, ids_full ri) := TRANSFORM
-    SELF.dist := ut.zip_Dist(le.Address_Verification.Input_Address_Information.zip5,ri.zip5);
-    SELF.relative_within25miles_count := (INTEGER)(SELF.dist < 25);
-    SELF.relative_within100miles_count := (INTEGER)(SELF.dist BETWEEN 25 AND 100 AND SELF.dist<>100);
-    SELF.relative_within500miles_count := (INTEGER)(SELF.dist BETWEEN 100 AND 500 AND SELF.dist<>500);
-    SELF.relative_withinOther_count := (INTEGER)(SELF.dist >= 500);
-    SELF.relat_did := ri.did;
-    SELF := ri;
-  END;
-
-  relat_joined := JOIN(p, ids_full(isrelat),LEFT.seq=RIGHT.seq, join_relat(LEFT,RIGHT), MANY LOOKUP);
-  relat_sorted := DEDUP(SORT(relat_joined,seq,relat_did,dist,-relatives_at_input_address),seq,relat_did);
-  // get a table of the counts per relat_did to get rid of indeterminate results in the relative counters that aren't tied to distance
-  relative_snapshot_table := table(relat_joined,
-    {seq, relat_did,
-    _relatives_at_input_address := count(group, relatives_at_input_address > 0),
-    _relative_suspicious_identities_count := if(count(group, relative_suspicious_identities_count > 0) > 0, 1, 0),
-    _relative_bureau_only_count := if(count(group, relative_bureau_only_count > 0) > 0, 1, 0),
-    _relative_bureau_only_count_created_1month := if(count(group, relative_bureau_only_count_created_1month > 0) > 0, 1, 0),
-    _relative_bureau_only_count_created_6months := if(count(group, relative_bureau_only_count_created_6months > 0) > 0, 1, 0),
-  }, seq, relat_did);
-
-
-relat_sorted2 := join(relat_sorted, relative_snapshot_table, left.seq=right.seq and left.relat_did=right.relat_did,
-  transform(relrec,
-  SELF.relatives_at_input_address := right._relatives_at_input_address;
-  SELF.relative_suspicious_identities_count := right._relative_suspicious_identities_count;
-  SELF.relative_bureau_only_count := right._relative_bureau_only_count;
-  SELF.relative_bureau_only_count_created_1month := right._relative_bureau_only_count_created_1month;
-  SELF.relative_bureau_only_count_created_6months := right._relative_bureau_only_count_created_6months;
-  self := left));
-
+relat_sorted2_thor := join(DISTRIBUTE(relat_sorted, HASH64(seq, relat_did)), 
+                           DISTRIBUTE(relative_snapshot_table, HASH64(seq, relat_did)), 
+                           left.seq=right.seq and left.relat_did=right.relat_did,
+                            transform(relrec,
+                            SELF.relatives_at_input_address := right._relatives_at_input_address;
+                            SELF.relative_suspicious_identities_count := right._relative_suspicious_identities_count;
+                            SELF.relative_bureau_only_count := right._relative_bureau_only_count;
+                            SELF.relative_bureau_only_count_created_1month := right._relative_bureau_only_count_created_1month;
+                            SELF.relative_bureau_only_count_created_6months := right._relative_bureau_only_count_created_6months;
+                            self := left), LOCAL);
+                            
+#IF(onThor)
+  relat_sorted2 := relat_sorted2_thor;
+#ELSE
+  relat_sorted2 := relat_sorted2_roxie;
+#END
 
 relrec roll_relat(relrec le, relrec ri) := TRANSFORM
   SELF.relative_within25miles_count := le.relative_within25miles_count + ri.relative_within25miles_count;
@@ -847,7 +909,16 @@ relrec roll_relat(relrec le, relrec ri) := TRANSFORM
 
 
 
-relatives_grouped := group(relat_sorted2, seq);
+relatives_grouped_roxie := group(relat_sorted2, seq);
+
+relatives_grouped_thor := group(sort(relat_sorted2, seq), seq);
+
+#IF(onThor)
+  relatives_grouped := relatives_grouped_thor;
+#ELSE
+  relatives_grouped := relatives_grouped_roxie;
+#END
+
 relat_rolled := ROLLUP(relatives_grouped,left.seq=right.seq,roll_relat(LEFT,RIGHT));
 
 // =============== put it together ===============
@@ -862,11 +933,24 @@ TRANSFORM
 
   SELF := le;
 END;
-vehicles_added_back := IF(IncludeVehInfo and ~isFCRA,
-                          JOIN(dl_added_back, vehicles_rolled,
-                               LEFT.seq=RIGHT.seq,
-                               add_back_vehicles(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
-                          dl_added_back);
+vehicles_added_back_roxie := IF(IncludeVehInfo and ~isFCRA,
+                                JOIN(dl_added_back, vehicles_rolled,
+                                     LEFT.seq=RIGHT.seq,
+                                     add_back_vehicles(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
+                                dl_added_back);
+                          
+vehicles_added_back_thor := IF(IncludeVehInfo and ~isFCRA,
+                                GROUP(SORT(JOIN(DISTRIBUTE(dl_added_back, HASH64(seq)),
+                                     DISTRIBUTE(vehicles_rolled, HASH64(seq)),
+                                     LEFT.seq=RIGHT.seq,
+                                     add_back_vehicles(LEFT,RIGHT), LEFT OUTER, LOCAL), seq), seq),
+                                dl_added_back);
+                                
+#IF(onThor)
+  vehicles_added_back := vehicles_added_back_thor;
+#ELSE
+  vehicles_added_back := vehicles_added_back_roxie;
+#END
 
 bsplus := record
   risk_indicators.layout_boca_shell;
@@ -886,8 +970,18 @@ layout_addzip add_crim_rels(doc_rolled le, ids_full ri) := transform
   self := le;
 END;
 
-derogs_w_rel_crims := dedup(JOIN(doc_rolled, ids_full(isrelat),
+derogs_w_rel_crims_roxie := dedup(JOIN(doc_rolled, ids_full(isrelat),
   left.did=right.did, add_crim_rels(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL), did);
+  
+derogs_w_rel_crims_thor := dedup(JOIN(DISTRIBUTE(doc_rolled, HASH64(did)), 
+                                      DISTRIBUTE(ids_full(isrelat), HASH64(did)),
+  left.did=right.did, add_crim_rels(LEFT,RIGHT), LEFT OUTER, LOCAL), did);
+  
+#IF(onThor)
+  derogs_w_rel_crims := derogs_w_rel_crims_thor;
+#ELSE
+  derogs_w_rel_crims := derogs_w_rel_crims_roxie;
+#END
 
 bsplus add_back_derogs(risk_indicators.Layout_Boca_Shell le, derogs_w_rel_crims ri) := TRANSFORM
   crim_dist := if(le.shell_input.z5<>'' and ri.zip5<>'', ut.zip_Dist(le.shell_input.z5,ri.zip5), 9999);//default to 9999 for at least 1 blank zip
@@ -939,6 +1033,8 @@ bsplus add_back_derogs(risk_indicators.Layout_Boca_Shell le, derogs_w_rel_crims 
                                        le.total_number_derogs);
   // for bocashell version 5.0 and higher, include the eviction count as well because evictions will no longer be part of the liens counts in 5.0 and higher
   self.total_number_derogs := if(BSversion>=50, total_number_derogs_50, total_number_derogs_original);
+	
+#IF(_CONTROL.Environment.onThor_LeadIntegrity=false)	
   self.LnJ_datasets.LnJLiens := IF(mainDid,ri.LnJLiens, dataset([], Risk_Indicators.Layouts_Derog_Info.Liens));
   self.LnJ_datasets.LnJJudgments := IF(mainDid, ri.LnJJudgments,  dataset([], Risk_Indicators.Layouts_Derog_Info.Judgments));
   SELF.LnJ_attributes.lnj_recent_unreleased_count              := IF(mainDid, RI.lnj_recent_unreleased_count          ,0   );
@@ -1019,6 +1115,8 @@ bsplus add_back_derogs(risk_indicators.Layout_Boca_Shell le, derogs_w_rel_crims 
   SELF.LnJ_attributes.lnj_last_jgmt_released_date              := IF(mainDid, RI.lnj_last_jgmt_released_date          ,0   ) ;
   SELF.LnJ_attributes.lnj_jgmt_total                           := IF(mainDid, RI.lnj_jgmt_total                       ,0   ) ;
   //self.LnJ := ri;
+#END
+
   SELF := le;
 END;
 
@@ -1029,10 +1127,11 @@ derogs_added_back_thor := JOIN(distribute(vehicles_added_back, hash64(seq)),
                                add_back_derogs(LEFT,RIGHT), LEFT OUTER, LOCAL);
 
 #IF(onThor)
-  derogs_added_back := group(sort(derogs_added_back_thor, seq, local), seq, local);
+  derogs_added_back := group(sort(derogs_added_back_thor, seq), seq);
 #ELSE
   derogs_added_back := derogs_added_back_roxie;
 #END
+
 
 bsplus roll_relatives(bsplus le, bsplus ri) := TRANSFORM
   SELF.Relatives.relative_bankrupt_count := le.Relatives.relative_bankrupt_count+ri.Relatives.relative_bankrupt_count;
@@ -1112,19 +1211,42 @@ risk_indicators.Layout_Boca_Shell add_relat(risk_indicators.Layout_Boca_Shell le
   SELF := le;
 END;
 
-relat_added := IF(includeRelativeInfo,
-                  JOIN(relat_derogs_rolled, relat_rolled, LEFT.seq=RIGHT.seq, add_relat(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
-                  relat_derogs_rolled);
+relat_added_roxie := IF(includeRelativeInfo,
+                        JOIN(relat_derogs_rolled, relat_rolled, LEFT.seq=RIGHT.seq, add_relat(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
+                        relat_derogs_rolled);
+                  
+relat_added_thor := IF(includeRelativeInfo,
+                        GROUP(SORT(JOIN(DISTRIBUTE(relat_derogs_rolled, HASH64(seq)), 
+                             DISTRIBUTE(relat_rolled, HASH64(seq)), 
+                             LEFT.seq=RIGHT.seq, add_relat(LEFT,RIGHT), LEFT OUTER, LOCAL), seq), seq),
+                        relat_derogs_rolled);
+                        
+#IF(onThor)
+  relat_added := relat_added_thor;
+#ELSE
+  relat_added := relat_added_roxie;
+#END
 
 risk_indicators.Layout_Boca_Shell add_relat_count(risk_indicators.Layout_Boca_Shell le, cntrelrec ri) := TRANSFORM
   SELF.Relatives.relative_count := ri.cnt;
   SELF := le;
 END;
 
-relat_count := IF(includeRelativeInfo,
-                  JOIN(relat_added, cntrelrec, LEFT.seq=RIGHT.seq, add_relat_count(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP),
-                  relat_added);
+relat_count_roxie := IF(includeRelativeInfo,
+                        JOIN(relat_added, cntrelrec, LEFT.seq=RIGHT.seq, add_relat_count(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP),
+                        relat_added);
 
+relat_count_thor := IF(includeRelativeInfo,
+                        GROUP(SORT(JOIN(DISTRIBUTE(relat_added, HASH64(seq)), 
+                             DISTRIBUTE(cntrelrec, HASH64(seq)), 
+                             LEFT.seq=RIGHT.seq, add_relat_count(LEFT,RIGHT), LEFT OUTER, LOCAL), seq), seq),
+                        relat_added);
+                        
+#IF(onThor)
+  relat_count := relat_count_thor;
+#ELSE
+  relat_count := relat_count_roxie;
+#END
 
 risk_indicators.Layout_Boca_Shell add_relat_prop(risk_indicators.Layout_Boca_Shell le, Rel_Property_Rolled ri) := TRANSFORM
   SELF.Relatives.owned :=  ri.owned;
@@ -1132,10 +1254,24 @@ risk_indicators.Layout_Boca_Shell add_relat_prop(risk_indicators.Layout_Boca_She
   SELF.Relatives.ambiguous := ri.ambiguous;
   SELF := le;
 END;
-relat_prop := IF (includeRelativeInfo,
-                  JOIN(relat_count, Rel_Property_Rolled, LEFT.seq=RIGHT.seq, add_relat_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
-                  relat_count);
 
+relat_prop_roxie := IF (includeRelativeInfo,
+                        JOIN(relat_count, Rel_Property_Rolled, LEFT.seq=RIGHT.seq, add_relat_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
+                        relat_count);
+
+relat_prop_thor := IF (includeRelativeInfo,
+                        GROUP(SORT(JOIN(DISTRIBUTE(relat_count, HASH64(seq)), 
+                             DISTRIBUTE(Rel_Property_Rolled, HASH64(seq)), 
+                             LEFT.seq=RIGHT.seq, add_relat_prop(LEFT,RIGHT), LEFT OUTER, LOCAL), seq), seq),
+                        relat_count);
+                        
+#IF(onThor)
+  relat_prop := relat_prop_thor;
+#ELSE
+  relat_prop := relat_prop_roxie;
+#END
+                  
+                  
 //MS-158: added new business property count and assessed value fields for owned and sold properties.  Special value definitions:
 //        -1 = DID not found
 //        -2 = no properties found for input subject
@@ -1168,13 +1304,26 @@ risk_indicators.Layout_Boca_Shell add_per_prop(risk_indicators.Layout_Boca_Shell
                                                                                                                               ri.bus_sold.property_owned_assessed_count);
   SELF := le;
 END;
-per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);
+per_prop_original_roxie := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP);
+per_prop_original_thor := JOIN(DISTRIBUTE(relat_prop, HASH64(seq)), 
+                               DISTRIBUTE(Per_Property_Rolled, HASH64(seq)), 
+                               LEFT.seq=RIGHT.seq, add_per_prop(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                               
+#IF(onThor)
+  per_prop_original := per_prop_original_thor;
+#ELSE
+  per_prop_original := per_prop_original_roxie;
+#END
 
 
-  //join v5 and v3 to get the v3 prop owned count if FIS custom attributes are being requested
-  append_fis_prop_owned := join(per_prop_original, Per_Property_Rolled_FIS,
+ //Fis will never run on thor, extra joins not needed.
+ #IF(onthor)
+   per_prop := per_prop_original;
+ #Else
+   //join v5 and v3 to get the v3 prop owned count if FIS custom attributes are being requested
+  append_fis_prop_owned := join(per_prop_original, Per_Property_Rolled_FIS, 
                           left.seq = right.seq,
-                          Transform(Risk_Indicators.Layout_Boca_Shell,
+                          Transform(Risk_Indicators.Layout_Boca_Shell, 
                                     self.FIS.ambiguous_property_total := right.ambiguous.property_total,
                                     self.FIS.sold_property_purchase_count := right.sold.property_owned_purchase_count,
                                     self.FIS.sold_property_purchase_total := right.sold.property_owned_purchase_total,
@@ -1182,11 +1331,11 @@ per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, a
                                     self.FIS.owned_assessed_total := right.owned.property_owned_assessed_total,
                                     self.FIS.owned_purchase_total := right.owned.property_owned_purchase_total,
                                     self.FIS.owned_property_total := right.owned.property_total,
-                                    self := left),
+                                    self := left), 
                           left outer, atmost(riskwise.max_atmost));
-
-
-
+                          
+                          
+                          
  //join to history2_fis
  append_fis_addr_hist := join(append_fis_prop_owned, History_2_Property_added_fis,
                            left.seq = right.seq,
@@ -1202,11 +1351,6 @@ per_prop_original := JOIN(relat_prop, Per_Property_Rolled, LEFT.seq=RIGHT.seq, a
                                      self.FIS.add3_purchase_amount := right.Address_Verification.Address_History_2.purchase_amount,
                                      self := left),
                            left outer, atmost(riskwise.max_atmost));
-
- //Fis will never run on thor, extra joins not needed.
- #IF(onthor)
-   per_prop := per_prop_original;
- #Else
    per_prop := IF(IsFIS, group(append_fis_addr_hist, seq), per_prop_original);
  #End
 
@@ -1217,10 +1361,21 @@ risk_indicators.Layout_Boca_Shell add_back_watercraft(risk_indicators.Layout_Boc
                 SELF := le;
 END;
 
-watercraft_added_back := if(BSversion>1, JOIN(per_prop, watercraft_rolled_indv,
+watercraft_added_back_roxie := if(BSversion>1, JOIN(per_prop, watercraft_rolled_indv,
                                               LEFT.seq=RIGHT.seq,
                                               add_back_watercraft(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
                                          per_prop);
+                                         
+watercraft_added_back_thor := JOIN(DISTRIBUTE(per_prop, HASH64(seq)), 
+                                                   DISTRIBUTE(watercraft_rolled_indv, HASH64(seq)),
+                                              LEFT.seq=RIGHT.seq,
+                                              add_back_watercraft(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                         
+#IF(onThor)
+  watercraft_added_back := watercraft_added_back_thor;
+#ELSE
+  watercraft_added_back := watercraft_added_back_roxie;
+#END
 
 
 // ================ Add Back Professional License ================
@@ -1229,10 +1384,21 @@ risk_indicators.Layout_Boca_Shell add_back_proflic(risk_indicators.Layout_Boca_S
   self.proflic_build_date := ri.proflic_build_date;
   SELF := le;
 END;
-proflic_added_back := if(BSversion>1, JOIN(watercraft_added_back, proflic_rolled,
+proflic_added_back_roxie := if(BSversion>1, JOIN(watercraft_added_back, proflic_rolled,
                                            LEFT.seq=RIGHT.seq,
                                            add_back_proflic(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
                                       watercraft_added_back);
+                                      
+proflic_added_back_thor := JOIN(DISTRIBUTE(watercraft_added_back, HASH64(seq)), 
+                                           DISTRIBUTE(proflic_rolled, HASH64(seq)),
+                                           LEFT.seq=RIGHT.seq,
+                                           add_back_proflic(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                      
+#IF(onThor)
+  proflic_added_back := proflic_added_back_thor;
+#ELSE
+  proflic_added_back := proflic_added_back_roxie;
+#END
 
 
 // ================ Add Back Student ================
@@ -1240,10 +1406,21 @@ risk_indicators.Layout_Boca_Shell add_back_student(risk_indicators.Layout_Boca_S
   SELF.student := PROJECT(ri,TRANSFORM(Riskwise.Layouts.Layout_American_Student, SELF := LEFT.student));
   SELF := le;
 END;
-student_added_back := if(BSversion>1, JOIN(proflic_added_back, student_rolled,
+student_added_back_roxie := if(BSversion>1, JOIN(proflic_added_back, student_rolled,
                                            LEFT.seq=RIGHT.seq,
                                            add_back_student(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
                                       proflic_added_back);
+                                      
+student_added_back_thor := JOIN(DISTRIBUTE(proflic_added_back, HASH64(seq)), 
+                                           DISTRIBUTE(student_rolled, HASH64(seq)),
+                                           LEFT.seq=RIGHT.seq,
+                                           add_back_student(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                      
+#IF(onThor)
+  student_added_back := student_added_back_thor;
+#ELSE
+  student_added_back := student_added_back_roxie;
+#END
 
 
 // ================ Add Back Aircraft ================
@@ -1253,10 +1430,21 @@ risk_indicators.Layout_Boca_Shell add_back_aircraft(risk_indicators.Layout_Boca_
                 SELF := le;
 END;
 
-aircraft_added_back := if(BSversion>1, JOIN(student_added_back, aircraft_rolled_indv,
+aircraft_added_back_roxie := if(BSversion>1, JOIN(student_added_back, aircraft_rolled_indv,
                                                         LEFT.seq=RIGHT.seq,
                                                         add_back_aircraft(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
                                                   student_added_back);
+                                                  
+aircraft_added_back_thor := JOIN(DISTRIBUTE(student_added_back, HASH64(seq)), 
+                                                 DISTRIBUTE(aircraft_rolled_indv, HASH64(seq)),
+                                                        LEFT.seq=RIGHT.seq,
+                                                        add_back_aircraft(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                                  
+#IF(onThor)
+  aircraft_added_back := aircraft_added_back_thor;
+#ELSE
+  aircraft_added_back := aircraft_added_back_roxie;
+#END
 
 
 // ================ Add Back AVM ================
@@ -1264,10 +1452,21 @@ risk_indicators.Layout_Boca_Shell add_back_avm(risk_indicators.Layout_Boca_Shell
   SELF.AVM := PROJECT(ri,TRANSFORM(Riskwise.Layouts.Layout_AVM, SELF := LEFT));
   SELF := le;
 END;
-avm_added_back := if(BSversion>1, JOIN(aircraft_added_back, avm_rolled,
+avm_added_back_roxie := if(BSversion>1, JOIN(aircraft_added_back, avm_rolled,
                                                 LEFT.seq=RIGHT.seq,
                                                 add_back_avm(LEFT,RIGHT), LEFT OUTER, MANY LOOKUP, PARALLEL),
                                         aircraft_added_back);
+                                        
+avm_added_back_thor := JOIN(DISTRIBUTE(aircraft_added_back, HASH64(seq)), 
+                                            DISTRIBUTE(avm_rolled, HASH64(seq)),
+                                                LEFT.seq=RIGHT.seq,
+                                                add_back_avm(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                        
+#IF(onThor)
+  avm_added_back := avm_added_back_thor;
+#ELSE
+  avm_added_back := avm_added_back_roxie;
+#END
 
 
 // ============== Add Back Gong ================
@@ -1278,22 +1477,42 @@ risk_indicators.Layout_Boca_Shell add_back_gong(risk_indicators.Layout_Boca_Shel
   self.header_summary.phones_on_file := ri.phones_on_file;
   SELF := le;
 END;
-gong_added_back := IF(BSversion>2, JOIN(avm_added_back, gong_rolled,
+gong_added_back_roxie := IF(BSversion>2, JOIN(avm_added_back, gong_rolled,
                                             LEFT.seq=RIGHT.seq,
                                             add_back_gong(LEFT,RIGHT), LEFT OUTER, LOOKUP, PARALLEL),
                                     avm_added_back);
 
+gong_added_back_thor := JOIN(DISTRIBUTE(avm_added_back, HASH64(seq)), 
+                                             DISTRIBUTE(gong_rolled, HASH64(seq)),
+                                            LEFT.seq=RIGHT.seq,
+                                            add_back_gong(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                    
+#IF(onThor)
+  gong_added_back := gong_added_back_thor;
+#ELSE
+  gong_added_back := gong_added_back_roxie;
+#END
 
 // =========== Add Back Infutor ================
 risk_indicators.Layout_Boca_Shell add_back_infutor(risk_indicators.Layout_Boca_Shell le, infutor_rolled ri) := TRANSFORM
   SELF.Infutor := PROJECT(ri,TRANSFORM(Risk_Indicators.Layouts.Layout_Infutor, SELF := LEFT));
   SELF := le;
 END;
-infutor_added_back := IF(BSversion>2, JOIN(gong_added_back, infutor_rolled,
+infutor_added_back_roxie := IF(BSversion>2, JOIN(gong_added_back, infutor_rolled,
                                               LEFT.seq=RIGHT.seq,
                                               add_back_infutor(LEFT,RIGHT), LEFT OUTER, LOOKUP, PARALLEL),
                                       gong_added_back);
 
+infutor_added_back_thor := JOIN(DISTRIBUTE(gong_added_back, HASH64(seq)), 
+                                                DISTRIBUTE(infutor_rolled, HASH64(seq)),
+                                              LEFT.seq=RIGHT.seq,
+                                              add_back_infutor(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                      
+#IF(onThor)
+  infutor_added_back := infutor_added_back_thor;
+#ELSE
+  infutor_added_back := infutor_added_back_roxie;
+#END
 
 
 // =========== Add Back Infutor ================
@@ -1301,10 +1520,21 @@ risk_indicators.Layout_Boca_Shell add_back_impulse(risk_indicators.Layout_Boca_S
   SELF.Impulse := PROJECT(ri,TRANSFORM(Risk_Indicators.Layouts.Layout_Impulse, SELF := LEFT));
   SELF := le;
 END;
-impulse_added_back := IF(BSversion>2, JOIN(infutor_added_back, impulse_rolled,
+impulse_added_back_roxie := IF(BSversion>2, JOIN(infutor_added_back, impulse_rolled,
                                               LEFT.seq=RIGHT.seq,
                                               add_back_impulse(LEFT,RIGHT), LEFT OUTER, LOOKUP, PARALLEL),
                                       infutor_added_back);
+                                      
+impulse_added_back_thor := JOIN(DISTRIBUTE(infutor_added_back, HASH64(seq)), 
+                                                DISTRIBUTE(impulse_rolled, HASH64(seq)),
+                                              LEFT.seq=RIGHT.seq,
+                                              add_back_impulse(LEFT,RIGHT), LEFT OUTER, LOCAL);
+                                      
+#IF(onThor)
+  impulse_added_back := GROUP(impulse_added_back_thor, seq);
+#ELSE
+  impulse_added_back := impulse_added_back_roxie;
+#END
 
 //add back for  AML attributes
 
@@ -1453,32 +1683,62 @@ relatAddDerog  := join(relatAddHdr, doc_rolled,
 
 
 // get easi census for wealth and fd6
-easi_census := ungroup(join(iid, Easi.Key_Easi_Census,
-            keyed(right.geolink=left.st+left.county+left.geo_blk),
-            transform(easi.layout_census,
-                self.state:= left.st,
-                self.county:=left.county,
-                self.tract:=left.geo_blk[1..6],
-                self.blkgrp:=left.geo_blk[7],
-                self.geo_blk:=left.geo_blk,
-                self := right), ATMOST(keyed(right.geolink=left.st+left.county+left.geo_blk), Riskwise.max_atmost), KEEP(1)));
+easi.layout_census easi_census_transform(iid le, Easi.Key_Easi_Census ri) := TRANSFORM
+  self.state:= le.st;
+  self.county:=le.county;
+  self.tract:=le.geo_blk[1..6];
+  self.blkgrp:=le.geo_blk[7];
+  self.geo_blk:=le.geo_blk;
+  self := ri;
+END;
+
+easi_census_roxie := ungroup(join(iid, Easi.Key_Easi_Census,
+                            keyed(right.geolink=left.st+left.county+left.geo_blk),
+                            easi_census_transform(LEFT, RIGHT),
+                            ATMOST(keyed(right.geolink=left.st+left.county+left.geo_blk), Riskwise.max_atmost), KEEP(1)));
+                
+easi_census_thor1 := ungroup(join(DISTRIBUTE(iid, HASH64(st+county+geo_blk)), 
+                                DISTRIBUTE(PULL(Easi.Key_Easi_Census), HASH64(geolink)),
+                            right.geolink=left.st+left.county+left.geo_blk,
+                            easi_census_transform(LEFT, RIGHT),
+                            ATMOST(right.geolink=left.st+left.county+left.geo_blk, Riskwise.max_atmost), KEEP(1), LOCAL));
+														
+easi_census_thor := dedup(sort(easi_census_thor1, geolink, local), geolink, local);
+                            
+#IF(onThor)
+	easi_census := easi_census_thor;
+#ELSE
+	easi_census := easi_census_roxie;
+#END
 
 wealth := Models.WIN704_0_0(impulse_added_back, if(isFCRA, dataset([],Easi.layout_census), easi_census), isFCRA, IsFIS);
 
-withWealth := join(impulse_added_back, wealth,
-        left.seq=right.seq,
-        transform(risk_indicators.Layout_Boca_Shell, self.wealth_indicator := (string)right.wealth_indicator, self := left),
-        left outer, many lookup);
+withWealth_roxie := join(impulse_added_back, wealth,
+                          left.seq=right.seq,
+                          transform(risk_indicators.Layout_Boca_Shell, self.wealth_indicator := (string)right.wealth_indicator, self := left),
+                          left outer, many lookup);
+        
+withWealth_thor := join(DISTRIBUTE(impulse_added_back, HASH64(seq)), 
+                        DISTRIBUTE(wealth, HASH64(seq)),
+                        left.seq=right.seq,
+                        transform(risk_indicators.Layout_Boca_Shell, self.wealth_indicator := (string)right.wealth_indicator, self := left),
+                        left outer, LOCAL);
+                        
+#IF(onThor)
+  withWealth := GROUP(SORT(withWealth_thor, seq), seq);
+#ELSE
+  withWealth := withWealth_roxie;
+#END
 
 //aml income  Models.IEN1006_0_1(withWealth, easi_census)),
 shell3_bsdata_tmp := map(
   bsversion > 1 and isFCRA => Models.IED1002_0_6(withWealth, bsversion), //calculates the student.income_level_code and estimated_income
-  bsversion > 2 and ~isFCRA => Models.IEN1006_0_1(withWealth, easi_census),
+  bsversion > 2 and ~isFCRA => Models.IEN1006_0_1(GROUP(withWealth, seq), easi_census),
   bsversion > 1 => withWealth,
   impulse_added_back
 );
 
-shell3_bsdata_newIncomeLevelCode := JOIN(shell3_bsdata_tmp, withWealth,
+shell3_bsdata_newIncomeLevelCode_roxie := JOIN(shell3_bsdata_tmp, withWealth,
     LEFT.seq=RIGHT.seq,
   TRANSFORM(risk_indicators.Layout_Boca_Shell,
     //use outcome from that model to convert to income code
@@ -1491,6 +1751,27 @@ shell3_bsdata_newIncomeLevelCode := JOIN(shell3_bsdata_tmp, withWealth,
       self.estimated_income := if(bsversion > 2, LEFT.estimated_income, 0),
       self := LEFT;),
     LEFT OUTER, LOOKUP, PARALLEL);
+    
+shell3_bsdata_newIncomeLevelCode_thor := JOIN(DISTRIBUTE(shell3_bsdata_tmp, HASH64(seq)), 
+                                              DISTRIBUTE(withWealth, HASH64(seq)),
+    LEFT.seq=RIGHT.seq,
+  TRANSFORM(risk_indicators.Layout_Boca_Shell,
+    //use outcome from that model to convert to income code
+      self.student.income_level_code := MAP(
+           bsversion >= 50 => '',
+           IsFCRA and trim(LEFT.student.file_type) = '' => '',
+           IsFCRA and LEFT.did = 0 => '',
+           IsFCRA => LEFT.student.income_level_code,
+           RIGHT.student.income_level_code),
+      self.estimated_income := if(bsversion > 2, LEFT.estimated_income, 0),
+      self := LEFT;),
+    LEFT OUTER, LOCAL);
+    
+#IF(onThor)
+  shell3_bsdata_newIncomeLevelCode := GROUP(SORT(shell3_bsdata_newIncomeLevelCode_thor, seq), seq);
+#ELSE
+  shell3_bsdata_newIncomeLevelCode := shell3_bsdata_newIncomeLevelCode_roxie;
+#END
 
 shell3_bsdata := if(bsversion >= 2, shell3_bsdata_newIncomeLevelCode, shell3_bsdata_tmp);
 
@@ -1525,7 +1806,7 @@ inquiries_rolled := if(isFCRA,
 LastSeenThreshold := risk_indicators.iid_constants.oneyear;  // set this to default like what it was prior to my BSOptions change
 email_summary_rolled := risk_indicators.boca_shell_email(ids_wide(~isrelat), isFCRA, bsversion, LastSeenThreshold, BSOptions, mod_access);
 
-with_advo := JOIN(shell3_bsdata, advo_rolled,
+with_advo_roxie := JOIN(shell3_bsdata, advo_rolled,
                   LEFT.seq=RIGHT.seq,
                   transform(risk_indicators.Layout_Boca_Shell,
                             self.advo_input_addr := right.advo_input_addr;
@@ -1533,13 +1814,38 @@ with_advo := JOIN(shell3_bsdata, advo_rolled,
                             self.advo_addr_hist2 := right.advo_addr_hist2;
                             self := left),
                   LEFT OUTER, LOOKUP, PARALLEL);
+with_advo_thor := JOIN(distribute(shell3_bsdata, seq), 
+											 distribute(advo_rolled, seq),
+                  LEFT.seq=RIGHT.seq,
+                  transform(risk_indicators.Layout_Boca_Shell,
+                            self.advo_input_addr := right.advo_input_addr;
+                            self.advo_addr_hist1 := right.advo_addr_hist1;
+                            self.advo_addr_hist2 := right.advo_addr_hist2;
+                            self := left),
+                  LEFT OUTER, LOOKUP, PARALLEL, local);
+#IF(onThor)
+  with_advo := with_advo_thor;
+#ELSE
+  with_advo := with_advo_roxie;
+#END
 
-with_employment := JOIN(with_advo, employment_rolled,
+with_employment_roxie := JOIN(with_advo, employment_rolled,
                   LEFT.seq=RIGHT.seq,
                   transform(risk_indicators.Layout_Boca_Shell,
                             self.employment := right.employment;
                             self := left),
                   LEFT OUTER, LOOKUP, PARALLEL);
+with_employment_thor := JOIN(distribute(with_advo, seq), distribute(employment_rolled, seq),
+                  LEFT.seq=RIGHT.seq,
+                  transform(risk_indicators.Layout_Boca_Shell,
+                            self.employment := right.employment;
+                            self := left),
+                  LEFT OUTER, LOOKUP, PARALLEL, local);
+#IF(onThor)
+  with_employment := with_employment_thor;
+#ELSE
+  with_employment := with_employment_roxie;
+#END
 
 with_inquiries_roxie := JOIN(with_employment, inquiries_rolled,
                   LEFT.seq=RIGHT.seq,
@@ -1589,6 +1895,8 @@ with_email_summary_thor := GROUP(JOIN(DISTRIBUTE(with_inquiries, HASH64(seq)),
 with_bus_header_summary := if(isFCRA, with_email_summary, risk_indicators.boca_shell_Bus_header(with_email_summary, mod_access, bsversion)); // won't use business header on FCRA queries
 with_address_risk := if(isFCRA, with_bus_header_summary, risk_indicators.Boca_Shell_Address_Risk(with_bus_header_summary, bsversion) );
 
+// with_address_risk := with_email_summary;  // todo: fix the grouping in bocashell address risk, working around it for now to see how the graph looks
+
 
 
 indBSvalues := join(relatAddDerog(~isrelat), with_address_risk, right.seq=left.seq and right.did=left.did,
@@ -1618,14 +1926,29 @@ risk_indicators.Layout_Boca_Shell AddAMLIndex(with_address_risk le, AMLIndexOut 
 
 END;
 
-with_AML  := join(with_address_risk, AMLIndexOut,
-                 left.seq=right.shell_input.seq and
-                 left.did=right.shell_input.did,
-                 AddAMLIndex(left,right),
-                 left outer);
+with_AML_roxie  := join(with_address_risk, AMLIndexOut,
+                       left.seq=right.shell_input.seq and
+                       left.did=right.shell_input.did,
+                       AddAMLIndex(left,right),
+                       left outer);
+                       
+with_AML_thor  := join(DISTRIBUTE(with_address_risk, HASH64(seq, did)), 
+                       DISTRIBUTE(AMLIndexOut, HASH64(shell_input.seq, shell_input.did)),
+                       left.seq=right.shell_input.seq and
+                       left.did=right.shell_input.did,
+                       AddAMLIndex(left,right),
+                       left outer, LOCAL);
+                       
+#IF(onThor)
+  with_AML := with_AML_thor;
+#ELSE
+  with_AML := with_AML_roxie;
+#END
 
 
-with_addr_stability_v2 := models.MSD1010_0_0(group(with_AML,seq));
+with_addr_stability_v2 := models.MSD1010_0_0(IF(onThor, 
+                                                      GROUP(SORT(with_AML, seq), seq), 
+                                                      group(with_AML,seq)));
 shell4_bsdata := with_addr_stability_v2;
 
 with_hotlist :=
@@ -1674,22 +1997,49 @@ bsdata_pre_optout := map(bsversion > 3 and ~isFCRA => with_hotlist,
     self.iid.iid_flags := le.iid.iid_flags | flagBit;
     self := le;
   END;
-  withDoNotMail := join(bsdata_pre_optout, dma.key_DNM_Name_Address,
-    left.shell_input.z5 != ''
-    and keyed(left.shell_input.prim_name = right.l_prim_name)
-    and keyed(left.shell_input.prim_range = right.l_prim_range)
-    and keyed(left.shell_input.st = right.l_st)
-    and keyed(right.l_city_code in doxie.Make_CityCodes(left.shell_input.p_city_name).rox)
-    and keyed(left.shell_input.z5= right.l_zip)
-    and keyed(left.shell_input.sec_range = right.l_sec_range)
-    and keyed(left.shell_input.lname = right.l_lname)
-    and keyed(left.shell_input.fname = right.l_fname),
-    setDNMFlag(left,right), left outer, keep(1)
-  );
+  
+  withDoNotMail_roxie := join(bsdata_pre_optout, dma.key_DNM_Name_Address,
+                              left.shell_input.z5 != ''
+                              and keyed(left.shell_input.prim_name = right.l_prim_name)
+                              and keyed(left.shell_input.prim_range = right.l_prim_range)
+                              and keyed(left.shell_input.st = right.l_st)
+                              and keyed(right.l_city_code in doxie.Make_CityCodes(left.shell_input.p_city_name).rox)
+                              and keyed(left.shell_input.z5= right.l_zip)
+                              and keyed(left.shell_input.sec_range = right.l_sec_range)
+                              and keyed(left.shell_input.lname = right.l_lname)
+                              and keyed(left.shell_input.fname = right.l_fname),
+                              setDNMFlag(left,right), left outer, keep(1)
+                              );
+                              
+  withDoNotMail_thor := join(DISTRIBUTE(bsdata_pre_optout, 
+                                          HASH64(shell_input.prim_name, shell_input.prim_range, shell_input.st,
+                                                 shell_input.p_city_name, shell_input.z5, shell_input.sec_range,
+                                                 shell_input.lname, shell_input.fname)),                
+                             DISTRIBUTE(dma.key_DNM_Name_Address,
+                                          HASH64(l_prim_name, l_prim_range, l_st,
+                                                 l_city_code, l_zip, l_sec_range,
+                                                 l_lname, l_fname)),
+                              left.shell_input.z5 != ''
+                              and left.shell_input.prim_name = right.l_prim_name
+                              and left.shell_input.prim_range = right.l_prim_range
+                              and left.shell_input.st = right.l_st
+                              and right.l_city_code in doxie.Make_CityCodes(left.shell_input.p_city_name).rox
+                              and left.shell_input.z5= right.l_zip
+                              and left.shell_input.sec_range = right.l_sec_range
+                              and left.shell_input.lname = right.l_lname
+                              and left.shell_input.fname = right.l_fname,
+                              setDNMFlag(left,right), left outer, keep(1), LOCAL
+                              );
+                              
+#IF(onThor)
+  withDoNotMail := withDoNotMail_thor;
+#ELSE
+  withDoNotMail := withDoNotMail_roxie;
+#END
 
 with_DNM_PreScreen := map(
       isFCRA and (BSOptions & risk_indicators.iid_constants.BSOptions.IncludePreScreen) > 0 => group(withPreScreen,seq),
-  not isFCRA and (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeDoNotMail) > 0 => group(withDoNotMail,seq),
+  not isFCRA and (BSOptions & risk_indicators.iid_constants.BSOptions.IncludeDoNotMail) > 0 => IF(onThor, GROUP(SORT(withDoNotMail, seq), seq), group(withDoNotMail,seq)),
   bsdata_pre_optout
 );
 
@@ -1917,13 +2267,16 @@ END;
 
 final55 := IF(bsversion < 55, project(final53, BlankDImodel(left)), final53);
 
+// eyeball := 200;
 // output(derogs_added_back, named('derogs_added_back'));
 // output(final, named('final'));
 // output(choosen(insurance_phones_rolled, eyeball), named('insurance_phones_rolled'));
+
 // output(choosen(ingenix_rolled, eyeball), named('ingenix_rolled'));
 // output(choosen(experian_phones_rolled, eyeball), named('experian_phones_rolled'));
 // output(choosen(mari_rolled, eyeball), named('mari_rolled'));
 // output(derogs_added_back, named('derogs_added_back'));
+
 // output(relat_derogs_rolled, named('relat_derogs_rolled'));
 // output(doc_rolled, named('doc_rolled'));
 // output(derogs_w_rel_crims, named('derogs_w_rel_crims'));
@@ -1934,14 +2287,18 @@ final55 := IF(bsversion < 55, project(final53, BlankDImodel(left)), final53);
 // output(relat_rolled, named('relat_rolled'));
 // output(final2, named('final2'));
 // output(IncludeLnJ, named('IncludeLnJ'));
-// output(prop_common, named('prop_common'));
+// output(prop_common, named('prop_common'), overwrite);
 // output(pre_ADVO, named('pre_ADVO'));
 // output(prop_with_advo, named('prop_with_advo'));
 // output(prop_with_advo_deduped, named('prop_with_advo_deduped'));
+
 // output(single_property, named('single_property'));
+
 // output(Rel_Property_Rolled, named('Rel_Property_Rolled'));
 // output(Per_Property_Rolled_FIS, named('Per_Property_Rolled_FIS'));
+
 // output(History_2_Property_added_fis, named('History_2_Property_added_fis'));
+
 // output(append_fis_prop_owned, named('append_fis_prop_owned'));
 // output(append_fis_addr_hist, named('append_fis_addr_hist'));
 // output(per_prop, named('per_prop'));
@@ -1949,6 +2306,14 @@ final55 := IF(bsversion < 55, project(final53, BlankDImodel(left)), final53);
 // output(p_address, named('p_address'), overwrite);
 // output(prop, named('prop'), overwrite);
 // output(prop_common, named('prop_common'), overwrite);
+
+// OUTPUT(History_2_Property_Added_a, NAMED('History_2_Property_Added_a'));
+// OUTPUT(History_2_Property_added, NAMED('History_2_Property_added'));
+// OUTPUT(History_2_Property_Added_1_fis, NAMED('History_2_Property_Added_1_fis'));
+// OUTPUT(History_2_Property_added_fis, NAMED('History_2_Property_added_fis'));
+// OUTPUT(p2, NAMED('p2'));
+// OUTPUT(single_property, NAMED('single_property'));
+// OUTPUT(single_property_fis, NAMED('single_property_fis'));
 
 RETURN final55;
 

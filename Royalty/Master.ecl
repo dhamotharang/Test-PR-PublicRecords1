@@ -107,6 +107,7 @@ export Master := dataset(
       {'ROYALTY', 'WORKPLACE_SP_SC'	, '328', 'I', 'SC'		, 'Workplace: Sales Channel - Spouse'},
       {'ROYALTY', 'WORKPLACE_SP_TM'	, '329', 'I', 'TM'		, 'Workplace: Thrive Mortgage - Spouse'},
       {'ROYALTY', 'WORKPLACE_SP_T$'	, '330', 'I', 'T$'		, 'Workplace: Thrive Pay Day - Spouse'},
+      {'ROYALTY', 'EMAIL_OC'        , '331', 'I', 'OC'    , 'Email: OneClick Data'},  // non-royalty source
       {'ROYALTY', 'WORLD'						, '350', 'I', ''			, 'Worldcheck'},
       {'ROYALTY', 'EAH_EQ'					, '360', 'I', ''			, 'Executive At Home (Equifax data)'},
       {'ROYALTY', 'EAH_DB_SALES'		, '361', 'I', ''			, ''},

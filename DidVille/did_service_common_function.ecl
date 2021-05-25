@@ -94,7 +94,7 @@ file_rslt3 := if (verify_value='' and
 file_rslt_eda := if(edabest_value, didville.gong_append(file_rslt3, mod_access), file_rslt3);
 
 //append patriot information
-patriot.MAC_AppendPatriot(file_rslt_eda, mod_access, did,fname,mname,lname,file_rslt4,ptys,false)
+patriot.MAC_AppendPatriot(file_rslt_eda, mod_access, did, fname, mname, lname, file_rslt4, ptys)
 
 file_rslt5 := if(patriot_flag, file_rslt4, file_rslt_eda);
 

@@ -12,6 +12,7 @@ EXPORT IParam := MODULE
   EXPORT string FraudPlatform;
   EXPORT boolean AppendBest := TRUE;
   EXPORT string InquiryReason; //added for RIN API request only.
+  EXPORT string LoginID; //added for RIN API request only.
  END;
 
  // **************************************************************************************
@@ -34,6 +35,7 @@ EXPORT IParam := MODULE
      EXPORT string FraudPlatform := RiskIntelligenceNetwork_Services.Constants.FRAUD_PLATFORM : STORED('FraudPlatform');
      EXPORT boolean AppendBest := TRUE: STORED('AppendBest');
      EXPORT string InquiryReason := '' : STORED('InquiryReason'); //added for RIN API request only.
+     EXPORT string LoginID := '' : STORED('_LoginID'); //added for RIN API request only.
   END;
 
   RETURN in_mod;
