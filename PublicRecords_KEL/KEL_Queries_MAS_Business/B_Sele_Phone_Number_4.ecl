@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Sele_Phone_Number_5,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Phone,E_Sele_Phone_Number FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Phone_Number_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Phone_Number_5(__in,__cfg).__ENH_Sele_Phone_Number_5) __ENH_Sele_Phone_Number_5 := B_Sele_Phone_Number_5(__in,__cfg).__ENH_Sele_Phone_Number_5;
-  SHARED __EE2121730 := __ENH_Sele_Phone_Number_5;
-  EXPORT __ST209598_Layout := RECORD
+  SHARED __EE2125331 := __ENH_Sele_Phone_Number_5;
+  EXPORT __ST213199_Layout := RECORD
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nstr Source_;
     KEL.typ.nkdate My_Date_First_Seen_;
@@ -18,7 +18,7 @@ EXPORT B_Sele_Phone_Number_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST209560_Layout := RECORD
+  EXPORT __ST213161_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Phone().Typ) Phone_Number_;
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).Best_Phone_Details_Layout) Best_Phone_Details_;
@@ -26,7 +26,7 @@ EXPORT B_Sele_Phone_Number_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).Marketability_Layout) Marketability_;
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).S_I_C_Codes_Layout) S_I_C_Codes_;
     KEL.typ.ndataset(E_Sele_Phone_Number(__in,__cfg).N_A_I_C_S_Codes_Layout) N_A_I_C_S_Codes_;
-    KEL.typ.ndataset(__ST209598_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST213199_Layout) Data_Sources_;
     KEL.typ.nbool Input_Phone_Match_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -35,10 +35,10 @@ EXPORT B_Sele_Phone_Number_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefaul
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST209560_Layout __ND2121735__Project(B_Sele_Phone_Number_5(__in,__cfg).__ST213927_Layout __PP2121731) := TRANSFORM
-    __EE2121784 := __PP2121731.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE2121784),__ST209598_Layout),__NL(__EE2121784));
-    SELF := __PP2121731;
+  SHARED __ST213161_Layout __ND2125336__Project(B_Sele_Phone_Number_5(__in,__cfg).__ST217528_Layout __PP2125332) := TRANSFORM
+    __EE2125385 := __PP2125332.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE2125385),__ST213199_Layout),__NL(__EE2125385));
+    SELF := __PP2125332;
   END;
-  EXPORT __ENH_Sele_Phone_Number_4 := PROJECT(__EE2121730,__ND2121735__Project(LEFT));
+  EXPORT __ENH_Sele_Phone_Number_4 := PROJECT(__EE2125331,__ND2125336__Project(LEFT));
 END;

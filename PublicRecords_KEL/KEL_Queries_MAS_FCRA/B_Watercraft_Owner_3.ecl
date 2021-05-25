@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile,E_Person,E_Watercraft,E_Watercraft_Owner,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Watercraft_Owner_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Watercraft_Owner(__in,__cfg).__Result) __E_Watercraft_Owner := E_Watercraft_Owner(__in,__cfg).__Result;
-  SHARED __EE385496 := __E_Watercraft_Owner;
-  EXPORT __ST168767_Layout := RECORD
+  SHARED __EE389387 := __E_Watercraft_Owner;
+  EXPORT __ST172370_Layout := RECORD
     KEL.typ.ntyp(E_Watercraft().Typ) W_Craft_;
     KEL.typ.ntyp(E_Person().Typ) Owner_;
     KEL.typ.ndataset(E_Watercraft_Owner(__in,__cfg).Data_Sources_Layout) Data_Sources_;
@@ -17,10 +17,10 @@ EXPORT B_Watercraft_Owner_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST168767_Layout __ND385505__Project(E_Watercraft_Owner(__in,__cfg).Layout __PP385449) := TRANSFORM
-    __CC13458 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('watercraft_build_version'))),__CN(__cfg.CurrentDate));
-    SELF.Date_First_Seen_Capped_ := IF(__T(__OP2(KEL.era.ToDate(__PP385449.Date_First_Seen_),>,__CC13458)),__ECAST(KEL.typ.nkdate,__CC13458),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP385449.Date_First_Seen_)));
-    SELF := __PP385449;
+  SHARED __ST172370_Layout __ND389396__Project(E_Watercraft_Owner(__in,__cfg).Layout __PP389340) := TRANSFORM
+    __CC13467 := KEL.Routines.MinN(FN_Compile(__cfg).FN_G_E_T_B_U_I_L_D_D_A_T_E(__ECAST(KEL.typ.nstr,__CN('watercraft_build_version'))),__CN(__cfg.CurrentDate));
+    SELF.Date_First_Seen_Capped_ := IF(__T(__OP2(KEL.era.ToDate(__PP389340.Date_First_Seen_),>,__CC13467)),__ECAST(KEL.typ.nkdate,__CC13467),__ECAST(KEL.typ.nkdate,KEL.era.ToDate(__PP389340.Date_First_Seen_)));
+    SELF := __PP389340;
   END;
-  EXPORT __ENH_Watercraft_Owner_3 := PROJECT(__EE385496,__ND385505__Project(LEFT));
+  EXPORT __ENH_Watercraft_Owner_3 := PROJECT(__EE389387,__ND389396__Project(LEFT));
 END;

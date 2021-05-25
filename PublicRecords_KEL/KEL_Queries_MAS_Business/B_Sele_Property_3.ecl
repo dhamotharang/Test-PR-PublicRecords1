@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Sele_Property_4,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Property,E_Sele_Property,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Property_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Property_4(__in,__cfg).__ENH_Sele_Property_4) __ENH_Sele_Property_4 := B_Sele_Property_4(__in,__cfg).__ENH_Sele_Property_4;
-  SHARED __EE2508384 := __ENH_Sele_Property_4;
-  EXPORT __ST201866_Layout := RECORD
+  SHARED __EE2511985 := __ENH_Sele_Property_4;
+  EXPORT __ST205467_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Property().Typ) Prop_;
     KEL.typ.nint Ult_I_D_;
@@ -33,9 +33,9 @@ EXPORT B_Sele_Property_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST201866_Layout __ND2508389__Project(B_Sele_Property_4(__in,__cfg).__ST209679_Layout __PP2508385) := TRANSFORM
-    SELF.Is_Currently_Owned_ := (__PP2508385.Property_Is_Owned_Assessment_ OR __PP2508385.Property_Is_Owned_Deed_) AND NOT (__PP2508385.Property_Is_Sold_);
-    SELF := __PP2508385;
+  SHARED __ST205467_Layout __ND2511990__Project(B_Sele_Property_4(__in,__cfg).__ST213280_Layout __PP2511986) := TRANSFORM
+    SELF.Is_Currently_Owned_ := (__PP2511986.Property_Is_Owned_Assessment_ OR __PP2511986.Property_Is_Owned_Deed_) AND NOT (__PP2511986.Property_Is_Sold_);
+    SELF := __PP2511986;
   END;
-  EXPORT __ENH_Sele_Property_3 := PROJECT(__EE2508384,__ND2508389__Project(LEFT));
+  EXPORT __ENH_Sele_Property_3 := PROJECT(__EE2511985,__ND2511990__Project(LEFT));
 END;

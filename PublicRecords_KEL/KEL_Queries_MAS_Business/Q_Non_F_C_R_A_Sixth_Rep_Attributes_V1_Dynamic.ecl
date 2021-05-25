@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile,E_Person FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
@@ -13,9 +13,9 @@ EXPORT Q_Non_F_C_R_A_Sixth_Rep_Attributes_V1_Dynamic(KEL.typ.uid __PLexID_in, DA
     SHARED __SourceFilter(DATASET(InLayout) __ds) := __UsingFitler(__AsofFitler(__ds));
   END;
   SHARED TYPEOF(E_Person(__in,__cfg_Local).__Result) __E_Person := E_Person_Filtered.__Result;
-  SHARED __EE1872088 := __E_Person;
-  SHARED __EE3682036 := __EE1872088(__T(__OP2(__EE1872088.UID,=,__CN(__PLexID_in))));
-  SHARED __ST113765_Layout := RECORD
+  SHARED __EE1875689 := __E_Person;
+  SHARED __EE3685637 := __EE1875689(__T(__OP2(__EE1875689.UID,=,__CN(__PLexID_in))));
+  SHARED __ST115803_Layout := RECORD
     KEL.typ.nuid Lex_I_D_;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -24,7 +24,7 @@ EXPORT Q_Non_F_C_R_A_Sixth_Rep_Attributes_V1_Dynamic(KEL.typ.uid __PLexID_in, DA
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(__EE3682036,TRANSFORM(__ST113765_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
+  EXPORT Res0 := __UNWRAP(PROJECT(__EE3685637,TRANSFORM(__ST115803_Layout,SELF.Lex_I_D_ := LEFT.UID,SELF := LEFT)));
   EXPORT DBG_E_Person_Result := __UNWRAP(E_Person_Filtered.__Result);
   EXPORT DBG_OutputAll := PARALLEL(
     OUTPUT(DBG_E_Person_Result,NAMED('DBG_E_Person_Result_Q_Non_F_C_R_A_Sixth_Rep_Attributes_V1_Dynamic'))

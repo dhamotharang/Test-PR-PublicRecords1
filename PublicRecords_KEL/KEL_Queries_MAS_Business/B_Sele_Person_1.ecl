@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Sele_Person_2,B_Sele_Person_3,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Person,E_Sele_Person,E_Surname FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_2(__in,__cfg).__ENH_Sele_Person_2) __ENH_Sele_Person_2 := B_Sele_Person_2(__in,__cfg).__ENH_Sele_Person_2;
-  SHARED __EE3216626 := __ENH_Sele_Person_2;
-  EXPORT __ST181730_Layout := RECORD
+  SHARED __EE3220227 := __ENH_Sele_Person_2;
+  EXPORT __ST185331_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -23,10 +23,10 @@ EXPORT B_Sele_Person_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST181730_Layout __ND3216761__Project(B_Sele_Person_2(__in,__cfg).__ST192268_Layout __PP3216627) := TRANSFORM
-    __CC14204 := '-99997';
-    SELF.Assoc_Valid_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP3216627.Assoc_Fs_Date_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP3216627.Assoc_Fs_Date_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC14204)));
-    SELF := __PP3216627;
+  SHARED __ST185331_Layout __ND3220362__Project(B_Sele_Person_2(__in,__cfg).__ST195869_Layout __PP3220228) := TRANSFORM
+    __CC14213 := '-99997';
+    SELF.Assoc_Valid_Date_ := IF(__T(__FN1(KEL.Routines.IsValidDate,__PP3220228.Assoc_Fs_Date_)),__ECAST(KEL.typ.nstr,__FN2(KEL.Routines.DateToString,__PP3220228.Assoc_Fs_Date_,__CN('%Y%m%d'))),__ECAST(KEL.typ.nstr,__CN(__CC14213)));
+    SELF := __PP3220228;
   END;
-  EXPORT __ENH_Sele_Person_1 := PROJECT(__EE3216626,__ND3216761__Project(LEFT));
+  EXPORT __ENH_Sele_Person_1 := PROJECT(__EE3220227,__ND3220362__Project(LEFT));
 END;
