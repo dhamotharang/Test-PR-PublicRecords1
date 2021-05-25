@@ -1,4 +1,4 @@
-import ut, _control;
+﻿import ut, _control, Orbit3;
 
 export proc_build_FDIC_BDID_all(string filedate) := function
 
@@ -7,7 +7,7 @@ sprayfile := FileServices.SprayVariable(if ( _Control.ThisEnvironment.Name <> 'P
 									,'/data/prod_data_build_10/production_data/business_headers/fdic/in/'+filedate+'/'+'INSTITUTIONS2.CSV'
 									//,1226
 									,,,,
-									, 'thor400_60',  // running on prod
+									, 'thor400_44',  // running on prod
 									//,'thor400_88',   // running on dataland
 									'~thor_data400::in::govdata::fdic_'+filedate+'.csv',-1,,,true,false,true);
 									
@@ -31,10 +31,15 @@ superfile_transac := sequential( output(csv2fixed,,'~thor_data400::in::govdata::
 //Build BDID
 make_BDID := govdata.make_FDIC_BDID(filedate);
 
+//ORBIT item update
+Orbit_Update := Orbit3.proc_Orbit3_CreateBuild_AddItem('FDIC',(filedate),'N');
+
+
 retval := sequential(sprayfile
 					  ,superfile_transac
 					  ,make_BDID
-					  ,govdata.Strata_Population_Stats.FDIC_pop); 
+					  ,govdata.Strata_Population_Stats.FDIC_pop
+						,Orbit_Update); 
 
 
 return retval;
