@@ -58,6 +58,9 @@
    EXPORT	STRING	ASSESSMENT           := 'A';
    EXPORT	STRING	DEED                 := 'D';
    EXPORT	STRING	ASSIGNMENTANDRELEASE := 'R';
+   EXPORT	STRING  DEEDSPLUSAR          := 'S';
+   EXPORT getFIDtype(string lookupVal) := if(lookupVal IN [ASSIGNMENTANDRELEASE, DEEDSPLUSAR],DEED,lookupVal);
+   EXPORT IsIncludeAllDeedTypes(STRING lookupVal) := lookupVal IN [EVERYTHING, DEEDSPLUSAR];
   END;
 
 end;

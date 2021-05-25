@@ -21,7 +21,8 @@ export SearchService() := macro
   #CONSTANT('DisplayMatchedParty', true);
 
   //This boolean is used in Property Report and Search Services to show Deeds, Assessments and A&R data when LooupType is blank
-  boolean includeBlackKnight := Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.EVERYTHING;
+  boolean includeBlackKnight :=  Ln_PropertyV2_Services.consts.LOOKUP_TYPE.IsIncludeAllDeedTypes(Ln_PropertyV2_Services.input.lookupVal);
+                                
 
   raw := project(LN_PropertyV2_Services.SearchService_records(,,,,includeBlackKnight).Records,
                    LN_PropertyV2_Services.layouts.combined.narrow);

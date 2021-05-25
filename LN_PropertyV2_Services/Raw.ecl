@@ -23,9 +23,7 @@ export Raw := module
   // Key conversions
   // ------------------------------------------
  // R -> Assignments and Releases Data
-  shared lookupValOK(string fid)			:= IF(Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.ASSIGNMENTANDRELEASE,
-                                        Ln_PropertyV2_Services.consts.LOOKUP_TYPE.DEED,
-                                        Ln_PropertyV2_Services.input.lookupVal) in ['',LN_PropertyV2.fn_fid_type(fid)];
+  shared lookupValOK(string fid)			:= Ln_PropertyV2_Services.consts.LOOKUP_TYPE.getFIDtype(Ln_PropertyV2_Services.input.lookupVal) IN ['',LN_PropertyV2.fn_fid_type(fid)]; 
   shared partyTypeOK(string src_code)	:= Ln_PropertyV2_Services.input.partyType in ['',src_code[1]];
   // shared partyTypeOK(string src_code)	:= case(input.partyType, ''=>true, 'P'=>src_code[2]='P', src_code[1]=input.partyType);
 
@@ -124,7 +122,7 @@ export Raw := module
     pnum_d := join(
       fids, Ln_PropertyV2_Services.keys.deed(isFCRA),
       keyed(left.ln_fares_id = right.ln_fares_id)
-   AND map(Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.EVERYTHING =>  true,
+   AND map(Ln_PropertyV2_Services.consts.LOOKUP_TYPE.IsIncludeAllDeedTypes(Ln_PropertyV2_Services.input.lookupVal) =>  true,
            Ln_PropertyV2_Services.input.lookupVal = Ln_PropertyV2_Services.consts.LOOKUP_TYPE.ASSIGNMENTANDRELEASE => LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code,right.ln_fares_id[2]),
            NOT LN_PropertyV2.fn_isAssignmentAndReleaseRecord(right.record_type,right.state,right.document_type_code,right.ln_fares_id[2])),
       transform(l_pnum, self.pnum := LN_PropertyV2.fn_strip_pnum(right.apnt_or_pin_number)),
