@@ -41,7 +41,8 @@ let main = async function() {
   ctrl.enable();
 
   if (deps) {
-    for (let item of deps) {
+    let sorted = deps.sort();
+    for (let item of sorted) {
       console.log(item);
     }
     ok = true;

@@ -77,7 +77,8 @@ let main = async function() {
   if (!verbose) ctrl.enable();
   
   // output our results
-  for (let item of out) {
+  let sorted = Array.from(out).sort();
+  for (let item of sorted) {
     console.log(item);
   }
 
