@@ -1,4 +1,4 @@
-//Build actions to update Text Search keys for the collection named by Filename_Info
+﻿//Build actions to update Text Search keys for the collection named by Filename_Info
 //Super keys are managed, including moving through the prior generations.
 //DO NOT USE WITH ANY OTHER SUPER KEY MANAGEMENT MACROS!!!!!!!!!!!!!!!!!!
 // The "kf" parameter is used to supply super key names to be managed with the
@@ -89,7 +89,8 @@ EXPORT Build_From_Postings(FileName_Info info, DATASET(Layout_Posting) rawPostin
                            TRANSFORM(Work_IndxInv, 
                                      SELF.lseg:=IF(LEFT.typ IN rtypes, LEFT.seg, 0),
                                      SELF:=LEFT));
-  seq_new := SORT(new_with_lseg, typ, nominal, lseg, part, docRef.src, docRef.doc, kwp, wip, suffix, LOCAL);
+	//DF-28543 add the missing field seg in sort
+	seq_new := SORT(new_with_lseg, typ, nominal, lseg, part, docRef.src, docRef.doc, seg, kwp, wip, suffix, LOCAL);
   inv_merged_or_single := MERGE(seq_new, old_incr,
                                 SORTED(typ, nominal, lseg, part, docRef.src, docRef.doc,
                                        seg, kwp, wip, suffix), LOCAL);
@@ -246,6 +247,7 @@ EXPORT Build_From_Postings(FileName_Info info, DATASET(Layout_Posting) rawPostin
   I_ExtKeyIn2 := Indx_ExtKeyIn2(info, TRUE, inkey_merged_or_single);
   I_ExtKeyOut2 := Indx_ExtKeyOut2(info, TRUE, outkey_merged_or_single);
   //Make the action
+
 	r := SEQUENTIAL(
     // Creae Super Keys as required
     NOTHOR(APPLY(add_keys+repl_keys, 
@@ -274,7 +276,8 @@ EXPORT Build_From_Postings(FileName_Info info, DATASET(Layout_Posting) rawPostin
       IF(merge_increment,
          BUILD(I_Dictionary3, DISTRIBUTED(Indx_Dictionary3(info_incr)), MERGE, UPDATE, OVERWRITE),
          BUILD(I_Dictionary3, UPDATE, OVERWRITE)),
-      BUILD(I_LocalDict2, SORTED, UPDATE, OVERWRITE),
+			//DF-28543 removed SORTED when building localDict index to fix the skew issue
+			BUILD(I_LocalDict2, UPDATE, OVERWRITE),
 			// Write inversion parts
       BUILD(i_Nominal3, SORTED, UPDATE, OVERWRITE),
 			BUILD(I_Field, SORTED, UPDATE, OVERWRITE),
