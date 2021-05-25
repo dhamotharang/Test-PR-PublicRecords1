@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT B_Business_Sele_Overflow_2,B_Business_Sele_Overflow_3,CFG_Compile,E_Business_Sele_Overflow FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Business_Sele_Overflow_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Business_Sele_Overflow_2(__in,__cfg).__ENH_Business_Sele_Overflow_2) __ENH_Business_Sele_Overflow_2 := B_Business_Sele_Overflow_2(__in,__cfg).__ENH_Business_Sele_Overflow_2;
-  SHARED __EE1372372 := __ENH_Business_Sele_Overflow_2;
-  EXPORT __ST142445_Layout := RECORD
+  SHARED __EE1376213 := __ENH_Business_Sele_Overflow_2;
+  EXPORT __ST153424_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nint Ult_I_D_;
     KEL.typ.nint Org_I_D_;
@@ -13,7 +13,7 @@ EXPORT B_Business_Sele_Overflow_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
     KEL.typ.ndataset(E_Business_Sele_Overflow(__in,__cfg).Vendor_Identification_Layout) Vendor_Identification_;
     KEL.typ.ndataset(E_Business_Sele_Overflow(__in,__cfg).S_O_S_Company_Types_Layout) S_O_S_Company_Types_;
     KEL.typ.ndataset(E_Business_Sele_Overflow(__in,__cfg).S_O_S_Registered_Agents_Layout) S_O_S_Registered_Agents_;
-    KEL.typ.ndataset(B_Business_Sele_Overflow_2(__in,__cfg).__ST146171_Layout) S_O_S_Statuses_;
+    KEL.typ.ndataset(B_Business_Sele_Overflow_2(__in,__cfg).__ST157136_Layout) S_O_S_Statuses_;
     KEL.typ.ndataset(E_Business_Sele_Overflow(__in,__cfg).S_O_S_Incorporation_Details_Layout) S_O_S_Incorporation_Details_;
     KEL.typ.ndataset(E_Business_Sele_Overflow(__in,__cfg).S_O_S_Charter_Numbers_Layout) S_O_S_Charter_Numbers_;
     KEL.typ.ndataset(E_Business_Sele_Overflow(__in,__cfg).S_O_S_Term_Exist_Codes_Layout) S_O_S_Term_Exist_Codes_;
@@ -32,10 +32,10 @@ EXPORT B_Business_Sele_Overflow_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST142445_Layout __ND1372386__Project(B_Business_Sele_Overflow_2(__in,__cfg).__ST146144_Layout __PP1371779) := TRANSFORM
-    __EE1372238 := __PP1371779.S_O_S_Statuses_;
-    __EE1372253 := __PP1371779.S_O_S_Statuses_;
-    __ST79564_Layout := RECORD
+  SHARED __ST153424_Layout __ND1376227__Project(B_Business_Sele_Overflow_2(__in,__cfg).__ST157109_Layout __PP1375620) := TRANSFORM
+    __EE1376079 := __PP1375620.S_O_S_Statuses_;
+    __EE1376094 := __PP1375620.S_O_S_Statuses_;
+    __ST85528_Layout := RECORD
       KEL.typ.nint Days_Since_Status_;
       KEL.typ.epoch Archive___Date_ := 0;
       KEL.typ.epoch Date_First_Seen_ := 0;
@@ -43,12 +43,12 @@ EXPORT B_Business_Sele_Overflow_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCD
       KEL.typ.epoch Hybrid_Archive_Date_ := 0;
       KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     END;
-    __EE1372263 := PROJECT(TABLE(PROJECT(__T(__EE1372253),__ST79564_Layout),{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Days_Since_Status_},Days_Since_Status_,MERGE),__ST79564_Layout);
-    __BS1372239 := __T(__EE1372238);
-    __EE1372378 := __BS1372239(__T(__OP2(__T(__EE1372238).Days_Since_Status_,=,KEL.Aggregates.MinN(__EE1372263,__EE1372263.Days_Since_Status_))));
-    SELF.Most_Recent_Status_Filing_Description_ := (__EE1372378)[1].S_O_S_Status_Description_;
-    SELF.S_O_S_Unique_State_Count_ := __OP2(__OP2(KEL.Aggregates.CountN(__PP1371779.S_O_S_Foreign_States_),+,KEL.Aggregates.CountN(__PP1371779.S_O_S_Domestic_States_)),-,__CN(__PP1371779.S_O_S_Filing_States_Count_Dups_));
-    SELF := __PP1371779;
+    __EE1376104 := PROJECT(TABLE(PROJECT(__T(__EE1376094),__ST85528_Layout),{KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),Days_Since_Status_},Days_Since_Status_,MERGE),__ST85528_Layout);
+    __BS1376080 := __T(__EE1376079);
+    __EE1376219 := __BS1376080(__T(__OP2(__T(__EE1376079).Days_Since_Status_,=,KEL.Aggregates.MinN(__EE1376104,__EE1376104.Days_Since_Status_))));
+    SELF.Most_Recent_Status_Filing_Description_ := (__EE1376219)[1].S_O_S_Status_Description_;
+    SELF.S_O_S_Unique_State_Count_ := __OP2(__OP2(KEL.Aggregates.CountN(__PP1375620.S_O_S_Foreign_States_),+,KEL.Aggregates.CountN(__PP1375620.S_O_S_Domestic_States_)),-,__CN(__PP1375620.S_O_S_Filing_States_Count_Dups_));
+    SELF := __PP1375620;
   END;
-  EXPORT __ENH_Business_Sele_Overflow_1 := PROJECT(__EE1372372,__ND1372386__Project(LEFT));
+  EXPORT __ENH_Business_Sele_Overflow_1 := PROJECT(__EE1376213,__ND1376227__Project(LEFT));
 END;

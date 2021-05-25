@@ -1,8 +1,8 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT CFG_Compile FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT E_Social_Security_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   EXPORT Typ := KEL.typ.uid;
   EXPORT InLayout := RECORD
@@ -25,14 +25,14 @@ EXPORT E_Social_Security_Number(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
   SHARED VIRTUAL __SourceFilter(DATASET(InLayout) __ds) := __ds;
   SHARED VIRTUAL __GroupedFilter(GROUPED DATASET(InLayout) __ds) := __ds;
   SHARED __Mapping := 'ssn(DEFAULT:UID|DEFAULT:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dateofdeath(DEFAULT:Date_Of_Death_:DATE),deathmasterflag(DEFAULT:Death_Master_Flag_),issuestate(DEFAULT:Issue_State_:\'\'),headerfirstseen(DEFAULT:Header_First_Seen_:DATE),source(DEFAULT:Source_:\'\'),archive_date(DEFAULT:Archive___Date_:EPOCH),datefirstseen(DEFAULT:Date_First_Seen_:EPOCH),datelastseen(DEFAULT:Date_Last_Seen_:EPOCH),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH)';
-  SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED Date_Last_Seen_0Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED __Mapping0 := 'ssn(OVERRIDE:UID|DEFAULT:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dod(OVERRIDE:Date_Of_Death_:DATE),deathmasterflag(DEFAULT:Death_Master_Flag_),st(OVERRIDE:Issue_State_:\'\'),dt_first_seen(OVERRIDE:Header_First_Seen_:DATE|OVERRIDE:Date_First_Seen_:EPOCH),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_0Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d0_Norm := NORMALIZE(__in,LEFT.Dataset_Doxie__Key_Header,TRANSFORM(RECORDOF(__in.Dataset_Doxie__Key_Header),SELF:=RIGHT));
   EXPORT __d0_KELfiltered := __d0_Norm((UNSIGNED)ssn != 0);
   EXPORT PublicRecords_KEL_ECL_Functions_Dataset_FDC_Dataset_Doxie__Key_Header_Invalid := __d0_KELfiltered((KEL.typ.uid)ssn = 0);
   SHARED __d0_Prefiltered := __d0_KELfiltered((KEL.typ.uid)ssn <> 0);
   SHARED __d0 := __SourceFilter(KEL.FromFlat.Convert(__d0_Prefiltered,InLayout,__Mapping0,'PublicRecords_KEL.ECL_Functions.Dataset_FDC'));
-  SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01','0');
+  SHARED Date_Last_Seen_1Rule(STRING a) := MAP(KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..6]+'01'))=>a[1..6]+'01',KEL.Routines.IsValidDate((KEL.typ.kdate)(a[1..4]+'0101'))=>a[1..4]+'0101','0');
   SHARED __Mapping1 := 'ssn(OVERRIDE:UID|DEFAULT:S_S_N_:\'\'),officialfirstseen(DEFAULT:Official_First_Seen_:DATE),officiallastseen(DEFAULT:Official_Last_Seen_:DATE),dateofdeath(DEFAULT:Date_Of_Death_:DATE),deathmasterflag(DEFAULT:Death_Master_Flag_),st(OVERRIDE:Issue_State_:\'\'),dt_first_seen(OVERRIDE:Header_First_Seen_:DATE|OVERRIDE:Date_First_Seen_:EPOCH),src(OVERRIDE:Source_:\'\'),archive_date(OVERRIDE:Archive___Date_:EPOCH),dt_last_seen(OVERRIDE:Date_Last_Seen_:EPOCH:Date_Last_Seen_1Rule),hybridarchivedate(DEFAULT:Hybrid_Archive_Date_:EPOCH),vaultdatelastseen(DEFAULT:Vault_Date_Last_Seen_:EPOCH),DPMBitmap(OVERRIDE:__Permits:PERMITS)';
   SHARED __d1_Norm := NORMALIZE(__in,LEFT.Dataset_Header_Quick__Key_Did,TRANSFORM(RECORDOF(__in.Dataset_Header_Quick__Key_Did),SELF:=RIGHT));
   EXPORT __d1_KELfiltered := __d1_Norm((UNSIGNED)ssn != 0);

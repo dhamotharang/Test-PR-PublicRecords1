@@ -1,17 +1,17 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT B_Input_B_I_I_2,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Email,E_Geo_Link,E_Input_B_I_I,E_Input_B_I_I_Input_P_I_I,E_Input_P_I_I,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_B_I_I_2(__in,__cfg).__ENH_Input_B_I_I_2) __ENH_Input_B_I_I_2 := B_Input_B_I_I_2(__in,__cfg).__ENH_Input_B_I_I_2;
   SHARED VIRTUAL TYPEOF(E_Input_B_I_I_Input_P_I_I(__in,__cfg).__Result) __E_Input_B_I_I_Input_P_I_I := E_Input_B_I_I_Input_P_I_I(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE1372559 := __ENH_Input_B_I_I_2;
-  SHARED __EE703680 := __E_Input_P_I_I;
-  SHARED __EE1376369 := __EE703680(__T(__OP2(__EE703680.Rep_Number_,=,__CN(1))));
-  SHARED __EE703678 := __E_Input_B_I_I_Input_P_I_I;
-  SHARED __EE1375207 := __EE703678(__NN(__EE703678.B_I_I_) AND __NN(__EE703678.P_I_I_));
-  SHARED __ST706070_Layout := RECORD
+  SHARED __EE1376400 := __ENH_Input_B_I_I_2;
+  SHARED __EE709807 := __E_Input_P_I_I;
+  SHARED __EE1380262 := __EE709807(__T(__OP2(__EE709807.Rep_Number_,=,__CN(1))));
+  SHARED __EE709805 := __E_Input_B_I_I_Input_P_I_I;
+  SHARED __EE1379080 := __EE709805(__NN(__EE709805.B_I_I_) AND __NN(__EE709805.P_I_I_));
+  SHARED __ST712257_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -19,7 +19,11 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr P___Inp_Name_First_;
     KEL.typ.nstr P___Inp_Name_Mid_;
     KEL.typ.nstr P___Inp_Name_Last_;
-    KEL.typ.ntyp(E_Surname().Typ) Last_Name_;
+    KEL.typ.nstr P___Inp_Cln_Surname1_;
+    KEL.typ.nstr P___Inp_Cln_Surname2_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name1_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name2_;
+    KEL.typ.nstr Address_Geo_Link_;
     KEL.typ.nstr P___Inp_Addr_Line1_;
     KEL.typ.nstr P___Inp_Addr_Line2_;
     KEL.typ.nstr P___Inp_Addr_City_;
@@ -148,13 +152,13 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1376375(E_Input_P_I_I(__in,__cfg).Layout __EE1376369, E_Input_B_I_I_Input_P_I_I(__in,__cfg).Layout __EE1375207) := __EEQP(__EE1375207.P_I_I_,__EE1376369.UID);
-  __ST706070_Layout __JT1376375(E_Input_P_I_I(__in,__cfg).Layout __l, E_Input_B_I_I_Input_P_I_I(__in,__cfg).Layout __r) := TRANSFORM
+  __JC1380268(E_Input_P_I_I(__in,__cfg).Layout __EE1380262, E_Input_B_I_I_Input_P_I_I(__in,__cfg).Layout __EE1379080) := __EEQP(__EE1379080.P_I_I_,__EE1380262.UID);
+  __ST712257_Layout __JT1380268(E_Input_P_I_I(__in,__cfg).Layout __l, E_Input_B_I_I_Input_P_I_I(__in,__cfg).Layout __r) := TRANSFORM
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1376506 := JOIN(__EE1375207,__EE1376369,__JC1376375(RIGHT,LEFT),__JT1376375(RIGHT,LEFT),INNER,SMART);
-  SHARED __ST704614_Layout := RECORD
+  SHARED __EE1380403 := JOIN(__EE1379080,__EE1380262,__JC1380268(RIGHT,LEFT),__JT1380268(RIGHT,LEFT),INNER,SMART);
+  SHARED __ST710769_Layout := RECORD
     KEL.typ.ntyp(E_Input_B_I_I().Typ) UID;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) P_I_I_;
     KEL.typ.ntyp(E_Input_B_I_I().Typ) B_I_I_;
@@ -165,7 +169,11 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.nstr P___Inp_Name_First_;
     KEL.typ.nstr P___Inp_Name_Mid_;
     KEL.typ.nstr P___Inp_Name_Last_;
-    KEL.typ.ntyp(E_Surname().Typ) Last_Name_;
+    KEL.typ.nstr P___Inp_Cln_Surname1_;
+    KEL.typ.nstr P___Inp_Cln_Surname2_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name1_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name2_;
+    KEL.typ.nstr Address_Geo_Link_;
     KEL.typ.nstr P___Inp_Addr_Line1_;
     KEL.typ.nstr P___Inp_Addr_Line2_;
     KEL.typ.nstr P___Inp_Addr_City_;
@@ -291,13 +299,13 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __ST704614_Layout __ND1376511__Project(__ST706070_Layout __PP1376507) := TRANSFORM
-    SELF.UID := __PP1376507.B_I_I_;
-    SELF.U_I_D__1_ := __PP1376507.UID;
-    SELF := __PP1376507;
+  SHARED __ST710769_Layout __ND1380408__Project(__ST712257_Layout __PP1380404) := TRANSFORM
+    SELF.UID := __PP1380404.B_I_I_;
+    SELF.U_I_D__1_ := __PP1380404.UID;
+    SELF := __PP1380404;
   END;
-  SHARED __EE1377032 := PROJECT(__EE1376506,__ND1376511__Project(LEFT));
-  SHARED __ST704888_Layout := RECORD
+  SHARED __EE1380945 := PROJECT(__EE1380403,__ND1380408__Project(LEFT));
+  SHARED __ST711051_Layout := RECORD
     KEL.typ.ntyp(E_Input_B_I_I().Typ) UID;
     KEL.typ.nuid U_I_D__1_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -306,8 +314,8 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE1377046 := PROJECT(__EE1377032,__ST704888_Layout);
-  SHARED __ST704916_Layout := RECORD
+  SHARED __EE1380959 := PROJECT(__EE1380945,__ST711051_Layout);
+  SHARED __ST711079_Layout := RECORD
     KEL.typ.ntyp(E_Input_B_I_I().Typ) UID;
     KEL.typ.ntyp(E_Input_P_I_I().Typ) O_N_L_Y___U_I_D_;
     KEL.typ.epoch Archive___Date_ := 0;
@@ -316,8 +324,8 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Hybrid_Archive_Date_ := 0;
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
   END;
-  SHARED __EE1377061 := PROJECT(__EE1377046,TRANSFORM(__ST704916_Layout,SELF.O_N_L_Y___U_I_D_ := LEFT.U_I_D__1_,SELF := LEFT));
-  SHARED __ST706870_Layout := RECORD
+  SHARED __EE1380974 := PROJECT(__EE1380959,TRANSFORM(__ST711079_Layout,SELF.O_N_L_Y___U_I_D_ := LEFT.U_I_D__1_,SELF := LEFT));
+  SHARED __ST713081_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -415,14 +423,14 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1377067(B_Input_B_I_I_2(__in,__cfg).__ST176723_Layout __EE1372559, __ST704916_Layout __EE1377061) := __EEQP(__EE1372559.UID,__EE1377061.UID);
-  __ST706870_Layout __JT1377067(B_Input_B_I_I_2(__in,__cfg).__ST176723_Layout __l, __ST704916_Layout __r) := TRANSFORM
+  __JC1380980(B_Input_B_I_I_2(__in,__cfg).__ST187634_Layout __EE1376400, __ST711079_Layout __EE1380974) := __EEQP(__EE1376400.UID,__EE1380974.UID);
+  __ST713081_Layout __JT1380980(B_Input_B_I_I_2(__in,__cfg).__ST187634_Layout __l, __ST711079_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1377161 := JOIN(__EE1372559,__EE1377061,__JC1377067(LEFT,RIGHT),__JT1377067(LEFT,RIGHT),LEFT OUTER,SMART,KEEP(1));
-  EXPORT __ST177153_Layout := RECORD
+  SHARED __EE1381074 := JOIN(__EE1376400,__EE1380974,__JC1380980(LEFT,RIGHT),__JT1380980(LEFT,RIGHT),LEFT OUTER,SMART,KEEP(1));
+  EXPORT __ST188064_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -517,5 +525,5 @@ EXPORT B_Input_B_I_I_1(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Input_B_I_I_1 := PROJECT(__EE1377161,TRANSFORM(__ST177153_Layout,SELF.Auth_Rep1_ := LEFT.O_N_L_Y___U_I_D_,SELF := LEFT));
+  EXPORT __ENH_Input_B_I_I_1 := PROJECT(__EE1381074,TRANSFORM(__ST188064_Layout,SELF.Auth_Rep1_ := LEFT.O_N_L_Y___U_I_D_,SELF := LEFT));
 END;

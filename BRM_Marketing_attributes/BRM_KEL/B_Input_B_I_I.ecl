@@ -1,13 +1,13 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT B_Input_B_I_I_1,B_Input_P_I_I_1,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Email,E_Geo_Link,E_Input_P_I_I,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Input_B_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_B_I_I_1(__in,__cfg).__ENH_Input_B_I_I_1) __ENH_Input_B_I_I_1 := B_Input_B_I_I_1(__in,__cfg).__ENH_Input_B_I_I_1;
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1) __ENH_Input_P_I_I_1 := B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1;
-  SHARED __EE1486584 := __ENH_Input_B_I_I_1;
-  SHARED __EE1486587 := __ENH_Input_P_I_I_1;
-  SHARED __ST795504_Layout := RECORD
+  SHARED __EE1490231 := __ENH_Input_B_I_I_1;
+  SHARED __EE1490234 := __ENH_Input_P_I_I_1;
+  SHARED __ST801709_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -102,7 +102,11 @@ EXPORT B_Input_B_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.nstr P___Inp_Name_First_;
     KEL.typ.nstr P___Inp_Name_Mid_;
     KEL.typ.nstr P___Inp_Name_Last_;
-    KEL.typ.ntyp(E_Surname().Typ) Last_Name_;
+    KEL.typ.nstr P___Inp_Cln_Surname1_;
+    KEL.typ.nstr P___Inp_Cln_Surname2_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name1_;
+    KEL.typ.ntyp(E_Surname().Typ) Last_Name2_;
+    KEL.typ.nstr Address_Geo_Link_;
     KEL.typ.nstr P___Inp_Addr_Line1_;
     KEL.typ.nstr P___Inp_Addr_Line2_;
     KEL.typ.nstr P___Inp_Addr_City_;
@@ -230,8 +234,8 @@ EXPORT B_Input_B_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  __JC1487180(B_Input_B_I_I_1(__in,__cfg).__ST177153_Layout __EE1486584, B_Input_P_I_I_1(__in,__cfg).__ST142906_Layout __EE1486587) := __EEQP(__EE1486584.Auth_Rep1_,__EE1486587.UID);
-  __ST795504_Layout __JT1487180(B_Input_B_I_I_1(__in,__cfg).__ST177153_Layout __l, B_Input_P_I_I_1(__in,__cfg).__ST142906_Layout __r) := TRANSFORM
+  __JC1490831(B_Input_B_I_I_1(__in,__cfg).__ST188064_Layout __EE1490231, B_Input_P_I_I_1(__in,__cfg).__ST153889_Layout __EE1490234) := __EEQP(__EE1490231.Auth_Rep1_,__EE1490234.UID);
+  __ST801709_Layout __JT1490831(B_Input_B_I_I_1(__in,__cfg).__ST188064_Layout __l, B_Input_P_I_I_1(__in,__cfg).__ST153889_Layout __r) := TRANSFORM
     SELF.U_I_D__1_ := __r.UID;
     SELF.G___Proc_Bus_U_I_D__1_ := __r.G___Proc_Bus_U_I_D_;
     SELF.Phone_Verification_Bureau__1_ := __r.Phone_Verification_Bureau_;
@@ -245,8 +249,8 @@ EXPORT B_Input_B_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     SELF := __l;
     SELF := __r;
   END;
-  SHARED __EE1487181 := JOIN(__EE1486584,__EE1486587,__JC1487180(LEFT,RIGHT),__JT1487180(LEFT,RIGHT),LEFT OUTER,SMART);
-  EXPORT __ST139209_Layout := RECORD
+  SHARED __EE1490832 := JOIN(__EE1490231,__EE1490234,__JC1490831(LEFT,RIGHT),__JT1490831(LEFT,RIGHT),LEFT OUTER,SMART);
+  EXPORT __ST150210_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -336,20 +340,20 @@ EXPORT B_Input_B_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST139209_Layout __ND1487834__Project(__ST795504_Layout __PP1486597) := TRANSFORM
-    __CC13605 := -99999;
-    SELF.B___Lex_I_D_Legal_Score_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,KEL.Routines.BoundsClip(__PP1486597.B___Lex_I_D_Legal_Score_,__CN(51),__CN(100))),__ECAST(KEL.typ.nint,__CN(__CC13605)));
-    SELF.B___Lex_I_D_Legal_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1486597.B___Lex_I_D_Legal_),__ECAST(KEL.typ.nint,__CN(__CC13605)));
-    SELF.B___Lex_I_D_Loc_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1486597.B___Lex_I_D_Loc_),__ECAST(KEL.typ.nint,__CN(__CC13605)));
-    SELF.B___Lex_I_D_Org_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1486597.B___Lex_I_D_Org_),__ECAST(KEL.typ.nint,__CN(__CC13605)));
-    SELF.B___Lex_I_D_Site_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1486597.B___Lex_I_D_Site_),__ECAST(KEL.typ.nint,__CN(__CC13605)));
-    SELF.B___Lex_I_D_Ult_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1486597.B___Lex_I_D_Ult_),__ECAST(KEL.typ.nint,__CN(__CC13605)));
-    SELF.Bus_Input_Account_Echo_Value_ := __PP1486597.Input_Account_Value_;
-    __CC13602 := '-99999';
-    __CC13607 := '-99998';
-    SELF.Bus_Input_Alternate_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP1486597.B___Inp_Alt_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13602)),__ECAST(KEL.typ.nstr,__PP1486597.B___Inp_Cln_Alt_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13607)));
-    SELF.Bus_Input_Email_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP1486597.B___Inp_Email_),__ECAST(KEL.typ.nstr,__CN(__CC13602)),__ECAST(KEL.typ.nstr,__PP1486597.B___Inp_Cln_Email_),__ECAST(KEL.typ.nstr,__CN(__CC13607)));
-    SELF := __PP1486597;
+  SHARED __ST150210_Layout __ND1491493__Project(__ST801709_Layout __PP1490244) := TRANSFORM
+    __CC13477 := -99999;
+    SELF.B___Lex_I_D_Legal_Score_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,KEL.Routines.BoundsClip(__PP1490244.B___Lex_I_D_Legal_Score_,__CN(51),__CN(100))),__ECAST(KEL.typ.nint,__CN(__CC13477)));
+    SELF.B___Lex_I_D_Legal_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1490244.B___Lex_I_D_Legal_),__ECAST(KEL.typ.nint,__CN(__CC13477)));
+    SELF.B___Lex_I_D_Loc_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1490244.B___Lex_I_D_Loc_),__ECAST(KEL.typ.nint,__CN(__CC13477)));
+    SELF.B___Lex_I_D_Org_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1490244.B___Lex_I_D_Org_),__ECAST(KEL.typ.nint,__CN(__CC13477)));
+    SELF.B___Lex_I_D_Site_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1490244.B___Lex_I_D_Site_),__ECAST(KEL.typ.nint,__CN(__CC13477)));
+    SELF.B___Lex_I_D_Ult_Value_ := FN_Compile(__cfg).FN_Is_Zero(__ECAST(KEL.typ.nint,__PP1490244.B___Lex_I_D_Ult_),__ECAST(KEL.typ.nint,__CN(__CC13477)));
+    SELF.Bus_Input_Account_Echo_Value_ := __PP1490244.Input_Account_Value_;
+    __CC13474 := '-99999';
+    __CC13479 := '-99998';
+    SELF.Bus_Input_Alternate_Name_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP1490244.B___Inp_Alt_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13474)),__ECAST(KEL.typ.nstr,__PP1490244.B___Inp_Cln_Alt_Name_),__ECAST(KEL.typ.nstr,__CN(__CC13479)));
+    SELF.Bus_Input_Email_Clean_Value_ := FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP1490244.B___Inp_Email_),__ECAST(KEL.typ.nstr,__CN(__CC13474)),__ECAST(KEL.typ.nstr,__PP1490244.B___Inp_Cln_Email_),__ECAST(KEL.typ.nstr,__CN(__CC13479)));
+    SELF := __PP1490244;
   END;
-  EXPORT __ENH_Input_B_I_I := PROJECT(__EE1487181,__ND1487834__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I := PROJECT(__EE1490832,__ND1491493__Project(LEFT));
 END;

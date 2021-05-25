@@ -1,7 +1,7 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT PublicRecords_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT CFG_Compile := MODULE, VIRTUAL
   // **** Do not override these definitions - they are used to define the interface to KEL queries ****;
   EXPORT FDCLayout := RECORDOF(PublicRecords_KEL.ECL_Functions.Dataset_FDC);

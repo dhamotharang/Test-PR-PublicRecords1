@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Input_B_I_I FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Input_B_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_B_I_I(__in,__cfg).__Result) __E_Input_B_I_I := E_Input_B_I_I(__in,__cfg).__Result;
-  SHARED __EE191011 := __E_Input_B_I_I;
-  EXPORT __ST163336_Layout := RECORD
+  SHARED __EE201922 := __E_Input_B_I_I;
+  EXPORT __ST174247_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.nint G___Proc_Bus_U_I_D_;
@@ -79,9 +79,9 @@ EXPORT B_Input_B_I_I_9(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST163336_Layout __ND800792__Project(E_Input_B_I_I(__in,__cfg).Layout __PP190661) := TRANSFORM
-    SELF.B___Inp_Addr_ := __OP2(IF(__T(__NT(__PP190661.B___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP190661.B___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP190661.B___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP190661.B___Inp_Addr_Line2_)));
-    SELF := __PP190661;
+  SHARED __ST174247_Layout __ND807001__Project(E_Input_B_I_I(__in,__cfg).Layout __PP201572) := TRANSFORM
+    SELF.B___Inp_Addr_ := __OP2(IF(__T(__NT(__PP201572.B___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP201572.B___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP201572.B___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP201572.B___Inp_Addr_Line2_)));
+    SELF := __PP201572;
   END;
-  EXPORT __ENH_Input_B_I_I_9 := PROJECT(__EE191011,__ND800792__Project(LEFT));
+  EXPORT __ENH_Input_B_I_I_9 := PROJECT(__EE201922,__ND807001__Project(LEFT));
 END;

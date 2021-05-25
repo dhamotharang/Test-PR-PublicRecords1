@@ -88,7 +88,7 @@ EXPORT LIB_B2B_attributes (
   BusinessSeleAttributes_Results := NOCOMBINE(JOIN(BusinessInput, FDCDataset,
                                               LEFT.G_ProcBusUID = RIGHT.G_ProcBusUID,
                                               TRANSFORM({INTEGER G_ProcBusUID, LayoutBusinessSeleIDAttributes},
-                                                        NonFCRABusinessSeleIDResults := PublicRecords_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
+                                                        NonFCRABusinessSeleIDResults := PublicRecords_KEL_Queries.B2B_KEL.Q_Non_F_C_R_A_Business_Sele_I_D_Attributes_V1_Dynamic(
                                                           LEFT.B_LexIDUlt,
                                                           LEFT.B_LexIDOrg,
                                                           LEFT.B_LexIDLegal,

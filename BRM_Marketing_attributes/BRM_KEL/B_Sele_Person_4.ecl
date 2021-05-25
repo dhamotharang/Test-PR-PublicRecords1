@@ -1,11 +1,11 @@
-﻿//HPCC Systems KEL Compiler Version 1.5.0rc1
-IMPORT KEL15 AS KEL;
+﻿//HPCC Systems KEL Compiler Version 1.6.0
+IMPORT KEL16 AS KEL;
 IMPORT B_Sele_Person_5,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Person,E_Sele_Person,E_Surname FROM BRM_Marketing_attributes.BRM_KEL;
-IMPORT * FROM KEL15.Null;
+IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_5(__in,__cfg).__ENH_Sele_Person_5) __ENH_Sele_Person_5 := B_Sele_Person_5(__in,__cfg).__ENH_Sele_Person_5;
-  SHARED __EE900563 := __ENH_Sele_Person_5;
-  EXPORT __ST155024_Layout := RECORD
+  SHARED __EE906645 := __ENH_Sele_Person_5;
+  EXPORT __ST165957_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -24,10 +24,10 @@ EXPORT B_Sele_Person_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST155024_Layout __ND900773__Project(B_Sele_Person_5(__in,__cfg).__ST158030_Layout __PP900564) := TRANSFORM
-    __BS900620 := __T(__PP900564.Contact_Info_);
-    SELF.Is_Executive_Ever_ := EXISTS(__BS900620(__T(__OP2(__T(__PP900564.Contact_Info_).Is_Executive_,=,__CN(TRUE)))));
-    SELF := __PP900564;
+  SHARED __ST165957_Layout __ND906855__Project(B_Sele_Person_5(__in,__cfg).__ST168941_Layout __PP906646) := TRANSFORM
+    __BS906702 := __T(__PP906646.Contact_Info_);
+    SELF.Is_Executive_Ever_ := EXISTS(__BS906702(__T(__OP2(__T(__PP906646.Contact_Info_).Is_Executive_,=,__CN(TRUE)))));
+    SELF := __PP906646;
   END;
-  EXPORT __ENH_Sele_Person_4 := PROJECT(__EE900563,__ND900773__Project(LEFT));
+  EXPORT __ENH_Sele_Person_4 := PROJECT(__EE906645,__ND906855__Project(LEFT));
 END;
