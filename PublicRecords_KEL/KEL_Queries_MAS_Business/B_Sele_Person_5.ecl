@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Sele_Person_6,CFG_Compile,E_Business_Org,E_Business_Sele,E_Business_Sele_Overflow,E_Business_Ult,E_Person,E_Sele_Person,E_Surname FROM PublicRecords_KEL.KEL_Queries_MAS_Business;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Sele_Person_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Sele_Person_6(__in,__cfg).__ENH_Sele_Person_6) __ENH_Sele_Person_6 := B_Sele_Person_6(__in,__cfg).__ENH_Sele_Person_6;
-  SHARED __EE1990564 := __ENH_Sele_Person_6;
-  EXPORT __ST213865_Layout := RECORD
+  SHARED __EE1994165 := __ENH_Sele_Person_6;
+  EXPORT __ST217466_Layout := RECORD
     KEL.typ.ntyp(E_Business_Sele().Typ) Legal_;
     KEL.typ.ntyp(E_Person().Typ) Contact_;
     KEL.typ.nint Ult_I_D_;
@@ -23,10 +23,10 @@ EXPORT B_Sele_Person_5(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST213865_Layout __ND1990687__Project(B_Sele_Person_6(__in,__cfg).__ST217242_Layout __PP1990565) := TRANSFORM
-    __CC65563 := 730;
-    SELF.Two_Years_ := __OP2(__PP1990565.Age_In_Days_,<=,__CN(__CC65563));
-    SELF := __PP1990565;
+  SHARED __ST217466_Layout __ND1994288__Project(B_Sele_Person_6(__in,__cfg).__ST220843_Layout __PP1994166) := TRANSFORM
+    __CC66477 := 730;
+    SELF.Two_Years_ := __OP2(__PP1994166.Age_In_Days_,<=,__CN(__CC66477));
+    SELF := __PP1994166;
   END;
-  EXPORT __ENH_Sele_Person_5 := PROJECT(__EE1990564,__ND1990687__Project(LEFT));
+  EXPORT __ENH_Sele_Person_5 := PROJECT(__EE1994165,__ND1994288__Project(LEFT));
 END;

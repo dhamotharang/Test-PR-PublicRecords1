@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Input_P_I_I_5,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_5(__in,__cfg).__ENH_Input_P_I_I_5) __ENH_Input_P_I_I_5 := B_Input_P_I_I_5(__in,__cfg).__ENH_Input_P_I_I_5;
-  SHARED __EE1132433 := __ENH_Input_P_I_I_5;
-  EXPORT __ST182546_Layout := RECORD
+  SHARED __EE1136547 := __ENH_Input_P_I_I_5;
+  EXPORT __ST186378_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -151,12 +151,12 @@ EXPORT B_Input_P_I_I_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST182546_Layout __ND1133038__Project(B_Input_P_I_I_5(__in,__cfg).__ST182210_Layout __PP1132434) := TRANSFORM
-    SELF.Name_Not_Populated_ := IF(FN_Compile(__cfg).FN_Name_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP1132434.P___Inp_Name_First_),__ECAST(KEL.typ.nstr,__PP1132434.P___Inp_Name_Mid_),__ECAST(KEL.typ.nstr,__PP1132434.P___Inp_Name_Last_)),TRUE,FALSE);
-    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1132434.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1132434.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1132434.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1132434.P___Inp_Addr_Line2_)));
-    __CC13675 := '-99999';
-    SELF.P___Inp_Val_Name_Bogus_Flag_ := MAP(__T(__AND(__AND(__OP2(__PP1132434.Input_First_Name_Value_,=,__CN(__CC13675)),__OP2(__PP1132434.Input_Middle_Name_Value_,=,__CN(__CC13675))),__OP2(__PP1132434.Input_Last_Name_Value_,=,__CN(__CC13675))))=>__CC13675,__T(__OP2(FN_Compile(__cfg).FN__fn_Bogus_Names(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1132434.P___Inp_Name_First_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1132434.Input_Middle_Name_Value_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1132434.Input_Last_Name_Value_))),=,__CAST(KEL.typ.str,__CN(1))))=>(KEL.typ.str)1,(KEL.typ.str)0);
-    SELF := __PP1132434;
+  SHARED __ST186378_Layout __ND1137152__Project(B_Input_P_I_I_5(__in,__cfg).__ST186042_Layout __PP1136548) := TRANSFORM
+    SELF.Name_Not_Populated_ := IF(FN_Compile(__cfg).FN_Name_Not_Populated_Check(__ECAST(KEL.typ.nstr,__PP1136548.P___Inp_Name_First_),__ECAST(KEL.typ.nstr,__PP1136548.P___Inp_Name_Mid_),__ECAST(KEL.typ.nstr,__PP1136548.P___Inp_Name_Last_)),TRUE,FALSE);
+    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1136548.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1136548.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1136548.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1136548.P___Inp_Addr_Line2_)));
+    __CC13684 := '-99999';
+    SELF.P___Inp_Val_Name_Bogus_Flag_ := MAP(__T(__AND(__AND(__OP2(__PP1136548.Input_First_Name_Value_,=,__CN(__CC13684)),__OP2(__PP1136548.Input_Middle_Name_Value_,=,__CN(__CC13684))),__OP2(__PP1136548.Input_Last_Name_Value_,=,__CN(__CC13684))))=>__CC13684,__T(__OP2(FN_Compile(__cfg).FN__fn_Bogus_Names(__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1136548.P___Inp_Name_First_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1136548.Input_Middle_Name_Value_)),__ECAST(KEL.typ.nstr,__FN1(KEL.Routines.ToUpperCase,__PP1136548.Input_Last_Name_Value_))),=,__CAST(KEL.typ.str,__CN(1))))=>(KEL.typ.str)1,(KEL.typ.str)0);
+    SELF := __PP1136548;
   END;
-  EXPORT __ENH_Input_P_I_I_4 := PROJECT(__EE1132433,__ND1133038__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_4 := PROJECT(__EE1136547,__ND1137152__Project(LEFT));
 END;

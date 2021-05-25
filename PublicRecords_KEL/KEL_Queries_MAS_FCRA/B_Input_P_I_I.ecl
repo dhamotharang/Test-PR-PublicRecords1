@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Input_P_I_I_1,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1) __ENH_Input_P_I_I_1 := B_Input_P_I_I_1(__in,__cfg).__ENH_Input_P_I_I_1;
-  SHARED __EE2162156 := __ENH_Input_P_I_I_1;
-  EXPORT __ST151839_Layout := RECORD
+  SHARED __EE2167490 := __ENH_Input_P_I_I_1;
+  EXPORT __ST155440_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -147,12 +147,12 @@ EXPORT B_Input_P_I_I(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_C
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST151839_Layout __ND2162161__Project(B_Input_P_I_I_1(__in,__cfg).__ST158012_Layout __PP2162157) := TRANSFORM
-    __CC13675 := '-99999';
-    __CC13680 := '-99998';
-    SELF.P___Inp_Cln_Arch_Dt_F2_Y_ := MAP(__PP2162157.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13675,__PP2162157.C_U_R_R_E_N_T___D_A_T_E__2_Y_E_A_R_S_ > KEL.Routines.Today()=>__CC13680,KEL.Routines.DateToString(__PP2162157.C_U_R_R_E_N_T___D_A_T_E__2_Y_E_A_R_S_,'%Y%m%d'));
-    SELF.P___Inp_Cln_Arch_Dt_F6_M_ := MAP(__PP2162157.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13675,__PP2162157.C_U_R_R_E_N_T___D_A_T_E__6_M_O_N_T_H_S_ > KEL.Routines.Today()=>__CC13680,KEL.Routines.DateToString(__PP2162157.C_U_R_R_E_N_T___D_A_T_E__6_M_O_N_T_H_S_,'%Y%m%d'));
-    SELF := __PP2162157;
+  SHARED __ST155440_Layout __ND2167495__Project(B_Input_P_I_I_1(__in,__cfg).__ST161613_Layout __PP2167491) := TRANSFORM
+    __CC13684 := '-99999';
+    __CC13689 := '-99998';
+    SELF.P___Inp_Cln_Arch_Dt_F2_Y_ := MAP(__PP2167491.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13684,__PP2167491.C_U_R_R_E_N_T___D_A_T_E__2_Y_E_A_R_S_ > KEL.Routines.Today()=>__CC13689,KEL.Routines.DateToString(__PP2167491.C_U_R_R_E_N_T___D_A_T_E__2_Y_E_A_R_S_,'%Y%m%d'));
+    SELF.P___Inp_Cln_Arch_Dt_F6_M_ := MAP(__PP2167491.P___Inp_Cln_Arch_Dt_Flag_Value_ <> '1'=>__CC13684,__PP2167491.C_U_R_R_E_N_T___D_A_T_E__6_M_O_N_T_H_S_ > KEL.Routines.Today()=>__CC13689,KEL.Routines.DateToString(__PP2167491.C_U_R_R_E_N_T___D_A_T_E__6_M_O_N_T_H_S_,'%Y%m%d'));
+    SELF := __PP2167491;
   END;
-  EXPORT __ENH_Input_P_I_I := PROJECT(__EE2162156,__ND2162161__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I := PROJECT(__EE2167490,__ND2167495__Project(LEFT));
 END;

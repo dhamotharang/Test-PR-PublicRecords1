@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Input_P_I_I_3,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_Shared;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3) __ENH_Input_P_I_I_3 := B_Input_P_I_I_3(__in,__cfg).__ENH_Input_P_I_I_3;
-  SHARED __EE212399 := __ENH_Input_P_I_I_3;
-  EXPORT __ST151311_Layout := RECORD
+  SHARED __EE216933 := __ENH_Input_P_I_I_3;
+  EXPORT __ST154941_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -145,11 +145,11 @@ EXPORT B_Input_P_I_I_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST151311_Layout __ND212938__Project(B_Input_P_I_I_3(__in,__cfg).__ST152004_Layout __PP212400) := TRANSFORM
-    __CC13675 := '-99999';
-    __CC13680 := '-99998';
-    SELF.P___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP212400.Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC13675)),__ECAST(KEL.typ.nstr,__CN(__CC13680)));
-    SELF := __PP212400;
+  SHARED __ST154941_Layout __ND217472__Project(B_Input_P_I_I_3(__in,__cfg).__ST155644_Layout __PP216934) := TRANSFORM
+    __CC13684 := '-99999';
+    __CC13689 := '-99998';
+    SELF.P___Inp_Cln_Addr_Full_Flag_Value_ := FN_Compile(__cfg).FN_Is_Clean_Populated(__ECAST(KEL.typ.nstr,__PP216934.Input_Full_Address_Clean_Value_),__ECAST(KEL.typ.nstr,__CN(__CC13684)),__ECAST(KEL.typ.nstr,__CN(__CC13689)));
+    SELF := __PP216934;
   END;
-  EXPORT __ENH_Input_P_I_I_2 := PROJECT(__EE212399,__ND212938__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_2 := PROJECT(__EE216933,__ND217472__Project(LEFT));
 END;

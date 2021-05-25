@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,B_Name_Summary,B_Name_Summary_1,B_Name_Summary_2,B_Name_Summary_3,B_Name_Summary_4,B_Name_Summary_5,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Input_P_I_I,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
@@ -128,9 +128,9 @@ EXPORT Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic(KEL.typ.str __PFirstName
     SHARED TYPEOF(B_Name_Summary_1(__in,__cfg_Local).__ENH_Name_Summary_1) __ENH_Name_Summary_1 := B_Name_Summary_1_Local.__ENH_Name_Summary_1;
   END;
   SHARED TYPEOF(B_Name_Summary(__in,__cfg_Local).__ENH_Name_Summary) __ENH_Name_Summary := B_Name_Summary_Local.__ENH_Name_Summary;
-  SHARED __EE3831121 := __ENH_Name_Summary;
-  SHARED __EE3831188 := __EE3831121(__T(__AND(__OP2(__EE3831121.First_Name_,=,__CN(__PFirstName_in)),__AND(__OP2(__EE3831121.Last_Name_,=,__CN(__PLastName_in)),__OP2(__EE3831121.Date_Of_Birth_,=,__CN(__PDateOfBirth_in))))));
-  SHARED __ST86957_Layout := RECORD
+  SHARED __EE3837320 := __ENH_Name_Summary;
+  SHARED __EE3837387 := __EE3837320(__T(__AND(__OP2(__EE3837320.First_Name_,=,__CN(__PFirstName_in)),__AND(__OP2(__EE3837320.Last_Name_,=,__CN(__PLastName_in)),__OP2(__EE3837320.Date_Of_Birth_,=,__CN(__PDateOfBirth_in))))));
+  SHARED __ST88995_Layout := RECORD
     KEL.typ.nstr P___Inp_Cln_Name_First_;
     KEL.typ.nstr P___Inp_Cln_Name_Last_;
     KEL.typ.nkdate P___Inp_Cln_D_O_B_;
@@ -144,13 +144,13 @@ EXPORT Q_Non_F_C_R_A_Name_Summary_Attributes_V1_Dynamic(KEL.typ.str __PFirstName
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST86957_Layout __ND3831193__Project(B_Name_Summary(__in,__cfg_Local).__ST149941_Layout __PP3831189) := TRANSFORM
-    SELF.P___Inp_Cln_Name_First_ := __PP3831189.First_Name_;
-    SELF.P___Inp_Cln_Name_Last_ := __PP3831189.Last_Name_;
-    SELF.P___Inp_Cln_D_O_B_ := __PP3831189.Date_Of_Birth_;
-    SELF := __PP3831189;
+  SHARED __ST88995_Layout __ND3837392__Project(B_Name_Summary(__in,__cfg_Local).__ST153542_Layout __PP3837388) := TRANSFORM
+    SELF.P___Inp_Cln_Name_First_ := __PP3837388.First_Name_;
+    SELF.P___Inp_Cln_Name_Last_ := __PP3837388.Last_Name_;
+    SELF.P___Inp_Cln_D_O_B_ := __PP3837388.Date_Of_Birth_;
+    SELF := __PP3837388;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE3831188,__ND3831193__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_},P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_,MERGE),__ST86957_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE3837387,__ND3837392__Project(LEFT)),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_},P___Inp_Cln_Name_First_,P___Inp_Cln_Name_Last_,P___Inp_Cln_D_O_B_,P_I___Src_W_Inp_F_L_D_List_Ev_,P_I___Src_W_Inp_F_L_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_D_Last_Dt_List_Ev_,MERGE),__ST88995_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Name_Summary_Result := __UNWRAP(E_Name_Summary_Filtered.__Result);

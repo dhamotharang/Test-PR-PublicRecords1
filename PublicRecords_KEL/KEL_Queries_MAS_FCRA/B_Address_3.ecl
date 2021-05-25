@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile,E_Address,E_Geo_Link,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Address(__in,__cfg).__Result) __E_Address := E_Address(__in,__cfg).__Result;
-  SHARED __EE304160 := __E_Address;
-  EXPORT __ST165737_Layout := RECORD
+  SHARED __EE307942 := __E_Address;
+  EXPORT __ST169340_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -43,12 +43,12 @@ EXPORT B_Address_3(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST165737_Layout __ND307064__Project(E_Address(__in,__cfg).Layout __PP303521) := TRANSFORM
-    __EE303965 := __PP303521.A_D_V_O_Summary_;
-    __BS304291 := __T(__EE303965);
-    __EE304311 := __BN(TOPN(__BS304291(__NN(__T(__EE303965).A_D_V_O_Date_First_Seen_)),1, -__T(__T(__EE303965).A_D_V_O_Date_First_Seen_),__T(Vacancy_Indicator_),__T(Throw_Back_Indicator_),__T(Seasonal_Delivery_Indicator_),__T(Style_Code_),__T(Drop_Indicator_),__T(College_Indicator_),__T(Only_Way_To_Get_Mail_Indicator_),__T(Residential_Or_Business_Indicator_),__T(Do_Not_Deliver_Indicator_),__T(A_D_V_O_Date_Last_Seen_)),__NL(__EE303965));
-    SELF.Bestchild_Advo_ := __EE304311;
-    SELF := __PP303521;
+  SHARED __ST169340_Layout __ND310846__Project(E_Address(__in,__cfg).Layout __PP307303) := TRANSFORM
+    __EE307747 := __PP307303.A_D_V_O_Summary_;
+    __BS308073 := __T(__EE307747);
+    __EE308093 := __BN(TOPN(__BS308073(__NN(__T(__EE307747).A_D_V_O_Date_First_Seen_)),1, -__T(__T(__EE307747).A_D_V_O_Date_First_Seen_),__T(Vacancy_Indicator_),__T(Throw_Back_Indicator_),__T(Seasonal_Delivery_Indicator_),__T(Style_Code_),__T(Drop_Indicator_),__T(College_Indicator_),__T(Only_Way_To_Get_Mail_Indicator_),__T(Residential_Or_Business_Indicator_),__T(Do_Not_Deliver_Indicator_),__T(A_D_V_O_Date_Last_Seen_)),__NL(__EE307747));
+    SELF.Bestchild_Advo_ := __EE308093;
+    SELF := __PP307303;
   END;
-  EXPORT __ENH_Address_3 := PROJECT(__EE304160,__ND307064__Project(LEFT));
+  EXPORT __ENH_Address_3 := PROJECT(__EE307942,__ND310846__Project(LEFT));
 END;

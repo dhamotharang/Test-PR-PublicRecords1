@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Input_P_I_I,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Input_P_I_I(__in,__cfg).__Result) __E_Input_P_I_I := E_Input_P_I_I(__in,__cfg).__Result;
-  SHARED __EE226285 := __E_Input_P_I_I;
-  EXPORT __ST183521_Layout := RECORD
+  SHARED __EE229908 := __E_Input_P_I_I;
+  EXPORT __ST187126_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -145,11 +145,11 @@ EXPORT B_Input_P_I_I_8(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST183521_Layout __ND1573598__Project(E_Input_P_I_I(__in,__cfg).Layout __PP225607) := TRANSFORM
-    __CC13680 := '-99998';
-    __CC13675 := '-99999';
-    SELF.Input_S_S_N_Clean_Value_ := IF(__T(__OP2(__FN1(LENGTH,__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nint,__PP225607.P___Inp_Cln_S_S_N_))),>,__CN(9))),__ECAST(KEL.typ.nstr,__CN(__CC13680)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP225607.P___Inp_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13675)),__ECAST(KEL.typ.nstr,__PP225607.P___Inp_Cln_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13680)))));
-    SELF := __PP225607;
+  SHARED __ST187126_Layout __ND1577909__Project(E_Input_P_I_I(__in,__cfg).Layout __PP229230) := TRANSFORM
+    __CC13689 := '-99998';
+    __CC13684 := '-99999';
+    SELF.Input_S_S_N_Clean_Value_ := IF(__T(__OP2(__FN1(LENGTH,__ECAST(KEL.typ.nstr,__ECAST(KEL.typ.nint,__PP229230.P___Inp_Cln_S_S_N_))),>,__CN(9))),__ECAST(KEL.typ.nstr,__CN(__CC13689)),__ECAST(KEL.typ.nstr,FN_Compile(__cfg).FN_Is_Blank2_Fields(__ECAST(KEL.typ.nstr,__PP229230.P___Inp_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13684)),__ECAST(KEL.typ.nstr,__PP229230.P___Inp_Cln_S_S_N_),__ECAST(KEL.typ.nstr,__CN(__CC13689)))));
+    SELF := __PP229230;
   END;
-  EXPORT __ENH_Input_P_I_I_8 := PROJECT(__EE226285,__ND1573598__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_8 := PROJECT(__EE229908,__ND1577909__Project(LEFT));
 END;

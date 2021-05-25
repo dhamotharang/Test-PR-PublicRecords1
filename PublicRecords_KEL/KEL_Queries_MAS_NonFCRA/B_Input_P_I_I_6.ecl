@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Input_P_I_I_7,B_Input_P_I_I_8,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code,FN_Compile FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Input_P_I_I_7(__in,__cfg).__ENH_Input_P_I_I_7) __ENH_Input_P_I_I_7 := B_Input_P_I_I_7(__in,__cfg).__ENH_Input_P_I_I_7;
-  SHARED __EE1597684 := __ENH_Input_P_I_I_7;
-  EXPORT __ST188590_Layout := RECORD
+  SHARED __EE1601995 := __ENH_Input_P_I_I_7;
+  EXPORT __ST191972_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.nstr P___Inp_Acct_;
@@ -149,13 +149,13 @@ EXPORT B_Input_P_I_I_6(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST188590_Layout __ND1598252__Project(B_Input_P_I_I_8(__in,__cfg).__ST183521_Layout __PP1597685) := TRANSFORM
-    __CC13675 := '-99999';
-    SELF.Input_First_Name_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP1597685.P___Inp_Name_First_),__ECAST(KEL.typ.nstr,__CN(__CC13675)));
-    SELF.Input_Last_Name_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP1597685.P___Inp_Name_Last_),__ECAST(KEL.typ.nstr,__CN(__CC13675)));
-    SELF.Input_Middle_Name_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP1597685.P___Inp_Name_Mid_),__ECAST(KEL.typ.nstr,__CN(__CC13675)));
-    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1597685.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1597685.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1597685.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1597685.P___Inp_Addr_Line2_)));
-    SELF := __PP1597685;
+  SHARED __ST191972_Layout __ND1602563__Project(B_Input_P_I_I_8(__in,__cfg).__ST187126_Layout __PP1601996) := TRANSFORM
+    __CC13684 := '-99999';
+    SELF.Input_First_Name_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP1601996.P___Inp_Name_First_),__ECAST(KEL.typ.nstr,__CN(__CC13684)));
+    SELF.Input_Last_Name_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP1601996.P___Inp_Name_Last_),__ECAST(KEL.typ.nstr,__CN(__CC13684)));
+    SELF.Input_Middle_Name_Value_ := FN_Compile(__cfg).FN_Is_Blank(__ECAST(KEL.typ.nstr,__PP1601996.P___Inp_Name_Mid_),__ECAST(KEL.typ.nstr,__CN(__CC13684)));
+    SELF.P___Inp_Addr_ := __OP2(IF(__T(__NT(__PP1601996.P___Inp_Addr_Line1_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__OP2(__PP1601996.P___Inp_Addr_Line1_,+,__CN(' ')))),+,IF(__T(__NT(__PP1601996.P___Inp_Addr_Line2_)),__ECAST(KEL.typ.nstr,__CN('')),__ECAST(KEL.typ.nstr,__PP1601996.P___Inp_Addr_Line2_)));
+    SELF := __PP1601996;
   END;
-  EXPORT __ENH_Input_P_I_I_6 := PROJECT(__EE1597684,__ND1598252__Project(LEFT));
+  EXPORT __ENH_Input_P_I_I_6 := PROJECT(__EE1601995,__ND1602563__Project(LEFT));
 END;

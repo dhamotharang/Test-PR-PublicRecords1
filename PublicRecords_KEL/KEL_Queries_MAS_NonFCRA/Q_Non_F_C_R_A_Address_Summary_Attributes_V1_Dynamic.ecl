@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT PublicRecords_KEL;
 IMPORT B_Address_Summary,B_Address_Summary_1,B_Address_Summary_2,B_Address_Summary_3,B_Address_Summary_4,B_Address_Summary_5,B_Input_P_I_I_2,B_Input_P_I_I_3,B_Input_P_I_I_4,B_Input_P_I_I_5,B_Input_P_I_I_6,B_Input_P_I_I_7,B_Input_P_I_I_8,CFG_Compile,E_Address,E_Address_Slim,E_Address_Summary,E_Email,E_Geo_Link,E_Input_P_I_I,E_Name_Summary,E_Person,E_Phone,E_Phone_Summary,E_Property,E_S_S_N_Summary,E_Social_Security_Number,E_Surname,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
@@ -132,9 +132,9 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic(KEL.typ.str __PPrimar
     SHARED TYPEOF(B_Address_Summary_1(__in,__cfg_Local).__ENH_Address_Summary_1) __ENH_Address_Summary_1 := B_Address_Summary_1_Local.__ENH_Address_Summary_1;
   END;
   SHARED TYPEOF(B_Address_Summary(__in,__cfg_Local).__ENH_Address_Summary) __ENH_Address_Summary := B_Address_Summary_Local.__ENH_Address_Summary;
-  SHARED __EE3831228 := __ENH_Address_Summary;
-  SHARED __EE3831305 := __EE3831228(__T(__AND(__OP2(__EE3831228.Primary_Name_,=,__CN(__PPrimaryName_in)),__AND(__OP2(__EE3831228.Primary_Range_,=,__CN(__PPrimaryRange_in)),__OP2(__EE3831228.Zip_,=,__CN(__PZIP5_in))))));
-  SHARED __ST87510_Layout := RECORD
+  SHARED __EE3837427 := __ENH_Address_Summary;
+  SHARED __EE3837504 := __EE3837427(__T(__AND(__OP2(__EE3837427.Primary_Name_,=,__CN(__PPrimaryName_in)),__AND(__OP2(__EE3837427.Primary_Range_,=,__CN(__PPrimaryRange_in)),__OP2(__EE3837427.Zip_,=,__CN(__PZIP5_in))))));
+  SHARED __ST89548_Layout := RECORD
     KEL.typ.nstr P_I___Src_W_Inp_F_L_A_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_;
     KEL.typ.nstr P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_;
@@ -148,7 +148,7 @@ EXPORT Q_Non_F_C_R_A_Address_Summary_Attributes_V1_Dynamic(KEL.typ.str __PPrimar
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE3831305,__ST87510_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_},P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_,MERGE),__ST87510_Layout));
+  EXPORT Res0 := __UNWRAP(PROJECT(TABLE(PROJECT(__EE3837504,__ST89548_Layout),{KEL.typ.int __RecordCount := SUM(GROUP,__RecordCount),KEL.typ.epoch Archive___Date_ := KEL.era.SimpleRoll(GROUP,Archive___Date_,MIN,FALSE),KEL.typ.epoch Date_First_Seen_ := KEL.era.SimpleRoll(GROUP,Date_First_Seen_,MIN,FALSE),KEL.typ.epoch Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Date_Last_Seen_,MAX,FALSE),KEL.typ.epoch Hybrid_Archive_Date_ := KEL.era.SimpleRoll(GROUP,Hybrid_Archive_Date_,MIN,FALSE),KEL.typ.epoch Vault_Date_Last_Seen_ := KEL.era.SimpleRoll(GROUP,Vault_Date_Last_Seen_,MAX,NMAX),P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_},P_I___Src_W_Inp_F_L_A_List_Ev_,P_I___Src_W_Inp_F_L_A_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_F_L_A_Last_Dt_List_Ev_,P_I___Src_W_Inp_A_D_List_Ev_,P_I___Src_W_Inp_A_D_Emrg_Dt_List_Ev_,P_I___Src_W_Inp_A_D_Last_Dt_List_Ev_,MERGE),__ST89548_Layout));
   EXPORT DBG_E_Input_P_I_I_PreEntity := __UNWRAP(E_Input_P_I_I_Params(__in,__cfg_Local).InData);
   EXPORT DBG_E_Input_P_I_I_Result := __UNWRAP(E_Input_P_I_I_Filtered.__Result);
   EXPORT DBG_E_Address_Summary_Result := __UNWRAP(E_Address_Summary_Filtered.__Result);

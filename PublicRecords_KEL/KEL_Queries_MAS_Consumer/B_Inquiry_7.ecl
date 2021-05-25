@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile,E_Inquiry FROM PublicRecords_KEL.KEL_Queries_MAS_Consumer;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Inquiry_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(E_Inquiry(__in,__cfg).__Result) __E_Inquiry := E_Inquiry(__in,__cfg).__Result;
-  SHARED __EE291888 := __E_Inquiry;
-  EXPORT __ST159142_Layout := RECORD
+  SHARED __EE295489 := __E_Inquiry;
+  EXPORT __ST162743_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Transaction_I_D_;
     KEL.typ.nstr Sequence_Number_;
@@ -24,10 +24,10 @@ EXPORT B_Inquiry_7(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Com
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST159142_Layout __ND291821__Project(E_Inquiry(__in,__cfg).Layout __PP165929) := TRANSFORM
-    __EE291814 := __PP165929.Bus_Intel_;
-    SELF.Inquiry_Sub_Market_ := __DEFAULT((__T(__EE291814))[1].Sub_Market_,'');
-    SELF := __PP165929;
+  SHARED __ST162743_Layout __ND295422__Project(E_Inquiry(__in,__cfg).Layout __PP169530) := TRANSFORM
+    __EE295415 := __PP169530.Bus_Intel_;
+    SELF.Inquiry_Sub_Market_ := __DEFAULT((__T(__EE295415))[1].Sub_Market_,'');
+    SELF := __PP169530;
   END;
-  EXPORT __ENH_Inquiry_7 := PROJECT(__EE291888,__ND291821__Project(LEFT));
+  EXPORT __ENH_Inquiry_7 := PROJECT(__EE295489,__ND295422__Project(LEFT));
 END;

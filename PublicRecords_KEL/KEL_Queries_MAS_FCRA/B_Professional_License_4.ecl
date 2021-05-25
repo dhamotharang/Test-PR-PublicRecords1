@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Professional_License_5,CFG_Compile,E_Professional_License FROM PublicRecords_KEL.KEL_Queries_MAS_FCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5) __ENH_Professional_License_5 := B_Professional_License_5(__in,__cfg).__ENH_Professional_License_5;
-  SHARED __EE1168351 := __ENH_Professional_License_5;
-  EXPORT __ST170937_Layout := RECORD
+  SHARED __EE1172969 := __ENH_Professional_License_5;
+  EXPORT __ST174542_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr License_Number_;
     KEL.typ.nstr License_State_;
@@ -29,10 +29,10 @@ EXPORT B_Professional_License_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDef
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST170937_Layout __ND1168535__Project(B_Professional_License_5(__in,__cfg).__ST172849_Layout __PP1168352) := TRANSFORM
-    SELF.Is_Active_ := __OP2(__PP1168352.Max_Expire_Date_,>,__PP1168352.B_U_I_L_D___D_A_T_E_);
-    SELF.Valid_Professional_License_ := __AND(__OP2(__PP1168352.License_Number_,<>,__CN('')),__OR(__OP2(__PP1168352.Max_Issue_Date_,<,__PP1168352.B_U_I_L_D___D_A_T_E_),__NT(__PP1168352.Max_Issue_Date_)));
-    SELF := __PP1168352;
+  SHARED __ST174542_Layout __ND1173153__Project(B_Professional_License_5(__in,__cfg).__ST176454_Layout __PP1172970) := TRANSFORM
+    SELF.Is_Active_ := __OP2(__PP1172970.Max_Expire_Date_,>,__PP1172970.B_U_I_L_D___D_A_T_E_);
+    SELF.Valid_Professional_License_ := __AND(__OP2(__PP1172970.License_Number_,<>,__CN('')),__OR(__OP2(__PP1172970.Max_Issue_Date_,<,__PP1172970.B_U_I_L_D___D_A_T_E_),__NT(__PP1172970.Max_Issue_Date_)));
+    SELF := __PP1172970;
   END;
-  EXPORT __ENH_Professional_License_4 := PROJECT(__EE1168351,__ND1168535__Project(LEFT));
+  EXPORT __ENH_Professional_License_4 := PROJECT(__EE1172969,__ND1173153__Project(LEFT));
 END;

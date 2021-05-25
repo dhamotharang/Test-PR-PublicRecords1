@@ -1,4 +1,4 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT CFG_Compile,E_Address,E_Address_Property,E_Geo_Link,E_Property,E_Zip_Code FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
 IMPORT * FROM KEL16.Null;
@@ -6,8 +6,8 @@ EXPORT B_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
   SHARED VIRTUAL TYPEOF(E_Address(__in,__cfg).__Result) __E_Address := E_Address(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(E_Address_Property(__in,__cfg).__Result) __E_Address_Property := E_Address_Property(__in,__cfg).__Result;
   SHARED VIRTUAL TYPEOF(E_Property(__in,__cfg).__Result) __E_Property := E_Property(__in,__cfg).__Result;
-  SHARED __EE346570 := __E_Property;
-  SHARED __ST347060_Layout := RECORD
+  SHARED __EE350432 := __E_Property;
+  SHARED __ST350922_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -27,18 +27,18 @@ EXPORT B_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __EE346482 := __E_Address_Property;
-  SHARED __EE1709158 := __EE346482(__NN(__EE346482.Location_) AND __NN(__EE346482.Prop_));
-  SHARED __EE346496 := __E_Address;
-  SHARED __EE346508 := __EE346496.A_D_V_O_Summary_;
-  __JC1709467(E_Address(__in,__cfg).A_D_V_O_Summary_Layout __EE346508) := __T(__OP2(__EE346508.Residential_Or_Business_Indicator_,IN,__CN(['B','D'])));
-  SHARED __EE1709468 := __EE346496(EXISTS(__CHILDJOINFILTER(__EE346508,__JC1709467)));
-  __JC1709590(E_Address_Property(__in,__cfg).Layout __EE1709158, E_Address(__in,__cfg).Layout __EE1709468) := __EEQP(__EE1709158.Location_,__EE1709468.UID);
-  SHARED __EE1709614 := JOIN(__EE1709158,__EE1709468,__JC1709590(LEFT,RIGHT),TRANSFORM(E_Address_Property(__in,__cfg).Layout,SELF:=LEFT),HASH,KEEP(1));
-  __JC1709620(E_Property(__in,__cfg).Layout __EE346570, E_Address_Property(__in,__cfg).Layout __EE1709614) := __EEQP(__EE346570.UID,__EE1709614.Prop_);
-  __JF1709620(E_Address_Property(__in,__cfg).Layout __EE1709614) := __NN(__EE1709614.Prop_);
-  SHARED __EE1709656 := JOIN(__EE346570,__EE1709614,__JC1709620(LEFT,RIGHT),TRANSFORM(__ST347060_Layout,SELF:=LEFT,SELF.Address_Property_:=__JF1709620(RIGHT)),HASH,LEFT OUTER,KEEP(1));
-  EXPORT __ST177434_Layout := RECORD
+  SHARED __EE350344 := __E_Address_Property;
+  SHARED __EE1714311 := __EE350344(__NN(__EE350344.Location_) AND __NN(__EE350344.Prop_));
+  SHARED __EE350358 := __E_Address;
+  SHARED __EE350370 := __EE350358.A_D_V_O_Summary_;
+  __JC1714620(E_Address(__in,__cfg).A_D_V_O_Summary_Layout __EE350370) := __T(__OP2(__EE350370.Residential_Or_Business_Indicator_,IN,__CN(['B','D'])));
+  SHARED __EE1714621 := __EE350358(EXISTS(__CHILDJOINFILTER(__EE350370,__JC1714620)));
+  __JC1714743(E_Address_Property(__in,__cfg).Layout __EE1714311, E_Address(__in,__cfg).Layout __EE1714621) := __EEQP(__EE1714311.Location_,__EE1714621.UID);
+  SHARED __EE1714767 := JOIN(__EE1714311,__EE1714621,__JC1714743(LEFT,RIGHT),TRANSFORM(E_Address_Property(__in,__cfg).Layout,SELF:=LEFT),HASH,KEEP(1));
+  __JC1714773(E_Property(__in,__cfg).Layout __EE350432, E_Address_Property(__in,__cfg).Layout __EE1714767) := __EEQP(__EE350432.UID,__EE1714767.Prop_);
+  __JF1714773(E_Address_Property(__in,__cfg).Layout __EE1714767) := __NN(__EE1714767.Prop_);
+  SHARED __EE1714809 := JOIN(__EE350432,__EE1714767,__JC1714773(LEFT,RIGHT),TRANSFORM(__ST350922_Layout,SELF:=LEFT,SELF.Address_Property_:=__JF1714773(RIGHT)),HASH,LEFT OUTER,KEEP(1));
+  EXPORT __ST181039_Layout := RECORD
     KEL.typ.nuid UID;
     KEL.typ.nstr Primary_Range_;
     KEL.typ.nstr Predirectional_;
@@ -58,5 +58,5 @@ EXPORT B_Property_4(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Co
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ENH_Property_4 := PROJECT(__EE1709656,TRANSFORM(__ST177434_Layout,SELF.Is_Business_Address_ := LEFT.Address_Property_,SELF := LEFT));
+  EXPORT __ENH_Property_4 := PROJECT(__EE1714809,TRANSFORM(__ST181039_Layout,SELF.Is_Business_Address_ := LEFT.Address_Property_,SELF := LEFT));
 END;

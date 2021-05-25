@@ -1,11 +1,11 @@
-//HPCC Systems KEL Compiler Version 1.6.0
+﻿//HPCC Systems KEL Compiler Version 1.6.0
 IMPORT KEL16 AS KEL;
 IMPORT B_Person_S_S_N_3,CFG_Compile,E_Person,E_Person_S_S_N,E_Social_Security_Number FROM PublicRecords_KEL.KEL_Queries_MAS_NonFCRA;
 IMPORT * FROM KEL16.Null;
 EXPORT B_Person_S_S_N_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CFG_Compile __cfg = CFG_Compile) := MODULE
   SHARED VIRTUAL TYPEOF(B_Person_S_S_N_3(__in,__cfg).__ENH_Person_S_S_N_3) __ENH_Person_S_S_N_3 := B_Person_S_S_N_3(__in,__cfg).__ENH_Person_S_S_N_3;
-  SHARED __EE2565313 := __ENH_Person_S_S_N_3;
-  EXPORT __ST169150_Layout := RECORD
+  SHARED __EE2571103 := __ENH_Person_S_S_N_3;
+  EXPORT __ST172753_Layout := RECORD
     KEL.typ.nstr Source_;
     KEL.typ.nbool Header_Hit_Flag_;
     KEL.typ.nbool F_D_N_Indicator_;
@@ -18,11 +18,11 @@ EXPORT B_Person_S_S_N_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  EXPORT __ST169142_Layout := RECORD
+  EXPORT __ST172745_Layout := RECORD
     KEL.typ.ntyp(E_Person().Typ) Subject_;
     KEL.typ.ntyp(E_Social_Security_Number().Typ) Social_;
     KEL.typ.ndataset(E_Person_S_S_N(__in,__cfg).Valid_S_S_N_Layout) Valid_S_S_N_;
-    KEL.typ.ndataset(__ST169150_Layout) Data_Sources_;
+    KEL.typ.ndataset(__ST172753_Layout) Data_Sources_;
     KEL.typ.bool Is_Best_S_S_N_ := FALSE;
     KEL.typ.epoch Archive___Date_ := 0;
     KEL.typ.epoch Date_First_Seen_ := 0;
@@ -31,10 +31,10 @@ EXPORT B_Person_S_S_N_2(CFG_Compile.FDCDataset __in = CFG_Compile.FDCDefault, CF
     KEL.typ.epoch Vault_Date_Last_Seen_ := 0;
     KEL.typ.int __RecordCount := 0;
   END;
-  SHARED __ST169142_Layout __ND2565318__Project(B_Person_S_S_N_3(__in,__cfg).__ST193769_Layout __PP2565314) := TRANSFORM
-    __EE2565333 := __PP2565314.Data_Sources_;
-    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE2565333),__ST169150_Layout),__NL(__EE2565333));
-    SELF := __PP2565314;
+  SHARED __ST172745_Layout __ND2571108__Project(B_Person_S_S_N_3(__in,__cfg).__ST197380_Layout __PP2571104) := TRANSFORM
+    __EE2571123 := __PP2571104.Data_Sources_;
+    SELF.Data_Sources_ := __BN(PROJECT(__T(__EE2571123),__ST172753_Layout),__NL(__EE2571123));
+    SELF := __PP2571104;
   END;
-  EXPORT __ENH_Person_S_S_N_2 := PROJECT(__EE2565313,__ND2565318__Project(LEFT));
+  EXPORT __ENH_Person_S_S_N_2 := PROJECT(__EE2571103,__ND2571108__Project(LEFT));
 END;
